@@ -2,57 +2,204 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SPRINGDRILL - Signup</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - Create Account</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.5)), url('tech3.jpg'); background-size: cover; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .signup-container { background: white; padding: 2.5rem; border-radius: 20px; width: 100%; max-width: 450px; }
+        body {
+            background: #f4f7fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 15px;
+        }
+        .signup-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: none;
+            width: 100%;
+            max-width: 550px;
+        }
+        .form-control, .form-select {
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #2ecc71;
+            box-shadow: 0 0 0 0.25rem rgba(46, 204, 113, 0.25);
+            background-color: white;
+        }
+        .btn-success {
+            background-color: #2ecc71;
+            border-color: #2ecc71;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .btn-success:hover {
+            background-color: #27ae60;
+            border-color: #27ae60;
+        }
     </style>
 </head>
 <body>
-    <div class="signup-container">
-        <h2 class="text-center mb-4">Create Account</h2>
-        <div id="alertBox" class="alert d-none"></div>
+    <div class="signup-card">
+        <div class="text-center mb-4">
+            <i class="fas fa-user-plus fa-3x mb-3 text-success"></i>
+            <h2 class="fw-bold">Create Account</h2>
+            <p class="text-muted">Register to access the Springdrill platform</p>
+        </div>
+
+        <div id="alertBox" class="alert d-none" role="alert"></div>
+
         <form id="signupForm">
-            <div class="mb-3"><label>Full Name</label><input type="text" id="name" class="form-control" required></div>
-            <div class="mb-3"><label>Email</label><input type="email" id="email" class="form-control" required></div>
-            <div class="mb-3"><label>Password</label><input type="password" id="password" class="form-control" required minlength="6"></div>
-            <div class="mb-3">
-                <label>Role</label>
-                <select id="role" class="form-select" required>
-                    <option value="student">Student</option>
-                    <option value="teacher">Teacher</option>
-                </select>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Full Name</label>
+                    <input type="text" id="name" class="form-control" placeholder="John Doe" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="john@example.com" required>
+                </div>
             </div>
-            <div class="mb-3" id="class-div"><label>Class</label><select id="class_id" class="form-select"></select></div>
-            <button type="submit" class="btn btn-success w-100" id="submitBtn">Sign Up</button>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Password</label>
+                <input type="password" id="password" class="form-control" placeholder="Minimum 6 characters" required minlength="6">
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label class="form-label fw-semibold">I am registering as a:</label>
+                    <select id="role" class="form-select" required>
+                        <option value="student" selected>Student</option>
+                        <option value="teacher">Teacher / Staff</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-6 mb-4" id="class-div">
+                    <label class="form-label fw-semibold">Select Class</label>
+                    <select id="class_id" class="form-select">
+                        <option value="">Loading classes...</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100" id="submitBtn">
+                Complete Registration <i class="fas fa-check-circle ms-2"></i>
+            </button>
         </form>
+
+        <div class="text-center mt-4 border-top pt-3">
+            <p class="text-muted mb-0">Already have an account? <a href="login.html" class="text-decoration-none fw-bold text-success">Sign In</a></p>
+        </div>
     </div>
+
     <script type="module">
         import { supabase } from './supabaseClient.js';
-        const roleSel = document.getElementById('role');
-        roleSel.onchange = () => document.getElementById('class-div').style.display = roleSel.value === 'student' ? 'block' : 'none';
-        
-        async function loadClasses() {
-            const { data } = await supabase.from('classes').select('*');
-            document.getElementById('class_id').innerHTML = data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-        }
-        loadClasses();
 
-        document.getElementById('signupForm').onsubmit = async (e) => {
+        // Toggle Class dropdown based on Role selection
+        const roleSel = document.getElementById('role');
+        const classDiv = document.getElementById('class-div');
+        
+        roleSel.addEventListener('change', () => {
+            if (roleSel.value === 'student') {
+                classDiv.style.display = 'block';
+                document.getElementById('class_id').required = true;
+            } else {
+                classDiv.style.display = 'none';
+                document.getElementById('class_id').required = false;
+            }
+        });
+        
+        // Fetch Nigerian Curriculum classes from Supabase
+        async function loadClasses() {
+            try {
+                const { data, error } = await supabase.from('classes').select('*').order('id', { ascending: true });
+                if (error) throw error;
+                
+                const classSelect = document.getElementById('class_id');
+                if (data.length > 0) {
+                    classSelect.innerHTML = '<option value="" disabled selected>Choose your class...</option>' + 
+                                            data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                } else {
+                    classSelect.innerHTML = '<option value="">No classes found in database</option>';
+                }
+            } catch (err) {
+                console.error("Error loading classes:", err);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', loadClasses);
+
+        // Handle Form Submission
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            const btn = document.getElementById('submitBtn');
+            const alertBox = document.getElementById('alertBox');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            btn.disabled = true;
+            
+            const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const { data, error } = await supabase.auth.signUp({ email, password });
-            if (error) alert(error.message);
-            else {
+            const role = roleSel.value;
+            const class_id = document.getElementById('class_id').value;
+
+            try {
+                // 1. Create User in Auth
+                const { data, error } = await supabase.auth.signUp({ email, password });
+                if (error) throw error;
+                
                 const userId = data.user.id;
-                await supabase.from('users').insert([{ id: userId, email, name: document.getElementById('name').value, role: roleSel.value, username: email.split('@')[0] }]);
-                if (roleSel.value === 'student') await supabase.from('students').insert([{ user_id: userId, class_id: document.getElementById('class_id').value, approved: false }]);
-                else await supabase.from('teachers').insert([{ user_id: userId, approved: false }]);
-                alert('Account created! Awaiting admin approval.');
+                
+                // 2. Add to public.users table
+                const { error: userErr } = await supabase.from('users').insert([{ 
+                    id: userId, 
+                    email: email, 
+                    name: name, 
+                    role: role, 
+                    username: email.split('@')[0] 
+                }]);
+                if (userErr) throw userErr;
+
+                // 3. Add to specific role table
+                if (role === 'student') {
+                    const { error: studentErr } = await supabase.from('students').insert([{ 
+                        user_id: userId, 
+                        class_id: class_id, 
+                        approved: false 
+                    }]);
+                    if (studentErr) throw studentErr;
+                } else {
+                    const { error: teacherErr } = await supabase.from('teachers').insert([{ 
+                        user_id: userId, 
+                        approved: false 
+                    }]);
+                    if (teacherErr) throw teacherErr;
+                }
+
+                // Success Message
+                alertBox.className = 'alert alert-success';
+                alertBox.innerHTML = '<i class="fas fa-check-circle me-2"></i> Registration successful! Awaiting admin approval. You may now proceed to login.';
+                document.getElementById('signupForm').reset();
+
+            } catch (err) {
+                alertBox.className = 'alert alert-danger';
+                alertBox.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i> ${err.message}`;
+            } finally {
+                btn.innerHTML = 'Complete Registration <i class="fas fa-check-circle ms-2"></i>';
+                btn.disabled = false;
             }
-        };
+        });
     </script>
 </body>
 </html>

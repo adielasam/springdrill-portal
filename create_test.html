@@ -3,141 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRING DRILL - Create Test</title>
+    <title>SPRINGDRILL - Create Test</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* ... Keep all your original CSS variables and styles here exactly as they were ... */
-        :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            --border-radius: 16px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        body {
+            background-color: #f4f7fa;
+            overflow-x: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .main-container { max-width: 1200px; margin: 0 auto; }
-        .header-card, .form-container { background: rgba(255, 255, 255, 0.95); border-radius: var(--border-radius); padding: 2rem; margin-bottom: 2rem; box-shadow: var(--card-shadow); }
-        .form-section { margin-bottom: 2.5rem; padding: 1.5rem; background: rgba(102, 126, 234, 0.05); border-radius: 12px; }
-        .form-control, .form-select { border: 2px solid #e5e7eb; border-radius: 12px; padding: 0.875rem 1rem; }
-        .row-modern { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
-        .marks-selector { display: flex; gap: 1rem; margin-top: 0.5rem; }
-        .marks-option { flex: 1; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 10px; text-align: center; cursor: pointer; }
-        .marks-option.active { border-color: #667eea; background: var(--primary-gradient); color: white; }
-        .btn-primary-modern { background: var(--primary-gradient); color: white; border: none; padding: 1rem 3rem; border-radius: 12px; cursor: pointer; }
+        
+        /* Sidebar Styling (Matching Teacher Dashboard) */
+        .sidebar {
+            width: 280px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%);
+            color: white;
+            padding-top: 30px;
+            z-index: 1000;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        }
+        .sidebar-brand {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        .sidebar-brand i {
+            color: #3498db;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 15px 25px;
+            margin: 4px 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        .nav-link i {
+            width: 25px;
+            font-size: 1.1rem;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            transform: translateX(5px);
+        }
+        .nav-link.text-danger:hover {
+            background: rgba(220, 53, 69, 0.2);
+            color: #ff6b6b !important;
+        }
+
+        /* Main Content Styling */
+        .main-content {
+            margin-left: 280px;
+            padding: 40px;
+            min-height: 100vh;
+        }
+        .top-header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            margin-bottom: 30px;
+        }
+        
+        /* Form Card Styling */
+        .form-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border: none;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .form-control, .form-select {
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+            background-color: white;
+        }
+        .section-title {
+            color: #1a3c34;
+            border-bottom: 2px solid #f4f7fa;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            margin-top: 30px;
+            font-weight: bold;
+        }
+        .form-check-input:checked {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+        
+        /* Loading Overlay */
+        #loadingOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9); z-index: 9999; display: flex;
+            align-items: center; justify-content: center; flex-direction: column;
+        }
     </style>
 </head>
 <body>
-    <div class="main-container">
-        <div class="header-card">
-            <div class="d-flex justify-content-between align-items-center">
-                <h2><i class="fas fa-plus-circle"></i> Create New Test</h2>
-                <button id="logoutBtn" class="btn btn-outline-danger"><i class="fas fa-sign-out-alt"></i> Logout</button>
-            </div>
+
+    <div id="loadingOverlay">
+        <i class="fas fa-spinner fa-spin fa-3x text-primary mb-3"></i>
+        <h4>Verifying Access & Loading Data...</h4>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <h4 class="text-white fw-bold mb-0">STAFF PORTAL</h4>
+        </div>
+        
+        <nav class="nav flex-column mt-4">
+            <a href="teacher_dashboard.html" class="nav-link">
+                <i class="fas fa-home"></i> Dashboard Home
+            </a>
+            <a href="create_test.html" class="nav-link active">
+                <i class="fas fa-plus-circle"></i> Create New Test
+            </a>
+            <a href="manage_questions.html" class="nav-link">
+                <i class="fas fa-list-ul"></i> Question Bank
+            </a>
+            <a href="test_results.html" class="nav-link">
+                <i class="fas fa-poll"></i> Student Results
+            </a>
+            <a href="report_scores.html" class="nav-link">
+                <i class="fas fa-file-signature"></i> Report Scores
+            </a>
+            
+            <hr class="mx-3 my-4 border-secondary">
+            
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto">
+                <i class="fas fa-sign-out-alt"></i> Secure Logout
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-header">
+            <h3 class="fw-bold mb-0 text-dark"><i class="fas fa-edit text-primary me-2"></i> Create Assessment</h3>
+            <p class="text-muted mb-0 mt-1">Configure test parameters, duration, and CBT rules.</p>
         </div>
 
-        <div id="alertBox" class="alert d-none"></div>
+        <div id="alertBox" class="alert d-none shadow-sm" role="alert"></div>
 
-        <div class="form-container">
+        <div class="form-card">
             <form id="createTestForm">
-                <div class="form-section">
-                    <h4>Basic Information</h4>
-                    <div class="row-modern">
-                        <div class="form-group">
-                            <label>Test Title</label>
-                            <input type="text" id="title" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Test Code</label>
-                            <input type="text" id="code" class="form-control" required>
-                        </div>
+                
+                <h5 class="section-title mt-0"><i class="fas fa-info-circle me-2"></i> Basic Information</h5>
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label">Test Title (e.g., First Term Mathematics Exam)</label>
+                        <input type="text" id="title" class="form-control" required placeholder="Enter clear test title">
                     </div>
-                    <div class="form-group mt-3">
-                        <label>Marks Per Question</label>
-                        <input type="hidden" id="marks_per_question" value="1">
-                        <div class="marks-selector">
-                            <div class="marks-option active" onclick="selectMarks(0.5, this)">0.5 Mark</div>
-                            <div class="marks-option" onclick="selectMarks(1, this)">1 Mark</div>
-                        </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Test Code (Unique Identifier)</label>
+                        <input type="text" id="code" class="form-control" required placeholder="e.g. MTH-JSS1-T1">
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <h4>Academic Details</h4>
-                    <div class="row-modern">
-                        <div class="form-group">
-                            <label>Class</label>
-                            <select id="class_id" class="form-select" required><option value="">Loading...</option></select>
+                <div class="row g-3 mt-2">
+                    <div class="col-md-4">
+                        <label class="form-label">Target Class</label>
+                        <select id="class_id" class="form-select" required>
+                            <option value="">Loading...</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Subject</label>
+                        <select id="subject_id" class="form-select" required>
+                            <option value="">Loading...</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Academic Session</label>
+                        <select id="session_id" class="form-select" required>
+                            <option value="">Loading...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h5 class="section-title"><i class="fas fa-cog me-2"></i> Grading & Time Settings</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Duration (in minutes)</label>
+                        <div class="input-group">
+                            <input type="number" id="duration" class="form-control" required min="1" placeholder="e.g. 45">
+                            <span class="input-group-text bg-light text-muted">Mins</span>
                         </div>
-                        <div class="form-group">
-                            <label>Subject</label>
-                            <select id="subject_id" class="form-select" required><option value="">Loading...</option></select>
-                        </div>
-                        <div class="form-group">
-                            <label>Session</label>
-                            <select id="session_id" class="form-select" required><option value="">Loading...</option></select>
-                        </div>
-                        <div class="form-group">
-                            <label>Term</label>
-                            <select id="term_id" class="form-select" required>
-                                <option value="">Select Term</option>
-                                <option value="1">First Term</option>
-                                <option value="2">Second Term</option>
-                                <option value="3">Third Term</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Sub-Term</label>
-                            <select id="sub_term" class="form-select" required>
-                                <option value="">Select Sub-Term</option>
-                                <option value="Half Term">Half Term</option>
-                                <option value="Full Term">Full Term</option>
-                            </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Marks per Question</label>
+                        <div class="input-group">
+                            <input type="number" id="marks" class="form-control" required step="0.1" min="0.1" value="1.0">
+                            <span class="input-group-text bg-light text-muted">Pts</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <h4>Schedule & Duration</h4>
-                    <div class="row-modern">
-                        <div class="form-group">
-                            <label>Start Date & Time</label>
-                            <input type="datetime-local" id="start_datetime" class="form-control" required>
+                <div class="mt-3">
+                    <label class="form-label">Instructions for Students (Optional)</label>
+                    <textarea id="instructions" class="form-control" rows="3" placeholder="e.g. Attempt all questions. Calculators are not allowed."></textarea>
+                </div>
+
+                <h5 class="section-title"><i class="fas fa-shield-alt me-2"></i> CBT Security & Rules</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="form-check form-switch fs-5 mb-2">
+                            <input class="form-check-input" type="checkbox" id="shuffle_questions" checked>
+                            <label class="form-check-label fs-6 text-dark mt-1" for="shuffle_questions">Shuffle Questions randomly</label>
                         </div>
-                        <div class="form-group">
-                            <label>End Date & Time</label>
-                            <input type="datetime-local" id="end_datetime" class="form-control" required>
+                        <div class="form-check form-switch fs-5">
+                            <input class="form-check-input" type="checkbox" id="shuffle_answers" checked>
+                            <label class="form-check-label fs-6 text-dark mt-1" for="shuffle_answers">Shuffle Options (A, B, C, D) randomly</label>
                         </div>
-                        <div class="form-group">
-                            <label>Duration (Hours)</label>
-                            <input type="number" id="duration_hours" class="form-control" min="0" value="0" required>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check form-switch fs-5 mb-2">
+                            <input class="form-check-input" type="checkbox" id="publish_result">
+                            <label class="form-check-label fs-6 text-dark mt-1" for="publish_result">Publish result immediately after submission</label>
                         </div>
-                        <div class="form-group">
-                            <label>Duration (Minutes)</label>
-                            <input type="number" id="duration_minutes" class="form-control" min="0" max="59" value="0" required>
+                        <div class="form-check form-switch fs-5">
+                            <input class="form-check-input" type="checkbox" id="practice_mode">
+                            <label class="form-check-label fs-6 text-dark mt-1" for="practice_mode">Practice Mode (Scores not recorded to permanent file)</label>
                         </div>
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <h4>Test Configuration</h4>
-                    <div class="row-modern">
-                        <div><input type="checkbox" id="random_selection"> Random Selection</div>
-                        <div><input type="checkbox" id="practice_mode"> Practice Mode</div>
-                        <div><input type="checkbox" id="shuffle_questions"> Shuffle Questions</div>
-                        <div><input type="checkbox" id="shuffle_answers"> Shuffle Answers</div>
-                        <div><input type="checkbox" id="view_correct_answers"> View Correct Answers</div>
-                        <div><input type="checkbox" id="publish_result"> Auto-Publish Results</div>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <h4>Instructions</h4>
-                    <textarea id="instructions" class="form-control" rows="4"></textarea>
-                </div>
-
-                <div class="text-center">
-                    <button type="submit" class="btn-primary-modern" id="submitBtn">Create Test & Add Questions</button>
+                <hr class="mt-5 mb-4">
+                <div class="d-flex justify-content-end gap-3">
+                    <button type="reset" class="btn btn-outline-secondary px-4 py-2">Clear Form</button>
+                    <button type="submit" class="btn btn-primary px-5 py-2 fw-bold" id="submitBtn">
+                        <i class="fas fa-save me-2"></i> Save Test Configuration
+                    </button>
                 </div>
             </form>
         </div>
@@ -146,118 +262,125 @@
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
-        // UI Helpers
-        window.selectMarks = function(value, element) {
-            document.querySelectorAll('.marks-option').forEach(opt => opt.classList.remove('active'));
-            element.classList.add('active');
-            document.getElementById('marks_per_question').value = value;
-        };
+        let currentUserId = null;
 
-        const alertBox = document.getElementById('alertBox');
-        function showAlert(msg, isError = true) {
-            alertBox.className = `alert ${isError ? 'alert-danger' : 'alert-success'} d-block`;
-            alertBox.textContent = msg;
-            window.scrollTo(0,0);
-        }
-
-        // Initialize Dropdowns on Page Load
-        async function loadDropdowns() {
+        // 1. Verify Access and Load Initial Data
+        async function initializePage() {
             try {
-                const [classesRes, subjectsRes, sessionsRes] = await Promise.all([
-                    supabase.from('classes').select('*'),
-                    supabase.from('subjects').select('*'),
-                    supabase.from('sessions').select('*')
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                currentUserId = session.user.id;
+
+                // Check Role
+                const { data: profile } = await supabase.from('users').select('role').eq('id', currentUserId).single();
+                if (profile.role !== 'teacher' && profile.role !== 'admin') {
+                    alert("Access Denied.");
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Load Dropdowns
+                await Promise.all([
+                    loadDropdown('classes', 'class_id'),
+                    loadDropdown('subjects', 'subject_id'),
+                    loadDropdown('sessions', 'session_id')
                 ]);
 
-                const populate = (id, data, placeholder) => {
-                    const select = document.getElementById(id);
-                    select.innerHTML = `<option value="">${placeholder}</option>` + 
-                        data.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
-                };
-
-                if(classesRes.data) populate('class_id', classesRes.data, 'Select Class');
-                if(subjectsRes.data) populate('subject_id', subjectsRes.data, 'Select Subject');
-                if(sessionsRes.data) populate('session_id', sessionsRes.data, 'Select Session');
+                document.getElementById('loadingOverlay').style.display = 'none';
 
             } catch (error) {
-                showAlert('Failed to load form data. Please check your connection.');
+                console.error("Initialization Error:", error);
+                alert("Failed to initialize system. Check console.");
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadDropdowns();
+        // Generic function to load dropdown data
+        async function loadDropdown(table, selectId) {
+            const { data, error } = await supabase.from(table).select('id, name').order('id', { ascending: true });
+            const selectEl = document.getElementById(selectId);
             
-            // Set default times
-            const now = new Date();
-            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-            document.getElementById('start_datetime').value = now.toISOString().slice(0, 16);
-            const endTime = new Date(now.getTime() + 60 * 60 * 1000);
-            document.getElementById('end_datetime').value = endTime.toISOString().slice(0, 16);
-        });
+            if (error) {
+                console.error(`Error loading ${table}:`, error);
+                selectEl.innerHTML = `<option value="">Error loading</option>`;
+                return;
+            }
+            
+            if (data && data.length > 0) {
+                selectEl.innerHTML = `<option value="" disabled selected>Select an option...</option>` + 
+                                     data.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
+            } else {
+                selectEl.innerHTML = `<option value="">No data available</option>`;
+            }
+        }
 
-        // Form Submission
+        document.addEventListener('DOMContentLoaded', initializePage);
+
+        // 2. Handle Form Submission
         document.getElementById('createTestForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Creating...';
+            
+            const btn = document.getElementById('submitBtn');
+            const alertBox = document.getElementById('alertBox');
+            
+            // Set loading state
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Saving...';
+            btn.disabled = true;
+            alertBox.classList.add('d-none');
+
+            // Gather Form Data
+            const testData = {
+                teacher_id: currentUserId,
+                title: document.getElementById('title').value,
+                code: document.getElementById('code').value,
+                class_id: parseInt(document.getElementById('class_id').value),
+                subject_id: parseInt(document.getElementById('subject_id').value),
+                session_id: parseInt(document.getElementById('session_id').value),
+                duration_minutes: parseInt(document.getElementById('duration').value),
+                marks_per_question: parseFloat(document.getElementById('marks').value),
+                instructions: document.getElementById('instructions').value,
+                shuffle_questions: document.getElementById('shuffle_questions').checked,
+                shuffle_answers: document.getElementById('shuffle_answers').checked,
+                publish_result: document.getElementById('publish_result').checked,
+                practice_mode: document.getElementById('practice_mode').checked
+            };
 
             try {
-                // Get current user to attach as teacher_id
-                const { data: { user }, error: authError } = await supabase.auth.getUser();
-                if (authError || !user) throw new Error("Authentication required. Please log in.");
-
-                const testData = {
-                    teacher_id: user.id,
-                    title: document.getElementById('title').value,
-                    code: document.getElementById('code').value,
-                    marks_per_question: parseFloat(document.getElementById('marks_per_question').value),
-                    class_id: parseInt(document.getElementById('class_id').value),
-                    subject_id: parseInt(document.getElementById('subject_id').value),
-                    session_id: parseInt(document.getElementById('session_id').value),
-                    term_id: parseInt(document.getElementById('term_id').value),
-                    sub_term: document.getElementById('sub_term').value,
-                    start_datetime: document.getElementById('start_datetime').value,
-                    end_datetime: document.getElementById('end_datetime').value,
-                    duration_hours: parseInt(document.getElementById('duration_hours').value),
-                    duration_minutes: parseInt(document.getElementById('duration_minutes').value),
-                    random_selection: document.getElementById('random_selection').checked,
-                    practice_mode: document.getElementById('practice_mode').checked,
-                    shuffle_questions: document.getElementById('shuffle_questions').checked,
-                    shuffle_answers: document.getElementById('shuffle_answers').checked,
-                    view_correct_answers: document.getElementById('view_correct_answers').checked,
-                    publish_result: document.getElementById('publish_result').checked,
-                    instructions: document.getElementById('instructions').value
-                };
-
-                // Validate dates
-                if (new Date(testData.end_datetime) <= new Date(testData.start_datetime)) {
-                    throw new Error("End date and time must be after start date and time.");
-                }
-
                 // Insert into Supabase
-                const { data, error } = await supabase
-                    .from('tests')
-                    .insert([testData])
-                    .select();
-
+                const { data, error } = await supabase.from('tests').insert([testData]).select();
+                
                 if (error) {
-                    if (error.code === '23505') throw new Error("This Test Code already exists.");
+                    if (error.code === '23505') { // Unique constraint violation (duplicate code)
+                        throw new Error("A test with this Test Code already exists. Please use a unique code.");
+                    }
                     throw error;
                 }
 
-                // Redirect to manage questions page with the new test ID
-                window.location.href = `manage_questions.html?test_id=${data[0].id}`;
+                // Success
+                alertBox.className = 'alert alert-success shadow-sm mb-4';
+                alertBox.innerHTML = `<i class="fas fa-check-circle me-2"></i> <strong>Success!</strong> Test created successfully. You can now add questions to it.`;
+                document.getElementById('createTestForm').reset();
+                
+                // Optional: Scroll to top to see message
+                window.scrollTo({ top: 0, behavior: 'smooth' });
 
             } catch (err) {
-                showAlert(err.message);
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Create Test & Add Questions';
+                // Error
+                alertBox.className = 'alert alert-danger shadow-sm mb-4';
+                alertBox.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i> ${err.message}`;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } finally {
+                // Restore button
+                btn.innerHTML = '<i class="fas fa-save me-2"></i> Save Test Configuration';
+                btn.disabled = false;
             }
         });
 
-        // Logout Handle
-        document.getElementById('logoutBtn').addEventListener('click', async () => {
+        // 3. Logout handler
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
             await supabase.auth.signOut();
             window.location.href = 'login.html';
         });
