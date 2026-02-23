@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Users</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light p-5">
+    <div class="container bg-white p-4 rounded shadow">
+        <h2>Pending Approvals</h2>
+        <div id="userList">Loading...</div>
+    </div>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+        async function load() {
+            const { data: st } = await supabase.from('students').select('id, approved, users!inner(name)').eq('approved', false);
+            const { data: tc } = await supabase.from('teachers').select('id, approved, users!inner(name)').eq('approved', false);
+            let html = '<h4>Teachers</h4><ul class="list-group mb-4">';
+            tc.forEach(t => html += `<li class="list-group-item d-flex justify-content-between">${t.users.name} <button onclick="window.approve('teachers', ${t.id})" class="btn btn-sm btn-success">Approve</button></li>`);
+            html += '</ul><h4>Students</h4><ul class="list-group">';
+            st.forEach(s => html += `<li class="list-group-item d-flex justify-content-between">${s.users.name} <button onclick="window.approve('students', ${s.id})" class="btn btn-sm btn-success">Approve</button></li>`);
+            document.getElementById('userList').innerHTML = html + '</ul>';
+        }
+        window.approve = async (table, id) => {
+            await supabase.from(table).update({ approved: true }).eq('id', id);
+            load();
+        };
+        load();
+    </script>
+</body>
+</html>
