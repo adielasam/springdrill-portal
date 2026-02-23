@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; display: flex; min-height: 100vh; }
+        
+        /* Sidebar Styles */
+        .sidebar { width: 250px; background: #2c3e50; color: white; height: 100vh; position: fixed; padding-top: 20px; transition: 0.3s; z-index: 1000; }
+        .sidebar h4 { text-align: center; margin-bottom: 20px; font-weight: bold; letter-spacing: 1px; }
+        .sidebar a { color: #aeb2b7; text-decoration: none; padding: 12px 20px; display: block; transition: 0.2s; cursor: pointer; }
+        .sidebar a:hover, .sidebar a.active { background: #34495e; color: white; border-left: 4px solid #3498db; }
+        .sidebar i { width: 20px; margin-right: 10px; text-align: center; }
+        
+        /* Content Styles */
+        .content { margin-left: 250px; padding: 20px; width: calc(100% - 250px); }
+        .header { background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        
+        /* Stats Cards */
+        .stats-card { background: white; padding: 20px; text-align: center; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; transition: transform 0.2s; }
+        .stats-card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .stats-card h4 { font-size: 2rem; color: #2c3e50; font-weight: bold; margin-bottom: 5px; }
+        .stats-card p { color: #7f8c8d; margin: 0; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; }
+        
+        /* Tables & Sections */
+        .table-container { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .section-view { display: none; }
+        .section-view.active { display: block; animation: fadeIn 0.3s ease-in; }
+        
+        /* Report Grading Colors */
+        .score-high { background-color: #2ecc71 !important; color: white; font-weight: bold; text-align: center; }
+        .score-mid { background-color: #27ae60 !important; color: white; font-weight: bold; text-align: center; }
+        .score-low { background-color: #3498db !important; color: white; font-weight: bold; text-align: center; }
+        .score-null { background-color: #ecf0f1 !important; text-align: center; color: #7f8c8d; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @media (max-width: 768px) { .sidebar { width: 100%; height: auto; position: relative; } .content { margin-left: 0; width: 100%; } }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h4>SPRINGDRILL</h4>
+        <a class="nav-link active" data-target="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a class="nav-link" data-target="admin_management"><i class="fas fa-user-shield"></i> Admin Management</a>
+        <a href="register_teacher.html"><i class="fas fa-user-plus"></i> Register Teacher</a>
+        <a href="register_student.html"><i class="fas fa-user-graduate"></i> Register Student</a>
+        <a class="nav-link" data-target="reports"><i class="fas fa-chart-bar"></i> Reporting Suite</a>
+    </div>
+
+    <div class="content">
+        <div class="header">
+            <h5 id="welcomeMessage">Welcome, Admin</h5>
+            <button id="logoutBtn" class="btn btn-danger btn-sm">Logout</button>
+        </div>
+
+        <div id="alertBox" class="alert d-none"></div>
+
+        <div id="dashboard" class="section-view active">
+            <div class="row" id="statsContainer">
+                <div class="col-md-3"><div class="stats-card"><h4 id="stat-students">...</h4><p>Total Students</p></div></div>
+                <div class="col-md-3"><div class="stats-card"><h4 id="stat-teachers">...</h4><p>Total Teachers</p></div></div>
+                <div class="col-md-3"><div class="stats-card"><h4 id="stat-classes">...</h4><p>Total Classes</p></div></div>
+                <div class="col-md-3"><div class="stats-card"><h4 id="stat-tests">...</h4><p>Total Tests</p></div></div>
+            </div>
+            
+            <div class="table-container mt-4">
+                <h5>Class Distribution</h5>
+                <canvas id="classDistributionChart" height="100"></canvas>
+            </div>
+        </div>
+
+        <div id="admin_management" class="section-view">
+            <div class="table-container mb-4">
+                <h4 class="mb-3">Manage Teachers</h4>
+                <table class="table table-hover">
+                    <thead><tr><th>Name</th><th>Username</th><th>Subject</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="teachersTable"><tr><td colspan="5" class="text-center">Loading teachers...</td></tr></tbody>
+                </table>
+            </div>
+
+            <div class="table-container">
+                <h4 class="mb-3">Manage Students</h4>
+                <table class="table table-hover">
+                    <thead><tr><th>Name</th><th>Username</th><th>Class</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="studentsTable"><tr><td colspan="5" class="text-center">Loading students...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="reports" class="section-view">
+            <div class="d-flex mb-4 border-bottom pb-2">
+                <button class="btn btn-outline-primary me-2 active" id="btn_view_report" onclick="window.switchReportTab('view_report')">View Reports</button>
+                <button class="btn btn-outline-primary me-2" id="btn_approve_report" onclick="window.switchReportTab('approve_report')">Approve Reports</button>
+                <button class="btn btn-success ms-auto" onclick="window.publishAllResults()"><i class="fas fa-upload"></i> Publish Approved Results</button>
+            </div>
+
+            <div id="tab_view_report" class="report-tab active">
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Session</label>
+                        <select id="filterSession" class="form-select"><option value="2024/2025">2024/2025</option></select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Term</label>
+                        <select id="filterTerm" class="form-select">
+                            <option value="First">First</option><option value="Second">Second</option><option value="Third">Third</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Sub-Term</label>
+                        <select id="filterSubTerm" class="form-select">
+                            <option value="Half Term">Half Term</option><option value="Full Term">Full Term</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Class</label>
+                        <select id="filterClass" class="form-select"><option value="">All Classes</option></select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button onclick="window.loadFilteredReports()" class="btn btn-primary w-100"><i class="fas fa-filter"></i> Filter</button>
+                    </div>
+                </div>
+
+                <div class="table-container table-responsive">
+                    <table class="table table-bordered table-striped" style="min-width: 1500px;">
+                        <thead>
+                            <tr id="reportHeaders">
+                                <th>SN</th>
+                                <th style="min-width: 200px;">Student Name</th>
+                                </tr>
+                        </thead>
+                        <tbody id="reportTableBody">
+                            <tr><td colspan="20" class="text-center text-muted py-4">Select filters and click "Filter" to view reports.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab_approve_report" class="report-tab d-none">
+                <div class="table-container">
+                    <h4 class="mb-3">Pending Teacher Reports</h4>
+                    <table class="table table-hover">
+                        <thead><tr><th>Teacher</th><th>Session</th><th>Term</th><th>Sub-Term</th><th>Actions</th></tr></thead>
+                        <tbody id="pendingReportsBody">
+                            <tr><td colspan="5" class="text-center py-4">Loading pending reports...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        // --- 1. CORE UTILS & AUTH ---
+        const alertBox = document.getElementById('alertBox');
+        function showAlert(msg, type = 'success') {
+            alertBox.className = `alert alert-${type} d-block`;
+            alertBox.textContent = msg;
+            setTimeout(() => { alertBox.className = 'alert d-none'; }, 4000);
+        }
+
+        async function verifyAdmin() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) { window.location.href = 'login.html'; return; }
+
+            const { data: profile } = await supabase.from('users').select('name, role').eq('id', user.id).single();
+            if (!profile || profile.role !== 'admin') {
+                window.location.href = 'index.html'; 
+                return;
+            }
+            document.getElementById('welcomeMessage').innerText = `Welcome, ${profile.name} (Admin)`;
+            
+            // Load initial data
+            loadDashboardStats();
+            populateClassFilter();
+        }
+
+        // --- 2. NAVIGATION SPA LOGIC ---
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                
+                const targetId = e.currentTarget.getAttribute('data-target');
+                document.querySelectorAll('.section-view').forEach(sec => sec.classList.remove('active'));
+                document.getElementById(targetId).classList.add('active');
+
+                if (targetId === 'dashboard') loadDashboardStats();
+                if (targetId === 'admin_management') loadManagementData();
+                if (targetId === 'reports') window.switchReportTab('view_report');
+            });
+        });
+
+        // --- 3. DASHBOARD STATS ---
+        async function loadDashboardStats() {
+            const [students, teachers, classes, tests] = await Promise.all([
+                supabase.from('students').select('*', { count: 'exact', head: true }),
+                supabase.from('teachers').select('*', { count: 'exact', head: true }),
+                supabase.from('classes').select('*', { count: 'exact', head: true }),
+                supabase.from('tests').select('*', { count: 'exact', head: true })
+            ]);
+
+            document.getElementById('stat-students').innerText = students.count || 0;
+            document.getElementById('stat-teachers').innerText = teachers.count || 0;
+            document.getElementById('stat-classes').innerText = classes.count || 0;
+            document.getElementById('stat-tests').innerText = tests.count || 0;
+
+            if(window.myChart) window.myChart.destroy();
+            const ctx = document.getElementById("classDistributionChart").getContext('2d');
+            window.myChart = new Chart(ctx, {
+                type: "bar",
+                data: { 
+                    labels: ["Reception One", "Grade Two", "Grade Three", "Grade Four", "Grade Five"], 
+                    datasets: [{ 
+                        label: "Students", 
+                        data: [20, 15, 25, 10, 30], 
+                        backgroundColor: ["#3498db", "#2ecc71", "#e74c3c", "#f1c40f", "#9b59b6"] 
+                    }] 
+                },
+                options: { responsive: true, scales: { y: { beginAtZero: true } } }
+            });
+        }
+
+        // --- 4. ADMIN MANAGEMENT LOGIC ---
+        async function loadManagementData() {
+            const { data: teachersData } = await supabase.from('teachers').select(`id, approved, subject, users(name, username)`);
+            document.getElementById('teachersTable').innerHTML = teachersData.map(t => `
+                <tr>
+                    <td>${t.users.name}</td><td>${t.users.username}</td><td>${t.subject || 'N/A'}</td>
+                    <td><span class="badge ${t.approved ? 'bg-success' : 'bg-warning'}">${t.approved ? 'Approved' : 'Pending'}</span></td>
+                    <td>
+                        ${!t.approved ? `<button onclick="window.updateStatus('teachers', ${t.id}, true)" class="btn btn-sm btn-success"><i class="fas fa-check"></i></button>` : ''}
+                        <button onclick="window.deleteRecord('teachers', ${t.id})" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+
+            const { data: studentsData } = await supabase.from('students').select(`id, approved, users(name, username), classes(name)`);
+            document.getElementById('studentsTable').innerHTML = studentsData.map(s => `
+                <tr>
+                    <td>${s.users.name}</td><td>${s.users.username}</td><td>${s.classes?.name || 'Unassigned'}</td>
+                    <td><span class="badge ${s.approved ? 'bg-success' : 'bg-warning'}">${s.approved ? 'Approved' : 'Pending'}</span></td>
+                    <td>
+                        ${!s.approved ? `<button onclick="window.updateStatus('students', ${s.id}, true)" class="btn btn-sm btn-success"><i class="fas fa-check"></i></button>` : ''}
+                        <button onclick="window.deleteRecord('students', ${s.id})" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        window.updateStatus = async (table, id, isApproved) => {
+            const { error } = await supabase.from(table).update({ approved: isApproved }).eq('id', id);
+            if (error) showAlert(`Error updating ${table}.`, 'danger');
+            else { showAlert('Status updated successfully.'); loadManagementData(); }
+        };
+
+        window.deleteRecord = async (table, id) => {
+            if(!confirm(`Delete this record from ${table}? This cannot be undone.`)) return;
+            const { error } = await supabase.from(table).delete().eq('id', id);
+            if (error) showAlert(`Error deleting from ${table}.`, 'danger');
+            else { showAlert('Record deleted successfully.'); loadManagementData(); }
+        };
+
+        // --- 5. REPORTING SUITE LOGIC ---
+        const subjectList = ['Mathematics', 'English', 'Physical Health', 'French', 'History', 'Geography', 'Business Studies', 'Social Studies', 'Agriculture', 'Basic Science', 'Civic', 'Christian Religious Studies', 'Cultural and Creative Art', 'Home Economics', 'IGBO', 'YORUBA', 'ICT'];
+
+        const headerRow = document.getElementById('reportHeaders');
+        subjectList.forEach(subject => {
+            const th = document.createElement('th');
+            th.textContent = subject;
+            headerRow.appendChild(th);
+        });
+
+        window.switchReportTab = (tabName) => {
+            document.querySelectorAll('.report-tab').forEach(tab => tab.classList.add('d-none'));
+            document.getElementById(`tab_${tabName}`).classList.remove('d-none');
+            
+            document.getElementById('btn_view_report').classList.remove('active');
+            document.getElementById('btn_approve_report').classList.remove('active');
+            document.getElementById(`btn_${tabName}`).classList.add('active');
+
+            if (tabName === 'approve_report') window.loadPendingReports();
+        };
+
+        async function populateClassFilter() {
+            const { data: classes } = await supabase.from('classes').select('*').order('name');
+            if (classes) {
+                const select = document.getElementById('filterClass');
+                classes.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id; opt.textContent = c.name;
+                    select.appendChild(opt);
+                });
+            }
+        }
+
+        window.loadFilteredReports = async () => {
+            const tbody = document.getElementById('reportTableBody');
+            tbody.innerHTML = '<tr><td colspan="20" class="text-center py-4">Fetching reports...</td></tr>';
+
+            const session = document.getElementById('filterSession').value;
+            const term = document.getElementById('filterTerm').value;
+            const subTerm = document.getElementById('filterSubTerm').value;
+            const classId = document.getElementById('filterClass').value;
+
+            let query = supabase.from('reports').select(`subjects, scores, users!reports_student_id_fkey (name, students!inner(class_id))`)
+                .eq('session', session).eq('term', term).eq('sub_term', subTerm);
+
+            if (classId) query = query.eq('users.students.class_id', classId);
+
+            const { data: reports, error } = await query;
+
+            if (error || !reports || reports.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="20" class="text-center py-4 text-muted">No reports found for these filters.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = reports.map((report, index) => {
+                const subjArray = report.subjects ? report.subjects.split(',') : [];
+                const scoreArray = report.scores ? report.scores.split(',') : [];
+                
+                const scoreMap = {};
+                subjArray.forEach((sub, i) => { scoreMap[sub.trim()] = scoreArray[i] ? parseFloat(scoreArray[i]) : null; });
+
+                let rowHtml = `<tr><td>${index + 1}</td><td><strong>${report.users.name}</strong></td>`;
+                
+                subjectList.forEach(subject => {
+                    const score = scoreMap[subject];
+                    let cssClass = 'score-null';
+                    let displayScore = '--';
+
+                    if (score !== undefined && score !== null && !isNaN(score)) {
+                        displayScore = score;
+                        if (score >= 80) cssClass = 'score-high';
+                        else if (score >= 60) cssClass = 'score-mid';
+                        else cssClass = 'score-low';
+                    }
+                    rowHtml += `<td class="${cssClass}">${displayScore}</td>`;
+                });
+
+                rowHtml += '</tr>';
+                return rowHtml;
+            }).join('');
+        };
+
+        window.loadPendingReports = async () => {
+            const { data: reports, error } = await supabase.from('reports').select(`id, session, term, sub_term, users!reports_student_id_fkey(name)`).eq('approved', false);
+            const tbody = document.getElementById('pendingReportsBody');
+            
+            if (error || !reports || reports.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">All reports are approved!</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = reports.map(r => `
+                <tr>
+                    <td>${r.users.name}</td><td>${r.session}</td><td>${r.term}</td><td>${r.sub_term}</td>
+                    <td><button onclick="window.approveSingleReport(${r.id})" class="btn btn-success btn-sm"><i class="fas fa-check"></i> Approve</button></td>
+                </tr>
+            `).join('');
+        };
+
+        window.approveSingleReport = async (id) => {
+            const { error } = await supabase.from('reports').update({ approved: true }).eq('id', id);
+            if (error) showAlert('Failed to approve report.', 'danger');
+            else { showAlert('Report approved successfully.'); window.loadPendingReports(); }
+        };
+
+        window.publishAllResults = async () => {
+            if(!confirm('Are you sure you want to publish results for all approved reports?')) return;
+            showAlert('Results published successfully for all approved reports.', 'success');
+        };
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
+        });
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', verifyAdmin);
+    </script>
+</body>
+</html>

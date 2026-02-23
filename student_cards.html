@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SPRINGDRILL - Student Cards</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body { background: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .content { padding: 30px; max-width: 1000px; margin: 0 auto; }
+        .header { background: linear-gradient(90deg, #1a3c34, #2c5f4a); color: white; padding: 20px 25px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); margin-bottom: 25px; overflow: hidden; page-break-inside: avoid; }
+        .card-header { background: #e3f2fd; border-bottom: 2px solid #90caf9; padding: 15px 20px; }
+        .card-title { margin: 0; color: #1565c0; font-weight: 700; }
+        .list-group-item { border-left: none; border-right: none; padding: 12px 20px; }
+        .list-group-item:first-child { border-top: none; }
+        .list-group-item:last-child { border-bottom: none; }
+        .stat-highlight { font-weight: 700; color: #2c3e50; }
+        #pdfContainer { background: #f4f7fa; padding: 10px; }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <div class="header">
+            <h2><i class="fas fa-id-card me-2"></i> Student Score Cards</h2>
+            <div>
+                <a href="admin_dashboard.html" class="btn btn-outline-light me-2"><i class="fas fa-arrow-left me-1"></i> Dashboard</a>
+                <button onclick="window.exportToPDF()" class="btn btn-warning fw-bold text-dark" id="exportBtn">
+                    <i class="fas fa-file-pdf me-1"></i> Export to PDF
+                </button>
+            </div>
+        </div>
+
+        <div id="alertBox" class="alert d-none"></div>
+
+        <div id="pdfContainer">
+            <div id="loadingIndicator" class="text-center py-5">
+                <div class="spinner-border text-success" role="status"></div>
+                <p class="mt-2 text-muted">Compiling student records...</p>
+            </div>
+            
+            <div id="cardsWrapper">
+                </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        const alertBox = document.getElementById('alertBox');
+        function showAlert(msg) {
+            alertBox.className = 'alert alert-danger d-block';
+            alertBox.textContent = msg;
+        }
+
+        async function init() {
+            try {
+                // 1. Authenticate & Verify Admin
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) { window.location.href = 'login.html'; return; }
+
+                const { data: profile } = await supabase.from('users').select('role').eq('id', user.id).single();
+                if (!profile || profile.role !== 'admin') { window.location.href = 'login.html'; return; }
+
+                // 2. Fetch all students
+                const { data: students, error: studentErr } = await supabase
+                    .from('users')
+                    .select('id, name')
+                    .eq('role', 'student')
+                    .order('name');
+
+                if (studentErr) throw studentErr;
+
+                // 3. Fetch scores for all students
+                // Mapping the old teacher_scores table structure
+                const { data: scores, error: scoresErr } = await supabase
+                    .from('teacher_scores')
+                    .select(`
+                        student_id, score,
+                        subjects (name)
+                    `)
+                    .eq('approved', true);
+
+                if (scoresErr) throw scoresErr;
+
+                // 4. Map scores to students and calculate ranks
+                const studentDataMap = students.map(student => {
+                    const studentScores = scores.filter(s => s.student_id === student.id);
+                    const totalScore = studentScores.reduce((sum, current) => sum + parseFloat(current.score || 0), 0);
+                    return {
+                        ...student,
+                        scores: studentScores,
+                        totalScore: totalScore
+                    };
+                });
+
+                // Sort by total score descending to determine Rank/Position
+                studentDataMap.sort((a, b) => b.totalScore - a.totalScore);
+
+                // 5. Render UI
+                const wrapper = document.getElementById('cardsWrapper');
+                let html = '';
+
+                studentDataMap.forEach((student, index) => {
+                    const rank = index + 1;
+                    const positionSuffix = getPositionSuffix(rank);
+
+                    let subjectsHtml = '';
+                    if (student.scores.length === 0) {
+                        subjectsHtml = '<li class="list-group-item text-muted"><em>No approved scores recorded yet.</em></li>';
+                    } else {
+                        student.scores.forEach(s => {
+                            subjectsHtml += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                                ${s.subjects?.name || 'Unknown Subject'}
+                                <span class="badge bg-primary rounded-pill">${s.score}</span>
+                            </li>`;
+                        });
+                    }
+
+                    html += `
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h4 class="card-title"><i class="fas fa-user-graduate me-2"></i>${student.name}</h4>
+                                <span class="badge bg-success fs-6 text-uppercase">Position: ${rank}${positionSuffix}</span>
+                            </div>
+                            <div class="card-body p-0">
+                                <ul class="list-group list-group-flush">
+                                    ${subjectsHtml}
+                                    <li class="list-group-item bg-light d-flex justify-content-between">
+                                        <span class="text-uppercase text-muted" style="font-size: 0.85em; font-weight: bold;">Cumulative Total</span>
+                                        <span class="stat-highlight fs-5 text-success">${student.totalScore}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                document.getElementById('loadingIndicator').style.display = 'none';
+                wrapper.innerHTML = html;
+
+            } catch (err) {
+                document.getElementById('loadingIndicator').style.display = 'none';
+                showAlert("System error: Unable to load student cards. Check database connection.");
+                console.error(err);
+            }
+        }
+
+        // Helper for 1st, 2nd, 3rd, etc.
+        function getPositionSuffix(i) {
+            let j = i % 10, k = i % 100;
+            if (j == 1 && k != 11) return "st";
+            if (j == 2 && k != 12) return "nd";
+            if (j == 3 && k != 13) return "rd";
+            return "th";
+        }
+
+        // PDF Generation Logic
+        window.exportToPDF = () => {
+            const btn = document.getElementById('exportBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Generating...';
+            btn.disabled = true;
+
+            const element = document.getElementById('pdfContainer');
+            
+            // Configure PDF settings
+            const opt = {
+                margin:       [0.5, 0.5, 0.5, 0.5],
+                filename:     'Springdrill_Student_Cards.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Generate and download
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.innerHTML = '<i class="fas fa-file-pdf me-1"></i> Export to PDF';
+                btn.disabled = false;
+            });
+        };
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

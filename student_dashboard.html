@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - Student Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar { width: 250px; position: fixed; top: 0; bottom: 0; left: 0; background-color: #1a3c34; padding-top: 20px; color: white; }
+        .sidebar a { color: white; padding: 10px 15px; text-decoration: none; display: block; }
+        .sidebar a:hover { background-color: #2a5c54; }
+        .sidebar .active { background-color: #2ecc71; }
+        .content { margin-left: 250px; padding: 20px; }
+        .profile-img { width: 100px; height: 100px; border-radius: 50%; margin-bottom: 10px; }
+        .nav-tabs .nav-link { color: #007bff; }
+        .nav-tabs .nav-link.active { color: #000; background-color: #fff; border-color: #dee2e6 #dee2e6 #fff; }
+        .student-info { display: flex; flex-direction: column; align-items: flex-start; }
+        .student-name { font-weight: bold; font-size: 1.1em; }
+        .student-class { font-size: 0.9em; color: #6c757d; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h5 class="text-center">SPRING DRILL</h5>
+        <input type="text" class="form-control mb-3 w-75 mx-auto" placeholder="Search...">
+        <a href="student_dashboard.html" class="active">Dashboard</a>
+        <a href="#">Pastoral</a>
+        <a href="#">Assignments</a>
+        <a href="#">Subjects</a>
+        <a href="cbt_manager.html">CBT</a>
+        <a href="#">Lesson Planner</a>
+    </div>
+
+    <div class="content">
+        <nav class="navbar navbar-light bg-light rounded shadow-sm p-3 mb-4">
+            <div class="container-fluid">
+                <div class="student-info">
+                    <span class="student-name" id="studentName">Welcome, Loading...</span>
+                    <span class="student-class" id="studentClass">Class: Loading...</span>
+                </div>
+                <div>
+                    <img src="https://ui-avatars.com/api/?name=Student&background=random" id="profileAvatar" alt="Profile" class="rounded-circle me-2" width="40" height="40">
+                    <button id="logoutBtn" class="btn btn-danger">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <ul class="nav nav-tabs mt-3" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation"><button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">Overview</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance" type="button" role="tab">Attendance</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link" id="result-tab" data-bs-toggle="tab" data-bs-target="#result" type="button" role="tab">Result</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link" id="medical-tab" data-bs-toggle="tab" data-bs-target="#medical" type="button" role="tab">Medical</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link" id="remarks-tab" data-bs-toggle="tab" data-bs-target="#remarks" type="button" role="tab">Remarks</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link" id="result-analysis-tab" data-bs-toggle="tab" data-bs-target="#result-analysis" type="button" role="tab">Result Analysis</button></li>
+        </ul>
+
+        <div class="tab-content border border-top-0 bg-white p-4 rounded-bottom shadow-sm" id="myTabContent">
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                <h3>Overview</h3>
+                <p>Welcome to your dashboard. Click on <strong>CBT</strong> in the sidebar to view and attempt your tests.</p>
+                <a href="cbt_manager.html" class="btn btn-primary mt-2">Go to CBT Manager</a>
+            </div>
+            <div class="tab-pane fade" id="attendance" role="tabpanel"><h3>Attendance</h3><p>Attendance details will be displayed here.</p></div>
+            <div class="tab-pane fade" id="result" role="tabpanel">
+                <h3>Result</h3>
+                <p>View your graded exams and scores here.</p>
+                <a href="results.html" class="btn btn-success">View My Results</a>
+            </div>
+            <div class="tab-pane fade" id="medical" role="tabpanel"><h3>Medical</h3><p>Medical details will be displayed here.</p></div>
+            <div class="tab-pane fade" id="remarks" role="tabpanel"><h3>Remarks</h3><p>Remarks details will be displayed here.</p></div>
+            <div class="tab-pane fade" id="result-analysis" role="tabpanel"><h3>Result Analysis</h3><p>Result analysis details will be displayed here.</p></div>
+        </div> 
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        async function init() {
+            // Authenticate User
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) { window.location.href = 'login.html'; return; }
+
+            // Fetch Profile & Verify Role
+            const { data: profile } = await supabase.from('users').select('name, role').eq('id', user.id).single();
+            if (!profile || profile.role !== 'student') { window.location.href = 'login.html'; return; }
+
+            // Fetch Student specific data (Class name via relational join)
+            const { data: studentData } = await supabase
+                .from('students')
+                .select('approved, classes(name)')
+                .eq('user_id', user.id)
+                .single();
+
+            if (!studentData || !studentData.approved) {
+                alert("Your account is pending admin approval.");
+                await supabase.auth.signOut();
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Update UI
+            document.getElementById('studentName').textContent = `Welcome, ${profile.name}`;
+            document.getElementById('studentClass').textContent = `Class: ${studentData.classes?.name || 'Unassigned'}`;
+            document.getElementById('profileAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name)}&background=random`;
+        }
+
+        // Handle Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
+        });
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

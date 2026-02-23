@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRING DRILL - Create Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* ... Keep all your original CSS variables and styles here exactly as they were ... */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .main-container { max-width: 1200px; margin: 0 auto; }
+        .header-card, .form-container { background: rgba(255, 255, 255, 0.95); border-radius: var(--border-radius); padding: 2rem; margin-bottom: 2rem; box-shadow: var(--card-shadow); }
+        .form-section { margin-bottom: 2.5rem; padding: 1.5rem; background: rgba(102, 126, 234, 0.05); border-radius: 12px; }
+        .form-control, .form-select { border: 2px solid #e5e7eb; border-radius: 12px; padding: 0.875rem 1rem; }
+        .row-modern { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+        .marks-selector { display: flex; gap: 1rem; margin-top: 0.5rem; }
+        .marks-option { flex: 1; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 10px; text-align: center; cursor: pointer; }
+        .marks-option.active { border-color: #667eea; background: var(--primary-gradient); color: white; }
+        .btn-primary-modern { background: var(--primary-gradient); color: white; border: none; padding: 1rem 3rem; border-radius: 12px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2><i class="fas fa-plus-circle"></i> Create New Test</h2>
+                <button id="logoutBtn" class="btn btn-outline-danger"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+
+        <div id="alertBox" class="alert d-none"></div>
+
+        <div class="form-container">
+            <form id="createTestForm">
+                <div class="form-section">
+                    <h4>Basic Information</h4>
+                    <div class="row-modern">
+                        <div class="form-group">
+                            <label>Test Title</label>
+                            <input type="text" id="title" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Test Code</label>
+                            <input type="text" id="code" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label>Marks Per Question</label>
+                        <input type="hidden" id="marks_per_question" value="1">
+                        <div class="marks-selector">
+                            <div class="marks-option active" onclick="selectMarks(0.5, this)">0.5 Mark</div>
+                            <div class="marks-option" onclick="selectMarks(1, this)">1 Mark</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4>Academic Details</h4>
+                    <div class="row-modern">
+                        <div class="form-group">
+                            <label>Class</label>
+                            <select id="class_id" class="form-select" required><option value="">Loading...</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <select id="subject_id" class="form-select" required><option value="">Loading...</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Session</label>
+                            <select id="session_id" class="form-select" required><option value="">Loading...</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Term</label>
+                            <select id="term_id" class="form-select" required>
+                                <option value="">Select Term</option>
+                                <option value="1">First Term</option>
+                                <option value="2">Second Term</option>
+                                <option value="3">Third Term</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Sub-Term</label>
+                            <select id="sub_term" class="form-select" required>
+                                <option value="">Select Sub-Term</option>
+                                <option value="Half Term">Half Term</option>
+                                <option value="Full Term">Full Term</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4>Schedule & Duration</h4>
+                    <div class="row-modern">
+                        <div class="form-group">
+                            <label>Start Date & Time</label>
+                            <input type="datetime-local" id="start_datetime" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>End Date & Time</label>
+                            <input type="datetime-local" id="end_datetime" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Duration (Hours)</label>
+                            <input type="number" id="duration_hours" class="form-control" min="0" value="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Duration (Minutes)</label>
+                            <input type="number" id="duration_minutes" class="form-control" min="0" max="59" value="0" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4>Test Configuration</h4>
+                    <div class="row-modern">
+                        <div><input type="checkbox" id="random_selection"> Random Selection</div>
+                        <div><input type="checkbox" id="practice_mode"> Practice Mode</div>
+                        <div><input type="checkbox" id="shuffle_questions"> Shuffle Questions</div>
+                        <div><input type="checkbox" id="shuffle_answers"> Shuffle Answers</div>
+                        <div><input type="checkbox" id="view_correct_answers"> View Correct Answers</div>
+                        <div><input type="checkbox" id="publish_result"> Auto-Publish Results</div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4>Instructions</h4>
+                    <textarea id="instructions" class="form-control" rows="4"></textarea>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn-primary-modern" id="submitBtn">Create Test & Add Questions</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        // UI Helpers
+        window.selectMarks = function(value, element) {
+            document.querySelectorAll('.marks-option').forEach(opt => opt.classList.remove('active'));
+            element.classList.add('active');
+            document.getElementById('marks_per_question').value = value;
+        };
+
+        const alertBox = document.getElementById('alertBox');
+        function showAlert(msg, isError = true) {
+            alertBox.className = `alert ${isError ? 'alert-danger' : 'alert-success'} d-block`;
+            alertBox.textContent = msg;
+            window.scrollTo(0,0);
+        }
+
+        // Initialize Dropdowns on Page Load
+        async function loadDropdowns() {
+            try {
+                const [classesRes, subjectsRes, sessionsRes] = await Promise.all([
+                    supabase.from('classes').select('*'),
+                    supabase.from('subjects').select('*'),
+                    supabase.from('sessions').select('*')
+                ]);
+
+                const populate = (id, data, placeholder) => {
+                    const select = document.getElementById(id);
+                    select.innerHTML = `<option value="">${placeholder}</option>` + 
+                        data.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
+                };
+
+                if(classesRes.data) populate('class_id', classesRes.data, 'Select Class');
+                if(subjectsRes.data) populate('subject_id', subjectsRes.data, 'Select Subject');
+                if(sessionsRes.data) populate('session_id', sessionsRes.data, 'Select Session');
+
+            } catch (error) {
+                showAlert('Failed to load form data. Please check your connection.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDropdowns();
+            
+            // Set default times
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('start_datetime').value = now.toISOString().slice(0, 16);
+            const endTime = new Date(now.getTime() + 60 * 60 * 1000);
+            document.getElementById('end_datetime').value = endTime.toISOString().slice(0, 16);
+        });
+
+        // Form Submission
+        document.getElementById('createTestForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating...';
+
+            try {
+                // Get current user to attach as teacher_id
+                const { data: { user }, error: authError } = await supabase.auth.getUser();
+                if (authError || !user) throw new Error("Authentication required. Please log in.");
+
+                const testData = {
+                    teacher_id: user.id,
+                    title: document.getElementById('title').value,
+                    code: document.getElementById('code').value,
+                    marks_per_question: parseFloat(document.getElementById('marks_per_question').value),
+                    class_id: parseInt(document.getElementById('class_id').value),
+                    subject_id: parseInt(document.getElementById('subject_id').value),
+                    session_id: parseInt(document.getElementById('session_id').value),
+                    term_id: parseInt(document.getElementById('term_id').value),
+                    sub_term: document.getElementById('sub_term').value,
+                    start_datetime: document.getElementById('start_datetime').value,
+                    end_datetime: document.getElementById('end_datetime').value,
+                    duration_hours: parseInt(document.getElementById('duration_hours').value),
+                    duration_minutes: parseInt(document.getElementById('duration_minutes').value),
+                    random_selection: document.getElementById('random_selection').checked,
+                    practice_mode: document.getElementById('practice_mode').checked,
+                    shuffle_questions: document.getElementById('shuffle_questions').checked,
+                    shuffle_answers: document.getElementById('shuffle_answers').checked,
+                    view_correct_answers: document.getElementById('view_correct_answers').checked,
+                    publish_result: document.getElementById('publish_result').checked,
+                    instructions: document.getElementById('instructions').value
+                };
+
+                // Validate dates
+                if (new Date(testData.end_datetime) <= new Date(testData.start_datetime)) {
+                    throw new Error("End date and time must be after start date and time.");
+                }
+
+                // Insert into Supabase
+                const { data, error } = await supabase
+                    .from('tests')
+                    .insert([testData])
+                    .select();
+
+                if (error) {
+                    if (error.code === '23505') throw new Error("This Test Code already exists.");
+                    throw error;
+                }
+
+                // Redirect to manage questions page with the new test ID
+                window.location.href = `manage_questions.html?test_id=${data[0].id}`;
+
+            } catch (err) {
+                showAlert(err.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Test & Add Questions';
+            }
+        });
+
+        // Logout Handle
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>

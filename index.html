@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - CBT Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-6">
+        <h1 class="text-2xl font-bold mb-4">Available Tests</h1>
+        
+        <div id="alert-container" class="mb-4"></div>
+
+        <table class="w-full bg-white shadow rounded">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="p-2">Title</th>
+                    <th class="p-2">Subject</th>
+                    <th class="p-2">Start Date</th>
+                    <th class="p-2">End Date</th>
+                    <th class="p-2">Duration (Min)</th>
+                    <th class="p-2">Total Marks</th>
+                    <th class="p-2">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="test-table-body">
+                <tr><td colspan="7" class="p-2 text-center text-gray-500">Loading your tests...</td></tr>
+            </tbody>
+        </table>
+        <div class="mt-4">
+            <a href="student_dashboard.html" class="bg-gray-500 text-white p-2 rounded">Back to Dashboard</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        async function loadTests() {
+            const alertContainer = document.getElementById('alert-container');
+            const tbody = document.getElementById('test-table-body');
+
+            try {
+                // 1. Authenticate Current User
+                const { data: { user }, error: authError } = await supabase.auth.getUser();
+                if (authError || !user) {
+                    window.location.href = 'index.html'; // Redirect if not logged in
+                    return;
+                }
+
+                // 2. Fetch Student Details & Verify Approval
+                const { data: student, error: studentError } = await supabase
+                    .from('students')
+                    .select('approved, class_id')
+                    .eq('user_id', user.id)
+                    .single();
+
+                if (studentError || !student?.approved) {
+                    alertContainer.innerHTML = `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">You are not approved to take tests.</div>`;
+                    tbody.innerHTML = `<tr><td colspan="7" class="p-2 text-center">Unauthorized access.</td></tr>`;
+                    return;
+                }
+
+                // 3. Fetch Published Tests for Student's Class (with Subject Name joined)
+                const { data: tests, error: testsError } = await supabase
+                    .from('tests')
+                    .select(`
+                        id, title, start_datetime, end_datetime, duration_minutes, total_marks,
+                        subjects (name)
+                    `)
+                    .eq('class_id', student.class_id)
+                    .eq('publish_result', true)
+                    .order('start_datetime', { ascending: false });
+
+                if (testsError) throw testsError;
+
+                // 4. Fetch Student's Past Attempts
+                const { data: attempts, error: attemptsError } = await supabase
+                    .from('test_attempts')
+                    .select('test_id, end_time')
+                    .eq('student_id', user.id);
+
+                if (attemptsError) throw attemptsError;
+
+                // Map attempts for quick lookup
+                const attemptMap = new Map();
+                attempts.forEach(att => attemptMap.set(att.test_id, att));
+
+                // 5. Render the Data
+                if (!tests || tests.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="p-2 text-center">No tests available for your class.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = ''; // Clear loading state
+                const currentTime = new Date();
+
+                const formatDate = (dateStr) => {
+                    return new Date(dateStr).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+                };
+
+                let rowsAdded = 0;
+
+                tests.forEach(test => {
+                    const attempt = attemptMap.get(test.id);
+                    const isCompleted = attempt && attempt.end_time !== null;
+                    const startDate = new Date(test.start_datetime);
+                    const endDate = new Date(test.end_datetime);
+                    const isWithinPeriod = currentTime >= startDate && currentTime <= endDate;
+
+                    let rowHtml = '';
+
+                    if (isWithinPeriod && !isCompleted) {
+                        rowHtml = `
+                            <tr class="border-t">
+                                <td class="p-2">${test.title}</td>
+                                <td class="p-2">${test.subjects?.name || 'N/A'}</td>
+                                <td class="p-2">${formatDate(test.start_datetime)}</td>
+                                <td class="p-2">${formatDate(test.end_datetime)}</td>
+                                <td class="p-2">${test.duration_minutes}</td>
+                                <td class="p-2">${test.total_marks || 0}</td>
+                                <td class="p-2">
+                                    <a href="take_test.html?test_id=${test.id}" class="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition">Attempt</a>
+                                </td>
+                            </tr>
+                        `;
+                    } else if (isCompleted) {
+                        rowHtml = `
+                            <tr class="border-t bg-gray-50">
+                                <td class="p-2">${test.title}</td>
+                                <td class="p-2">${test.subjects?.name || 'N/A'}</td>
+                                <td class="p-2">${formatDate(test.start_datetime)}</td>
+                                <td class="p-2">${formatDate(test.end_datetime)}</td>
+                                <td class="p-2">${test.duration_minutes}</td>
+                                <td class="p-2">${test.total_marks || 0}</td>
+                                <td class="p-2">
+                                    <a href="view_scores.html?test_id=${test.id}" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition">View Score</a>
+                                </td>
+                            </tr>
+                        `;
+                    }
+
+                    if (rowHtml) {
+                        tbody.innerHTML += rowHtml;
+                        rowsAdded++;
+                    }
+                });
+
+                if (rowsAdded === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="p-2 text-center">No active tests at this time.</td></tr>`;
+                }
+
+            } catch (err) {
+                console.error("System Error:", err.message);
+                alertContainer.innerHTML = `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">Error connecting to the database.</div>`;
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', loadTests);
+    </script>
+</body>
+</html>

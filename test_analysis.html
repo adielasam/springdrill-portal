@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - Test Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <style>
+        body { background: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .content { padding: 30px; max-width: 1200px; margin: 0 auto; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); padding: 20px; margin-bottom: 20px; }
+        .chart-container { position: relative; height: 400px; width: 100%; }
+        .table-responsive { max-height: 500px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 id="pageTitle">Test Analysis</h2>
+            <div>
+                <a id="backBtn" href="#" class="btn btn-outline-secondary">Back to Dashboard</a>
+            </div>
+        </div>
+
+        <div id="alertBox" class="alert d-none"></div>
+
+        <div id="teacherFilters" class="card d-none">
+            <form id="filterForm">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Select Class</label>
+                        <select id="class_id" class="form-select" required><option value="">Loading...</option></select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Select Subject</label>
+                        <select id="subject_id" class="form-select" required><option value="">Loading...</option></select>
+                    </div>
+                    <div class="col-md-4 align-self-end">
+                        <button type="submit" class="btn btn-primary">Fetch Results</button>
+                        <button type="button" id="exportBtn" class="btn btn-success ms-2 d-none">Export to Excel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div id="resultsCard" class="card d-none">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr id="tableHeaders">
+                            </tr>
+                    </thead>
+                    <tbody id="resultsBody">
+                        <tr><td colspan="6" class="text-center">Loading data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="chartsContainer" class="d-none">
+            <div class="card mt-4">
+                <h4 class="mb-3">Average Percentage per Student</h4>
+                <div class="chart-container"><canvas id="barChart"></canvas></div>
+            </div>
+            <div class="card mt-4">
+                <h4 class="mb-3">Score Distribution</h4>
+                <div class="chart-container"><canvas id="pieChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        let currentUserRole = '';
+        let currentUserId = '';
+        let rawDataForExport = [];
+        let barChartInstance = null;
+        let pieChartInstance = null;
+
+        const alertBox = document.getElementById('alertBox');
+        function showAlert(msg) {
+            alertBox.className = 'alert alert-danger d-block';
+            alertBox.textContent = msg;
+        }
+
+        async function init() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) { window.location.href = 'login.html'; return; }
+            currentUserId = user.id;
+
+            const { data: profile } = await supabase.from('users').select('role').eq('id', user.id).single();
+            currentUserRole = profile?.role;
+
+            document.getElementById('backBtn').href = currentUserRole === 'teacher' ? 'teacher_dashboard.html' : 'student_dashboard.html';
+
+            if (currentUserRole === 'teacher') {
+                document.getElementById('pageTitle').textContent = 'Test Analysis';
+                document.getElementById('teacherFilters').classList.remove('d-none');
+                
+                const [classesRes, subjectsRes] = await Promise.all([
+                    supabase.from('classes').select('*').order('name'),
+                    supabase.from('subjects').select('*').order('name')
+                ]);
+
+                const pop = (id, data) => {
+                    const el = document.getElementById(id);
+                    el.innerHTML = '<option value="">-- Select --</option>' + data.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+                };
+
+                if (classesRes.data) pop('class_id', classesRes.data);
+                if (subjectsRes.data) pop('subject_id', subjectsRes.data);
+
+                document.getElementById('tableHeaders').innerHTML = '<th>Student Name</th><th>Test Title</th><th>Score</th><th>Percentage</th><th>Date Taken</th>';
+
+            } else if (currentUserRole === 'student') {
+                document.getElementById('pageTitle').textContent = 'My Test Results';
+                document.getElementById('tableHeaders').innerHTML = '<th>Test Title</th><th>Class</th><th>Subject</th><th>Score</th><th>Percentage</th><th>Date Taken</th>';
+                loadStudentData();
+            }
+        }
+
+        // Student Data Fetch
+        async function loadStudentData() {
+            document.getElementById('resultsCard').classList.remove('d-none');
+            
+            const { data, error } = await supabase
+                .from('test_results')
+                .select(`
+                    score, percentage,
+                    test_attempts!inner(start_time),
+                    tests!inner(title, classes(name), subjects(name))
+                `)
+                .eq('student_id', currentUserId)
+                .order('created_at', { ascending: false });
+
+            if (error || !data || data.length === 0) {
+                document.getElementById('resultsBody').innerHTML = '<tr><td colspan="6" class="text-center">You have not taken any tests yet.</td></tr>';
+                return;
+            }
+
+            document.getElementById('resultsBody').innerHTML = data.map(r => {
+                const totalMarks = r.percentage > 0 ? (r.score / (r.percentage / 100)).toFixed(2) : r.score;
+                const dateTaken = new Date(r.test_attempts[0]?.start_time).toLocaleString();
+                return `<tr>
+                    <td>${r.tests.title}</td>
+                    <td>${r.tests.classes?.name || 'N/A'}</td>
+                    <td>${r.tests.subjects?.name || 'N/A'}</td>
+                    <td>${r.score} / ${totalMarks}</td>
+                    <td>${Math.round(r.percentage)}/100</td>
+                    <td>${dateTaken}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        // Teacher Data Fetch
+        document.getElementById('filterForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const classId = document.getElementById('class_id').value;
+            const subjectId = document.getElementById('subject_id').value;
+            
+            document.getElementById('resultsCard').classList.remove('d-none');
+            document.getElementById('resultsBody').innerHTML = '<tr><td colspan="5" class="text-center"><div class="spinner-border spinner-border-sm text-primary"></div> Fetching...</td></tr>';
+
+            const { data, error } = await supabase
+                .from('test_results')
+                .select(`
+                    score, percentage,
+                    test_attempts!inner(start_time),
+                    tests!inner(title, class_id, subject_id),
+                    users!inner(name)
+                `)
+                .eq('tests.class_id', classId)
+                .eq('tests.subject_id', subjectId);
+
+            if (error || !data || data.length === 0) {
+                document.getElementById('resultsBody').innerHTML = '<tr><td colspan="5" class="text-center">No results found for this class and subject.</td></tr>';
+                document.getElementById('exportBtn').classList.add('d-none');
+                document.getElementById('chartsContainer').classList.add('d-none');
+                return;
+            }
+
+            rawDataForExport = data;
+            document.getElementById('exportBtn').classList.remove('d-none');
+            
+            // Render Table
+            document.getElementById('resultsBody').innerHTML = data.map(r => {
+                const totalMarks = r.percentage > 0 ? (r.score / (r.percentage / 100)).toFixed(2) : r.score;
+                return `<tr>
+                    <td>${r.users.name}</td>
+                    <td>${r.tests.title}</td>
+                    <td>${r.score} / ${totalMarks}</td>
+                    <td>${Math.round(r.percentage)}/100</td>
+                    <td>${new Date(r.test_attempts[0]?.start_time).toLocaleString()}</td>
+                </tr>`;
+            }).join('');
+
+            renderCharts(data);
+        });
+
+        function renderCharts(data) {
+            document.getElementById('chartsContainer').classList.remove('d-none');
+            
+            // Crunch Numbers
+            const studentStats = {};
+            data.forEach(r => {
+                if(!studentStats[r.users.name]) studentStats[r.users.name] = { total: 0, count: 0 };
+                studentStats[r.users.name].total += parseFloat(r.percentage);
+                studentStats[r.users.name].count += 1;
+            });
+
+            const labels = [];
+            const averages = [];
+            const pieBuckets = [0, 0, 0, 0, 0]; // 0-20, 21-40, 41-60, 61-80, 81-100
+            
+            for (const [name, stats] of Object.entries(studentStats)) {
+                labels.push(name);
+                const avg = Math.round(stats.total / stats.count);
+                averages.push(avg);
+
+                if (avg <= 20) pieBuckets[0]++;
+                else if (avg <= 40) pieBuckets[1]++;
+                else if (avg <= 60) pieBuckets[2]++;
+                else if (avg <= 80) pieBuckets[3]++;
+                else pieBuckets[4]++;
+            }
+
+            // Draw Bar Chart
+            if (barChartInstance) barChartInstance.destroy();
+            barChartInstance = new Chart(document.getElementById('barChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Average Percentage',
+                        data: averages,
+                        backgroundColor: '#4e79a7'
+                    }]
+                },
+                options: { maintainAspectRatio: false, scales: { y: { max: 100 } } }
+            });
+
+            // Draw Pie Chart
+            if (pieChartInstance) pieChartInstance.destroy();
+            pieChartInstance = new Chart(document.getElementById('pieChart').getContext('2d'), {
+                type: 'pie',
+                data: {
+                    labels: ['0-20%', '21-40%', '41-60%', '61-80%', '81-100%'],
+                    datasets: [{ data: pieBuckets, backgroundColor: ['#ff6384', '#36a2eb', '#ffcd56', '#4bc0c0', '#9966ff'] }]
+                },
+                options: { maintainAspectRatio: false }
+            });
+        }
+
+        // Client-Side CSV Export
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            if (rawDataForExport.length === 0) return;
+            
+            let csv = "Student Name,Test Title,Score,Percentage,Date Taken\n";
+            rawDataForExport.forEach(r => {
+                const totalMarks = r.percentage > 0 ? (r.score / (r.percentage / 100)).toFixed(2) : r.score;
+                const safeName = `"${r.users.name.replace(/"/g, '""')}"`;
+                const safeTitle = `"${r.tests.title.replace(/"/g, '""')}"`;
+                csv += `${safeName},${safeTitle},'${r.score}/${totalMarks}',${Math.round(r.percentage)}/100,${new Date(r.test_attempts[0]?.start_time).toLocaleString()}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `student_results_${new Date().getTime()}.csv`;
+            link.click();
+        });
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBT System - Loading...</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* [Your Original CSS - Preserved Exactly] */
+        * { font-family: 'Inter', sans-serif; }
+        .header-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .glass-effect { backdrop-filter: blur(20px); background: rgba(255,255,255,0.95); }
+        .question-card { background: white; border-left: 4px solid #6366f1; transition: all 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .question-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .option-item { transition: all 0.2s ease; border: 2px solid transparent; cursor: pointer; }
+        .option-item:hover { background: rgba(99,102,241,0.05); border-color: #6366f1; }
+        .option-item.selected { background: rgba(99,102,241,0.1); border-color: #6366f1; }
+        
+        /* Navigation Styles */
+        .nav-container { background: rgba(249,250,251,0.95); backdrop-filter: blur(10px); border-bottom: 2px solid #e5e7eb; position: sticky; top: 0; z-index: 30; }
+        .nav-grid { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; max-height: 120px; overflow-y: auto; }
+        .nav-item { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid #d1d5db; background: white; color: #6b7280; font-weight: 600; font-size: 14px; transition: all 0.2s ease; cursor: pointer; position: relative; }
+        .nav-item:hover { border-color: #6366f1; background: rgba(99,102,241,0.1); transform: scale(1.05); }
+        .nav-item.active { background: #6366f1; color: white; border-color: #6366f1; box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+        .nav-item.answered { background: #10b981; color: white; border-color: #10b981; }
+        .nav-item.answered.active { background: #059669; border-color: #059669; }
+        .nav-item.answered::after { content: '✓'; position: absolute; top: -4px; right: -4px; background: #ffffff; color: #10b981; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; font-weight: bold; display: flex; align-items: center; justify-content: center; border: 2px solid #10b981; }
+        
+        /* Timer & Buttons */
+        .timer-normal { background: #f3f4f6; color: #374151; }
+        .timer-warning { background: #fef2f2; color: #dc2626; animation: pulse 2s infinite; }
+        .submit-btn { background: linear-gradient(135deg, #10b981 0%, #059669 100%); transition: all 0.3s ease; }
+        .submit-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 25px rgba(16,185,129,0.25); }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
+        
+        @media (max-width: 640px) { .nav-item { width: 36px; height: 36px; font-size: 12px; } .nav-grid { gap: 6px; padding: 8px; } }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <div id="loadingOverlay" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div class="text-xl font-semibold text-gray-600">Initializing Test Environment...</div>
+    </div>
+
+    <div class="header-gradient text-white p-6">
+        <div class="max-w-6xl mx-auto">
+            <h1 id="testTitle" class="text-2xl lg:text-3xl font-bold mb-4">Loading Test...</h1>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                <div><div class="text-blue-200">Subject</div><div id="testSubject" class="font-medium">...</div></div>
+                <div><div class="text-blue-200">Class</div><div id="testClass" class="font-medium">...</div></div>
+                <div><div class="text-blue-200">Duration</div><div id="testDuration" class="font-medium">...</div></div>
+                <div><div class="text-blue-200">Questions</div><div id="testQuestionCount" class="font-medium">...</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-container">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center justify-between py-2 px-4">
+                <h3 class="text-sm font-semibold text-gray-600">Questions Navigation</h3>
+                <div class="text-sm text-gray-500" id="nav-progress">0 of 0 answered</div>
+            </div>
+            <div class="nav-grid" id="navGrid">
+                </div>
+        </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto p-4">
+        
+        <div class="glass-effect rounded-lg p-4 mb-6 border border-gray-200">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="timer-normal px-4 py-2 rounded-lg font-mono text-lg font-bold" id="timer">Loading...</div>
+                    <div class="text-sm text-gray-600"><div>Time Remaining</div></div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-gray-500">Progress</div>
+                    <div class="font-semibold" id="progress">0 of 0</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="timeUpWarning" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 hidden">
+            <div class="flex items-center text-red-800">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"/></svg>
+                <strong>Time's up! Test is being submitted automatically...</strong>
+            </div>
+        </div>
+
+        <div id="questionsContainer">
+            </div>
+            
+        <div class="bg-white rounded-lg p-6 shadow-sm mt-6">
+            <div class="flex flex-col sm:flex-row gap-4 items-center justify-between">
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-1">Ready to Submit?</h3>
+                    <p class="text-gray-600 text-sm">Please review your answers before submitting</p>
+                </div>
+                <div class="flex gap-3">
+                    <a href="cbt_manager.html" class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">Exit</a>
+                    <button id="submitBtn" class="submit-btn px-8 py-2 text-white rounded-lg font-semibold" onclick="window.submitTest()">Submit Test</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        // Global State Variables
+        let currentUserId = null;
+        let testId = null;
+        let attemptId = null;
+        let questionsData = [];
+        let remainingSeconds = 0;
+        let timerInterval;
+        let timeExpired = false;
+        let isSubmitting = false;
+
+        // Utility: Fisher-Yates Shuffle
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        async function initTest() {
+            try {
+                // 1. Get Test ID from URL
+                const urlParams = new URLSearchParams(window.location.search);
+                testId = urlParams.get('test_id');
+                if (!testId) { alert("Invalid Test ID"); window.location.href = 'cbt_manager.html'; return; }
+
+                // 2. Auth Check
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) { window.location.href = 'login.html'; return; }
+                currentUserId = user.id;
+
+                // 3. Fetch Test Details
+                const { data: test, error: testErr } = await supabase
+                    .from('tests')
+                    .select('*, subjects(name), classes(name)')
+                    .eq('id', testId)
+                    .single();
+                
+                if (testErr || !test) throw new Error("Test not found.");
+
+                // Populate Header UI
+                document.getElementById('testTitle').innerText = test.title;
+                document.title = `CBT System - ${test.title}`;
+                document.getElementById('testSubject').innerText = test.subjects?.name || 'N/A';
+                document.getElementById('testClass').innerText = test.classes?.name || 'N/A';
+                document.getElementById('testDuration').innerText = `${test.duration_minutes} minutes`;
+
+                // 4. Handle Attempt & Timer (Simulating backend start logic)
+                const { data: existingAttempt } = await supabase
+                    .from('test_attempts')
+                    .select('*')
+                    .eq('test_id', testId)
+                    .eq('student_id', currentUserId)
+                    .single();
+
+                let startTimeStr;
+
+                if (existingAttempt) {
+                    if (existingAttempt.end_time) {
+                        alert("You have already completed this test.");
+                        window.location.href = `view_scores.html?test_id=${testId}`;
+                        return;
+                    }
+                    attemptId = existingAttempt.id;
+                    startTimeStr = existingAttempt.start_time;
+                } else {
+                    // Create new attempt
+                    startTimeStr = new Date().toISOString();
+                    const { data: newAttempt, error: attemptErr } = await supabase
+                        .from('test_attempts')
+                        .insert([{ test_id: testId, student_id: currentUserId, start_time: startTimeStr, total_marks: 0 }])
+                        .select()
+                        .single();
+                    if (attemptErr) throw attemptErr;
+                    attemptId = newAttempt.id;
+                }
+
+                // Calculate remaining time
+                const startTime = new Date(startTimeStr).getTime();
+                const now = new Date().getTime();
+                const durationMs = test.duration_minutes * 60000;
+                const expirationTime = startTime + durationMs;
+                remainingSeconds = Math.max(0, Math.floor((expirationTime - now) / 1000));
+
+                if (remainingSeconds <= 0) {
+                    await autoSubmitTest(testId, currentUserId, attemptId); // Time expired before load
+                    return;
+                }
+
+                // 5. Fetch Questions & Previous Answers
+                const { data: testQuestions } = await supabase.from('test_questions').select('question_id').eq('test_id', testId);
+                const questionIds = testQuestions.map(tq => tq.question_id);
+
+                const { data: questions } = await supabase.from('questions').select('*').in('id', questionIds);
+                questionsData = test.shuffle_questions ? shuffleArray(questions) : questions;
+
+                const { data: savedAnswers } = await supabase.from('student_answers').select('question_id, selected_answer').eq('attempt_id', attemptId);
+                const answerMap = {};
+                if(savedAnswers) savedAnswers.forEach(ans => answerMap[ans.question_id] = ans.selected_answer);
+
+                document.getElementById('testQuestionCount').innerText = `${questionsData.length} items`;
+
+                // 6. Render UI
+                renderNavigation(questionsData.length);
+                renderQuestions(questionsData, answerMap, test.shuffle_answers);
+                
+                // 7. Start Engine
+                document.getElementById('loadingOverlay').style.display = 'none';
+                startTimer();
+                updateProgress();
+                
+                // Setup Auto-save interval (every 30 seconds)
+                setInterval(autoSaveCurrentAnswers, 30000);
+
+            } catch (err) {
+                console.error(err);
+                alert("Error initializing test: " + err.message);
+            }
+        }
+
+        // --- RENDER FUNCTIONS ---
+        function renderNavigation(count) {
+            const navGrid = document.getElementById('navGrid');
+            let navHtml = '';
+            for(let i=0; i<count; i++) {
+                navHtml += `<a href="#question-${i}" class="nav-item ${i===0?'active':''}" data-index="${i}" id="nav-${i}">${i+1}</a>`;
+            }
+            navGrid.innerHTML = navHtml;
+
+            // Scroll spy for navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = item.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    const navHeight = document.querySelector('.nav-container').offsetHeight;
+                    window.scrollTo({ top: targetElement.offsetTop - navHeight - 20, behavior: 'smooth' });
+                });
+            });
+        }
+
+        function renderQuestions(questions, answerMap, shouldShuffleOptions) {
+            const container = document.getElementById('questionsContainer');
+            let html = '';
+
+            questions.forEach((q, index) => {
+                let options = [
+                    { key: 'A', text: q.option_a }, { key: 'B', text: q.option_b },
+                    { key: 'C', text: q.option_c }, { key: 'D', text: q.option_d }
+                ].filter(opt => opt.text); // Remove empty options
+
+                if (shouldShuffleOptions) options = shuffleArray(options);
+
+                const previouslySelected = answerMap[q.id];
+
+                let optionsHtml = options.map(opt => `
+                    <div class="option-item rounded-lg p-3 ${previouslySelected === opt.key ? 'selected' : ''}">
+                        <label class="flex items-start space-x-3 cursor-pointer w-full h-full">
+                            <input type="radio" name="ans_${q.id}" value="${opt.key}" ${previouslySelected === opt.key ? 'checked' : ''} 
+                                   class="mt-1 w-4 h-4 text-blue-600 focus:ring-blue-500" 
+                                   onchange="window.handleAnswerSelection(${index}, ${q.id}, '${opt.key}', this)">
+                            <div class="flex-1">
+                                <span class="inline-flex items-center justify-center w-6 h-6 bg-gray-100 text-gray-700 rounded-full font-medium text-sm mr-2">${opt.key}</span>
+                                <span class="text-gray-800">${opt.text}</span>
+                            </div>
+                        </label>
+                    </div>
+                `).join('');
+
+                html += `
+                    <div id="question-${index}" class="question-card rounded-lg p-6 mb-6" data-qid="${q.id}">
+                        <div class="flex items-start justify-between mb-4">
+                            <h2 class="text-lg font-semibold text-gray-800">Question ${index + 1}</h2>
+                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-medium">${q.marks} marks</span>
+                        </div>
+                        <p class="text-gray-700 mb-4 leading-relaxed">${q.question_text}</p>
+                        <div class="space-y-2">${optionsHtml}</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // --- TEST ENGINE LOGIC ---
+        window.handleAnswerSelection = (index, questionId, selectedValue, radioElement) => {
+            // Update UI styles
+            const optionsDivs = radioElement.closest('.space-y-2').querySelectorAll('.option-item');
+            optionsDivs.forEach(div => div.classList.remove('selected'));
+            radioElement.closest('.option-item').classList.add('selected');
+            
+            // Auto-save instantly on click for best UX
+            saveSingleAnswer(questionId, selectedValue);
+            updateProgress();
+        };
+
+        async function saveSingleAnswer(questionId, selectedValue) {
+            if (timeExpired || isSubmitting) return;
+            const qData = questionsData.find(q => q.id === questionId);
+            const marksObtained = (selectedValue === qData.correct_option) ? qData.marks : 0;
+
+            await supabase.from('student_answers').upsert({
+                attempt_id: attemptId,
+                question_id: questionId,
+                selected_answer: selectedValue,
+                marks_obtained: marksObtained,
+                marks: qData.marks
+            }, { onConflict: 'attempt_id, question_id' });
+        }
+
+        async function autoSaveCurrentAnswers() {
+            if (timeExpired || isSubmitting) return;
+            // The handleAnswerSelection handles live saving, so this interval is just a fallback.
+            console.log("Auto-save ping.");
+        }
+
+        function updateProgress() {
+            const total = questionsData.length;
+            const answeredInputs = document.querySelectorAll('input[type="radio"]:checked');
+            const answeredCount = answeredInputs.length;
+            
+            document.getElementById('progress').innerText = `${answeredCount} of ${total}`;
+            document.getElementById('nav-progress').innerText = `${answeredCount} of ${total} answered`;
+
+            // Update Nav Pills
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('answered'));
+            answeredInputs.forEach(input => {
+                const qDiv = input.closest('.question-card');
+                const index = qDiv.id.split('-')[1];
+                document.getElementById(`nav-${index}`).classList.add('answered');
+            });
+        }
+
+        function startTimer() {
+            const timerEl = document.getElementById('timer');
+            timerInterval = setInterval(() => {
+                if (remainingSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    if (!timeExpired) handleTimeExpiration();
+                    return;
+                }
+                
+                const h = Math.floor(remainingSeconds / 3600);
+                const m = Math.floor((remainingSeconds % 3600) / 60);
+                const s = remainingSeconds % 60;
+                
+                timerEl.innerText = h > 0 ? `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}` 
+                                          : `${m}:${s.toString().padStart(2,'0')}`;
+                
+                if (remainingSeconds <= 300) {
+                    timerEl.className = 'timer-warning px-4 py-2 rounded-lg font-mono text-lg font-bold';
+                }
+                remainingSeconds--;
+            }, 1000);
+        }
+
+        function handleTimeExpiration() {
+            timeExpired = true;
+            document.getElementById('timer').innerText = "Time's Up!";
+            document.getElementById('timeUpWarning').classList.remove('hidden');
+            document.getElementById('submitBtn').disabled = true;
+            
+            // Disable all radio buttons
+            document.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
+            
+            // Auto-submit after short delay
+            setTimeout(() => window.submitTest(true), 2000);
+        }
+
+        // --- SUBMISSION ---
+        window.submitTest = async (isAuto = false) => {
+            if (isSubmitting) return;
+            if (!isAuto && !confirm("Are you sure you want to submit your test?")) return;
+            
+            isSubmitting = true;
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = "Submitting...";
+            btn.disabled = true;
+
+            try {
+                // Calculate final score
+                const { data: finalAnswers } = await supabase.from('student_answers').select('marks_obtained').eq('attempt_id', attemptId);
+                let score = 0;
+                if(finalAnswers) finalAnswers.forEach(a => score += a.marks_obtained || 0);
+                
+                let totalMarks = 0;
+                questionsData.forEach(q => totalMarks += q.marks);
+                const percentage = totalMarks > 0 ? (score / totalMarks) * 100 : 0;
+
+                // Close attempt
+                await supabase.from('test_attempts').update({
+                    score: score,
+                    percentage: percentage,
+                    total_marks: totalMarks,
+                    end_time: new Date().toISOString()
+                }).eq('id', attemptId);
+
+                // Save to Results table (matching PHP architecture)
+                await supabase.from('test_results').upsert({
+                    test_id: testId,
+                    student_id: currentUserId,
+                    score: score,
+                    percentage: percentage
+                }, { onConflict: 'test_id, student_id' });
+
+                window.location.href = `view_scores.html?test_id=${testId}`;
+
+            } catch (err) {
+                alert("Error submitting test: " + err.message);
+                btn.innerText = "Submit Test";
+                btn.disabled = false;
+                isSubmitting = false;
+            }
+        };
+
+        // Scroll spy for Nav Items
+        window.addEventListener('scroll', () => {
+            const navHeight = document.querySelector('.nav-container').offsetHeight;
+            const navItems = document.querySelectorAll('.nav-item');
+            document.querySelectorAll('.question-card').forEach((card, index) => {
+                const rect = card.getBoundingClientRect();
+                if (rect.top <= navHeight + 50 && rect.bottom >= navHeight + 50) {
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    document.getElementById(`nav-${index}`).classList.add('active');
+                }
+            });
+        });
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initTest);
+
+    </script>
+</body>
+</html>

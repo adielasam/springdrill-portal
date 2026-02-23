@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRING DRILL - Report Card</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .content { padding: 30px; max-width: 800px; margin: 0 auto; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); padding: 25px; margin-bottom: 20px; }
+        .grade-A { color: #28a745; }
+        .grade-B { color: #17a2b8; }
+        .grade-C { color: #ffc107; }
+        .grade-D { color: #fd7e14; }
+        .grade-F { color: #dc3545; }
+        .total-row { background-color: #f8f9fa; font-weight: bold; font-size: 1.1em; }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Student Report Card</h2>
+            <a href="teacher_dashboard.html" class="btn btn-outline-secondary">Back to Dashboard</a>
+        </div>
+
+        <div id="alertBox" class="alert d-none"></div>
+
+        <div class="card">
+            <form id="reportForm">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Student</label>
+                        <select id="student_id" class="form-select" required><option value="">Loading...</option></select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Term</label>
+                        <select id="term_id" class="form-select" required>
+                            <option value="">Select Term</option>
+                            <option value="1">First Term</option>
+                            <option value="2">Second Term</option>
+                            <option value="3">Third Term</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3 w-100">Generate Report</button>
+            </form>
+        </div>
+
+        <div id="reportDisplay" class="card d-none">
+            </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        const alertBox = document.getElementById('alertBox');
+        function showAlert(msg) {
+            alertBox.className = 'alert alert-danger d-block';
+            alertBox.textContent = msg;
+        }
+
+        async function init() {
+            // Verify access
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) { window.location.href = 'login.html'; return; }
+
+            // Fetch Approved Students for Dropdown
+            const { data: students } = await supabase
+                .from('students')
+                .select('id, users!inner(name)')
+                .eq('approved', true)
+                .order('users(name)');
+
+            if (students) {
+                const select = document.getElementById('student_id');
+                select.innerHTML = '<option value="">Select Student</option>' + 
+                    students.map(s => `<option value="${s.id}">${s.users.name}</option>`).join('');
+            }
+        }
+
+        document.getElementById('reportForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const studentId = document.getElementById('student_id').value;
+            const termId = document.getElementById('term_id').value;
+            const termName = document.getElementById('term_id').options[document.getElementById('term_id').selectedIndex].text;
+            const studentName = document.getElementById('student_id').options[document.getElementById('student_id').selectedIndex].text;
+
+            const display = document.getElementById('reportDisplay');
+            display.innerHTML = '<div class="text-center"><div class="spinner-border text-primary"></div></div>';
+            display.classList.remove('d-none');
+
+            try {
+                // Fetch scores, matching the PHP logic
+                const { data: scores, error } = await supabase
+                    .from('student_scores')
+                    .select('cat1, cat2, exam')
+                    .eq('student_id', studentId)
+                    .eq('term_id', termId);
+
+                if (error || !scores || scores.length === 0) {
+                    display.innerHTML = '<p class="text-center text-muted mt-3">No report data found for this student and term.</p>';
+                    return;
+                }
+
+                // Aggregate the scores if there are multiple entries (e.g. multiple subjects)
+                // The PHP file just fetched the first row, but it's safer to sum them up or display the first subject.
+                const report = scores[0]; 
+                
+                const cat1 = parseFloat(report.cat1 || 0);
+                const cat2 = parseFloat(report.cat2 || 0);
+                const exam = parseFloat(report.exam || 0);
+                const total = cat1 + cat2 + exam;
+                
+                let grade = 'F';
+                let gradeClass = 'grade-F';
+                if (total >= 70) { grade = 'A'; gradeClass = 'grade-A'; }
+                else if (total >= 60) { grade = 'B'; gradeClass = 'grade-B'; }
+                else if (total >= 50) { grade = 'C'; gradeClass = 'grade-C'; }
+                else if (total >= 40) { grade = 'D'; gradeClass = 'grade-D'; }
+
+                // Determine Class Name
+                const { data: studentData } = await supabase.from('students').select('classes(name)').eq('id', studentId).single();
+                const className = studentData?.classes?.name || 'Unknown Class';
+
+                display.innerHTML = `
+                    <h3 class="mb-4 pb-2 border-bottom text-primary">Academic Report Card</h3>
+                    <div class="row mb-4">
+                        <div class="col-sm-4"><span class="text-muted d-block">Student Name</span><strong>${studentName}</strong></div>
+                        <div class="col-sm-4"><span class="text-muted d-block">Class</span><strong>${className}</strong></div>
+                        <div class="col-sm-4"><span class="text-muted d-block">Term</span><strong>${termName}</strong></div>
+                    </div>
+                    <table class="table table-bordered">
+                        <thead class="table-light"><tr><th>Assessment</th><th>Score</th></tr></thead>
+                        <tbody>
+                            <tr><td>Continuous Assessment 1 (CAT1)</td><td>${cat1} / 20</td></tr>
+                            <tr><td>Continuous Assessment 2 (CAT2)</td><td>${cat2} / 20</td></tr>
+                            <tr><td>Term Examination</td><td>${exam} / 60</td></tr>
+                            <tr class="total-row"><td>Cumulative Total</td><td>${total} / 100</td></tr>
+                            <tr><td><strong>Final Grade</strong></td><td><strong class="fs-4 ${gradeClass}">${grade}</strong></td></tr>
+                        </tbody>
+                    </table>
+                    <div class="text-end mt-3">
+                        <button onclick="window.print()" class="btn btn-outline-primary"><i class="fas fa-print me-1"></i> Print Slip</button>
+                    </div>
+                `;
+
+            } catch (err) {
+                showAlert("Error generating report.");
+                console.error(err);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

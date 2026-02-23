@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRING DRILL - Question Bank</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f6f9; }
+        .content { padding: 20px; max-width: 1400px; margin: 0 auto; }
+        .header { background-color: #1a3c34; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .edit-form { background-color: #ffffff; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-top: 4px solid #1a3c34; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .edit-form h4 { color: #1a3c34; margin-bottom: 20px; font-weight: 600; }
+        .table-container { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .selected-row { background-color: #e3f2fd !important; }
+        #editQuestionSection { display: none; }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <div class="header">
+            <h2 id="pageTitle">Question Bank</h2>
+            <div>
+                <button class="btn btn-outline-light me-2" onclick="window.toggleSection('importSection')">Bulk Import</button>
+                <button class="btn btn-outline-light" onclick="window.history.back()">Back</button>
+            </div>
+        </div>
+
+        <div id="alertBox" class="alert d-none"></div>
+
+        <div id="importSection" class="edit-form">
+            <h4>Import Questions Manually</h4>
+            <form id="importForm">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Class</label>
+                        <select class="form-select class-dropdown" id="importClassId" required><option value="">Loading...</option></select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Subject</label>
+                        <select class="form-select subject-dropdown" id="importSubjectId" required><option value="">Loading...</option></select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Enter Questions (Format: Question|Option A|Option B|Option C|Option D|Correct Option)</label>
+                    <textarea class="form-control" id="manualQuestions" rows="5" placeholder="What is 2 + 2?|3|4|5|6|B" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-success" id="btnImport">Import Questions</button>
+            </form>
+        </div>
+
+        <div id="editQuestionSection" class="edit-form">
+            <h4>Edit Question</h4>
+            <form id="editForm">
+                <input type="hidden" id="editQuestionId">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Class</label>
+                        <select class="form-select class-dropdown" id="editClassId" required></select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Subject</label>
+                        <select class="form-select subject-dropdown" id="editSubjectId" required></select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Question Text</label>
+                    <textarea class="form-control" id="editQuestionText" rows="2" required></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3"><label class="form-label">Option A</label><input type="text" id="editOptA" class="form-control" required></div>
+                    <div class="col-md-6 mb-3"><label class="form-label">Option B</label><input type="text" id="editOptB" class="form-control" required></div>
+                    <div class="col-md-6 mb-3"><label class="form-label">Option C</label><input type="text" id="editOptC" class="form-control" required></div>
+                    <div class="col-md-6 mb-3"><label class="form-label">Option D</label><input type="text" id="editOptD" class="form-control" required></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Correct Option</label>
+                    <select class="form-select" id="editCorrectOpt" required>
+                        <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success" id="btnUpdate">Save Changes</button>
+                <button type="button" class="btn btn-secondary" onclick="window.cancelEdit()">Cancel</button>
+            </form>
+        </div>
+
+        <div class="table-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="mb-0">Your Repository</h4>
+                <button id="btnAddToTest" class="btn btn-primary d-none" onclick="window.addSelectedToTest()">Add Selected to Test</button>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th id="thSelect" class="d-none">Select</th>
+                            <th>Question</th>
+                            <th>Class</th>
+                            <th>Subject</th>
+                            <th>Answer</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="questionsTbody">
+                        <tr><td colspan="6" class="text-center py-4">Loading questions...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        let currentUserId = null;
+        let activeTestId = null;
+        let testQuestionIds = []; // Array to store IDs of questions already in the test
+
+        // UI Helpers
+        const alertBox = document.getElementById('alertBox');
+        function showAlert(msg, isSuccess = true) {
+            alertBox.className = `alert ${isSuccess ? 'alert-success' : 'alert-danger'} d-block`;
+            alertBox.textContent = msg;
+            setTimeout(() => { alertBox.classList.add('d-none'); }, 4000);
+            window.scrollTo(0,0);
+        }
+
+        window.toggleSection = (id) => {
+            const sec = document.getElementById(id);
+            sec.style.display = sec.style.display === 'none' || sec.style.display === '' ? 'block' : 'none';
+        };
+
+        // Initialize App
+        async function init() {
+            // Check Auth
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) { window.location.href = 'login.html'; return; }
+            currentUserId = user.id;
+
+            // Check if we are adding to a specific test
+            const urlParams = new URLSearchParams(window.location.search);
+            activeTestId = urlParams.get('test_id');
+
+            if (activeTestId) {
+                document.getElementById('pageTitle').textContent = `Add Questions to Test`;
+                document.getElementById('thSelect').classList.remove('d-none');
+                document.getElementById('btnAddToTest').classList.remove('d-none');
+                
+                // Fetch existing test questions to disable checkboxes
+                const { data: tq } = await supabase.from('test_questions').select('question_id').eq('test_id', activeTestId);
+                if (tq) testQuestionIds = tq.map(row => row.question_id);
+            }
+
+            await loadDropdowns();
+            await loadQuestions();
+        }
+
+        // Load Classes and Subjects
+        async function loadDropdowns() {
+            const [classesRes, subjectsRes] = await Promise.all([
+                supabase.from('classes').select('*').order('name'),
+                supabase.from('subjects').select('*').order('name')
+            ]);
+
+            const pop = (selector, data) => {
+                const html = '<option value="">Select...</option>' + data.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+                document.querySelectorAll(selector).forEach(el => el.innerHTML = html);
+            };
+
+            if (classesRes.data) pop('.class-dropdown', classesRes.data);
+            if (subjectsRes.data) pop('.subject-dropdown', subjectsRes.data);
+        }
+
+        // Load Teacher's Questions
+        async function loadQuestions() {
+            const { data, error } = await supabase
+                .from('questions')
+                .select(`*, classes(name), subjects(name)`)
+                .eq('teacher_id', currentUserId)
+                .order('created_at', { ascending: false });
+
+            const tbody = document.getElementById('questionsTbody');
+            
+            if (error || !data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">No questions found. Add some above!</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map(q => {
+                const isAlreadyInTest = testQuestionIds.includes(q.id);
+                const checkboxHtml = activeTestId ? `
+                    <td>
+                        <input type="checkbox" class="q-checkbox form-check-input" value="${q.id}" ${isAlreadyInTest ? 'checked disabled' : ''}>
+                    </td>` : '';
+
+                return `
+                    <tr id="row-${q.id}" class="${isAlreadyInTest ? 'table-light text-muted' : ''}">
+                        ${checkboxHtml}
+                        <td style="max-width: 400px;" class="text-truncate" title="${q.question_text}">${q.question_text}</td>
+                        <td>${q.classes?.name || 'N/A'}</td>
+                        <td>${q.subjects?.name || 'N/A'}</td>
+                        <td><span class="badge bg-secondary">${q.correct_option}</span></td>
+                        <td>
+                            <button onclick="window.editQuestion(${q.id})" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button>
+                            <button onclick="window.deleteQuestion(${q.id})" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 1. Bulk Import Logic (Matching the PHP parsing logic)
+        document.getElementById('importForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnImport');
+            btn.disabled = true;
+
+            const classId = document.getElementById('importClassId').value;
+            const subjectId = document.getElementById('importSubjectId').value;
+            const rawText = document.getElementById('manualQuestions').value;
+
+            const lines = rawText.split('\n');
+            const insertPayload = [];
+
+            lines.forEach(line => {
+                if (!line.trim()) return;
+                const parts = line.split('|').map(p => p.trim());
+                if (parts.length >= 6) {
+                    insertPayload.push({
+                        teacher_id: currentUserId, class_id: classId, subject_id: subjectId,
+                        question_text: parts[0], option_a: parts[1], option_b: parts[2], 
+                        option_c: parts[3], option_d: parts[4], correct_option: parts[5].toUpperCase()
+                    });
+                }
+            });
+
+            if (insertPayload.length === 0) {
+                showAlert('No valid questions parsed. Check format.', false);
+                btn.disabled = false;
+                return;
+            }
+
+            const { error } = await supabase.from('questions').insert(insertPayload);
+            
+            if (error) showAlert(error.message, false);
+            else {
+                showAlert(`${insertPayload.length} questions imported successfully!`);
+                document.getElementById('importForm').reset();
+                window.toggleSection('importSection');
+                loadQuestions();
+            }
+            btn.disabled = false;
+        });
+
+        // 2. Edit Logic
+        window.editQuestion = async (id) => {
+            const { data: q } = await supabase.from('questions').select('*').eq('id', id).single();
+            if (!q) return;
+
+            document.getElementById('editQuestionId').value = q.id;
+            document.getElementById('editClassId').value = q.class_id;
+            document.getElementById('editSubjectId').value = q.subject_id;
+            document.getElementById('editQuestionText').value = q.question_text;
+            document.getElementById('editOptA').value = q.option_a;
+            document.getElementById('editOptB').value = q.option_b;
+            document.getElementById('editOptC').value = q.option_c;
+            document.getElementById('editOptD').value = q.option_d;
+            document.getElementById('editCorrectOpt').value = q.correct_option;
+
+            document.getElementById('editQuestionSection').style.display = 'block';
+            window.scrollTo({ top: document.getElementById('editQuestionSection').offsetTop - 20, behavior: 'smooth' });
+        };
+
+        window.cancelEdit = () => { document.getElementById('editQuestionSection').style.display = 'none'; };
+
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editQuestionId').value;
+            const payload = {
+                class_id: document.getElementById('editClassId').value,
+                subject_id: document.getElementById('editSubjectId').value,
+                question_text: document.getElementById('editQuestionText').value,
+                option_a: document.getElementById('editOptA').value,
+                option_b: document.getElementById('editOptB').value,
+                option_c: document.getElementById('editOptC').value,
+                option_d: document.getElementById('editOptD').value,
+                correct_option: document.getElementById('editCorrectOpt').value,
+            };
+
+            const { error } = await supabase.from('questions').update(payload).eq('id', id);
+            
+            if (error) showAlert(error.message, false);
+            else {
+                showAlert('Question updated successfully!');
+                window.cancelEdit();
+                loadQuestions();
+            }
+        });
+
+        // 3. Delete Logic
+        window.deleteQuestion = async (id) => {
+            if (!confirm('Delete this question permanently?')) return;
+            const { error } = await supabase.from('questions').delete().eq('id', id);
+            if (error) showAlert('Cannot delete question. It might be linked to existing tests.', false);
+            else { showAlert('Deleted successfully.'); loadQuestions(); }
+        };
+
+        // 4. Add to Test Logic
+        window.addSelectedToTest = async () => {
+            if (!activeTestId) return;
+            
+            const checkboxes = document.querySelectorAll('.q-checkbox:checked:not(:disabled)');
+            const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+
+            if (selectedIds.length === 0) {
+                showAlert('Please select at least one new question.', false);
+                return;
+            }
+
+            const payload = selectedIds.map(qId => ({ test_id: activeTestId, question_id: qId }));
+            
+            // Insert Ignore alternative in Supabase (upsert ignores if unique constraint fails)
+            const { error } = await supabase.from('test_questions').upsert(payload, { onConflict: 'test_id, question_id', ignoreDuplicates: true });
+
+            if (error) showAlert(error.message, false);
+            else {
+                showAlert(`${selectedIds.length} questions added to test!`);
+                // Add to local state so UI updates instantly
+                selectedIds.forEach(id => testQuestionIds.push(parseInt(id)));
+                loadQuestions(); // Re-render to show them disabled/grayed out
+            }
+        };
+
+        // Run
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
