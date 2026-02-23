@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SPRINGDRILL - Signup</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { 
+            background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.5)), url('tech3.jpg'); 
+            background-size: cover; 
+            background-position: center; 
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 2rem; 
+        }
+        .signup-container { 
+            background: rgba(255, 255, 255, 0.95); 
+            border-radius: 20px; 
+            padding: 2.5rem 2rem; 
+            max-width: 450px; 
+            width: 100%; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25); 
+        }
+        .form-floating { margin-bottom: 1rem; }
+        .btn-signup { 
+            width: 100%; 
+            background: #3498db; 
+            color: white; 
+            border: none; 
+            padding: 0.75rem; 
+            font-size: 1.1rem; 
+            border-radius: 8px; 
+        }
+        .login-link { display: block; text-align: center; margin-top: 1rem; font-size: 0.95rem; }
+        .login-link a { color: #3498db; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <h2 class="text-center mb-3"><i class="fas fa-user-plus me-2"></i>Create Account</h2>
+
+        <div id="alertBox" class="alert" style="display: none;"></div>
+
+        <form id="signupForm">
+            <div class="form-floating">
+                <input type="text" id="name" class="form-control" placeholder="Full Name" required>
+                <label for="name">Full Name</label>
+            </div>
+
+            <div class="form-floating">
+                <input type="text" id="username" class="form-control" placeholder="Username" required>
+                <label for="username">Display Username</label>
+            </div>
+
+            <div class="form-floating">
+                <input type="email" id="email" class="form-control" placeholder="Email Address" required>
+                <label for="email">Email Address</label>
+            </div>
+
+            <div class="form-floating">
+                <input type="password" id="password" class="form-control" placeholder="Password" required minlength="6">
+                <label for="password">Password (Min 6 chars)</label>
+            </div>
+
+            <div class="form-floating">
+                <select id="role" class="form-select" required>
+                    <option value="student">Student</option>
+                    <option value="teacher">Teacher</option>
+                </select>
+                <label for="role">Role</label>
+            </div>
+
+            <div class="form-floating" id="class-selection">
+                <select id="class_id" class="form-select">
+                    <option value="">Loading Classes...</option>
+                </select>
+                <label for="class_id">Class</label>
+            </div>
+
+            <button type="submit" class="btn-signup" id="submitBtn">Create Account</button>
+        </form>
+
+        <div class="login-link">
+            Already have an account? <a href="login.html">Log in here</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        const roleSelect = document.getElementById('role');
+        const classDiv = document.getElementById('class-selection');
+        const classSelect = document.getElementById('class_id');
+        const alertBox = document.getElementById('alertBox');
+
+        function showAlert(msg, isSuccess = false) {
+            alertBox.style.display = 'block';
+            alertBox.className = `alert ${isSuccess ? 'alert-success' : 'alert-danger'}`;
+            alertBox.textContent = msg;
+        }
+
+        roleSelect.addEventListener('change', () => {
+            classDiv.style.display = roleSelect.value === 'student' ? 'block' : 'none';
+        });
+
+        async function loadClasses() {
+            const { data: classes } = await supabase.from('classes').select('*').order('name');
+            if (classes) {
+                classSelect.innerHTML = '<option value="">Select Class</option>' + 
+                    classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            }
+        }
+        loadClasses();
+
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const name = document.getElementById('name').value;
+            const username = document.getElementById('username').value;
+            const role = document.getElementById('role').value;
+            const class_id = classSelect.value;
+
+            try {
+                const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
+                if (authError) throw authError;
+
+                const userId = authData.user.id;
+
+                const { error: userError } = await supabase.from('users').insert([
+                    { id: userId, email: email, username: username, name: name, role: role }
+                ]);
+                if (userError) throw userError;
+
+                if (role === 'student') {
+                    await supabase.from('students').insert([{ user_id: userId, class_id: class_id, approved: false }]);
+                } else if (role === 'teacher') {
+                    await supabase.from('teachers').insert([{ user_id: userId, approved: false }]);
+                }
+
+                await supabase.auth.signOut();
+                showAlert('Account created! Awaiting Admin approval.', true);
+                document.getElementById('signupForm').reset();
+
+            } catch (err) {
+                showAlert(err.message);
+            } finally {
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
