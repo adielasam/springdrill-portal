@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - Official Report Card</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7fa; overflow-x: hidden; }
+        
+        /* Sidebar Styling (Hidden in Print) */
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding-top: 30px; z-index: 1000; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-brand i { color: #3498db; font-size: 2.5rem; margin-bottom: 10px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 15px 25px; margin: 4px 15px; border-radius: 8px; text-decoration: none; display: flex; align-items: center; }
+        .nav-link i { width: 25px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; }
+
+        .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
+        .controls-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; border-left: 5px solid #0d6efd; }
+
+        /* A4 Report Card Styling */
+        .report-card-container {
+            background: white;
+            width: 210mm; /* A4 Width */
+            min-height: 297mm; /* A4 Height */
+            margin: 0 auto;
+            padding: 20mm;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 5px;
+            position: relative;
+        }
+        
+        /* Report Card Elements */
+        .rc-header { text-align: center; border-bottom: 4px double #1a3c34; padding-bottom: 20px; margin-bottom: 30px; }
+        .rc-logo { font-size: 4rem; color: #1a3c34; margin-bottom: 10px; }
+        .rc-school-name { font-size: 28px; font-weight: 900; color: #1a3c34; text-transform: uppercase; letter-spacing: 2px; margin: 0; }
+        .rc-title { font-size: 20px; font-weight: bold; background: #1a3c34; color: white; display: inline-block; padding: 5px 20px; border-radius: 20px; margin-top: 15px; }
+        
+        .rc-student-info { display: flex; justify-content: space-between; margin-bottom: 30px; border: 1px solid #dee2e6; padding: 20px; border-radius: 10px; background: #fdfdfd; }
+        .rc-passport { width: 120px; height: 120px; border: 2px solid #1a3c34; border-radius: 10px; object-fit: cover; }
+        
+        .rc-table th { background-color: #f4f7fa !important; color: #1a3c34; border-bottom: 2px solid #1a3c34; }
+        .rc-table td { font-weight: bold; }
+        
+        .rc-footer { margin-top: 50px; display: flex; justify-content: space-between; }
+        .rc-signature { width: 250px; border-top: 2px solid #1a3c34; text-align: center; padding-top: 10px; font-weight: bold; }
+
+        /* Print Media Query */
+        @media print {
+            body { background: white; margin: 0; padding: 0; }
+            .sidebar, .controls-card { display: none !important; }
+            .main-content { margin: 0; padding: 0; }
+            .report-card-container { width: 100%; box-shadow: none; border-radius: 0; padding: 0; margin: 0; min-height: auto; }
+            .rc-table th { background-color: #f4f7fa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .rc-title { background: #1a3c34 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            @page { margin: 1cm; size: A4 portrait; }
+        }
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay">
+        <i class="fas fa-spinner fa-spin fa-3x text-primary mb-3"></i>
+        <h4>Loading Report Engine...</h4>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <h4 class="text-white fw-bold mb-0">STAFF PORTAL</h4>
+        </div>
+        <nav class="nav flex-column mt-4">
+            <a href="teacher_dashboard.html" class="nav-link"><i class="fas fa-home me-2"></i> Dashboard Home</a>
+            <a href="report_scores.html" class="nav-link"><i class="fas fa-th me-2"></i> Gradebook Heatmap</a>
+            <a href="report_card.html" class="nav-link active"><i class="fas fa-print me-2"></i> Print Report Cards</a>
+            <hr class="mx-3 my-4 border-secondary">
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-sign-out-alt me-2"></i> Secure Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        
+        <div class="controls-card">
+            <div class="row align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">1. Select Class</label>
+                    <select id="classSelect" class="form-select">
+                        <option value="">Loading classes...</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">2. Select Student</label>
+                    <select id="studentSelect" class="form-select" disabled>
+                        <option value="">Select a class first...</option>
+                    </select>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="btn btn-primary fw-bold px-4" onclick="window.print()" id="printBtn" disabled>
+                        <i class="fas fa-print me-2"></i> Print Document
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-card-container" id="reportDocument" style="display: none;">
+            
+            <div class="rc-header">
+                <i class="fas fa-graduation-cap rc-logo"></i>
+                <h1 class="rc-school-name">SPRINGDRILL ACADEMY</h1>
+                <p class="mb-1 text-muted fw-bold">Excellence in Education & Character</p>
+                <div class="rc-title">OFFICIAL STUDENT REPORT CARD</div>
+            </div>
+
+            <div class="rc-student-info">
+                <div>
+                    <h4 class="fw-bold mb-3 text-dark text-uppercase" id="rcStudentName">STUDENT NAME</h4>
+                    <p class="mb-1"><strong>Admission No:</strong> <span id="rcRegNo">--</span></p>
+                    <p class="mb-1"><strong>Class Assigned:</strong> <span id="rcClass">--</span></p>
+                    <p class="mb-0"><strong>Current Session:</strong> 2024/2025</p>
+                </div>
+                <div>
+                    <img id="rcPassport" src="https://via.placeholder.com/150?text=No+Photo" class="rc-passport" alt="Passport">
+                </div>
+            </div>
+
+            <table class="table table-bordered rc-table mb-5">
+                <thead>
+                    <tr>
+                        <th width="40%">SUBJECT</th>
+                        <th width="20%" class="text-center">SCORE (%)</th>
+                        <th width="20%" class="text-center">GRADE</th>
+                        <th width="20%">REMARKS</th>
+                    </tr>
+                </thead>
+                <tbody id="rcGradesTbody">
+                    </tbody>
+                <tfoot>
+                    <tr class="table-light border-top border-dark border-2">
+                        <td class="fw-bold text-end">OVERALL AVERAGE:</td>
+                        <td class="text-center fw-bold fs-5" id="rcTotalAvg">--%</td>
+                        <td colspan="2"></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="alert alert-light border border-dark rounded-0 p-3 mb-5">
+                <h6 class="fw-bold mb-2 text-decoration-underline">Principal's Comment:</h6>
+                <p class="fst-italic mb-0" id="rcComment">An outstanding academic performance. Keep up the excellent work!</p>
+            </div>
+
+            <div class="rc-footer">
+                <div class="rc-signature">
+                    Class Teacher's Signature
+                </div>
+                <div class="rc-signature">
+                    Principal's Signature & Stamp
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        async function initializePage() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = 'login.html';
+
+                // Load classes
+                const { data: classes } = await supabase.from('classes').select('id, name').order('id');
+                const classSelect = document.getElementById('classSelect');
+                if (classes) {
+                    classSelect.innerHTML = `<option value="" disabled selected>-- Select Target Class --</option>` + 
+                        classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                }
+
+                document.getElementById('loadingOverlay').style.display = 'none';
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initializePage);
+
+        // Load Students when Class is selected
+        document.getElementById('classSelect').addEventListener('change', async (e) => {
+            const classId = e.target.value;
+            const studentSelect = document.getElementById('studentSelect');
+            studentSelect.innerHTML = `<option value="">Loading students...</option>`;
+            studentSelect.disabled = true;
+
+            try {
+                const { data: students } = await supabase
+                    .from('students')
+                    .select('user_id, users(name)')
+                    .eq('class_id', classId)
+                    .eq('approved', true)
+                    .order('user_id'); // Just an arbitrary ordering
+
+                if (students && students.length > 0) {
+                    studentSelect.innerHTML = `<option value="" disabled selected>-- Select a Student --</option>` + 
+                        students.map(s => `<option value="${s.user_id}">${s.users.name}</option>`).join('');
+                    studentSelect.disabled = false;
+                } else {
+                    studentSelect.innerHTML = `<option value="">No approved students found.</option>`;
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        });
+
+        // Generate Report Card when Student is selected
+        document.getElementById('studentSelect').addEventListener('change', async (e) => {
+            const studentId = e.target.value;
+            if (!studentId) return;
+
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            try {
+                // 1. Get Student Info & Passport
+                const { data: studentInfo } = await supabase
+                    .from('students')
+                    .select('passport_url, classes(name), users(name)')
+                    .eq('user_id', studentId)
+                    .single();
+
+                document.getElementById('rcStudentName').innerText = studentInfo.users.name;
+                document.getElementById('rcClass').innerText = studentInfo.classes.name;
+                // Generate a fake reg number using part of ID
+                document.getElementById('rcRegNo').innerText = "SD-" + studentId.substring(0, 8).toUpperCase();
+                
+                if (studentInfo.passport_url) {
+                    document.getElementById('rcPassport').src = studentInfo.passport_url;
+                } else {
+                    document.getElementById('rcPassport').src = "https://via.placeholder.com/150?text=No+Photo";
+                }
+
+                // 2. Get Grades (Average per subject)
+                const { data: attempts } = await supabase
+                    .from('test_attempts')
+                    .select(`percentage, tests!inner(subjects(name))`)
+                    .eq('student_id', studentId)
+                    .not('end_time', 'is', null);
+
+                const tbody = document.getElementById('rcGradesTbody');
+                
+                if (!attempts || attempts.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-4">No exam records found for this student.</td></tr>`;
+                    document.getElementById('rcTotalAvg').innerText = '0%';
+                } else {
+                    // Aggregate scores by subject
+                    const subjectData = {};
+                    attempts.forEach(a => {
+                        const subName = a.tests.subjects.name;
+                        if (!subjectData[subName]) subjectData[subName] = [];
+                        subjectData[subName].push(parseFloat(a.percentage));
+                    });
+
+                    let totalSum = 0;
+                    let subCount = 0;
+                    let rowsHtml = '';
+
+                    for (const [subject, scores] of Object.entries(subjectData)) {
+                        const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+                        totalSum += avg;
+                        subCount++;
+
+                        let grade = 'F';
+                        let remark = 'Fail';
+                        let color = 'text-danger';
+                        if (avg >= 75) { grade = 'A'; remark = 'Excellent'; color = 'text-success'; }
+                        else if (avg >= 60) { grade = 'B'; remark = 'Good'; color = 'text-primary'; }
+                        else if (avg >= 50) { grade = 'C'; remark = 'Pass'; color = 'text-warning'; }
+
+                        rowsHtml += `
+                            <tr>
+                                <td>${subject}</td>
+                                <td class="text-center">${avg.toFixed(1)}</td>
+                                <td class="text-center fw-bold ${color}">${grade}</td>
+                                <td>${remark}</td>
+                            </tr>
+                        `;
+                    }
+
+                    tbody.innerHTML = rowsHtml;
+                    const finalAvg = (totalSum / subCount).toFixed(1);
+                    document.getElementById('rcTotalAvg').innerText = finalAvg + '%';
+
+                    // Dynamic Comment
+                    let finalComment = "Requires urgent academic intervention and focus.";
+                    if (finalAvg >= 75) finalComment = "An outstanding academic performance. Keep up the excellent work!";
+                    else if (finalAvg >= 60) finalComment = "A good result with room for continued improvement.";
+                    else if (finalAvg >= 50) finalComment = "An average performance. More effort is needed next session.";
+                    
+                    document.getElementById('rcComment').innerText = finalComment;
+                }
+
+                // Show Document and Enable Print
+                document.getElementById('reportDocument').style.display = 'block';
+                document.getElementById('printBtn').disabled = false;
+                document.getElementById('loadingOverlay').style.display = 'none';
+
+            } catch (err) {
+                console.error(err);
+                alert("Error generating report card.");
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>

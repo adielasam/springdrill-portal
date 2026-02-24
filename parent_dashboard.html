@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - Parent Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7fa; overflow-x: hidden; }
+        
+        /* Sidebar Styling */
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%); color: white; padding-top: 30px; z-index: 1000; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-brand i { color: #e67e22; font-size: 2.5rem; margin-bottom: 10px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 15px 25px; margin: 4px 15px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; text-decoration: none; }
+        .nav-link i { width: 25px; font-size: 1.1rem; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; transform: translateX(5px); }
+
+        /* Main Content Styling */
+        .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
+        .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; background: white; padding: 20px 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border-left: 5px solid #e67e22; }
+
+        .content-card { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: none; margin-bottom: 30px; }
+        
+        /* Table Styling */
+        .table th { background-color: #f8f9fa; color: #495057; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
+        .score-badge { font-weight: bold; padding: 6px 12px; border-radius: 8px; font-size: 0.95rem; }
+        .score-excellent { background-color: #d4edda; color: #155724; }
+        .score-average { background-color: #fff3cd; color: #856404; }
+        .score-poor { background-color: #f8d7da; color: #721c24; }
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay">
+        <i class="fas fa-spinner fa-spin fa-3x text-warning mb-3"></i>
+        <h4>Loading Parent Dashboard...</h4>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-user-friends"></i>
+            <h4 class="text-white fw-bold mb-0">PARENT PORTAL</h4>
+        </div>
+        
+        <nav class="nav flex-column mt-4">
+            <a href="parent_dashboard.html" class="nav-link active"><i class="fas fa-home"></i> My Dashboard</a>
+            <hr class="mx-3 my-4 border-secondary">
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-sign-out-alt"></i> Secure Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-header">
+            <div>
+                <h3 class="fw-bold mb-0 text-dark"><i class="fas fa-hand-holding-heart text-warning me-2"></i> Welcome, <span id="parentName">Parent</span></h3>
+                <p class="text-muted mb-0 mt-1">Review your child's academic progress.</p>
+            </div>
+            <div class="w-25">
+                <label class="form-label mb-1 fw-bold text-warning">Select Ward:</label>
+                <select id="wardSelect" class="form-select border-warning shadow-sm fw-bold text-dark">
+                    <option value="">Loading...</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="resultsSection" style="display: none;">
+            <div class="content-card">
+                <h5 class="fw-bold mb-4 border-bottom pb-3"><i class="fas fa-history text-primary me-2"></i> Academic Performance History</h5>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th width="35%">Exam Title</th>
+                                <th width="20%">Date Taken</th>
+                                <th width="15%">Raw Score</th>
+                                <th width="15%">Percentage</th>
+                                <th width="15%">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTbody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="emptyState" class="text-center py-5 mt-5">
+            <i class="fas fa-child fa-4x text-muted opacity-25 mb-3"></i>
+            <h4 class="text-muted fw-bold">No Ward Selected</h4>
+            <p class="text-muted">Please select your child from the dropdown menu to view their results.</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        let currentUserId = null;
+
+        async function initializePage() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = 'login.html';
+                currentUserId = session.user.id;
+
+                const { data: profile } = await supabase.from('users').select('name, role').eq('id', currentUserId).single();
+                if (profile.role !== 'parent' && profile.role !== 'admin') {
+                    alert("Access Denied: Parent Portal Only.");
+                    return window.location.href = 'login.html';
+                }
+                document.getElementById('parentName').innerText = profile.name;
+
+                // Load Linked Wards (Students)
+                const { data: links, error } = await supabase
+                    .from('parent_student_link')
+                    .select('student_id, users!parent_student_link_student_id_fkey(name)')
+                    .eq('parent_id', currentUserId);
+
+                const wardSelect = document.getElementById('wardSelect');
+                if (links && links.length > 0) {
+                    wardSelect.innerHTML = `<option value="" disabled selected>-- Select your Child --</option>` + 
+                        links.map(l => `<option value="${l.student_id}">${l.users.name}</option>`).join('');
+                } else {
+                    wardSelect.innerHTML = `<option value="">No children linked to this account.</option>`;
+                }
+
+                document.getElementById('loadingOverlay').style.display = 'none';
+            } catch (err) {
+                console.error(err);
+                alert("Failed to load portal.");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initializePage);
+
+        document.getElementById('wardSelect').addEventListener('change', async (e) => {
+            const studentId = e.target.value;
+            if (!studentId) return;
+
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'block';
+            const tbody = document.getElementById('resultsTbody');
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i> Loading records...</td></tr>`;
+
+            try {
+                const { data: attempts, error } = await supabase
+                    .from('test_attempts')
+                    .select('score, total_marks, percentage, end_time, tests (title, code, subjects(name))')
+                    .eq('student_id', studentId)
+                    .not('end_time', 'is', null)
+                    .order('end_time', { ascending: false });
+
+                if (error) throw error;
+
+                if (attempts.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5 text-muted">No exams completed yet.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = attempts.map(attempt => {
+                    const date = new Date(attempt.end_time).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                    let badgeClass = 'score-poor';
+                    let statusText = 'Fail';
+                    if (attempt.percentage >= 70) { badgeClass = 'score-excellent'; statusText = 'Excellent'; }
+                    else if (attempt.percentage >= 50) { badgeClass = 'score-average'; statusText = 'Pass'; }
+
+                    return `
+                        <tr>
+                            <td>
+                                <strong class="text-dark d-block mb-1">${attempt.tests?.title || 'Unknown'}</strong>
+                                <span class="badge bg-light text-secondary border">${attempt.tests?.code || 'N/A'}</span>
+                            </td>
+                            <td class="small text-muted fw-bold">${date}</td>
+                            <td class="fw-bold">${attempt.score} / ${attempt.total_marks}</td>
+                            <td><span class="score-badge ${badgeClass}">${attempt.percentage}%</span></td>
+                            <td class="fw-bold text-muted">${statusText}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Error loading data.</td></tr>`;
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>

@@ -66,17 +66,17 @@
             <div class="brand-header">
                 <i class="fas fa-shield-alt"></i>
                 <h3 class="fw-bold text-dark">Welcome Back</h3>
-                <p class="text-muted">Sign in to continue to your dashboard</p>
+                <p class="text-muted">Sign in to access the Springdrill Portal</p>
             </div>
 
             <div id="errorAlert" class="alert alert-danger d-none" role="alert"></div>
 
             <form id="loginForm">
                 <div class="mb-4">
-                    <label class="form-label fw-semibold text-secondary">Email Address</label>
+                    <label class="form-label fw-semibold text-secondary">School Login ID</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-envelope text-muted"></i></span>
-                        <input type="email" id="email" class="form-control border-start-0 ps-0" placeholder="name@springdrill.com" required>
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-id-badge text-muted"></i></span>
+                        <input type="email" id="email" class="form-control border-start-0 ps-0" placeholder="e.g. john.doe1234@springdrill.edu" required>
                     </div>
                 </div>
 
@@ -94,8 +94,10 @@
             </form>
 
             <div class="text-center mt-4">
-                <p class="text-muted mb-0">Don't have an account? <a href="signup.html" class="text-decoration-none fw-bold" style="color: #1a3c34;">Sign up</a></p>
-                <a href="index.html" class="text-decoration-none text-secondary small mt-2 d-inline-block"><i class="fas fa-home me-1"></i> Return Home</a>
+                <div class="alert alert-light border small text-muted mb-3">
+                    <i class="fas fa-info-circle me-1"></i> Need an account or forgot your password? Please contact the School Administrator.
+                </div>
+                <a href="index.html" class="text-decoration-none text-secondary small d-inline-block"><i class="fas fa-home me-1"></i> Return Home</a>
             </div>
         </div>
     </div>
@@ -106,7 +108,7 @@
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const errorAlert = document.getElementById('errorAlert');
             const loginBtn = document.getElementById('loginBtn');
@@ -136,6 +138,8 @@
                     window.location.href = 'admin_dashboard.html';
                 } else if (profile.role === 'teacher') {
                     window.location.href = 'teacher_dashboard.html';
+                } else if (profile.role === 'parent') {
+                    window.location.href = 'parent_dashboard.html';
                 } else {
                     window.location.href = 'student_dashboard.html';
                 }
@@ -143,7 +147,8 @@
             } catch (err) {
                 // Show error to user
                 errorAlert.classList.remove('d-none');
-                errorAlert.innerText = err.message;
+                errorAlert.innerText = "Invalid Login ID or Password. Please try again.";
+                
                 // Reset button
                 loginBtn.innerHTML = 'Sign In <i class="fas fa-arrow-right ms-2"></i>';
                 loginBtn.disabled = false;
