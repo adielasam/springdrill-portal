@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - My Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7fa; overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        /* Sidebar Styling */
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding-top: 30px; z-index: 1000; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-brand i { color: #2ecc71; font-size: 2.5rem; margin-bottom: 10px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 15px 25px; margin: 4px 15px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; text-decoration: none; }
+        .nav-link i { width: 25px; font-size: 1.1rem; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; transform: translateX(5px); }
+        .nav-link.text-danger:hover { background: rgba(220, 53, 69, 0.2); color: #ff6b6b !important; }
+
+        /* Main Content */
+        .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
+        .top-header { background: white; padding: 20px 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #2ecc71; }
+
+        /* Profile Card & Upload */
+        .content-card { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: none; }
+        
+        .passport-container {
+            width: 150px;
+            height: 150px;
+            border-radius: 15px;
+            border: 3px dashed #cbd3da;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #f8f9fa;
+            position: relative;
+            margin-bottom: 15px;
+        }
+        .passport-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        .passport-container i {
+            font-size: 4rem;
+            color: #cbd3da;
+        }
+        .upload-btn-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        .upload-btn-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .form-label { font-weight: bold; color: #495057; }
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay">
+        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
+        <h4>Loading Profile...</h4>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-user-graduate"></i>
+            <h4 class="text-white fw-bold mb-0">STUDENT PORTAL</h4>
+        </div>
+        
+        <nav class="nav flex-column mt-4">
+            <a href="student_dashboard.html" class="nav-link"><i class="fas fa-home"></i> My Dashboard</a>
+            <a href="take_test.html" class="nav-link"><i class="fas fa-laptop-code"></i> Take a Test</a>
+            <a href="student_results.html" class="nav-link"><i class="fas fa-award"></i> My Results</a>
+            <a href="my_profile.html" class="nav-link active"><i class="fas fa-user-circle"></i> Profile & Settings</a>
+            <hr class="mx-3 my-4 border-secondary">
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-sign-out-alt"></i> Secure Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-header">
+            <div>
+                <h3 class="fw-bold mb-0 text-dark"><i class="fas fa-user-edit text-success me-2"></i> My Profile</h3>
+                <p class="text-muted mb-0 mt-1">Manage your personal information and official passport photograph.</p>
+            </div>
+        </div>
+
+        <div id="alertBox" class="alert d-none shadow-sm" role="alert"></div>
+
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="content-card text-center">
+                    <h5 class="fw-bold mb-4 border-bottom pb-2">Official Passport</h5>
+                    
+                    <div class="d-flex justify-content-center">
+                        <div class="passport-container" id="passportContainer">
+                            <i class="fas fa-user" id="passportPlaceholder"></i>
+                            <img id="passportPreview" src="" alt="Student Passport">
+                        </div>
+                    </div>
+                    
+                    <p class="small text-muted mb-3">Upload a clear, recent passport photograph. This will appear on your final Report Card.</p>
+
+                    <div class="upload-btn-wrapper w-100">
+                        <button class="btn btn-outline-success w-100 fw-bold" id="uploadBtnUI">
+                            <i class="fas fa-camera me-2"></i> Select New Photo
+                        </button>
+                        <input type="file" id="passportUpload" accept="image/png, image/jpeg, image/jpg" />
+                    </div>
+                    
+                    <button class="btn btn-success w-100 fw-bold mt-2 d-none" id="savePhotoBtn">
+                        <i class="fas fa-cloud-upload-alt me-2"></i> Save Photo
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="content-card">
+                    <h5 class="fw-bold mb-4 border-bottom pb-2">Personal Details</h5>
+                    
+                    <form>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" id="fullName" class="form-control bg-light" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" id="emailAdd" class="form-control bg-light" readonly>
+                            </div>
+                            <div class="col-md-6 mt-4">
+                                <label class="form-label">Assigned Class</label>
+                                <input type="text" id="className" class="form-control bg-light" readonly>
+                            </div>
+                            <div class="col-md-6 mt-4">
+                                <label class="form-label">Account Status</label>
+                                <input type="text" id="accStatus" class="form-control bg-light text-success fw-bold" readonly value="Active & Approved">
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-top">
+                            <p class="small text-muted"><i class="fas fa-info-circle me-1"></i> To change your assigned class or name, please contact the school Administrator.</p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        let currentUserId = null;
+        let selectedFile = null;
+
+        // 1. Initialize Page and Load Data
+        async function initializePage() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = 'login.html';
+                currentUserId = session.user.id;
+
+                // Fetch User Details
+                const { data: userProfile } = await supabase.from('users').select('name, email').eq('id', currentUserId).single();
+                if (userProfile) {
+                    document.getElementById('fullName').value = userProfile.name;
+                    document.getElementById('emailAdd').value = userProfile.email;
+                }
+
+                // Fetch Student Details & Passport
+                const { data: studentProfile } = await supabase.from('students').select('passport_url, classes(name)').eq('user_id', currentUserId).single();
+                
+                if (studentProfile) {
+                    document.getElementById('className').value = studentProfile.classes?.name || 'Unassigned';
+                    
+                    // Display existing passport if they have one
+                    if (studentProfile.passport_url) {
+                        document.getElementById('passportPreview').src = studentProfile.passport_url;
+                        document.getElementById('passportPreview').style.display = 'block';
+                        document.getElementById('passportPlaceholder').style.display = 'none';
+                    }
+                }
+
+                document.getElementById('loadingOverlay').style.display = 'none';
+
+            } catch (err) {
+                console.error("Error loading profile:", err);
+                alert("Failed to load profile data.");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initializePage);
+
+        // 2. Handle File Selection (Preview Image)
+        document.getElementById('passportUpload').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Check file size (limit to 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                alert("Image is too large. Please select an image under 2MB.");
+                return;
+            }
+
+            selectedFile = file;
+
+            // Preview the image
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                document.getElementById('passportPreview').src = event.target.result;
+                document.getElementById('passportPreview').style.display = 'block';
+                document.getElementById('passportPlaceholder').style.display = 'none';
+            }
+            reader.readAsDataURL(file);
+
+            // Show the Save button
+            document.getElementById('savePhotoBtn').classList.remove('d-none');
+            document.getElementById('uploadBtnUI').classList.add('d-none');
+        });
+
+        // 3. Upload Image to Supabase Storage
+        document.getElementById('savePhotoBtn').addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            const btn = document.getElementById('savePhotoBtn');
+            const alertBox = document.getElementById('alertBox');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Uploading...';
+            btn.disabled = true;
+
+            try {
+                // Format file name safely
+                const fileExt = selectedFile.name.split('.').pop();
+                const fileName = `passport_${currentUserId}_${Date.now()}.${fileExt}`;
+                const filePath = `${fileName}`;
+
+                // 1. Upload to Supabase Storage Bucket ('passports')
+                const { error: uploadError } = await supabase.storage
+                    .from('passports')
+                    .upload(filePath, selectedFile, { cacheControl: '3600', upsert: true });
+
+                if (uploadError) throw uploadError;
+
+                // 2. Get the public URL of the uploaded image
+                const { data: publicUrlData } = supabase.storage
+                    .from('passports')
+                    .getPublicUrl(filePath);
+                
+                const finalUrl = publicUrlData.publicUrl;
+
+                // 3. Update the student's database record with the new URL
+                const { error: updateError } = await supabase
+                    .from('students')
+                    .update({ passport_url: finalUrl })
+                    .eq('user_id', currentUserId);
+
+                if (updateError) throw updateError;
+
+                // Success
+                alertBox.className = 'alert alert-success mt-3';
+                alertBox.innerHTML = '<i class="fas fa-check-circle me-2"></i> Passport uploaded successfully!';
+                
+                // Reset UI
+                btn.classList.add('d-none');
+                document.getElementById('uploadBtnUI').classList.remove('d-none');
+                btn.innerHTML = '<i class="fas fa-cloud-upload-alt me-2"></i> Save Photo';
+                btn.disabled = false;
+
+            } catch (err) {
+                console.error("Upload failed:", err);
+                alertBox.className = 'alert alert-danger mt-3';
+                alertBox.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i> Upload failed: ' + err.message;
+                
+                btn.innerHTML = '<i class="fas fa-cloud-upload-alt me-2"></i> Try Again';
+                btn.disabled = false;
+            }
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>
