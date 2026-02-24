@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - Student Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f7fa;
+            overflow-x: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* Sidebar Styling */
+        .sidebar {
+            width: 280px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%);
+            color: white;
+            padding-top: 30px;
+            z-index: 1000;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        }
+        .sidebar-brand {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        .sidebar-brand i {
+            color: #3498db;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 15px 25px;
+            margin: 4px 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        .nav-link i {
+            width: 25px;
+            font-size: 1.1rem;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            transform: translateX(5px);
+        }
+        .nav-link.text-danger:hover {
+            background: rgba(220, 53, 69, 0.2);
+            color: #ff6b6b !important;
+        }
+
+        /* Main Content Styling */
+        .main-content {
+            margin-left: 280px;
+            padding: 40px;
+            min-height: 100vh;
+        }
+        .top-header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid #198754;
+        }
+
+        /* Analytics Cards */
+        .analytics-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .analytics-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+        .bg-light-primary { background: rgba(13, 110, 253, 0.1); color: #0d6efd; }
+        .bg-light-success { background: rgba(25, 135, 84, 0.1); color: #198754; }
+        .bg-light-warning { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
+
+        /* Data Table */
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border: none;
+        }
+        .table th {
+            background-color: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .table td { vertical-align: middle; }
+        .score-badge { font-weight: bold; padding: 5px 12px; border-radius: 8px; font-size: 0.9rem; }
+        .score-excellent { background-color: #d4edda; color: #155724; }
+        .score-average { background-color: #fff3cd; color: #856404; }
+        .score-poor { background-color: #f8d7da; color: #721c24; }
+        
+        /* Loading Overlay */
+        #loadingOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9); z-index: 9999; display: flex;
+            align-items: center; justify-content: center; flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay">
+        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
+        <h4>Loading Results Database...</h4>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <h4 class="text-white fw-bold mb-0">STAFF PORTAL</h4>
+        </div>
+        
+        <nav class="nav flex-column mt-4">
+            <a href="teacher_dashboard.html" class="nav-link">
+                <i class="fas fa-home"></i> Dashboard Home
+            </a>
+            <a href="create_test.html" class="nav-link">
+                <i class="fas fa-plus-circle"></i> Create New Test
+            </a>
+            <a href="manage_cbt.html" class="nav-link">
+                <i class="fas fa-tasks"></i> Manage CBT
+            </a>
+            <a href="test_results.html" class="nav-link active">
+                <i class="fas fa-poll"></i> Student Results
+            </a>
+            <a href="report_scores.html" class="nav-link">
+                <i class="fas fa-file-signature"></i> Report Scores
+            </a>
+            
+            <hr class="mx-3 my-4 border-secondary">
+            
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto">
+                <i class="fas fa-sign-out-alt"></i> Secure Logout
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-header">
+            <div>
+                <h3 class="fw-bold mb-0 text-dark"><i class="fas fa-chart-bar text-success me-2"></i> Examination Results</h3>
+                <p class="text-muted mb-0 mt-1">Review student performance, analytics, and export grades.</p>
+            </div>
+            
+            <div class="w-50">
+                <label class="form-label mb-1 fw-bold text-success">Select Administered Test:</label>
+                <select id="testSelect" class="form-select border-success shadow-sm fw-bold text-dark">
+                    <option value="">Loading your tests...</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="resultsDashboard" style="display: none;">
+            
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="analytics-card">
+                        <div class="analytics-icon bg-light-primary"><i class="fas fa-users"></i></div>
+                        <div>
+                            <p class="text-muted fw-bold mb-0">TOTAL ATTEMPTS</p>
+                            <h3 class="fw-bold mb-0 text-dark" id="statAttempts">0</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="analytics-card">
+                        <div class="analytics-icon bg-light-warning"><i class="fas fa-percentage"></i></div>
+                        <div>
+                            <p class="text-muted fw-bold mb-0">AVERAGE SCORE</p>
+                            <h3 class="fw-bold mb-0 text-dark" id="statAverage">0%</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="analytics-card">
+                        <div class="analytics-icon bg-light-success"><i class="fas fa-check-double"></i></div>
+                        <div>
+                            <p class="text-muted fw-bold mb-0">PASS RATE</p>
+                            <h3 class="fw-bold mb-0 text-dark" id="statPassRate">0%</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                    <h5 class="fw-bold m-0"><i class="fas fa-list text-primary me-2"></i> Detailed Student Scores</h5>
+                    <button class="btn btn-outline-success fw-bold" onclick="exportToCSV()">
+                        <i class="fas fa-file-excel me-2"></i> Export to CSV
+                    </button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle" id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th width="5%">#</th>
+                                <th width="30%">Student Name</th>
+                                <th width="20%">Date Submitted</th>
+                                <th width="15%">Raw Score</th>
+                                <th width="15%">Percentage</th>
+                                <th width="15%">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTbody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+        
+        <div id="emptyState" class="text-center py-5 mt-5">
+            <i class="fas fa-clipboard-list fa-4x text-muted opacity-25 mb-3"></i>
+            <h4 class="text-muted fw-bold">No Test Selected</h4>
+            <p class="text-muted">Please select an examination from the dropdown menu above to view its results.</p>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        let currentUserId = null;
+        let currentResultsData = [];
+
+        // 1. Initialize Page
+        async function initializePage() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                currentUserId = session.user.id;
+
+                // Load Teacher's Tests into Dropdown
+                const { data: tests, error } = await supabase
+                    .from('tests')
+                    .select('id, title, classes(name)')
+                    .eq('teacher_id', currentUserId)
+                    .order('created_at', { ascending: false });
+
+                const testSelect = document.getElementById('testSelect');
+                if (error) throw error;
+
+                if (tests && tests.length > 0) {
+                    testSelect.innerHTML = `<option value="" disabled selected>-- Select a Test to View Results --</option>` + 
+                        tests.map(t => `<option value="${t.id}">[${t.classes.name}] ${t.title}</option>`).join('');
+                } else {
+                    testSelect.innerHTML = `<option value="">No tests found in your account.</option>`;
+                }
+
+                document.getElementById('loadingOverlay').style.display = 'none';
+            } catch (err) {
+                console.error("Initialization Error:", err);
+                alert("Failed to authenticate. Please log in again.");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initializePage);
+
+        // 2. Fetch Results when a Test is Selected
+        document.getElementById('testSelect').addEventListener('change', async (e) => {
+            const testId = e.target.value;
+            if (!testId) return;
+
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('resultsDashboard').style.display = 'block';
+            const tbody = document.getElementById('resultsTbody');
+            
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i> Analyzing results...</td></tr>`;
+
+            try {
+                // Fetch attempts with completed status (end_time is not null) and join with public.users for names
+                const { data: attempts, error } = await supabase
+                    .from('test_attempts')
+                    .select(`
+                        id, 
+                        score, 
+                        total_marks, 
+                        percentage, 
+                        end_time, 
+                        users (name)
+                    `)
+                    .eq('test_id', testId)
+                    .not('end_time', 'is', null)
+                    .order('percentage', { ascending: false }); // Order highest score first
+
+                if (error) throw error;
+
+                currentResultsData = attempts; // Store for CSV export
+                
+                if (attempts.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No students have completed this test yet.</td></tr>`;
+                    updateAnalytics(0, 0, 0);
+                    return;
+                }
+
+                let totalPercentage = 0;
+                let passedCount = 0;
+
+                tbody.innerHTML = attempts.map((attempt, index) => {
+                    totalPercentage += parseFloat(attempt.percentage);
+                    if (parseFloat(attempt.percentage) >= 50) passedCount++;
+
+                    // Determine Badge Colors
+                    let badgeClass = 'score-poor';
+                    let statusText = 'Fail';
+                    if (attempt.percentage >= 70) { badgeClass = 'score-excellent'; statusText = 'Excellent'; }
+                    else if (attempt.percentage >= 50) { badgeClass = 'score-average'; statusText = 'Pass'; }
+
+                    const submitDate = new Date(attempt.end_time).toLocaleString('en-GB', { 
+                        day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' 
+                    });
+
+                    return `
+                        <tr>
+                            <td class="fw-bold text-muted">${index + 1}</td>
+                            <td class="fw-bold text-dark">${attempt.users?.name || 'Unknown Student'}</td>
+                            <td class="small text-muted">${submitDate}</td>
+                            <td class="fw-bold">${attempt.score} / ${attempt.total_marks}</td>
+                            <td><span class="score-badge ${badgeClass}">${attempt.percentage}%</span></td>
+                            <td class="small fw-bold text-muted">${statusText}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+                // Update Analytics Top Cards
+                const avg = (totalPercentage / attempts.length).toFixed(1);
+                const passRate = ((passedCount / attempts.length) * 100).toFixed(1);
+                updateAnalytics(attempts.length, avg, passRate);
+
+            } catch (err) {
+                console.error("Error fetching results:", err);
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">Error loading results data.</td></tr>`;
+            }
+        });
+
+        // 3. Helper to update top analytics cards
+        function updateAnalytics(attempts, avgScore, passRate) {
+            document.getElementById('statAttempts').innerText = attempts;
+            document.getElementById('statAverage').innerText = `${avgScore}%`;
+            document.getElementById('statPassRate').innerText = `${passRate}%`;
+        }
+
+        // 4. Export to CSV Logic
+        window.exportToCSV = () => {
+            if (currentResultsData.length === 0) {
+                alert("No data available to export.");
+                return;
+            }
+
+            const testSelect = document.getElementById('testSelect');
+            const testName = testSelect.options[testSelect.selectedIndex].text.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            
+            // CSV Headers
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Rank,Student Name,Submission Date,Raw Score,Total Marks,Percentage,Status\n";
+
+            currentResultsData.forEach((row, index) => {
+                const name = row.users?.name || 'Unknown';
+                const date = new Date(row.end_time).toLocaleString('en-GB');
+                const score = row.score;
+                const total = row.total_marks;
+                const percent = row.percentage;
+                const status = percent >= 50 ? 'Pass' : 'Fail';
+
+                csvContent += `${index + 1},"${name}","${date}",${score},${total},${percent}%,${status}\n`;
+            });
+
+            // Trigger Download
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `results_${testName}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        // 5. Logout handler
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>

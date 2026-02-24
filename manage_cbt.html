@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - Manage CBT</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
+    <style>
+        body { background-color: #f4f7fa; overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        /* Sidebar Styling */
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding-top: 30px; z-index: 1000; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-brand i { color: #3498db; font-size: 2.5rem; margin-bottom: 10px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 15px 25px; margin: 4px 15px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; text-decoration: none; }
+        .nav-link i { width: 25px; font-size: 1.1rem; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; transform: translateX(5px); }
+        .nav-link.text-danger:hover { background: rgba(220, 53, 69, 0.2); color: #ff6b6b !important; }
+
+        /* Main Content */
+        .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
+        .top-header { background: white; padding: 20px 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #3498db; }
+        
+        /* Cards & Tabs */
+        .content-card { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: none; margin-bottom: 30px; }
+        .nav-tabs .nav-link { font-weight: 600; color: #6c757d; border: none; border-bottom: 3px solid transparent; padding: 12px 20px; }
+        .nav-tabs .nav-link.active { color: #1a3c34; border-bottom: 3px solid #3498db; background: transparent; }
+        .nav-tabs { border-bottom: 2px solid #e9ecef; margin-bottom: 25px; }
+
+        /* File Upload Area */
+        .upload-area { border: 2px dashed #cbd3da; border-radius: 12px; padding: 40px; text-align: center; background: #f8f9fa; cursor: pointer; transition: all 0.3s; }
+        .upload-area:hover { border-color: #3498db; background: #f1f8fc; }
+        .upload-area i { font-size: 3rem; color: #aab2bd; margin-bottom: 15px; }
+        .upload-area.dragover { border-color: #2ecc71; background: #eafaf1; }
+
+        /* Preview Table */
+        .table th { background: #f8f9fa; color: #495057; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; }
+        .status-badge { padding: 8px 15px; border-radius: 50px; font-weight: bold; font-size: 0.9rem; }
+        .status-draft { background: #fff3cd; color: #856404; }
+        .status-published { background: #d4edda; color: #155724; }
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay">
+        <i class="fas fa-spinner fa-spin fa-3x text-primary mb-3"></i>
+        <h4>Loading CBT Control Center...</h4>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <h4 class="text-white fw-bold mb-0">STAFF PORTAL</h4>
+        </div>
+        
+        <nav class="nav flex-column mt-4">
+            <a href="teacher_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard Home</a>
+            <a href="create_test.html" class="nav-link"><i class="fas fa-plus-circle"></i> Create New Test</a>
+            <a href="manage_cbt.html" class="nav-link active"><i class="fas fa-tasks"></i> Manage CBT</a>
+            <a href="test_results.html" class="nav-link"><i class="fas fa-poll"></i> Student Results</a>
+            <a href="report_scores.html" class="nav-link"><i class="fas fa-file-signature"></i> Report Scores</a>
+            <hr class="mx-3 my-4 border-secondary">
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-sign-out-alt"></i> Secure Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-header">
+            <div>
+                <h3 class="fw-bold mb-0 text-dark"><i class="fas fa-cogs text-primary me-2"></i> Manage CBT & Assignments</h3>
+                <p class="text-muted mb-0 mt-1">Import questions, review test details, and publish to specific classes.</p>
+            </div>
+            
+            <div class="w-50">
+                <label class="form-label mb-1 fw-bold text-primary">Select Active Test to Manage:</label>
+                <select id="testSelect" class="form-select border-primary shadow-sm fw-bold">
+                    <option value="">Loading your tests...</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="alertBox" class="alert d-none shadow-sm" role="alert"></div>
+
+        <div class="content-card" id="workspaceCard" style="display: none;">
+            
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold text-dark" id="displayTestTitle">Test Title</h4>
+                <div id="publishStatusContainer">
+                    </div>
+            </div>
+
+            <ul class="nav nav-tabs" id="cbtTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="assign-tab" data-bs-toggle="tab" data-bs-target="#assign" type="button" role="tab"><i class="fas fa-cloud-upload-alt me-2"></i> Import .DOCX Questions</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual" type="button" role="tab"><i class="fas fa-edit me-2"></i> Manual Entry & Review</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="cbtTabsContent">
+                
+                <div class="tab-pane fade show active" id="assign" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <h5 class="fw-bold text-dark mb-3">Bulk Upload via Word Document</h5>
+                            
+                            <label for="docxUpload" class="upload-area w-100 mb-3" id="dropZone">
+                                <i class="fas fa-file-word text-primary"></i>
+                                <h5 class="fw-bold text-dark">Click to browse or drag .docx file here</h5>
+                                <p class="text-muted mb-0">Only Microsoft Word (.docx) formats are supported</p>
+                                <input type="file" id="docxUpload" accept=".docx" class="d-none">
+                            </label>
+                            
+                            <div class="d-grid">
+                                <button class="btn btn-primary btn-lg fw-bold d-none" id="processDocxBtn">
+                                    <i class="fas fa-cogs me-2"></i> Process Document
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-md-5">
+                            <div class="alert alert-info border-0 shadow-sm h-100">
+                                <h6 class="fw-bold"><i class="fas fa-info-circle me-2"></i> Document Formatting Rules</h6>
+                                <p class="small mb-2">For the system to extract your questions correctly, your Word document <strong>must</strong> strictly follow this exact template:</p>
+                                <div class="bg-white p-3 rounded border small" style="font-family: monospace;">
+                                    1. What is the capital of Nigeria?<br>
+                                    A) Lagos<br>
+                                    B) Abuja<br>
+                                    C) Kano<br>
+                                    D) Port Harcourt<br>
+                                    Answer: B<br>
+                                    <br>
+                                    2. Evaluate 5 + 5.<br>
+                                    A) 10<br>
+                                    ...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="extractionPreview" class="mt-5 d-none">
+                        <h5 class="fw-bold border-bottom pb-2 mb-3">Preview Extracted Questions</h5>
+                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                            <table class="table table-bordered table-hover bg-white">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th width="5%">#</th>
+                                        <th width="40%">Question Text</th>
+                                        <th width="40%">Options</th>
+                                        <th width="15%">Ans</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="previewTbody"></tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex justify-content-end mt-3">
+                            <button class="btn btn-success fw-bold px-5" id="confirmImportBtn">
+                                <i class="fas fa-database me-2"></i> Import Questions to Database
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="manual" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-dark m-0"><i class="fas fa-database text-success me-2"></i> Existing Question Bank</h5>
+                        <span class="badge bg-success rounded-pill px-3 py-2 fs-6" id="questionCount">0 Questions</span>
+                    </div>
+
+                    <div class="table-responsive" style="max-height: 500px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 8px;">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th width="50%">Question</th>
+                                    <th width="35%">Options</th>
+                                    <th width="15%">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="questionsTbody">
+                                <tr><td colspan="3" class="text-center py-4">Select a test to view questions.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        let currentUserId = null;
+        let activeTest = null;
+        let parsedQuestions = []; // Temporarily holds docx data
+
+        // 1. Initialize Page
+        async function initializePage() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = 'login.html';
+                currentUserId = session.user.id;
+
+                // Load Teacher's Tests
+                const { data: tests, error } = await supabase
+                    .from('tests')
+                    .select('*, classes(name), subjects(name)')
+                    .eq('teacher_id', currentUserId)
+                    .order('created_at', { ascending: false });
+
+                const testSelect = document.getElementById('testSelect');
+                if (error) throw error;
+
+                if (tests && tests.length > 0) {
+                    testSelect.innerHTML = `<option value="" disabled selected>-- Select a Test to Manage --</option>` + 
+                        tests.map(t => `<option value='${JSON.stringify(t)}'>[${t.classes.name}] ${t.title}</option>`).join('');
+                } else {
+                    testSelect.innerHTML = `<option value="">No tests found. Please create one first.</option>`;
+                }
+
+                document.getElementById('loadingOverlay').style.display = 'none';
+            } catch (err) {
+                console.error(err);
+                alert("Failed to load dashboard.");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initializePage);
+
+        // 2. Handle Test Selection
+        document.getElementById('testSelect').addEventListener('change', async (e) => {
+            if (!e.target.value) return;
+            activeTest = JSON.parse(e.target.value);
+            
+            document.getElementById('workspaceCard').style.display = 'block';
+            document.getElementById('displayTestTitle').innerText = `${activeTest.title} (${activeTest.classes.name})`;
+            
+            updatePublishUI();
+            await loadExistingQuestions();
+            
+            // Reset upload area
+            document.getElementById('extractionPreview').classList.add('d-none');
+            document.getElementById('processDocxBtn').classList.add('d-none');
+            document.getElementById('docxUpload').value = '';
+        });
+
+        // 3. Publish / Unpublish UI Logic
+        function updatePublishUI() {
+            const container = document.getElementById('publishStatusContainer');
+            if (activeTest.is_published) {
+                container.innerHTML = `
+                    <span class="status-badge status-published me-3"><i class="fas fa-globe"></i> Published to Class</span>
+                    <button class="btn btn-outline-warning fw-bold btn-sm" onclick="window.togglePublish(false)">Retract Test</button>
+                `;
+            } else {
+                container.innerHTML = `
+                    <span class="status-badge status-draft me-3"><i class="fas fa-lock"></i> Hidden (Draft)</span>
+                    <button class="btn btn-success fw-bold btn-sm shadow-sm" onclick="window.togglePublish(true)"><i class="fas fa-paper-plane me-2"></i> Publish to Class Dashboard</button>
+                `;
+            }
+        }
+
+        window.togglePublish = async (status) => {
+            const msg = status ? "Publish this test? Students in the assigned class will now see it on their dashboard." : "Hide this test? It will be removed from the student dashboard.";
+            if (!confirm(msg)) return;
+
+            try {
+                const { error } = await supabase.from('tests').update({ is_published: status }).eq('id', activeTest.id);
+                if (error) throw error;
+                activeTest.is_published = status;
+                updatePublishUI();
+            } catch (err) {
+                alert("Error updating status: " + err.message);
+            }
+        };
+
+        // 4. File Upload & Mammoth.js Extraction Logic
+        const docxInput = document.getElementById('docxUpload');
+        const processBtn = document.getElementById('processDocxBtn');
+
+        docxInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                processBtn.classList.remove('d-none');
+                processBtn.innerHTML = `<i class="fas fa-cogs me-2"></i> Process ${e.target.files[0].name}`;
+            }
+        });
+
+        processBtn.addEventListener('click', () => {
+            const file = docxInput.files[0];
+            if (!file) return;
+
+            processBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Extracting Text...';
+            processBtn.disabled = true;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                mammoth.extractRawText({ arrayBuffer: event.target.result })
+                    .then(parseExtractedText)
+                    .catch(handleMammothError);
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        function handleMammothError(err) {
+            alert("Error reading document. Please ensure it is a valid .docx file.");
+            console.error(err);
+            processBtn.innerHTML = `<i class="fas fa-cogs me-2"></i> Process Document`;
+            processBtn.disabled = false;
+        }
+
+        // 5. Custom Regex Parser for the specified template
+        function parseExtractedText(result) {
+            const text = result.value;
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            
+            parsedQuestions = [];
+            let currentQ = null;
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+
+                // Detect Question start (e.g., "1. What is...")
+                if (/^\d+[\.\)]\s+/.test(line)) {
+                    if (currentQ && currentQ.question) parsedQuestions.push(currentQ);
+                    currentQ = { 
+                        question: line.replace(/^\d+[\.\)]\s*/, ''), 
+                        optA: '', optB: '', optC: '', optD: '', 
+                        answer: '', marks: activeTest.marks_per_question 
+                    };
+                } 
+                // Detect Options (e.g., "A) Option text")
+                else if (/^[A-D][\.\)]\s+/i.test(line) && currentQ) {
+                    const letter = line.charAt(0).toUpperCase();
+                    const optText = line.substring(2).trim();
+                    if (letter === 'A') currentQ.optA = optText;
+                    if (letter === 'B') currentQ.optB = optText;
+                    if (letter === 'C') currentQ.optC = optText;
+                    if (letter === 'D') currentQ.optD = optText;
+                }
+                // Detect Answer (e.g., "Answer: B")
+                else if (/^Answer:\s*[A-D]/i.test(line) && currentQ) {
+                    currentQ.answer = line.replace(/^Answer:\s*/i, '').trim().charAt(0).toUpperCase();
+                }
+                // Append multi-line questions
+                else if (currentQ && !currentQ.optA) {
+                    currentQ.question += " " + line;
+                }
+            }
+            if (currentQ && currentQ.question) parsedQuestions.push(currentQ);
+
+            renderPreview();
+        }
+
+        function renderPreview() {
+            const previewSection = document.getElementById('extractionPreview');
+            const tbody = document.getElementById('previewTbody');
+            
+            processBtn.innerHTML = `<i class="fas fa-check-circle me-2"></i> Extraction Complete`;
+            processBtn.classList.replace('btn-primary', 'btn-success');
+            
+            if (parsedQuestions.length === 0) {
+                alert("Could not detect any questions. Please check the formatting rules.");
+                return;
+            }
+
+            tbody.innerHTML = parsedQuestions.map((q, index) => `
+                <tr>
+                    <td class="fw-bold">${index + 1}</td>
+                    <td>${q.question}</td>
+                    <td class="small">
+                        A) ${q.optA || '<span class="text-danger">Missing</span>'}<br>
+                        B) ${q.optB || '<span class="text-danger">Missing</span>'}<br>
+                        C) ${q.optC || '<span class="text-danger">Missing</span>'}<br>
+                        D) ${q.optD || '<span class="text-danger">Missing</span>'}
+                    </td>
+                    <td class="fw-bold text-success">${q.answer || '<span class="text-danger">?</span>'}</td>
+                </tr>
+            `).join('');
+
+            previewSection.classList.remove('d-none');
+        }
+
+        // 6. Save Bulk Questions to Database
+        document.getElementById('confirmImportBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('confirmImportBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Saving to Database...';
+            btn.disabled = true;
+
+            try {
+                for (let q of parsedQuestions) {
+                    // 1. Insert into questions table
+                    const { data: newQ, error: qErr } = await supabase.from('questions').insert([{
+                        teacher_id: currentUserId,
+                        class_id: activeTest.class_id,
+                        subject_id: activeTest.subject_id,
+                        question_text: q.question,
+                        option_a: q.optA, option_b: q.optB, option_c: q.optC, option_d: q.optD,
+                        correct_option: q.answer,
+                        marks: q.marks
+                    }]).select('id').single();
+
+                    if (qErr) throw qErr;
+
+                    // 2. Link to test in test_questions table
+                    await supabase.from('test_questions').insert([{
+                        test_id: activeTest.id,
+                        question_id: newQ.id
+                    }]);
+                }
+
+                alert(`Successfully imported ${parsedQuestions.length} questions!`);
+                
+                // Switch to manual review tab automatically
+                const triggerEl = document.querySelector('#manual-tab');
+                bootstrap.Tab.getOrCreateInstance(triggerEl).show();
+                
+                await loadExistingQuestions();
+
+                // Reset import view
+                document.getElementById('extractionPreview').classList.add('d-none');
+                processBtn.classList.add('d-none');
+                processBtn.disabled = false;
+                processBtn.classList.replace('btn-success', 'btn-primary');
+                docxInput.value = '';
+
+            } catch (err) {
+                alert("Database Error during import: " + err.message);
+                btn.innerHTML = '<i class="fas fa-database me-2"></i> Import Questions to Database';
+                btn.disabled = false;
+            }
+        });
+
+        // 7. Load Existing Questions (For the Manual Review Tab)
+        async function loadExistingQuestions() {
+            const tbody = document.getElementById('questionsTbody');
+            tbody.innerHTML = `<tr><td colspan="3" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>`;
+            
+            try {
+                const { data, error } = await supabase
+                    .from('test_questions')
+                    .select(`id, question_id, questions(question_text, option_a, option_b, option_c, option_d, correct_option, marks)`)
+                    .eq('test_id', activeTest.id)
+                    .order('id', { ascending: true });
+
+                if (error) throw error;
+                document.getElementById('questionCount').innerText = `${data.length} Questions`;
+
+                if (data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="3" class="text-center py-4">No questions added yet. Use the Import tab to upload.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = data.map((item, index) => {
+                    const q = item.questions;
+                    return `
+                        <tr>
+                            <td>
+                                <strong>${index + 1}. ${q.question_text}</strong><br>
+                                <span class="badge bg-light text-dark border mt-1">Ans: ${q.correct_option}</span>
+                            </td>
+                            <td class="small text-muted">
+                                A) ${q.option_a}<br>B) ${q.option_b}<br>C) ${q.option_c}<br>D) ${q.option_d}
+                            </td>
+                            <td>
+                                <button onclick="window.deleteQuestion(${item.id}, ${item.question_id})" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash"></i> Remove
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        window.deleteQuestion = async (testQuestionId, questionId) => {
+            if (!confirm("Remove this question?")) return;
+            await supabase.from('test_questions').delete().eq('id', testQuestionId);
+            await supabase.from('questions').delete().eq('id', questionId);
+            loadExistingQuestions();
+        };
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>

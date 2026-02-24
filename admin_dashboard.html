@@ -6,10 +6,12 @@
     <title>SPRINGDRILL - Admin Portal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             background-color: #f4f7fa;
             overflow-x: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         /* Sidebar Styling */
@@ -45,6 +47,7 @@
             transition: all 0.3s;
             display: flex;
             align-items: center;
+            text-decoration: none;
         }
         .nav-link i {
             width: 25px;
@@ -108,6 +111,7 @@
             transition: transform 0.3s;
             text-decoration: none;
             color: inherit;
+            height: 100%;
         }
         .stat-card:hover {
             transform: translateY(-5px);
@@ -116,6 +120,8 @@
         .stat-card.primary { border-left-color: #0d6efd; }
         .stat-card.success { border-left-color: #198754; }
         .stat-card.warning { border-left-color: #ffc107; }
+        .stat-card.info { border-left-color: #0dcaf0; }
+        .stat-card.danger { border-left-color: #dc3545; }
         
         .stat-icon {
             width: 60px;
@@ -129,6 +135,8 @@
         .stat-card.primary .stat-icon { background: rgba(13, 110, 253, 0.1); color: #0d6efd; }
         .stat-card.success .stat-icon { background: rgba(25, 135, 84, 0.1); color: #198754; }
         .stat-card.warning .stat-icon { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
+        .stat-card.info .stat-icon { background: rgba(13, 202, 240, 0.1); color: #0dcaf0; }
+        .stat-card.danger .stat-icon { background: rgba(220, 53, 69, 0.1); color: #dc3545; }
     </style>
 </head>
 <body>
@@ -148,6 +156,9 @@
             </a>
             <a href="class_list.html" class="nav-link">
                 <i class="fas fa-clipboard-list"></i> Class Lists & Data
+            </a>
+            <a href="manage_cbt.html" class="nav-link">
+                <i class="fas fa-tasks"></i> Manage CBT
             </a>
             <a href="test_analysis.html" class="nav-link">
                 <i class="fas fa-chart-pie"></i> Academic Analysis
@@ -179,11 +190,37 @@
         </div>
 
         <div class="row g-4">
-            <div class="col-md-6 col-lg-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="stat-card info">
+                    <div>
+                        <p class="text-muted fw-bold mb-1">TOTAL</p>
+                        <h3 class="fw-bold mb-0" id="activeStudentsCount">--</h3>
+                        <small class="text-muted">Active Students</small>
+                    </div>
+                    <div class="stat-icon shadow-sm">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="stat-card danger">
+                    <div>
+                        <p class="text-muted fw-bold mb-1">TOTAL</p>
+                        <h3 class="fw-bold mb-0" id="activeTeachersCount">--</h3>
+                        <small class="text-muted">Active Teachers</small>
+                    </div>
+                    <div class="stat-icon shadow-sm">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
                 <a href="manage_users.html" class="stat-card warning">
                     <div>
-                        <p class="text-muted fw-bold mb-1">USER MANAGEMENT</p>
-                        <h4 class="fw-bold mb-0">Review Approvals</h4>
+                        <p class="text-muted fw-bold mb-1">ACTION</p>
+                        <h5 class="fw-bold mb-0">Approvals</h5>
                     </div>
                     <div class="stat-icon shadow-sm">
                         <i class="fas fa-user-clock"></i>
@@ -191,37 +228,27 @@
                 </a>
             </div>
 
-            <div class="col-md-6 col-lg-4">
-                <a href="class_list.html" class="stat-card primary">
+            <div class="col-md-6 col-lg-3">
+                <a href="manage_cbt.html" class="stat-card primary">
                     <div>
-                        <p class="text-muted fw-bold mb-1">ACADEMICS</p>
-                        <h4 class="fw-bold mb-0">View Class Lists</h4>
+                        <p class="text-muted fw-bold mb-1">EXAMINATIONS</p>
+                        <h5 class="fw-bold mb-0">Manage CBT</h5>
                     </div>
                     <div class="stat-icon shadow-sm">
-                        <i class="fas fa-school"></i>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-md-6 col-lg-4">
-                <a href="test_analysis.html" class="stat-card success">
-                    <div>
-                        <p class="text-muted fw-bold mb-1">PERFORMANCE</p>
-                        <h4 class="fw-bold mb-0">Test Analysis</h4>
-                    </div>
-                    <div class="stat-icon shadow-sm">
-                        <i class="fas fa-chart-line"></i>
+                        <i class="fas fa-tasks"></i>
                     </div>
                 </a>
             </div>
         </div>
         
+        
         <div class="mt-5">
             <div class="card border-0 shadow-sm" style="border-radius: 15px;">
-                <div class="card-body p-4 text-center text-muted">
-                    <i class="fas fa-info-circle fa-2x mb-3 text-primary opacity-50"></i>
-                    <h5>Welcome to the new Serverless Architecture</h5>
-                    <p>Use the navigation menu on the left to manage the Springdrill platform. All data is securely synced with Supabase in real-time.</p>
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4"><i class="fas fa-chart-bar text-primary me-2"></i> Active Students Distribution by Class</h5>
+                    <div style="position: relative; height:40vh; width:100%">
+                        <canvas id="studentDistributionChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -230,20 +257,103 @@
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
-        // Load Admin Name
-        async function loadProfile() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) {
-                window.location.href = 'login.html';
-                return;
-            }
+        async function initializeDashboard() {
+            try {
+                // 1. Load Admin Name
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    window.location.href = 'login.html';
+                    return;
+                }
 
-            const { data } = await supabase.from('users').select('name').eq('id', session.user.id).single();
-            if (data) {
-                document.getElementById('adminName').innerText = data.name;
+                const { data: userProfile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
+                if (userProfile) {
+                    document.getElementById('adminName').innerText = userProfile.name;
+                }
+
+                // 2. Fetch Active Counts
+                // Get approved teachers
+                const { count: teacherCount, error: tErr } = await supabase
+                    .from('teachers')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('approved', true);
+                if (!tErr) document.getElementById('activeTeachersCount').innerText = teacherCount || 0;
+
+                // Get approved students
+                const { count: studentCount, error: sErr } = await supabase
+                    .from('students')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('approved', true);
+                if (!sErr) document.getElementById('activeStudentsCount').innerText = studentCount || 0;
+
+                // 3. Prepare Data for Bar Chart (Students per Class)
+                const { data: classesData } = await supabase.from('classes').select('id, name').order('id');
+                const { data: studentsData } = await supabase.from('students').select('class_id').eq('approved', true);
+
+                if (classesData && studentsData) {
+                    // Initialize count object
+                    const classCounts = {};
+                    classesData.forEach(c => {
+                        classCounts[c.id] = { name: c.name, count: 0 };
+                    });
+
+                    // Tally students
+                    studentsData.forEach(s => {
+                        if (classCounts[s.class_id]) {
+                            classCounts[s.class_id].count++;
+                        }
+                    });
+
+                    // Extract arrays for Chart.js
+                    const labels = Object.values(classCounts).map(c => c.name);
+                    const dataPoints = Object.values(classCounts).map(c => c.count);
+
+                    renderChart(labels, dataPoints);
+                }
+
+            } catch (error) {
+                console.error("Dashboard Error:", error);
             }
         }
-        document.addEventListener('DOMContentLoaded', loadProfile);
+
+        function renderChart(labels, dataPoints) {
+            const ctx = document.getElementById('studentDistributionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Number of Active Students',
+                        data: dataPoints,
+                        backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 1,
+                        borderRadius: 5,
+                        hoverBackgroundColor: 'rgba(52, 152, 219, 0.9)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1 // Ensure it only shows whole numbers for students
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
 
         // Secure Logout Logic
         document.getElementById('logoutBtn').addEventListener('click', async (e) => {
