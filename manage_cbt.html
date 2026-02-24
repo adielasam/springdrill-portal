@@ -72,7 +72,7 @@
         <div class="top-header">
             <div>
                 <h3 class="fw-bold mb-0 text-dark"><i class="fas fa-cogs text-primary me-2"></i> Manage CBT & Assignments</h3>
-                <p class="text-muted mb-0 mt-1">Import questions, review test details, and publish to specific classes.</p>
+                <p class="text-muted mb-0 mt-1">Import questions, reuse from bank, review details, and publish.</p>
             </div>
             
             <div class="w-50">
@@ -95,10 +95,13 @@
 
             <ul class="nav nav-tabs" id="cbtTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="assign-tab" data-bs-toggle="tab" data-bs-target="#assign" type="button" role="tab"><i class="fas fa-cloud-upload-alt me-2"></i> Import .DOCX Questions</button>
+                    <button class="nav-link active" id="assign-tab" data-bs-toggle="tab" data-bs-target="#assign" type="button" role="tab"><i class="fas fa-cloud-upload-alt me-2"></i> Import .DOCX</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual" type="button" role="tab"><i class="fas fa-edit me-2"></i> Manual Entry & Review</button>
+                    <button class="nav-link" id="bank-tab" data-bs-toggle="tab" data-bs-target="#bank" type="button" role="tab"><i class="fas fa-archive me-2"></i> Select from Bank</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual" type="button" role="tab"><i class="fas fa-edit me-2"></i> Review & Manage</button>
                 </li>
             </ul>
 
@@ -166,9 +169,36 @@
                     </div>
                 </div>
 
+                <div class="tab-pane fade" id="bank" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                        <div>
+                            <h5 class="fw-bold text-dark m-0"><i class="fas fa-archive text-warning me-2"></i> Reuse Questions from Bank</h5>
+                            <p class="text-muted small m-0 mt-1">Showing previous questions for this Subject and Class that are not yet in this test.</p>
+                        </div>
+                        <button class="btn btn-success fw-bold" id="addFromBankBtn" onclick="window.addSelectedFromBank()">
+                            <i class="fas fa-plus me-2"></i> Add Selected to Test
+                        </button>
+                    </div>
+
+                    <div class="table-responsive" style="max-height: 500px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 8px;">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th width="5%"><input type="checkbox" id="selectAllBank" onchange="window.toggleAllBankCheckboxes(this)"></th>
+                                    <th width="50%">Question</th>
+                                    <th width="45%">Options</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bankTbody">
+                                <tr><td colspan="3" class="text-center py-4">Select a test to view available questions.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <div class="tab-pane fade" id="manual" role="tabpanel">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold text-dark m-0"><i class="fas fa-database text-success me-2"></i> Existing Question Bank</h5>
+                        <h5 class="fw-bold text-dark m-0"><i class="fas fa-database text-success me-2"></i> Active Questions in Test</h5>
                         <span class="badge bg-success rounded-pill px-3 py-2 fs-6" id="questionCount">0 Questions</span>
                     </div>
 
@@ -242,12 +272,16 @@
             document.getElementById('displayTestTitle').innerText = `${activeTest.title} (${activeTest.classes.name})`;
             
             updatePublishUI();
+            
+            // Load both tables
             await loadExistingQuestions();
+            await loadBankQuestions();
             
             // Reset upload area
             document.getElementById('extractionPreview').classList.add('d-none');
             document.getElementById('processDocxBtn').classList.add('d-none');
             document.getElementById('docxUpload').value = '';
+            document.getElementById('selectAllBank').checked = false;
         });
 
         // 3. Publish / Unpublish UI Logic
@@ -314,7 +348,7 @@
             processBtn.disabled = false;
         }
 
-        // 5. Custom Regex Parser for the specified template
+        // Custom Regex Parser
         function parseExtractedText(result) {
             const text = result.value;
             const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
@@ -325,7 +359,6 @@
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i];
 
-                // Detect Question start (e.g., "1. What is...")
                 if (/^\d+[\.\)]\s+/.test(line)) {
                     if (currentQ && currentQ.question) parsedQuestions.push(currentQ);
                     currentQ = { 
@@ -333,22 +366,16 @@
                         optA: '', optB: '', optC: '', optD: '', 
                         answer: '', marks: activeTest.marks_per_question 
                     };
-                } 
-                // Detect Options (e.g., "A) Option text")
-                else if (/^[A-D][\.\)]\s+/i.test(line) && currentQ) {
+                } else if (/^[A-D][\.\)]\s+/i.test(line) && currentQ) {
                     const letter = line.charAt(0).toUpperCase();
                     const optText = line.substring(2).trim();
                     if (letter === 'A') currentQ.optA = optText;
                     if (letter === 'B') currentQ.optB = optText;
                     if (letter === 'C') currentQ.optC = optText;
                     if (letter === 'D') currentQ.optD = optText;
-                }
-                // Detect Answer (e.g., "Answer: B")
-                else if (/^Answer:\s*[A-D]/i.test(line) && currentQ) {
+                } else if (/^Answer:\s*[A-D]/i.test(line) && currentQ) {
                     currentQ.answer = line.replace(/^Answer:\s*/i, '').trim().charAt(0).toUpperCase();
-                }
-                // Append multi-line questions
-                else if (currentQ && !currentQ.optA) {
+                } else if (currentQ && !currentQ.optA) {
                     currentQ.question += " " + line;
                 }
             }
@@ -386,7 +413,7 @@
             previewSection.classList.remove('d-none');
         }
 
-        // 6. Save Bulk Questions to Database
+        // Save Bulk Questions to Database
         document.getElementById('confirmImportBtn').addEventListener('click', async () => {
             const btn = document.getElementById('confirmImportBtn');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Saving to Database...';
@@ -394,7 +421,6 @@
 
             try {
                 for (let q of parsedQuestions) {
-                    // 1. Insert into questions table
                     const { data: newQ, error: qErr } = await supabase.from('questions').insert([{
                         teacher_id: currentUserId,
                         class_id: activeTest.class_id,
@@ -407,11 +433,7 @@
 
                     if (qErr) throw qErr;
 
-                    // 2. Link to test in test_questions table
-                    await supabase.from('test_questions').insert([{
-                        test_id: activeTest.id,
-                        question_id: newQ.id
-                    }]);
+                    await supabase.from('test_questions').insert([{ test_id: activeTest.id, question_id: newQ.id }]);
                 }
 
                 alert(`Successfully imported ${parsedQuestions.length} questions!`);
@@ -421,6 +443,7 @@
                 bootstrap.Tab.getOrCreateInstance(triggerEl).show();
                 
                 await loadExistingQuestions();
+                await loadBankQuestions();
 
                 // Reset import view
                 document.getElementById('extractionPreview').classList.add('d-none');
@@ -436,7 +459,95 @@
             }
         });
 
-        // 7. Load Existing Questions (For the Manual Review Tab)
+        // 5. Load Question Bank (New Feature)
+        async function loadBankQuestions() {
+            const tbody = document.getElementById('bankTbody');
+            tbody.innerHTML = `<tr><td colspan="3" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i> Loading bank...</td></tr>`;
+
+            try {
+                // Get IDs of questions already mapped to this test
+                const { data: existingMap, error: mapErr } = await supabase.from('test_questions').select('question_id').eq('test_id', activeTest.id);
+                if (mapErr) throw mapErr;
+                const existingIds = existingMap.map(e => e.question_id);
+
+                // Fetch all questions for this subject and class
+                const { data: bankQs, error: bankErr } = await supabase
+                    .from('questions')
+                    .select('id, question_text, option_a, option_b, option_c, option_d, correct_option')
+                    .eq('subject_id', activeTest.subject_id)
+                    .eq('class_id', activeTest.class_id);
+                if (bankErr) throw bankErr;
+
+                // Filter out questions already in the test
+                const availableQs = bankQs.filter(q => !existingIds.includes(q.id));
+
+                if (availableQs.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-muted">No additional questions found in the bank for this subject and class.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = availableQs.map(q => `
+                    <tr>
+                        <td class="align-middle"><input type="checkbox" class="bank-checkbox" value="${q.id}"></td>
+                        <td>
+                            <strong>${q.question_text}</strong><br>
+                            <span class="badge bg-light text-dark border mt-1">Ans: ${q.correct_option}</span>
+                        </td>
+                        <td class="small text-muted">
+                            A) ${q.option_a}<br>B) ${q.option_b}<br>C) ${q.option_c}<br>D) ${q.option_d}
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="3" class="text-center text-danger">Error loading bank questions.</td></tr>`;
+            }
+        }
+
+        window.toggleAllBankCheckboxes = (source) => {
+            const checkboxes = document.querySelectorAll('.bank-checkbox');
+            checkboxes.forEach(cb => cb.checked = source.checked);
+        };
+
+        window.addSelectedFromBank = async () => {
+            const checkboxes = document.querySelectorAll('.bank-checkbox:checked');
+            if (checkboxes.length === 0) {
+                alert("Please select at least one question from the list.");
+                return;
+            }
+
+            const btn = document.getElementById('addFromBankBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Adding...';
+            btn.disabled = true;
+
+            const inserts = Array.from(checkboxes).map(cb => ({
+                test_id: activeTest.id,
+                question_id: parseInt(cb.value)
+            }));
+
+            try {
+                const { error } = await supabase.from('test_questions').insert(inserts);
+                if (error) throw error;
+
+                alert(`Successfully assigned ${inserts.length} questions to the test!`);
+                document.getElementById('selectAllBank').checked = false;
+                
+                await loadExistingQuestions();
+                await loadBankQuestions();
+
+                const triggerEl = document.querySelector('#manual-tab');
+                bootstrap.Tab.getOrCreateInstance(triggerEl).show();
+
+            } catch (err) {
+                alert("Error adding questions: " + err.message);
+            } finally {
+                btn.innerHTML = '<i class="fas fa-plus me-2"></i> Add Selected to Test';
+                btn.disabled = false;
+            }
+        };
+
+        // 6. Load Existing Questions (For the Manual Review Tab)
         async function loadExistingQuestions() {
             const tbody = document.getElementById('questionsTbody');
             tbody.innerHTML = `<tr><td colspan="3" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>`;
@@ -452,7 +563,7 @@
                 document.getElementById('questionCount').innerText = `${data.length} Questions`;
 
                 if (data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="3" class="text-center py-4">No questions added yet. Use the Import tab to upload.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="3" class="text-center py-4">No questions added yet. Use the Import or Bank tabs to assign questions.</td></tr>`;
                     return;
                 }
 
@@ -467,7 +578,7 @@
                             <td class="small text-muted">
                                 A) ${q.option_a}<br>B) ${q.option_b}<br>C) ${q.option_c}<br>D) ${q.option_d}
                             </td>
-                            <td>
+                            <td class="align-middle">
                                 <button onclick="window.deleteQuestion(${item.id}, ${item.question_id})" class="btn btn-sm btn-outline-danger">
                                     <i class="fas fa-trash"></i> Remove
                                 </button>
@@ -481,10 +592,11 @@
         }
 
         window.deleteQuestion = async (testQuestionId, questionId) => {
-            if (!confirm("Remove this question?")) return;
+            if (!confirm("Remove this question from the active test? (It will remain in the general bank)")) return;
+            // Only delete the mapping, do not delete from the general questions table
             await supabase.from('test_questions').delete().eq('id', testQuestionId);
-            await supabase.from('questions').delete().eq('id', questionId);
-            loadExistingQuestions();
+            await loadExistingQuestions();
+            await loadBankQuestions();
         };
 
         // Logout
