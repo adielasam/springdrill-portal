@@ -17,7 +17,7 @@
         .nav-link i { width: 25px; font-size: 1.1rem; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; transform: translateX(5px); }
 
-        /* Main Content Styling */
+        /* Main Content */
         .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
         .top-header { background: white; padding: 20px 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #f1c40f; }
 
@@ -25,9 +25,12 @@
         .form-control, .form-select { padding: 12px 15px; border-radius: 8px; border: 1px solid #dee2e6; background-color: #f8f9fa; }
         .form-control:focus, .form-select:focus { border-color: #1a3c34; box-shadow: 0 0 0 0.25rem rgba(26, 60, 52, 0.25); background-color: white; }
         
-        /* Credentials Display Card */
+        /* Credentials Display */
         .credentials-card { background: #e8f5e9; border: 2px dashed #2ecc71; border-radius: 12px; padding: 25px; text-align: center; display: none; }
         .cred-box { background: white; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 1.2rem; font-weight: bold; color: #2c3e50; border: 1px solid #ced4da; margin-bottom: 10px;}
+
+        /* Section Headers */
+        .section-title { font-size: 0.9rem; font-weight: 700; color: #6c757d; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; margin-top: 20px; border-bottom: 2px solid #e9ecef; padding-bottom: 5px; }
 
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
@@ -61,52 +64,95 @@
         <div class="top-header">
             <div>
                 <h3 class="fw-bold mb-0 text-dark"><i class="fas fa-user-shield text-warning me-2"></i> Account Generator</h3>
-                <p class="text-muted mb-0 mt-1">Officially provision accounts for Staff, Students, and Parents.</p>
+                <p class="text-muted mb-0 mt-1">Officially provision comprehensive accounts for the school database.</p>
             </div>
         </div>
 
         <div class="row">
-            <div class="col-lg-7">
+            <div class="col-lg-8">
                 <div class="content-card">
                     <h5 class="fw-bold mb-4 border-bottom pb-2">Create New User Profile</h5>
                     
                     <form id="createUserForm">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Full Name</label>
-                            <input type="text" id="fullName" class="form-control" placeholder="e.g. John Doe" required>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-primary">Account Role</label>
+                            <select id="roleSelect" class="form-select border-primary fw-bold" required>
+                                <option value="" disabled selected>-- Select Role to Expand Form --</option>
+                                <option value="student">Student</option>
+                                <option value="teacher">Teacher / Staff</option>
+                                <option value="parent">Parent / Guardian</option>
+                            </select>
                         </div>
 
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Account Role</label>
-                                <select id="roleSelect" class="form-select" required>
-                                    <option value="" disabled selected>Select Role...</option>
-                                    <option value="student">Student</option>
-                                    <option value="teacher">Teacher / Staff</option>
-                                    <option value="parent">Parent / Guardian</option>
-                                </select>
+                        <div id="basicDetailsSection" style="display: none;">
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Full Name</label>
+                                <input type="text" id="basicFullName" class="form-control" placeholder="e.g. John Doe">
                             </div>
+                        </div>
+
+                        <div id="studentDetailsSection" style="display: none; background: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #dee2e6; margin-bottom: 25px;">
+                            <h6 class="fw-bold text-dark mb-3"><i class="fas fa-id-card me-2"></i> Comprehensive Student Data</h6>
                             
-                            <div class="col-md-6" id="classSelectDiv" style="display: none;">
-                                <label class="form-label fw-bold">Assign Class (Students Only)</label>
-                                <select id="classSelect" class="form-select">
-                                    <option value="">Loading classes...</option>
-                                </select>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold small">Surname <span class="text-danger">*</span></label>
+                                    <input type="text" id="stuSurname" class="form-control" placeholder="Surname">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold small">First Name <span class="text-danger">*</span></label>
+                                    <input type="text" id="stuFirstName" class="form-control" placeholder="First Name">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold small">Other Name</label>
+                                    <input type="text" id="stuOtherName" class="form-control" placeholder="Middle Name">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small">Registration / ID Number</label>
+                                    <input type="text" id="stuRegNumber" class="form-control" placeholder="e.g. 2024/2025/001">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small">Assign Class <span class="text-danger">*</span></label>
+                                    <select id="stuClassSelect" class="form-select">
+                                        <option value="">Loading classes...</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small">Phone Number</label>
+                                    <input type="text" id="stuPhone" class="form-control" placeholder="Contact number">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small">Parent/Guardian Name</label>
+                                    <input type="text" id="stuParentName" class="form-control" placeholder="Name of primary contact">
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label fw-bold small">Residential Address</label>
+                                    <input type="text" id="stuAddress" class="form-control" placeholder="Full home address">
+                                </div>
+
+                                <div class="col-12 mt-3 pt-3 border-top">
+                                    <label class="form-label fw-bold small text-primary"><i class="fas fa-camera me-1"></i> Optional Passport Upload</label>
+                                    <input type="file" id="stuPassport" class="form-control" accept="image/png, image/jpeg, image/jpg">
+                                    <small class="text-muted">You can upload the student's passport now, or they can upload it later from their own dashboard.</small>
+                                </div>
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-dark w-100 py-3 fw-bold fs-5" id="generateBtn">
-                            <i class="fas fa-cogs me-2"></i> Generate Login ID & Password
+                        <button type="submit" class="btn btn-dark w-100 py-3 fw-bold fs-5" id="generateBtn" style="display: none;">
+                            <i class="fas fa-cogs me-2"></i> Generate Login ID & Save Profile
                         </button>
                     </form>
                 </div>
             </div>
 
-            <div class="col-lg-5">
+            <div class="col-lg-4">
                 <div class="credentials-card shadow-sm" id="credentialsCard">
                     <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                    <h4 class="fw-bold text-dark">Account Created!</h4>
-                    <p class="text-muted small">Please copy these credentials and provide them to the user. They will use this Login ID instead of a personal email.</p>
+                    <h4 class="fw-bold text-dark">Profile Created!</h4>
+                    <p class="text-muted small">Please provide these credentials to the user. They will use this Login ID instead of an email.</p>
                     
                     <div class="mt-4 text-start">
                         <label class="text-muted small fw-bold">Generated Login ID (Username):</label>
@@ -121,9 +167,10 @@
                     </button>
                 </div>
 
-                <div class="alert alert-info border-0 shadow-sm mt-4">
+                <div class="alert alert-info border-0 shadow-sm">
                     <h6 class="fw-bold"><i class="fas fa-info-circle me-2"></i> How this works</h6>
-                    <p class="small mb-0">Accounts created here are automatically marked as <strong>Approved</strong>. The system generates a unique school Login ID ending in <i>@springdrill.edu</i> to serve as their username for the portal.</p>
+                    <p class="small mb-2">Accounts created here are automatically marked as <strong>Approved</strong>. The system generates a unique school Login ID ending in <i>@springdrill.edu</i> to serve as their username.</p>
+                    <p class="small mb-0">For students, filling out the comprehensive data ensures their Term Report Cards are instantly ready for printing.</p>
                 </div>
             </div>
         </div>
@@ -139,13 +186,11 @@
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
-                
-                // Save admin session so we can restore it after creating a user
-                adminSession = session;
+                adminSession = session; // Save admin session for restoration
 
                 // Load classes for the student dropdown
                 const { data: classes } = await supabase.from('classes').select('*').order('id');
-                const classDropdown = document.getElementById('classSelect');
+                const classDropdown = document.getElementById('stuClassSelect');
                 if (classes) {
                     classDropdown.innerHTML = `<option value="" disabled selected>-- Select Class --</option>` + 
                         classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
@@ -159,52 +204,88 @@
 
         document.addEventListener('DOMContentLoaded', initializePage);
 
-        // Toggle Class dropdown based on Role
+        // 2. Dynamic Form Toggling
         document.getElementById('roleSelect').addEventListener('change', (e) => {
-            const classDiv = document.getElementById('classSelectDiv');
-            const classSelect = document.getElementById('classSelect');
-            if (e.target.value === 'student') {
-                classDiv.style.display = 'block';
-                classSelect.required = true;
+            const role = e.target.value;
+            const basicDiv = document.getElementById('basicDetailsSection');
+            const studentDiv = document.getElementById('studentDetailsSection');
+            const btn = document.getElementById('generateBtn');
+
+            btn.style.display = 'block';
+
+            if (role === 'student') {
+                basicDiv.style.display = 'none';
+                document.getElementById('basicFullName').required = false;
+                
+                studentDiv.style.display = 'block';
+                document.getElementById('stuSurname').required = true;
+                document.getElementById('stuFirstName').required = true;
+                document.getElementById('stuClassSelect').required = true;
             } else {
-                classDiv.style.display = 'none';
-                classSelect.required = false;
-                classSelect.value = '';
+                studentDiv.style.display = 'none';
+                document.getElementById('stuSurname').required = false;
+                document.getElementById('stuFirstName').required = false;
+                document.getElementById('stuClassSelect').required = false;
+
+                basicDiv.style.display = 'block';
+                document.getElementById('basicFullName').required = true;
             }
         });
 
-        // 2. Form Submission & User Generation
+        // 3. Form Submission & User Generation
         document.getElementById('createUserForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const btn = document.getElementById('generateBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Generating Account...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Processing...';
             btn.disabled = true;
 
-            const fullName = document.getElementById('fullName').value.trim();
             const role = document.getElementById('roleSelect').value;
-            const classId = document.getElementById('classSelect').value;
-
-            // Generate Login ID & Password
-            const nameClean = fullName.replace(/\s+/g, '.').toLowerCase();
-            const randomNum = Math.floor(1000 + Math.random() * 9000);
-            
-            // This generated email acts as their "Login ID"
-            const generatedEmail = `${nameClean}${randomNum}@springdrill.edu`;
-            const generatedPassword = `Spring${randomNum}!`;
+            let fullName = "";
+            let generatedEmail = "";
+            let generatedPassword = "";
 
             try {
+                let finalPassportUrl = null;
+
+                // --- DATA PREPARATION based on role ---
+                if (role === 'student') {
+                    const surname = document.getElementById('stuSurname').value.trim();
+                    const firstName = document.getElementById('stuFirstName').value.trim();
+                    fullName = `${firstName} ${surname}`;
+                    
+                    // Handle Passport Upload if provided by Admin
+                    const passportFile = document.getElementById('stuPassport').files[0];
+                    if (passportFile) {
+                        const fileExt = passportFile.name.split('.').pop();
+                        const fileName = `admin_upload_${Date.now()}.${fileExt}`;
+                        
+                        const { error: uploadErr } = await supabase.storage.from('passports').upload(fileName, passportFile);
+                        if (uploadErr) throw new Error("Image upload failed: " + uploadErr.message);
+                        
+                        const { data: pubData } = supabase.storage.from('passports').getPublicUrl(fileName);
+                        finalPassportUrl = pubData.publicUrl;
+                    }
+                } else {
+                    fullName = document.getElementById('basicFullName').value.trim();
+                }
+
+                // Generate Secure Credentials
+                const nameClean = fullName.replace(/\s+/g, '.').toLowerCase();
+                const randomNum = Math.floor(1000 + Math.random() * 9000);
+                generatedEmail = `${nameClean}${randomNum}@springdrill.edu`;
+                generatedPassword = `Spring${randomNum}!`;
+
+                // --- DATABASE INSERTS ---
                 // Step A: Create User in Supabase Auth
-                // Note: Standard Supabase signs the NEW user in. We will restore the Admin session immediately.
                 const { data: authData, error: authErr } = await supabase.auth.signUp({
                     email: generatedEmail,
                     password: generatedPassword,
                 });
-
                 if (authErr) throw authErr;
                 const newUserId = authData.user.id;
 
-                // Step B: Insert into public.users
+                // Step B: Insert into core users table
                 await supabase.from('users').insert([{
                     id: newUserId,
                     name: fullName,
@@ -213,23 +294,32 @@
                     username: generatedEmail.split('@')[0]
                 }]);
 
-                // Step C: Insert into specific role table and Auto-Approve
+                // Step C: Insert Role-Specific Data
                 if (role === 'student') {
-                    await supabase.from('students').insert([{ user_id: newUserId, class_id: classId, approved: true }]);
+                    await supabase.from('students').insert([{ 
+                        user_id: newUserId, 
+                        class_id: document.getElementById('stuClassSelect').value, 
+                        approved: true,
+                        surname: document.getElementById('stuSurname').value.trim(),
+                        first_name: document.getElementById('stuFirstName').value.trim(),
+                        other_name: document.getElementById('stuOtherName').value.trim(),
+                        reg_number: document.getElementById('stuRegNumber').value.trim(),
+                        phone_number: document.getElementById('stuPhone').value.trim(),
+                        address: document.getElementById('stuAddress').value.trim(),
+                        parent_guardian_name: document.getElementById('stuParentName').value.trim(),
+                        passport_url: finalPassportUrl
+                    }]);
                 } else if (role === 'teacher') {
                     await supabase.from('teachers').insert([{ user_id: newUserId, approved: true }]);
                 } else if (role === 'parent') {
-                    await supabase.from('parents').insert([{ user_id: newUserId }]); // Parents don't need approval
+                    await supabase.from('parents').insert([{ user_id: newUserId }]);
                 }
 
-                // Step D: Restore Admin Session (Crucial step for pure frontend)
-                await supabase.auth.signOut(); // Sign out the newly created user
-                await supabase.auth.setSession({
-                    access_token: adminSession.access_token,
-                    refresh_token: adminSession.refresh_token
-                });
+                // Step D: Restore Admin Session
+                await supabase.auth.signOut();
+                await supabase.auth.setSession({ access_token: adminSession.access_token, refresh_token: adminSession.refresh_token });
 
-                // Display Credentials
+                // Display Success
                 document.getElementById('displayLoginId').innerText = generatedEmail;
                 document.getElementById('displayPassword').innerText = generatedPassword;
                 document.getElementById('credentialsCard').style.display = 'block';
@@ -237,20 +327,21 @@
 
             } catch (err) {
                 alert("Error generating account: " + err.message);
-                
-                // Failsafe: Restore Admin Session just in case
                 if (adminSession) {
                     await supabase.auth.setSession({ access_token: adminSession.access_token, refresh_token: adminSession.refresh_token });
                 }
             } finally {
-                btn.innerHTML = '<i class="fas fa-cogs me-2"></i> Generate Login ID & Password';
+                btn.innerHTML = '<i class="fas fa-cogs me-2"></i> Generate Login ID & Save Profile';
                 btn.disabled = false;
             }
         });
 
+        // Reset Form UI
         window.resetGenerator = () => {
             document.getElementById('createUserForm').reset();
-            document.getElementById('classSelectDiv').style.display = 'none';
+            document.getElementById('basicDetailsSection').style.display = 'none';
+            document.getElementById('studentDetailsSection').style.display = 'none';
+            document.getElementById('generateBtn').style.display = 'none';
             document.getElementById('credentialsCard').style.display = 'none';
             document.getElementById('createUserForm').style.display = 'block';
         };

@@ -3,69 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRINGDRILL - User Management</title>
+    <title>SPRINGDRILL - Manage Users</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .content { padding: 30px; max-width: 1000px; margin: 0 auto; }
-        .header { background: linear-gradient(90deg, #1a3c34, #2c5f4a); color: white; padding: 20px 25px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
-        .card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); padding: 25px; background: white; }
-        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.85em; font-weight: bold; }
-        .status-pending { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
-        .status-approved { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .nav-pills .nav-link { border-radius: 50px; margin-right: 10px; color: #1a3c34; border: 1px solid #1a3c34; }
-        .nav-pills .nav-link.active { background-color: #1a3c34; color: white; }
-        .table th { border-top: none; color: #6c757d; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
+        body { background-color: #f4f7fa; overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        /* Sidebar Styling */
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding-top: 30px; z-index: 1000; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-brand i { color: #f1c40f; font-size: 2.5rem; margin-bottom: 10px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 15px 25px; margin: 4px 15px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; text-decoration: none; }
+        .nav-link i { width: 25px; font-size: 1.1rem; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; transform: translateX(5px); }
+
+        /* Main Content Styling */
+        .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
+        .top-header { background: white; padding: 20px 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #ffc107; }
+
+        /* Tabs & Tables */
+        .content-card { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: none; margin-bottom: 30px; }
+        .nav-tabs .nav-link { font-weight: 600; color: #6c757d; border: none; border-bottom: 3px solid transparent; padding: 12px 20px; }
+        .nav-tabs .nav-link.active { color: #1a3c34; border-bottom: 3px solid #ffc107; background: transparent; }
+        .nav-tabs { border-bottom: 2px solid #e9ecef; margin-bottom: 25px; }
+        
+        .table th { background-color: #f8f9fa; color: #495057; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; border-bottom: 2px solid #dee2e6; }
         .table td { vertical-align: middle; }
+        
+        .badge-active { background-color: #d4edda; color: #155724; padding: 6px 10px; border-radius: 6px; font-weight: bold; }
+        .badge-suspended { background-color: #f8d7da; color: #721c24; padding: 6px 10px; border-radius: 6px; font-weight: bold; }
+
+        .ward-tag { display: inline-block; background: #e9ecef; color: #495057; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; margin: 2px; font-weight: bold; border: 1px solid #ced4da; }
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
 <body>
-    <div class="content">
-        <div class="header">
-            <h2 class="m-0"><i class="fas fa-users-cog me-2"></i> Approval Queue</h2>
-            <a href="admin_dashboard.html" class="btn btn-outline-light"><i class="fas fa-arrow-left me-1"></i> Back to Dashboard</a>
+
+    <div id="loadingOverlay">
+        <i class="fas fa-spinner fa-spin fa-3x text-warning mb-3"></i>
+        <h4>Loading User Directory...</h4>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-shield-alt"></i>
+            <h4 class="text-white fw-bold mb-0">ADMIN PORTAL</h4>
+        </div>
+        
+        <nav class="nav flex-column mt-4">
+            <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard Overview</a>
+            <a href="admin_create_user.html" class="nav-link"><i class="fas fa-user-plus"></i> Generate Accounts</a>
+            <a href="manage_users.html" class="nav-link active"><i class="fas fa-users-cog"></i> Manage Approvals</a>
+            <a href="class_list.html" class="nav-link"><i class="fas fa-clipboard-list"></i> Class Lists & Data</a>
+            <a href="manage_cbt.html" class="nav-link"><i class="fas fa-tasks"></i> Manage CBT</a>
+            <a href="test_analysis.html" class="nav-link"><i class="fas fa-chart-pie"></i> Academic Analysis</a>
+            <hr class="mx-3 my-4 border-secondary">
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-sign-out-alt"></i> Secure Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-header">
+            <div>
+                <h3 class="fw-bold mb-0 text-dark"><i class="fas fa-users-cog text-warning me-2"></i> User Management</h3>
+                <p class="text-muted mb-0 mt-1">Approve accounts, manage access, and link parents to students.</p>
+            </div>
+            <a href="admin_create_user.html" class="btn btn-warning fw-bold shadow-sm"><i class="fas fa-plus me-2"></i> Create New User</a>
         </div>
 
-        <div class="card">
-            <ul class="nav nav-pills mb-4" id="pills-tab" role="tablist">
+        <div class="content-card">
+            <ul class="nav nav-tabs" id="userTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="pills-teachers-tab" data-bs-toggle="pill" data-bs-target="#pills-teachers" type="button" role="tab">
-                        <i class="fas fa-chalkboard-teacher me-1"></i> Teachers
-                    </button>
+                    <button class="nav-link active" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button" role="tab"><i class="fas fa-user-graduate me-2"></i> Students</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="pills-students-tab" data-bs-toggle="pill" data-bs-target="#pills-students" type="button" role="tab">
-                        <i class="fas fa-user-graduate me-1"></i> Students
-                    </button>
+                    <button class="nav-link" id="teachers-tab" data-bs-toggle="tab" data-bs-target="#teachers" type="button" role="tab"><i class="fas fa-chalkboard-teacher me-2"></i> Staff & Teachers</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="parents-tab" data-bs-toggle="tab" data-bs-target="#parents" type="button" role="tab"><i class="fas fa-user-friends me-2"></i> Parents</button>
                 </li>
             </ul>
 
-            <div class="tab-content" id="pills-tabContent">
-                <div class="tab-pane fade show active" id="pills-teachers" role="tabpanel">
+            <div class="tab-content" id="userTabsContent">
+                
+                <div class="tab-pane fade show active" id="students" role="tabpanel">
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover align-middle">
                             <thead>
-                                <tr><th>Name</th><th>Email</th><th>Status</th><th>Action</th></tr>
+                                <tr>
+                                    <th width="30%">Student Name</th>
+                                    <th width="25%">Login ID (Email)</th>
+                                    <th width="15%">Class</th>
+                                    <th width="15%">Status</th>
+                                    <th width="15%">Actions</th>
+                                </tr>
                             </thead>
-                            <tbody id="teachersTbody">
-                                <tr><td colspan="4" class="text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Loading teachers...</td></tr>
+                            <tbody id="studentsTbody">
+                                <tr><td colspan="5" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <div class="tab-pane fade" id="pills-students" role="tabpanel">
+                <div class="tab-pane fade" id="teachers" role="tabpanel">
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover align-middle">
                             <thead>
-                                <tr><th>Name</th><th>Class</th><th>Status</th><th>Action</th></tr>
+                                <tr>
+                                    <th width="35%">Staff Name</th>
+                                    <th width="30%">Login ID (Email)</th>
+                                    <th width="15%">Status</th>
+                                    <th width="20%">Actions</th>
+                                </tr>
                             </thead>
-                            <tbody id="studentsTbody">
-                                <tr><td colspan="4" class="text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Loading students...</td></tr>
+                            <tbody id="teachersTbody">
+                                <tr><td colspan="4" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
                             </tbody>
                         </table>
                     </div>
+                </div>
+
+                <div class="tab-pane fade" id="parents" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th width="25%">Parent Name</th>
+                                    <th width="25%">Login ID (Email)</th>
+                                    <th width="30%">Linked Wards (Students)</th>
+                                    <th width="20%">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="parentsTbody">
+                                <tr><td colspan="4" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="linkWardModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-warning text-dark border-0">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-link me-2"></i> Link Student to Parent</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="text-muted mb-4">Select a student from the directory to securely link them to <strong id="modalParentName" class="text-dark">--</strong>'s portal.</p>
+                    
+                    <input type="hidden" id="modalParentId">
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Select Student</label>
+                        <select id="modalStudentSelect" class="form-select border-warning shadow-sm" required>
+                            <option value="">Loading students...</option>
+                        </select>
+                    </div>
+
+                    <button type="button" class="btn btn-dark w-100 fw-bold py-2" id="saveLinkBtn" onclick="window.saveParentLink()">
+                        <i class="fas fa-save me-2"></i> Save Link
+                    </button>
                 </div>
             </div>
         </div>
@@ -75,76 +177,229 @@
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
-        async function loadUsers() {
+        let allStudentsList = []; // Cached for the modal dropdown
+
+        async function initializePage() {
             try {
-                // Fetch Teachers
-                const { data: teachers, error: tError } = await supabase
-                    .from('teachers')
-                    .select('id, approved, users!inner(name, email)')
-                    .order('approved', { ascending: true }); // Show pending first
-                
-                if (tError) throw tError;
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = 'login.html';
 
-                const tBody = document.getElementById('teachersTbody');
-                if (teachers.length === 0) {
-                    tBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No teachers found.</td></tr>';
-                } else {
-                    tBody.innerHTML = teachers.map(t => `
-                        <tr>
-                            <td class="fw-bold text-dark">${t.users.name}</td>
-                            <td class="text-muted">${t.users.email}</td>
-                            <td><span class="status-badge ${t.approved ? 'status-approved' : 'status-pending'}">${t.approved ? 'Approved' : 'Pending'}</span></td>
-                            <td>
-                                ${!t.approved 
-                                    ? `<button onclick="window.approveUser('teachers', ${t.id})" class="btn btn-sm btn-success"><i class="fas fa-check me-1"></i> Approve</button>` 
-                                    : `<button disabled class="btn btn-sm btn-secondary"><i class="fas fa-check-double me-1"></i> Done</button>`}
-                            </td>
-                        </tr>
-                    `).join('');
-                }
+                // Load all data concurrently
+                await Promise.all([
+                    loadStudents(),
+                    loadTeachers(),
+                    loadParents()
+                ]);
 
-                // Fetch Students
-                const { data: students, error: sError } = await supabase
-                    .from('students')
-                    .select('id, approved, classes(name), users!inner(name)')
-                    .order('approved', { ascending: true }); // Show pending first
-                
-                if (sError) throw sError;
-
-                const sBody = document.getElementById('studentsTbody');
-                if (students.length === 0) {
-                    sBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No students found.</td></tr>';
-                } else {
-                    sBody.innerHTML = students.map(s => `
-                        <tr>
-                            <td class="fw-bold text-dark">${s.users.name}</td>
-                            <td class="text-muted">${s.classes?.name || 'Unassigned'}</td>
-                            <td><span class="status-badge ${s.approved ? 'status-approved' : 'status-pending'}">${s.approved ? 'Approved' : 'Pending'}</span></td>
-                            <td>
-                                ${!s.approved 
-                                    ? `<button onclick="window.approveUser('students', ${s.id})" class="btn btn-sm btn-success"><i class="fas fa-check me-1"></i> Approve</button>` 
-                                    : `<button disabled class="btn btn-sm btn-secondary"><i class="fas fa-check-double me-1"></i> Done</button>`}
-                            </td>
-                        </tr>
-                    `).join('');
-                }
-            } catch (error) {
-                console.error("Error loading users:", error);
-                alert("Failed to load users. Please check your connection.");
+                document.getElementById('loadingOverlay').style.display = 'none';
+            } catch (err) {
+                console.error("Initialization Error:", err);
+                alert("Failed to load user directory.");
             }
         }
 
-        // Make function globally available to inline onclick handlers
-        window.approveUser = async (table, id) => {
-            const { error } = await supabase.from(table).update({ approved: true }).eq('id', id);
-            if (error) {
-                alert("Error approving user: " + error.message);
-            } else {
-                loadUsers(); // Refresh tables instantly
+        document.addEventListener('DOMContentLoaded', initializePage);
+
+        // 1. Load Students
+        async function loadStudents() {
+            const tbody = document.getElementById('studentsTbody');
+            try {
+                const { data, error } = await supabase
+                    .from('students')
+                    .select('user_id, approved, classes(name), users(name, email)')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+                
+                // Cache for the parent linking modal
+                allStudentsList = data.map(s => ({ id: s.user_id, name: s.users.name, class: s.classes?.name || 'No Class' }));
+
+                if (data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">No students found.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = data.map(student => {
+                    const statusBadge = student.approved 
+                        ? `<span class="badge-active"><i class="fas fa-check-circle me-1"></i> Active</span>` 
+                        : `<span class="badge-suspended"><i class="fas fa-lock me-1"></i> Suspended</span>`;
+                    
+                    const actionBtn = student.approved
+                        ? `<button class="btn btn-sm btn-outline-danger fw-bold" onclick="window.toggleStatus('${student.user_id}', 'students', false)"><i class="fas fa-ban me-1"></i> Suspend</button>`
+                        : `<button class="btn btn-sm btn-success fw-bold shadow-sm" onclick="window.toggleStatus('${student.user_id}', 'students', true)"><i class="fas fa-check me-1"></i> Approve</button>`;
+
+                    return `
+                        <tr>
+                            <td class="fw-bold">${student.users.name}</td>
+                            <td class="text-muted small">${student.users.email}</td>
+                            <td><span class="badge bg-light text-dark border">${student.classes?.name || 'Unassigned'}</span></td>
+                            <td>${statusBadge}</td>
+                            <td>${actionBtn}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Error loading students.</td></tr>`;
+            }
+        }
+
+        // 2. Load Teachers
+        async function loadTeachers() {
+            const tbody = document.getElementById('teachersTbody');
+            try {
+                const { data, error } = await supabase
+                    .from('teachers')
+                    .select('user_id, approved, users(name, email)')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">No staff found.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = data.map(teacher => {
+                    const statusBadge = teacher.approved 
+                        ? `<span class="badge-active"><i class="fas fa-check-circle me-1"></i> Active</span>` 
+                        : `<span class="badge-suspended"><i class="fas fa-lock me-1"></i> Suspended</span>`;
+                    
+                    const actionBtn = teacher.approved
+                        ? `<button class="btn btn-sm btn-outline-danger fw-bold" onclick="window.toggleStatus('${teacher.user_id}', 'teachers', false)"><i class="fas fa-ban me-1"></i> Suspend</button>`
+                        : `<button class="btn btn-sm btn-success fw-bold shadow-sm" onclick="window.toggleStatus('${teacher.user_id}', 'teachers', true)"><i class="fas fa-check me-1"></i> Approve</button>`;
+
+                    return `
+                        <tr>
+                            <td class="fw-bold">${teacher.users.name}</td>
+                            <td class="text-muted small">${teacher.users.email}</td>
+                            <td>${statusBadge}</td>
+                            <td>${actionBtn}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Error loading staff.</td></tr>`;
+            }
+        }
+
+        // 3. Load Parents & Linked Wards
+        async function loadParents() {
+            const tbody = document.getElementById('parentsTbody');
+            try {
+                // Fetch parents
+                const { data: parents, error: pErr } = await supabase.from('parents').select('user_id, users(name, email)');
+                if (pErr) throw pErr;
+
+                // Fetch all active links
+                const { data: links, error: lErr } = await supabase.from('parent_student_link').select('parent_id, users!parent_student_link_student_id_fkey(name)');
+                if (lErr) throw lErr;
+
+                if (parents.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">No parents found.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = parents.map(parent => {
+                    // Find wards for this specific parent
+                    const parentLinks = links.filter(l => l.parent_id === parent.user_id);
+                    const wardsHTML = parentLinks.length > 0 
+                        ? parentLinks.map(l => `<span class="ward-tag"><i class="fas fa-user-graduate text-success me-1"></i>${l.users.name}</span>`).join(' ')
+                        : `<span class="text-muted small fst-italic">No students linked</span>`;
+
+                    return `
+                        <tr>
+                            <td class="fw-bold">${parent.users.name}</td>
+                            <td class="text-muted small">${parent.users.email}</td>
+                            <td>${wardsHTML}</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning fw-bold text-dark shadow-sm" onclick="window.openLinkModal('${parent.user_id}', '${parent.users.name}')">
+                                    <i class="fas fa-link me-1"></i> Link Ward
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Error loading parents.</td></tr>`;
+            }
+        }
+
+        // 4. Toggle Status (Approve/Suspend)
+        window.toggleStatus = async (userId, table, setApproved) => {
+            const action = setApproved ? "Approve" : "Suspend";
+            if (!confirm(`Are you sure you want to ${action} this account?`)) return;
+
+            try {
+                const { error } = await supabase.from(table).update({ approved: setApproved }).eq('user_id', userId);
+                if (error) throw error;
+
+                // Reload the specific table
+                if (table === 'students') await loadStudents();
+                if (table === 'teachers') await loadTeachers();
+                
+            } catch (err) {
+                alert(`Failed to update status: ${err.message}`);
             }
         };
 
-        document.addEventListener('DOMContentLoaded', loadUsers);
+        // 5. Parent-Student Linking Logic
+        let modalInstance = null;
+
+        window.openLinkModal = (parentId, parentName) => {
+            document.getElementById('modalParentId').value = parentId;
+            document.getElementById('modalParentName').innerText = parentName;
+
+            const selectEl = document.getElementById('modalStudentSelect');
+            selectEl.innerHTML = `<option value="" disabled selected>-- Select a Student to Link --</option>` + 
+                allStudentsList.map(s => `<option value="${s.id}">${s.name} (${s.class})</option>`).join('');
+
+            if (!modalInstance) {
+                modalInstance = new bootstrap.Modal(document.getElementById('linkWardModal'));
+            }
+            modalInstance.show();
+        };
+
+        window.saveParentLink = async () => {
+            const parentId = document.getElementById('modalParentId').value;
+            const studentId = document.getElementById('modalStudentSelect').value;
+            
+            if (!studentId) return alert("Please select a student from the dropdown.");
+
+            const btn = document.getElementById('saveLinkBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Saving...';
+            btn.disabled = true;
+
+            try {
+                const { error } = await supabase.from('parent_student_link').insert([{ parent_id: parentId, student_id: studentId }]);
+                
+                // 23505 is the Postgres error code for unique constraint violation (already linked)
+                if (error && error.code === '23505') {
+                    alert("This student is already linked to this parent.");
+                } else if (error) {
+                    throw error;
+                } else {
+                    alert("Student successfully linked to parent!");
+                    modalInstance.hide();
+                    await loadParents(); // Refresh the table to show the new tag
+                }
+
+            } catch (err) {
+                alert(`Error linking accounts: ${err.message}`);
+            } finally {
+                btn.innerHTML = '<i class="fas fa-save me-2"></i> Save Link';
+                btn.disabled = false;
+            }
+        };
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
+        });
     </script>
 </body>
 </html>

@@ -3,291 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRING DRILL - Class List</title>
+    <title>SPRINGDRILL - Class & Subject Data</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        .content { margin-left: 250px; padding: 20px; }
-        .header { background-color: #1a3c34; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
-        .pending { background-color: #fff3cd; }
-        .section-title { margin-top: 30px; margin-bottom: 10px; }
-        .action-buttons { white-space: nowrap; }
-        .edit-form { display: none; }
-        .edit-form.active { display: block; }
-        .student-row.editing .student-name { display: none; }
-        .export-btn { margin-bottom: 15px; }
+        body { background-color: #f4f7fa; overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
-        /* Mobile adjustment for sidebar absence in this snippet */
-        @media (max-width: 768px) {
-            .content { margin-left: 0; }
-        }
+        /* Sidebar Styling */
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding-top: 30px; z-index: 1000; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-brand i { color: #f1c40f; font-size: 2.5rem; margin-bottom: 10px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 15px 25px; margin: 4px 15px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; text-decoration: none; }
+        .nav-link i { width: 25px; font-size: 1.1rem; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; transform: translateX(5px); }
+
+        /* Main Content Styling */
+        .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
+        .top-header { background: white; padding: 20px 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #0d6efd; }
+
+        /* Data Cards */
+        .content-card { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: none; height: 100%; }
+        .form-control { padding: 12px 15px; border-radius: 8px; border: 1px solid #dee2e6; background-color: #f8f9fa; }
+        .form-control:focus { border-color: #1a3c34; box-shadow: 0 0 0 0.25rem rgba(26, 60, 52, 0.25); background-color: white; }
+        
+        .list-group-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; font-weight: 500; color: #2c3e50; border-color: #e9ecef; }
+        .list-group-item:hover { background-color: #f8f9fa; }
+        .btn-delete { color: #dc3545; background: none; border: none; transition: transform 0.2s; }
+        .btn-delete:hover { transform: scale(1.1); color: #c82333; }
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
 <body>
-    <div class="content">
-        <div class="header">
-            <h2>Class List</h2>
-            <p class="mb-0">View and manage students by class.</p>
+
+    <div id="loadingOverlay">
+        <i class="fas fa-spinner fa-spin fa-3x text-primary mb-3"></i>
+        <h4>Loading Academic Data...</h4>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-shield-alt"></i>
+            <h4 class="text-white fw-bold mb-0">ADMIN PORTAL</h4>
         </div>
+        
+        <nav class="nav flex-column mt-4">
+            <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard Overview</a>
+            <a href="admin_create_user.html" class="nav-link"><i class="fas fa-user-plus"></i> Generate Accounts</a>
+            <a href="manage_users.html" class="nav-link"><i class="fas fa-users-cog"></i> Manage Approvals</a>
+            <a href="class_list.html" class="nav-link active"><i class="fas fa-clipboard-list"></i> Class Lists & Data</a>
+            <a href="manage_cbt.html" class="nav-link"><i class="fas fa-tasks"></i> Manage CBT</a>
+            <a href="test_analysis.html" class="nav-link"><i class="fas fa-chart-pie"></i> Academic Analysis</a>
+            <hr class="mx-3 my-4 border-secondary">
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-sign-out-alt"></i> Secure Logout</a>
+        </nav>
+    </div>
 
-        <div id="alertBox" class="alert d-none"></div>
-
-        <div class="row mb-3">
-            <div class="col-md-4">
-                <label for="class_id" class="form-label">Class</label>
-                <select id="class_id" class="form-select" required>
-                    <option value="">Select Class</option>
-                    </select>
+    <div class="main-content">
+        <div class="top-header">
+            <div>
+                <h3 class="fw-bold mb-0 text-dark"><i class="fas fa-clipboard-list text-primary me-2"></i> Class Lists & Subjects</h3>
+                <p class="text-muted mb-0 mt-1">Manage the core academic data that powers the entire portal.</p>
             </div>
         </div>
 
-        <div class="export-btn d-none" id="exportContainer">
-            <button id="exportBtn" class="btn btn-success">
-                <i class="fas fa-download"></i> Export Approved Students
-            </button>
-        </div>
+        <div id="alertBox" class="alert d-none shadow-sm" role="alert"></div>
 
-        <h4 class="section-title">Approved Class List</h4>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Student Name</th>
-                    <th>Class Name</th>
-                    <th width="200">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="approvedStudentsBody">
-                <tr><td colspan="3" class="text-center text-muted">Select a class to view students.</td></tr>
-            </tbody>
-        </table>
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="content-card">
+                    <h5 class="fw-bold mb-4 border-bottom pb-2"><i class="fas fa-chalkboard text-success me-2"></i> Manage Classes</h5>
+                    
+                    <form id="addClassForm" class="mb-4">
+                        <div class="input-group">
+                            <input type="text" id="classNameInput" class="form-control" placeholder="e.g. Year 7, JSS 2, Grade 10" required>
+                            <button type="submit" class="btn btn-success fw-bold px-4" id="addClassBtn">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                    </form>
 
-        <h4 class="section-title">Pending Approval</h4>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Student Name</th>
-                    <th>Class Name</th>
-                    <th width="200">Action</th>
-                </tr>
-            </thead>
-            <tbody id="pendingStudentsBody">
-                <tr><td colspan="3" class="text-center text-muted">Select a class to view pending students.</td></tr>
-            </tbody>
-        </table>
+                    <div style="max-height: 400px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 8px;">
+                        <ul class="list-group list-group-flush" id="classesList">
+                            <li class="list-group-item text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i> Loading classes...</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-        <div class="mt-4">
-            <a href="teacher_dashboard.html" class="btn btn-secondary">Back to Dashboard</a>
+            <div class="col-lg-6">
+                <div class="content-card">
+                    <h5 class="fw-bold mb-4 border-bottom pb-2"><i class="fas fa-book text-primary me-2"></i> Manage Subjects</h5>
+                    
+                    <form id="addSubjectForm" class="mb-4">
+                        <div class="input-group">
+                            <input type="text" id="subjectNameInput" class="form-control" placeholder="e.g. Mathematics, ICT, Biology" required>
+                            <button type="submit" class="btn btn-primary fw-bold px-4" id="addSubjectBtn">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                    </form>
+
+                    <div style="max-height: 400px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 8px;">
+                        <ul class="list-group list-group-flush" id="subjectsList">
+                            <li class="list-group-item text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i> Loading subjects...</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
-        const alertBox = document.getElementById('alertBox');
-        const classSelect = document.getElementById('class_id');
-        const exportContainer = document.getElementById('exportContainer');
-        
-        let currentClassId = null;
-        let currentClassName = '';
-        let approvedStudentsData = []; // Store for CSV export
-
-        function showAlert(msg, type = 'success') {
-            alertBox.className = `alert alert-${type} d-block`;
-            alertBox.textContent = msg;
-            setTimeout(() => { alertBox.className = 'alert d-none'; }, 4000);
-        }
-
-        async function init() {
-            // 1. Authenticate & Verify Teacher Role
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) { window.location.href = 'login.html'; return; }
-
-            const { data: userData } = await supabase
-                .from('users')
-                .select('role')
-                .eq('id', user.id)
-                .single();
-
-            if (!userData || userData.role !== 'teacher') {
-                window.location.href = 'login.html'; // Or restricted page
-                return;
-            }
-
-            // 2. Load Classes Dropdown
-            const { data: classes, error } = await supabase.from('classes').select('*').order('name');
-            if (classes) {
-                classSelect.innerHTML = `<option value="">Select Class</option>` + 
-                    classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-            }
-        }
-
-        async function loadStudents(classId) {
-            if (!classId) return;
-            currentClassId = classId;
-            currentClassName = classSelect.options[classSelect.selectedIndex].text;
-
+        async function initializePage() {
             try {
-                // Fetch Students with nested User data
-                const { data: students, error } = await supabase
-                    .from('students')
-                    .select(`
-                        id, approved, user_id,
-                        users (id, name)
-                    `)
-                    .eq('class_id', classId)
-                    .order('users(name)');
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = 'login.html';
 
+                await Promise.all([
+                    loadData('classes', 'classesList'),
+                    loadData('subjects', 'subjectsList')
+                ]);
+
+                document.getElementById('loadingOverlay').style.display = 'none';
+            } catch (err) {
+                console.error("Initialization Error:", err);
+                showAlert("Failed to load academic data. Please check your connection.", "danger");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initializePage);
+
+        // Utility to display alerts
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.className = `alert alert-${type} shadow-sm`;
+            alertBox.innerHTML = `<i class="fas ${type === 'danger' ? 'fa-exclamation-triangle' : 'fa-check-circle'} me-2"></i> ${message}`;
+            alertBox.classList.remove('d-none');
+            setTimeout(() => alertBox.classList.add('d-none'), 5000);
+        }
+
+        // 1. Load Data
+        async function loadData(tableName, listId) {
+            const listEl = document.getElementById(listId);
+            try {
+                const { data, error } = await supabase.from(tableName).select('id, name').order('name', { ascending: true });
                 if (error) throw error;
 
-                const approved = students.filter(s => s.approved === true);
-                const pending = students.filter(s => s.approved === false);
-                
-                approvedStudentsData = approved; // Save for CSV
-
-                renderApproved(approved);
-                renderPending(pending);
-
-                if (approved.length > 0) {
-                    exportContainer.classList.remove('d-none');
-                } else {
-                    exportContainer.classList.add('d-none');
+                if (data.length === 0) {
+                    listEl.innerHTML = `<li class="list-group-item text-muted fst-italic justify-content-center">No ${tableName} found. Add one above.</li>`;
+                    return;
                 }
 
-            } catch (err) {
-                showAlert('Failed to load students: ' + err.message, 'danger');
-            }
-        }
-
-        function renderApproved(students) {
-            const tbody = document.getElementById('approvedStudentsBody');
-            if (students.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No approved students found.</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = students.map(student => `
-                <tr class="student-row" id="row-${student.user_id}">
-                    <td>
-                        <span class="student-name" id="name-${student.user_id}">${student.users.name}</span>
-                        <div class="edit-form input-group" id="edit-form-${student.user_id}">
-                            <input type="text" id="input-${student.user_id}" class="form-control" value="${student.users.name}">
-                            <button onclick="window.saveStudentName('${student.user_id}')" class="btn btn-success btn-sm"><i class="fas fa-check"></i></button>
-                            <button onclick="window.cancelEdit('${student.user_id}')" class="btn btn-secondary btn-sm"><i class="fas fa-times"></i></button>
-                        </div>
-                    </td>
-                    <td>${currentClassName}</td>
-                    <td class="action-buttons">
-                        <button onclick="window.editStudent('${student.user_id}')" class="btn btn-primary btn-sm">
-                            <i class="fas fa-edit"></i> Edit
+                listEl.innerHTML = data.map(item => `
+                    <li class="list-group-item">
+                        <span><i class="fas fa-caret-right text-secondary me-2"></i> ${item.name}</span>
+                        <button class="btn-delete" onclick="window.deleteItem('${tableName}', ${item.id}, '${item.name}')" title="Delete">
+                            <i class="fas fa-trash-alt"></i>
                         </button>
-                        <button onclick="window.deleteStudent('${student.id}', true)" class="btn btn-danger btn-sm">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+                    </li>
+                `).join('');
+            } catch (err) {
+                listEl.innerHTML = `<li class="list-group-item text-danger justify-content-center">Error loading data.</li>`;
+                console.error(err);
+            }
         }
 
-        function renderPending(students) {
-            const tbody = document.getElementById('pendingStudentsBody');
-            if (students.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No pending approvals.</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = students.map(student => `
-                <tr class="pending">
-                    <td>${student.users.name}</td>
-                    <td>${currentClassName}</td>
-                    <td>
-                        <button onclick="window.approveStudent('${student.id}')" class="btn btn-success btn-sm"><i class="fas fa-check"></i> Approve</button>
-                        <button onclick="window.deleteStudent('${student.id}', false)" class="btn btn-danger btn-sm"><i class="fas fa-times"></i> Reject</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        // --- GLOBAL ACTIONS FOR INLINE HTML CALLS ---
-        window.editStudent = (userId) => {
-            document.getElementById(`row-${userId}`).classList.add('editing');
-            document.getElementById(`edit-form-${userId}`).classList.add('active');
-        };
-
-        window.cancelEdit = (userId) => {
-            document.getElementById(`row-${userId}`).classList.remove('editing');
-            document.getElementById(`edit-form-${userId}`).classList.remove('active');
-            document.getElementById(`input-${userId}`).value = document.getElementById(`name-${userId}`).innerText;
-        };
-
-        window.saveStudentName = async (userId) => {
-            const newName = document.getElementById(`input-${userId}`).value.trim();
-            if (!newName) return;
-
-            try {
-                // Update the user's name in the 'users' table
-                const { error } = await supabase.from('users').update({ name: newName }).eq('id', userId);
-                if (error) throw error;
-                
-                showAlert('Student name updated successfully.');
-                loadStudents(currentClassId); // Reload UI
-            } catch (err) {
-                showAlert('Error updating name: ' + err.message, 'danger');
-            }
-        };
-
-        window.approveStudent = async (studentId) => {
-            try {
-                const { error } = await supabase.from('students').update({ approved: true }).eq('id', studentId);
-                if (error) throw error;
-                showAlert('Student approved successfully.');
-                loadStudents(currentClassId);
-            } catch (err) {
-                showAlert('Error approving student.', 'danger');
-            }
-        };
-
-        window.deleteStudent = async (studentId, isApproved) => {
-            const msg = isApproved ? 'Are you sure you want to remove this student from the class?' : 'Are you sure you want to reject this student?';
-            if (!confirm(msg)) return;
-
-            try {
-                const { error } = await supabase.from('students').delete().eq('id', studentId);
-                if (error) throw error;
-                showAlert(`Student ${isApproved ? 'removed' : 'rejected'} successfully.`);
-                loadStudents(currentClassId);
-            } catch (err) {
-                showAlert('Error removing student.', 'danger');
-            }
-        };
-
-        // --- EVENT LISTENERS ---
-        classSelect.addEventListener('change', (e) => loadStudents(e.target.value));
-
-        document.getElementById('exportBtn').addEventListener('click', () => {
-            if (approvedStudentsData.length === 0) return;
-
-            // Generate CSV completely in the browser
-            let csvContent = "Student Name,Class Name\n";
-            approvedStudentsData.forEach(student => {
-                // Escape commas in names by wrapping in quotes
-                const safeName = `"${student.users.name.replace(/"/g, '""')}"`;
-                csvContent += `${safeName},"${currentClassName}"\n`;
-            });
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            const url = URL.createObjectURL(blob);
+        // 2. Add Class
+        document.getElementById('addClassForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('addClassBtn');
+            const input = document.getElementById('classNameInput');
+            const name = input.value.trim();
             
-            link.setAttribute("href", url);
-            link.setAttribute("download", `${currentClassName.replace(/\s+/g, '_')}_students.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            try {
+                const { error } = await supabase.from('classes').insert([{ name: name }]);
+                if (error) {
+                    if (error.code === '23505') throw new Error("A class with this name already exists.");
+                    throw error;
+                }
+                input.value = '';
+                showAlert(`Class "${name}" added successfully!`, "success");
+                await loadData('classes', 'classesList');
+            } catch (err) {
+                showAlert(err.message, "danger");
+            } finally {
+                btn.innerHTML = '<i class="fas fa-plus"></i> Add';
+                btn.disabled = false;
+            }
         });
 
-        // Start
-        document.addEventListener('DOMContentLoaded', init);
+        // 3. Add Subject
+        document.getElementById('addSubjectForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('addSubjectBtn');
+            const input = document.getElementById('subjectNameInput');
+            const name = input.value.trim();
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            try {
+                const { error } = await supabase.from('subjects').insert([{ name: name }]);
+                if (error) {
+                    if (error.code === '23505') throw new Error("A subject with this name already exists.");
+                    throw error;
+                }
+                input.value = '';
+                showAlert(`Subject "${name}" added successfully!`, "success");
+                await loadData('subjects', 'subjectsList');
+            } catch (err) {
+                showAlert(err.message, "danger");
+            } finally {
+                btn.innerHTML = '<i class="fas fa-plus"></i> Add';
+                btn.disabled = false;
+            }
+        });
+
+        // 4. Delete Item (Class or Subject)
+        window.deleteItem = async (tableName, id, name) => {
+            if (!confirm(`Are you sure you want to delete "${name}"? \n\nNote: If this is currently being used by students or tests, the system will block the deletion.`)) {
+                return;
+            }
+
+            try {
+                const { error } = await supabase.from(tableName).delete().eq('id', id);
+                
+                // Handle Foreign Key Constraint Violations
+                if (error && error.code === '23503') {
+                    throw new Error(`Cannot delete "${name}" because it is currently assigned to active students, questions, or tests.`);
+                } else if (error) {
+                    throw error;
+                }
+
+                showAlert(`Successfully deleted "${name}".`, "success");
+                const listId = tableName === 'classes' ? 'classesList' : 'subjectsList';
+                await loadData(tableName, listId);
+
+            } catch (err) {
+                showAlert(err.message, "danger");
+            }
+        };
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
+        });
     </script>
 </body>
 </html>
