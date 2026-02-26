@@ -3,425 +3,379 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRINGDRILL - Student Results</title>
+    <title>SPRINGDRILL - Result Manager</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f4f7fa;
-            overflow-x: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
         
-        /* Sidebar Styling */
-        .sidebar {
-            width: 280px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%);
-            color: white;
-            padding-top: 30px;
-            z-index: 1000;
-            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
-        }
-        .sidebar-brand {
-            text-align: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 20px;
-        }
-        .sidebar-brand i {
-            color: #3498db;
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        .nav-link {
-            color: rgba(255,255,255,0.8);
-            padding: 15px 25px;
-            margin: 4px 15px;
-            border-radius: 8px;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-        }
-        .nav-link i {
-            width: 25px;
-            font-size: 1.1rem;
-        }
-        .nav-link:hover, .nav-link.active {
-            background: rgba(255,255,255,0.15);
-            color: white;
-            transform: translateX(5px);
-        }
-        .nav-link.text-danger:hover {
-            background: rgba(220, 53, 69, 0.2);
-            color: #ff6b6b !important;
-        }
+        /* Sidebar Styling (Educare Clone) */
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #1a3c34; color: white; padding-top: 30px; z-index: 1000; }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; display: flex; align-items: center; font-size: 0.95rem; }
+        .nav-link i { width: 25px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; }
 
-        /* Main Content Styling */
-        .main-content {
-            margin-left: 280px;
-            padding: 40px;
-            min-height: 100vh;
-        }
-        .top-header {
-            background: white;
-            padding: 20px 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 5px solid #198754;
-        }
-
-        /* Analytics Cards */
-        .analytics-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            border: none;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        .analytics-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-        }
-        .bg-light-primary { background: rgba(13, 110, 253, 0.1); color: #0d6efd; }
-        .bg-light-success { background: rgba(25, 135, 84, 0.1); color: #198754; }
-        .bg-light-warning { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
-
-        /* Data Table */
-        .content-card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            border: none;
-        }
-        .table th {
-            background-color: #f8f9fa;
-            color: #495057;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid #dee2e6;
-        }
-        .table td { vertical-align: middle; }
-        .score-badge { font-weight: bold; padding: 5px 12px; border-radius: 8px; font-size: 0.9rem; }
-        .score-excellent { background-color: #d4edda; color: #155724; }
-        .score-average { background-color: #fff3cd; color: #856404; }
-        .score-poor { background-color: #f8d7da; color: #721c24; }
+        /* Main Content */
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
         
-        /* Loading Overlay */
-        #loadingOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.9); z-index: 9999; display: flex;
-            align-items: center; justify-content: center; flex-direction: column;
-        }
+        /* Educare Cards */
+        .edu-card { background: white; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
+        .edu-header { background-color: #007a4d; color: white; padding: 12px 20px; border-radius: 4px 4px 0 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .edu-body { padding: 25px; }
+
+        /* Form Inputs */
+        .form-label { font-weight: 600; color: #495057; font-size: 0.9rem;}
+        .form-select { padding: 10px 15px; border-radius: 4px; border: 1px solid #dee2e6; background-color: #f8f9fa; font-weight: bold;}
+        .form-select:focus { border-color: #007a4d; box-shadow: 0 0 0 0.25rem rgba(0, 122, 77, 0.25); background-color: white; }
+
+        /* Analytics Stats */
+        .stat-card { background: white; border-radius: 8px; padding: 20px; border: 1px solid #eee; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
+        .stat-icon { width: 50px; height: 50px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .stat-info h6 { font-weight: bold; color: #6c757d; margin-bottom: 2px; font-size: 0.8rem; text-transform: uppercase;}
+        .stat-info h3 { font-weight: 900; color: #333; margin-bottom: 0; }
+        
+        .ic-blue { background-color: #e3f2fd; color: #3498db; }
+        .ic-green { background-color: #e8f5e9; color: #2ecc71; }
+        .ic-yellow { background-color: #fff3cd; color: #f1c40f; }
+        .ic-purple { background-color: #f3e5f5; color: #9b59b6; }
+
+        /* Table Styling */
+        .table th { border-top: none; color: #495057; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; background-color: #f8f9fa; letter-spacing: 0.5px;}
+        .table td { vertical-align: middle; font-size: 0.95rem; }
+        
+        .badge-pass { background-color: #d4edda; color: #155724; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; border: 1px solid #c3e6cb;}
+        .badge-fail { background-color: #f8d7da; color: #721c24; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; border: 1px solid #f5c6cb;}
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
 <body>
 
     <div id="loadingOverlay">
         <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
-        <h4>Loading Results Database...</h4>
+        <h4>Loading Result Manager...</h4>
     </div>
 
     <div class="sidebar">
         <div class="sidebar-brand">
-            <i class="fas fa-chalkboard-teacher"></i>
-            <h4 class="text-white fw-bold mb-0">STAFF PORTAL</h4>
+            <h5 class="text-white fw-bold mb-0"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
         </div>
         
-        <nav class="nav flex-column mt-4">
-            <a href="teacher_dashboard.html" class="nav-link">
-                <i class="fas fa-home"></i> Dashboard Home
-            </a>
-            <a href="create_test.html" class="nav-link">
-                <i class="fas fa-plus-circle"></i> Create New Test
-            </a>
-            <a href="manage_cbt.html" class="nav-link">
-                <i class="fas fa-tasks"></i> Manage CBT
-            </a>
-            <a href="test_results.html" class="nav-link active">
-                <i class="fas fa-poll"></i> Student Results
-            </a>
-            <a href="report_scores.html" class="nav-link">
-                <i class="fas fa-file-signature"></i> Report Scores
-            </a>
+        <nav class="nav flex-column mt-3">
+            <a href="teacher_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             
+            <a href="#cbtMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
+                <span><i class="fas fa-laptop-code me-2"></i> CBT</span>
+                <i class="fas fa-caret-down"></i>
+            </a>
+            <div class="collapse show bg-dark mx-2 mt-1 rounded" id="cbtMenu">
+                <a href="#" class="nav-link small py-2 text-muted"><i class="fas fa-database me-2"></i> Question Bank</a>
+                <a href="manage_cbt.html" class="nav-link small py-2"><i class="fas fa-list me-2"></i> Manage CBT</a>
+                <a href="test_results.html" class="nav-link small py-2 active text-success fw-bold"><i class="fas fa-chart-bar me-2"></i> Result Manager</a>
+            </div>
+
             <hr class="mx-3 my-4 border-secondary">
-            
-            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto">
-                <i class="fas fa-sign-out-alt"></i> Secure Logout
-            </a>
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Logout</a>
         </nav>
     </div>
 
     <div class="main-content">
-        <div class="top-header">
-            <div>
-                <h3 class="fw-bold mb-0 text-dark"><i class="fas fa-chart-bar text-success me-2"></i> Examination Results</h3>
-                <p class="text-muted mb-0 mt-1">Review student performance, analytics, and export grades.</p>
+        <h5 class="text-muted fw-bold mb-4">Home / Cbt / Result Manager</h5>
+
+        <div class="edu-card">
+            <div class="edu-header">
+                <span><i class="fas fa-filter me-2"></i> Select Exam to View Results</span>
             </div>
-            
-            <div class="w-50">
-                <label class="form-label mb-1 fw-bold text-success">Select Administered Test:</label>
-                <select id="testSelect" class="form-select border-success shadow-sm fw-bold text-dark">
-                    <option value="">Loading your tests...</option>
-                </select>
+            <div class="edu-body py-4">
+                <div class="row align-items-end">
+                    <div class="col-md-9">
+                        <label class="form-label">Available Exams</label>
+                        <select class="form-select border-primary" id="testSelect">
+                            <option value="">Loading your exams...</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-primary w-100 fw-bold py-2" onclick="window.fetchResults()">
+                            <i class="fas fa-search me-2"></i> Fetch Results
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div id="resultsDashboard" style="display: none;">
-            
-            <div class="row g-4 mb-4">
-                <div class="col-md-4">
-                    <div class="analytics-card">
-                        <div class="analytics-icon bg-light-primary"><i class="fas fa-users"></i></div>
-                        <div>
-                            <p class="text-muted fw-bold mb-0">TOTAL ATTEMPTS</p>
-                            <h3 class="fw-bold mb-0 text-dark" id="statAttempts">0</h3>
+        <div id="analyticsSection" style="display: none;">
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon ic-blue"><i class="fas fa-users"></i></div>
+                        <div class="stat-info">
+                            <h6>Total Attempts</h6>
+                            <h3 id="statTotal">0</h3>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="analytics-card">
-                        <div class="analytics-icon bg-light-warning"><i class="fas fa-percentage"></i></div>
-                        <div>
-                            <p class="text-muted fw-bold mb-0">AVERAGE SCORE</p>
-                            <h3 class="fw-bold mb-0 text-dark" id="statAverage">0%</h3>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon ic-yellow"><i class="fas fa-chart-pie"></i></div>
+                        <div class="stat-info">
+                            <h6>Average Score</h6>
+                            <h3 id="statAvg">0%</h3>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="analytics-card">
-                        <div class="analytics-icon bg-light-success"><i class="fas fa-check-double"></i></div>
-                        <div>
-                            <p class="text-muted fw-bold mb-0">PASS RATE</p>
-                            <h3 class="fw-bold mb-0 text-dark" id="statPassRate">0%</h3>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon ic-purple"><i class="fas fa-trophy"></i></div>
+                        <div class="stat-info">
+                            <h6>Highest Score</h6>
+                            <h3 id="statHighest">0%</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon ic-green"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info">
+                            <h6>Pass Rate</h6>
+                            <h3 id="statPassRate">0%</h3>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="content-card">
-                <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-                    <h5 class="fw-bold m-0"><i class="fas fa-list text-primary me-2"></i> Detailed Student Scores</h5>
-                    <button class="btn btn-outline-success fw-bold" onclick="exportToCSV()">
-                        <i class="fas fa-file-excel me-2"></i> Export to CSV
+            <div class="edu-card">
+                <div class="edu-header">
+                    <span><i class="fas fa-table me-2"></i> Student Performance</span>
+                    <button class="btn btn-sm btn-light text-primary fw-bold px-3 shadow-sm" onclick="window.exportToCSV()">
+                        <i class="fas fa-file-csv me-1"></i> Export CSV
                     </button>
                 </div>
-
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle" id="resultsTable">
-                        <thead>
+                <div class="table-responsive p-0">
+                    <table class="table table-hover table-striped mb-0" id="resultsTable">
+                        <thead class="table-light border-bottom">
                             <tr>
-                                <th width="5%">#</th>
-                                <th width="30%">Student Name</th>
-                                <th width="20%">Date Submitted</th>
-                                <th width="15%">Raw Score</th>
-                                <th width="15%">Percentage</th>
-                                <th width="15%">Status</th>
+                                <th width="5%" class="text-center">Rank</th>
+                                <th width="35%">Student Name</th>
+                                <th width="20%">Date Attempted</th>
+                                <th width="15%" class="text-center">Raw Score</th>
+                                <th width="15%" class="text-center">Percentage</th>
+                                <th width="10%" class="text-center">Status</th>
                             </tr>
                         </thead>
-                        <tbody id="resultsTbody">
-                            </tbody>
+                        <tbody id="resultsBody">
+                            <tr><td colspan="6" class="text-center py-5 text-muted">Click 'Fetch Results' to load data.</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
-
-        </div>
-        
-        <div id="emptyState" class="text-center py-5 mt-5">
-            <i class="fas fa-clipboard-list fa-4x text-muted opacity-25 mb-3"></i>
-            <h4 class="text-muted fw-bold">No Test Selected</h4>
-            <p class="text-muted">Please select an examination from the dropdown menu above to view its results.</p>
         </div>
 
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
         let currentUserId = null;
-        let currentResultsData = [];
+        let currentResultsData = []; // Store globally for CSV export
 
-        // 1. Initialize Page
-        async function initializePage() {
+        // 1. Initialize Page and Load Tests
+        window.initializePage = async function() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
-                if (!session) {
-                    window.location.href = 'login.html';
-                    return;
-                }
+                if (!session) return window.location.href = 'login.html';
                 currentUserId = session.user.id;
 
-                // Load Teacher's Tests into Dropdown
+                // Fetch tests created by this teacher
                 const { data: tests, error } = await supabase
                     .from('tests')
-                    .select('id, title, classes(name)')
+                    .select('id, title, code, classes(name)')
                     .eq('teacher_id', currentUserId)
                     .order('created_at', { ascending: false });
 
-                const testSelect = document.getElementById('testSelect');
                 if (error) throw error;
 
+                const testSelect = document.getElementById('testSelect');
                 if (tests && tests.length > 0) {
-                    testSelect.innerHTML = `<option value="" disabled selected>-- Select a Test to View Results --</option>` + 
-                        tests.map(t => `<option value="${t.id}">[${t.classes.name}] ${t.title}</option>`).join('');
+                    testSelect.innerHTML = `<option value="" disabled selected>-- Select an Exam --</option>` + 
+                        tests.map(t => `<option value="${t.id}">[${t.classes?.name || 'Gen'}] ${t.code} - ${t.title}</option>`).join('');
                 } else {
-                    testSelect.innerHTML = `<option value="">No tests found in your account.</option>`;
+                    testSelect.innerHTML = `<option value="">No exams found. Create one first.</option>`;
                 }
 
                 document.getElementById('loadingOverlay').style.display = 'none';
+
             } catch (err) {
-                console.error("Initialization Error:", err);
-                alert("Failed to authenticate. Please log in again.");
+                console.error(err);
+                alert("Failed to initialize Result Manager.");
+                document.getElementById('loadingOverlay').style.display = 'none';
             }
-        }
+        };
 
-        document.addEventListener('DOMContentLoaded', initializePage);
+        // Run on load
+        document.addEventListener('DOMContentLoaded', window.initializePage);
 
-        // 2. Fetch Results when a Test is Selected
-        document.getElementById('testSelect').addEventListener('change', async (e) => {
-            const testId = e.target.value;
-            if (!testId) return;
+        // 2. Fetch Results Logic
+        window.fetchResults = async function() {
+            const testId = document.getElementById('testSelect').value;
+            if (!testId) return alert("Please select an exam from the dropdown first.");
 
-            document.getElementById('emptyState').style.display = 'none';
-            document.getElementById('resultsDashboard').style.display = 'block';
-            const tbody = document.getElementById('resultsTbody');
-            
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i> Analyzing results...</td></tr>`;
+            const btn = document.querySelector('button[onclick="window.fetchResults()"]');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Loading...';
+            btn.disabled = true;
+
+            const tbody = document.getElementById('resultsBody');
+            document.getElementById('analyticsSection').style.display = 'block';
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5"><i class="fas fa-spinner fa-spin me-2"></i> Compiling grades...</td></tr>`;
 
             try {
-                // Fetch attempts with completed status (end_time is not null) and join with public.users for names
-                const { data: attempts, error } = await supabase
-                    .from('test_attempts')
-                    .select(`
-                        id, 
-                        score, 
-                        total_marks, 
-                        percentage, 
-                        end_time, 
-                        users (name)
-                    `)
-                    .eq('test_id', testId)
-                    .not('end_time', 'is', null)
-                    .order('percentage', { ascending: false }); // Order highest score first
+                // A. Fetch Results
+                const { data: rawResults, error: resErr } = await supabase
+                    .from('test_results')
+                    .select('*')
+                    .eq('test_id', testId);
 
-                if (error) throw error;
+                if (resErr) throw resErr;
 
-                currentResultsData = attempts; // Store for CSV export
-                
-                if (attempts.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No students have completed this test yet.</td></tr>`;
-                    updateAnalytics(0, 0, 0);
+                if (!rawResults || rawResults.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-muted"><i class="fas fa-folder-open fa-2x mb-2 opacity-50"></i><br>No students have taken this exam yet.</td></tr>`;
+                    resetStats();
                     return;
                 }
 
+                // B. Fetch Student Details to map names
+                const studentIds = rawResults.map(r => r.student_id);
+                
+                // Fetch from students table
+                const { data: studentRecords } = await supabase
+                    .from('students')
+                    .select('user_id, first_name, surname')
+                    .in('user_id', studentIds);
+
+                // Fetch from base users table as a fallback
+                const { data: userRecords } = await supabase
+                    .from('users')
+                    .select('id, name')
+                    .in('id', studentIds);
+
+                // Helper to find a name
+                const getStudentName = (sid) => {
+                    const sRecord = studentRecords?.find(s => s.user_id === sid);
+                    if (sRecord && sRecord.first_name) return `${sRecord.surname || ''} ${sRecord.first_name}`.trim();
+                    const uRecord = userRecords?.find(u => u.id === sid);
+                    return uRecord ? uRecord.name : 'Unknown Student';
+                };
+
+                // C. Process Data
+                let processedResults = rawResults.map(r => {
+                    const totalQs = r.total_questions || 1;
+                    const percentage = Math.round((r.score / totalQs) * 100);
+                    return {
+                        name: getStudentName(r.student_id),
+                        date: new Date(r.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }),
+                        score: r.score,
+                        total_questions: totalQs,
+                        percentage: percentage,
+                        passed: percentage >= 50
+                    };
+                });
+
+                // Sort by Percentage Highest to Lowest
+                processedResults.sort((a, b) => b.percentage - a.percentage);
+                currentResultsData = processedResults; // Save for CSV
+
+                // D. Calculate Stats
                 let totalPercentage = 0;
                 let passedCount = 0;
+                let highest = 0;
 
-                tbody.innerHTML = attempts.map((attempt, index) => {
-                    totalPercentage += parseFloat(attempt.percentage);
-                    if (parseFloat(attempt.percentage) >= 50) passedCount++;
+                processedResults.forEach(pr => {
+                    totalPercentage += pr.percentage;
+                    if (pr.passed) passedCount++;
+                    if (pr.percentage > highest) highest = pr.percentage;
+                });
 
-                    // Determine Badge Colors
-                    let badgeClass = 'score-poor';
-                    let statusText = 'Fail';
-                    if (attempt.percentage >= 70) { badgeClass = 'score-excellent'; statusText = 'Excellent'; }
-                    else if (attempt.percentage >= 50) { badgeClass = 'score-average'; statusText = 'Pass'; }
+                const avg = Math.round(totalPercentage / processedResults.length);
+                const passRate = Math.round((passedCount / processedResults.length) * 100);
 
-                    const submitDate = new Date(attempt.end_time).toLocaleString('en-GB', { 
-                        day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' 
-                    });
+                // Update UI Stats
+                document.getElementById('statTotal').innerText = processedResults.length;
+                document.getElementById('statAvg').innerText = `${avg}%`;
+                document.getElementById('statHighest').innerText = `${highest}%`;
+                document.getElementById('statPassRate').innerText = `${passRate}%`;
+
+                // E. Render Table
+                tbody.innerHTML = processedResults.map((pr, index) => {
+                    const statusBadge = pr.passed 
+                        ? `<span class="badge-pass">PASS</span>` 
+                        : `<span class="badge-fail">FAIL</span>`;
+                    
+                    // Add a tiny trophy for rank 1
+                    const rankDisplay = index === 0 ? `<i class="fas fa-trophy text-warning"></i> 1` : index + 1;
 
                     return `
                         <tr>
-                            <td class="fw-bold text-muted">${index + 1}</td>
-                            <td class="fw-bold text-dark">${attempt.users?.name || 'Unknown Student'}</td>
-                            <td class="small text-muted">${submitDate}</td>
-                            <td class="fw-bold">${attempt.score} / ${attempt.total_marks}</td>
-                            <td><span class="score-badge ${badgeClass}">${attempt.percentage}%</span></td>
-                            <td class="small fw-bold text-muted">${statusText}</td>
+                            <td class="text-center fw-bold text-muted">${rankDisplay}</td>
+                            <td class="fw-bold text-dark text-uppercase">${pr.name}</td>
+                            <td class="small text-muted">${pr.date}</td>
+                            <td class="text-center fw-bold">${pr.score} / ${pr.total_questions}</td>
+                            <td class="text-center fw-bold text-primary">${pr.percentage}%</td>
+                            <td class="text-center">${statusBadge}</td>
                         </tr>
                     `;
                 }).join('');
 
-                // Update Analytics Top Cards
-                const avg = (totalPercentage / attempts.length).toFixed(1);
-                const passRate = ((passedCount / attempts.length) * 100).toFixed(1);
-                updateAnalytics(attempts.length, avg, passRate);
-
             } catch (err) {
-                console.error("Error fetching results:", err);
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">Error loading results data.</td></tr>`;
+                console.error(err);
+                alert("Error compiling results: " + err.message);
+            } finally {
+                btn.innerHTML = '<i class="fas fa-search me-2"></i> Fetch Results';
+                btn.disabled = false;
             }
-        });
+        };
 
-        // 3. Helper to update top analytics cards
-        function updateAnalytics(attempts, avgScore, passRate) {
-            document.getElementById('statAttempts').innerText = attempts;
-            document.getElementById('statAverage').innerText = `${avgScore}%`;
-            document.getElementById('statPassRate').innerText = `${passRate}%`;
+        function resetStats() {
+            document.getElementById('statTotal').innerText = '0';
+            document.getElementById('statAvg').innerText = '0%';
+            document.getElementById('statHighest').innerText = '0%';
+            document.getElementById('statPassRate').innerText = '0%';
+            currentResultsData = [];
         }
 
-        // 4. Export to CSV Logic
-        window.exportToCSV = () => {
-            if (currentResultsData.length === 0) {
-                alert("No data available to export.");
-                return;
-            }
-
-            const testSelect = document.getElementById('testSelect');
-            const testName = testSelect.options[testSelect.selectedIndex].text.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        // 3. Simple CSV Export Function
+        window.exportToCSV = function() {
+            if (currentResultsData.length === 0) return alert("No data to export.");
+            
+            let csvContent = "data:text/csv;charset=utf-8,";
             
             // CSV Headers
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Rank,Student Name,Submission Date,Raw Score,Total Marks,Percentage,Status\n";
+            csvContent += "Rank,Student Name,Date Attempted,Raw Score,Total Questions,Percentage,Status\n";
 
+            // Add rows
             currentResultsData.forEach((row, index) => {
-                const name = row.users?.name || 'Unknown';
-                const date = new Date(row.end_time).toLocaleString('en-GB');
-                const score = row.score;
-                const total = row.total_marks;
-                const percent = row.percentage;
-                const status = percent >= 50 ? 'Pass' : 'Fail';
-
-                csvContent += `${index + 1},"${name}","${date}",${score},${total},${percent}%,${status}\n`;
+                const status = row.passed ? "PASS" : "FAIL";
+                const rowString = `${index + 1},"${row.name}","${row.date}",${row.score},${row.total_questions},${row.percentage}%,${status}`;
+                csvContent += rowString + "\n";
             });
 
-            // Trigger Download
+            // Trigger download
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `results_${testName}.csv`);
+            
+            // Name file dynamically based on selected test ID
+            const testName = document.getElementById('testSelect').options[document.getElementById('testSelect').selectedIndex].text;
+            link.setAttribute("download", `Exam_Results_${testName}.csv`);
+            
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         };
 
-        // 5. Logout handler
+        // Logout
         document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            await supabase.auth.signOut();
-            window.location.href = 'login.html';
+            e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html';
         });
     </script>
 </body>
