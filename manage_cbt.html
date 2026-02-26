@@ -6,40 +6,31 @@
     <title>SPRINGDRILL - Manage CBT</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
     <style>
-        body { background-color: #f4f7fa; overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
         
-        /* Sidebar Styling */
-        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding-top: 30px; z-index: 1000; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        /* Sidebar Styling (With Educare Menu Structure) */
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #1a3c34; color: white; padding-top: 30px; z-index: 1000; }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-brand i { color: #3498db; font-size: 2.5rem; margin-bottom: 10px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 15px 25px; margin: 4px 15px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; text-decoration: none; }
-        .nav-link i { width: 25px; font-size: 1.1rem; }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; transform: translateX(5px); }
-        .nav-link.text-danger:hover { background: rgba(220, 53, 69, 0.2); color: #ff6b6b !important; }
-
-        /* Main Content */
-        .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
-        .top-header { background: white; padding: 20px 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #3498db; }
+        .sidebar-brand img { width: 40px; margin-bottom: 10px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; display: flex; align-items: center; font-size: 0.95rem; }
+        .nav-link i { width: 25px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; }
         
-        /* Cards & Tabs */
-        .content-card { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: none; margin-bottom: 30px; }
-        .nav-tabs .nav-link { font-weight: 600; color: #6c757d; border: none; border-bottom: 3px solid transparent; padding: 12px 20px; }
-        .nav-tabs .nav-link.active { color: #1a3c34; border-bottom: 3px solid #3498db; background: transparent; }
-        .nav-tabs { border-bottom: 2px solid #e9ecef; margin-bottom: 25px; }
+        /* Main Content */
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
+        
+        /* Educare Clone Cards */
+        .edu-card { background: white; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
+        .edu-header { background-color: #007a4d; color: white; padding: 12px 20px; border-radius: 4px 4px 0 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .edu-body { padding: 25px; }
 
-        /* File Upload Area */
-        .upload-area { border: 2px dashed #cbd3da; border-radius: 12px; padding: 40px; text-align: center; background: #f8f9fa; cursor: pointer; transition: all 0.3s; }
-        .upload-area:hover { border-color: #3498db; background: #f1f8fc; }
-        .upload-area i { font-size: 3rem; color: #aab2bd; margin-bottom: 15px; }
-        .upload-area.dragover { border-color: #2ecc71; background: #eafaf1; }
-
-        /* Preview Table */
-        .table th { background: #f8f9fa; color: #495057; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; }
-        .status-badge { padding: 8px 15px; border-radius: 50px; font-weight: bold; font-size: 0.9rem; }
-        .status-draft { background: #fff3cd; color: #856404; border: 1px solid #ffeeba;}
-        .status-published { background: #d4edda; color: #155724; border: 1px solid #c3e6cb;}
+        /* Table Styling */
+        .table th { border-top: none; color: #495057; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; background-color: #f8f9fa; }
+        .table td { vertical-align: middle; font-size: 0.9rem; }
+        
+        .badge-draft { background-color: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; border: 1px solid #ffeeba;}
+        .badge-live { background-color: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; border: 1px solid #c3e6cb;}
 
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
@@ -47,175 +38,77 @@
 <body>
 
     <div id="loadingOverlay">
-        <i class="fas fa-spinner fa-spin fa-3x text-primary mb-3"></i>
-        <h4>Loading CBT Control Center...</h4>
+        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
+        <h4>Loading Test Manager...</h4>
     </div>
 
     <div class="sidebar">
         <div class="sidebar-brand">
-            <i class="fas fa-chalkboard-teacher"></i>
-            <h4 class="text-white fw-bold mb-0">STAFF PORTAL</h4>
+            <h5 class="text-white fw-bold mb-0"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
         </div>
         
-        <nav class="nav flex-column mt-4">
-            <a href="teacher_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard Home</a>
-            <a href="create_test.html" class="nav-link"><i class="fas fa-plus-circle"></i> Create New Test</a>
-            <a href="manage_cbt.html" class="nav-link active"><i class="fas fa-tasks"></i> Manage CBT</a>
-            <a href="test_results.html" class="nav-link"><i class="fas fa-poll"></i> Student Results</a>
+        <nav class="nav flex-column mt-3">
+            <a href="teacher_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            
+            <a href="#cbtMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
+                <span><i class="fas fa-laptop-code me-2"></i> CBT</span>
+                <i class="fas fa-caret-down"></i>
+            </a>
+            <div class="collapse show bg-dark mx-2 mt-1 rounded" id="cbtMenu">
+                <a href="#" class="nav-link small py-2 text-muted"><i class="fas fa-database me-2"></i> Question Bank</a>
+                <a href="manage_cbt.html" class="nav-link small py-2 active text-success fw-bold"><i class="fas fa-list me-2"></i> Manage CBT</a>
+                <a href="test_results.html" class="nav-link small py-2"><i class="fas fa-chart-bar me-2"></i> Result Manager</a>
+            </div>
+
             <hr class="mx-3 my-4 border-secondary">
-            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-sign-out-alt"></i> Secure Logout</a>
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Logout</a>
         </nav>
     </div>
 
     <div class="main-content">
-        <div class="top-header">
-            <div>
-                <h3 class="fw-bold mb-0 text-dark"><i class="fas fa-cogs text-primary me-2"></i> Manage CBT & Assignments</h3>
-                <p class="text-muted mb-0 mt-1">Import questions, reuse from bank, review details, and publish.</p>
+        <h5 class="text-muted fw-bold mb-4">Home / Cbt / Manage CBT</h5>
+
+        <div class="edu-card">
+            <div class="edu-header">
+                <span><i class="fas fa-filter me-2"></i> Test Manager</span>
             </div>
-            
-            <div class="w-50">
-                <label class="form-label mb-1 fw-bold text-primary">Select Active Test to Manage:</label>
-                <select id="testSelect" class="form-select border-primary shadow-sm fw-bold">
-                    <option value="">Loading your tests...</option>
-                </select>
+            <div class="edu-body py-3">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-5 d-flex align-items-center">
+                        <label class="form-label me-3 fw-bold mb-0 text-muted" style="min-width: 80px;">Class</label>
+                        <select class="form-select form-select-sm" id="filterClass"><option value="">All Classes</option></select>
+                    </div>
+                    <div class="col-md-5 d-flex align-items-center">
+                        <label class="form-label me-3 fw-bold mb-0 text-muted" style="min-width: 80px;">Subject</label>
+                        <select class="form-select form-select-sm" id="filterSubject"><option value="">All Subjects</option></select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-sm btn-dark w-100" onclick="initializePage()">Apply Filter</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div id="alertBox" class="alert d-none shadow-sm" role="alert"></div>
-
-        <div class="content-card" id="workspaceCard" style="display: none;">
-            
-            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-3">
-                <h4 class="fw-bold text-dark mb-0" id="displayTestTitle">Test Title</h4>
-                <div id="publishStatusContainer"></div>
+        <div class="edu-card">
+            <div class="edu-header">
+                <span><i class="fas fa-list-ul me-2"></i> Test List</span>
+                <a href="create_test.html" class="btn btn-sm btn-light text-success fw-bold px-3 shadow-sm"><i class="fas fa-plus me-1"></i> New Test</a>
             </div>
-
-            <ul class="nav nav-tabs" id="cbtTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="assign-tab" data-bs-toggle="tab" data-bs-target="#assign" type="button" role="tab"><i class="fas fa-cloud-upload-alt me-2"></i> Import .DOCX</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="bank-tab" data-bs-toggle="tab" data-bs-target="#bank" type="button" role="tab"><i class="fas fa-archive me-2"></i> Select from Bank</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual" type="button" role="tab"><i class="fas fa-edit me-2"></i> Review & Manage</button>
-                </li>
-            </ul>
-
-            <div class="tab-content" id="cbtTabsContent">
-                
-                <div class="tab-pane fade show active" id="assign" role="tabpanel">
-                    <div class="row">
-                        <div class="col-md-7">
-                            <h5 class="fw-bold text-dark mb-3">Bulk Upload via Word Document</h5>
-                            
-                            <label for="docxUpload" class="upload-area w-100 mb-3" id="dropZone">
-                                <i class="fas fa-file-word text-primary"></i>
-                                <h5 class="fw-bold text-dark">Click to browse or drag .docx file here</h5>
-                                <p class="text-muted mb-0">Only Microsoft Word (.docx) formats are supported</p>
-                                <input type="file" id="docxUpload" accept=".docx" class="d-none">
-                            </label>
-                            
-                            <div class="d-grid">
-                                <button class="btn btn-primary btn-lg fw-bold d-none" id="processDocxBtn">
-                                    <i class="fas fa-cogs me-2"></i> Process Document
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="col-md-5">
-                            <div class="alert alert-info border-0 shadow-sm h-100">
-                                <h6 class="fw-bold"><i class="fas fa-info-circle me-2"></i> Document Formatting Rules</h6>
-                                <p class="small mb-2">For the system to extract your questions correctly, your Word document <strong>must</strong> strictly follow this exact template:</p>
-                                <div class="bg-white p-3 rounded border small" style="font-family: monospace;">
-                                    1. What is the capital of Nigeria?<br>
-                                    A) Lagos<br>
-                                    B) Abuja<br>
-                                    C) Kano<br>
-                                    D) Port Harcourt<br>
-                                    Answer: B<br>
-                                    <br>
-                                    2. Evaluate 5 + 5.<br>
-                                    A) 10<br>
-                                    ...
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="extractionPreview" class="mt-5 d-none">
-                        <h5 class="fw-bold border-bottom pb-2 mb-3">Preview Extracted Questions</h5>
-                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                            <table class="table table-bordered table-hover bg-white">
-                                <thead class="table-light sticky-top">
-                                    <tr>
-                                        <th width="5%">#</th>
-                                        <th width="40%">Question Text</th>
-                                        <th width="40%">Options</th>
-                                        <th width="15%">Ans</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="previewTbody"></tbody>
-                            </table>
-                        </div>
-                        <div class="d-flex justify-content-end mt-3">
-                            <button class="btn btn-success fw-bold px-5" id="confirmImportBtn">
-                                <i class="fas fa-database me-2"></i> Import Questions to Database
-                            </button>
-                        </div>
-                    </div>
+            <div class="edu-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light border-bottom">
+                            <tr>
+                                <th class="text-center" width="5%">S/N</th>
+                                <th width="65%">Test Information</th>
+                                <th width="30%" class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="testListBody">
+                            <tr><td colspan="3" class="text-center py-5"><i class="fas fa-spinner fa-spin me-2"></i> Fetching records...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
-
-                <div class="tab-pane fade" id="bank" role="tabpanel">
-                    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
-                        <div>
-                            <h5 class="fw-bold text-dark m-0"><i class="fas fa-archive text-warning me-2"></i> Reuse Questions from Bank</h5>
-                            <p class="text-muted small m-0 mt-1">Showing previous questions for this Subject and Class that are not yet in this test.</p>
-                        </div>
-                        <button class="btn btn-success fw-bold" id="addFromBankBtn" onclick="window.addSelectedFromBank()">
-                            <i class="fas fa-plus me-2"></i> Add Selected to Test
-                        </button>
-                    </div>
-
-                    <div class="table-responsive" style="max-height: 500px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 8px;">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light sticky-top">
-                                <tr>
-                                    <th width="5%"><input type="checkbox" id="selectAllBank" onchange="window.toggleAllBankCheckboxes(this)"></th>
-                                    <th width="50%">Question</th>
-                                    <th width="45%">Options</th>
-                                </tr>
-                            </thead>
-                            <tbody id="bankTbody">
-                                <tr><td colspan="3" class="text-center py-4">Select a test to view available questions.</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="tab-pane fade" id="manual" role="tabpanel">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold text-dark m-0"><i class="fas fa-database text-success me-2"></i> Active Questions in Test</h5>
-                        <span class="badge bg-success rounded-pill px-3 py-2 fs-6" id="questionCount">0 Questions</span>
-                    </div>
-
-                    <div class="table-responsive" style="max-height: 500px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 8px;">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light sticky-top">
-                                <tr>
-                                    <th width="50%">Question</th>
-                                    <th width="35%">Options</th>
-                                    <th width="15%">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="questionsTbody">
-                                <tr><td colspan="3" class="text-center py-4">Select a test to view questions.</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>
@@ -225,426 +118,136 @@
         import { supabase } from './supabaseClient.js';
 
         let currentUserId = null;
-        let activeTest = null;
-        let parsedQuestions = []; 
+        let currentUserProfile = null;
 
-        // 1. Initialize Page
-        async function initializePage() {
+        window.initializePage = async function() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
                 currentUserId = session.user.id;
 
+                const { data: profile } = await supabase.from('users').select('name').eq('id', currentUserId).single();
+                currentUserProfile = profile;
+
+                // 1. Fetch Tests
                 const { data: tests, error } = await supabase
                     .from('tests')
                     .select('*, classes(name), subjects(name)')
                     .eq('teacher_id', currentUserId)
                     .order('created_at', { ascending: false });
 
-                const testSelect = document.getElementById('testSelect');
                 if (error) throw error;
 
-                // --- NEW: SMART AUTO-SELECT URL CHECK ---
-                const urlParams = new URLSearchParams(window.location.search);
-                const autoTestId = urlParams.get('test_id');
+                // 2. Compute Total Questions & Marks per test
+                const { data: testQuestions } = await supabase.from('test_questions').select('test_id, questions(marks)');
+                const stats = {};
+                if (testQuestions) {
+                    testQuestions.forEach(tq => {
+                        if (!stats[tq.test_id]) stats[tq.test_id] = { count: 0, marks: 0 };
+                        stats[tq.test_id].count += 1;
+                        stats[tq.test_id].marks += (tq.questions?.marks || 1);
+                    });
+                }
 
-                if (tests && tests.length > 0) {
-                    testSelect.innerHTML = `<option value="" disabled selected>-- Select a Test to Manage --</option>` + 
-                        tests.map(t => `<option value='${JSON.stringify(t)}'>[${t.classes.name}] ${t.title}</option>`).join('');
-                    
-                    if (autoTestId) {
-                        const matchedTest = tests.find(t => t.id == autoTestId);
-                        if (matchedTest) {
-                            testSelect.value = JSON.stringify(matchedTest);
-                            testSelect.dispatchEvent(new Event('change')); 
-                        }
-                    }
+                // 3. Render Table
+                const tbody = document.getElementById('testListBody');
+                if (!tests || tests.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="3" class="text-center py-5 text-muted">No tests found. Click '+ New Test' to create one.</td></tr>`;
                 } else {
-                    testSelect.innerHTML = `<option value="">No tests found. Please create one first.</option>`;
+                    tbody.innerHTML = tests.map((test, index) => {
+                        const tStats = stats[test.id] || { count: 0, marks: 0 };
+                        const statusBadge = test.is_published 
+                            ? `<span class="badge-live">Published</span>` 
+                            : `<span class="badge-draft">Not Published</span>`;
+                        
+                        const scheduleText = test.start_time 
+                            ? `<div class="small text-muted text-end mt-1"><i class="fas fa-calendar-alt me-1"></i> ${new Date(test.start_time).toLocaleString()}</div>`
+                            : `<div class="small text-muted text-end mt-1"><i class="fas fa-bolt me-1"></i> Open Live</div>`;
+
+                        return `
+                            <tr>
+                                <td class="text-center fw-bold text-muted">${index + 1}</td>
+                                <td>
+                                    <div class="mb-1">
+                                        <strong class="text-primary" style="font-size: 1.05rem;">${test.code}</strong> 
+                                        <span class="text-muted ms-1">(${test.classes?.name || 'Unassigned'}) . ${currentUserProfile?.name || 'Teacher'}</span>
+                                    </div>
+                                    <div class="small text-muted mb-2">
+                                        <span class="me-3">Duration (mins): <strong>${test.duration_minutes || test.duration || 30}</strong></span>
+                                        <span class="me-3">Total Ques: <strong>${tStats.count}</strong></span>
+                                        <span>Total Mrks: <strong>${tStats.marks}</strong></span>
+                                    </div>
+                                    <div>${statusBadge}</div>
+                                </td>
+                                <td class="text-end pe-4 align-middle">
+                                    <div class="btn-group shadow-sm">
+                                        <button class="btn btn-sm ${test.is_published ? 'btn-outline-warning' : 'btn-outline-success'} fw-bold" onclick="window.togglePublish(${test.id}, ${test.is_published}, ${tStats.count})">
+                                            <i class="fas ${test.is_published ? 'fa-lock' : 'fa-globe'}"></i> ${test.is_published ? 'Unpublish' : 'Publish'}
+                                        </button>
+                                        <a href="assign_questions.html?test_id=${test.id}" class="btn btn-sm btn-info text-white fw-bold">
+                                            <i class="fas fa-edit"></i> Edit / Add Qs
+                                        </a>
+                                        <button class="btn btn-sm btn-danger fw-bold" onclick="window.deleteTest(${test.id})">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </div>
+                                    ${scheduleText}
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
                 }
 
                 document.getElementById('loadingOverlay').style.display = 'none';
             } catch (err) {
                 console.error(err);
-                alert("Failed to load dashboard.");
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', initializePage);
-
-        // 2. Handle Test Selection
-        document.getElementById('testSelect').addEventListener('change', async (e) => {
-            if (!e.target.value) return;
-            activeTest = JSON.parse(e.target.value);
-            
-            document.getElementById('workspaceCard').style.display = 'block';
-            document.getElementById('displayTestTitle').innerText = `${activeTest.title} (${activeTest.classes.name})`;
-            
-            updatePublishUI();
-            await loadExistingQuestions();
-            await loadBankQuestions();
-            
-            // Reset upload area
-            document.getElementById('extractionPreview').classList.add('d-none');
-            document.getElementById('processDocxBtn').classList.add('d-none');
-            document.getElementById('docxUpload').value = '';
-            document.getElementById('selectAllBank').checked = false;
-        });
-
-        // 3. Publish / Unpublish UI Logic
-        function updatePublishUI() {
-            const container = document.getElementById('publishStatusContainer');
-            if (activeTest.is_published) {
-                container.innerHTML = `
-                    <span class="status-badge status-published me-3"><i class="fas fa-globe"></i> Published & Live</span>
-                    <button class="btn btn-outline-danger fw-bold btn-sm shadow-sm" onclick="window.togglePublish(false)"><i class="fas fa-lock me-1"></i> Retract to Draft</button>
-                `;
-            } else {
-                container.innerHTML = `
-                    <span class="status-badge status-draft me-3"><i class="fas fa-lock"></i> Hidden (Draft)</span>
-                    <button class="btn btn-success fw-bold btn-sm shadow-sm" onclick="window.togglePublish(true)"><i class="fas fa-paper-plane me-2"></i> Publish to Class Dashboard</button>
-                `;
-            }
-        }
-
-        window.togglePublish = async (status) => {
-            // --- STRICT ZERO-QUESTION VALIDATION LOCK ---
-            if (status === true) {
-                try {
-                    const { data: checkQ, error: checkErr } = await supabase
-                        .from('test_questions')
-                        .select('id')
-                        .eq('test_id', activeTest.id)
-                        .limit(1);
-                        
-                    if (checkErr || !checkQ || checkQ.length === 0) {
-                        alert("ACTION BLOCKED: You cannot publish an empty test. Please import or add at least one question first.");
-                        return; // Instantly stops the publish process
-                    }
-                } catch (err) {
-                    console.error("Validation error:", err);
-                    return;
-                }
-            }
-            // --------------------------------------------
-
-            const msg = status ? "Publish this test? Students in the assigned class will now see it on their dashboard." : "Hide this test? It will be removed from the student dashboard.";
-            if (!confirm(msg)) return;
-
-            try {
-                const { error } = await supabase.from('tests').update({ is_published: status }).eq('id', activeTest.id);
-                if (error) throw error;
-                activeTest.is_published = status;
-                
-                // Update the hidden JSON value in the dropdown so it persists if they click away
-                const selectedOption = document.getElementById('testSelect').options[document.getElementById('testSelect').selectedIndex];
-                selectedOption.value = JSON.stringify(activeTest);
-
-                updatePublishUI();
-            } catch (err) {
-                alert("Error updating status: " + err.message);
+                alert("Failed to load test list.");
+                document.getElementById('loadingOverlay').style.display = 'none';
             }
         };
 
-        // 4. File Upload & Mammoth.js Extraction Logic
-        const docxInput = document.getElementById('docxUpload');
-        const processBtn = document.getElementById('processDocxBtn');
+        document.addEventListener('DOMContentLoaded', window.initializePage);
 
-        docxInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                processBtn.classList.remove('d-none');
-                processBtn.innerHTML = `<i class="fas fa-cogs me-2"></i> Process ${e.target.files[0].name}`;
-            }
-        });
-
-        processBtn.addEventListener('click', () => {
-            const file = docxInput.files[0];
-            if (!file) return;
-
-            processBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Extracting Text...';
-            processBtn.disabled = true;
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                mammoth.extractRawText({ arrayBuffer: event.target.result })
-                    .then(parseExtractedText)
-                    .catch(handleMammothError);
-            };
-            reader.readAsArrayBuffer(file);
-        });
-
-        function handleMammothError(err) {
-            alert("Error reading document. Please ensure it is a valid .docx file.");
-            console.error(err);
-            processBtn.innerHTML = `<i class="fas fa-cogs me-2"></i> Process Document`;
-            processBtn.disabled = false;
-        }
-
-        function parseExtractedText(result) {
-            const text = result.value;
-            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        // Publish Toggle with Security Lock
+        window.togglePublish = async (testId, currentStatus, questionCount) => {
+            const newStatus = !currentStatus;
             
-            parsedQuestions = [];
-            let currentQ = null;
-
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i];
-
-                if (/^\d+[\.\)]\s+/.test(line)) {
-                    if (currentQ && currentQ.question) parsedQuestions.push(currentQ);
-                    currentQ = { 
-                        question: line.replace(/^\d+[\.\)]\s*/, ''), 
-                        optA: '', optB: '', optC: '', optD: '', 
-                        answer: '', marks: activeTest.marks_per_question || 1 
-                    };
-                } else if (/^[A-D][\.\)]\s+/i.test(line) && currentQ) {
-                    const letter = line.charAt(0).toUpperCase();
-                    const optText = line.substring(2).trim();
-                    if (letter === 'A') currentQ.optA = optText;
-                    if (letter === 'B') currentQ.optB = optText;
-                    if (letter === 'C') currentQ.optC = optText;
-                    if (letter === 'D') currentQ.optD = optText;
-                } else if (/^Answer:\s*[A-D]/i.test(line) && currentQ) {
-                    currentQ.answer = line.replace(/^Answer:\s*/i, '').trim().charAt(0).toUpperCase();
-                } else if (currentQ && !currentQ.optA) {
-                    currentQ.question += " " + line;
-                }
-            }
-            if (currentQ && currentQ.question) parsedQuestions.push(currentQ);
-
-            renderPreview();
-        }
-
-        function renderPreview() {
-            const previewSection = document.getElementById('extractionPreview');
-            const tbody = document.getElementById('previewTbody');
-            
-            processBtn.innerHTML = `<i class="fas fa-check-circle me-2"></i> Extraction Complete`;
-            processBtn.classList.replace('btn-primary', 'btn-success');
-            
-            if (parsedQuestions.length === 0) {
-                alert("Could not detect any questions. Please check the formatting rules.");
+            if (newStatus === true && questionCount === 0) {
+                alert("ACTION BLOCKED: You cannot publish an empty test. Please click 'Edit / Add Qs' to add questions first.");
                 return;
             }
 
-            tbody.innerHTML = parsedQuestions.map((q, index) => `
-                <tr>
-                    <td class="fw-bold">${index + 1}</td>
-                    <td>${q.question}</td>
-                    <td class="small">
-                        A) ${q.optA || '<span class="text-danger">Missing</span>'}<br>
-                        B) ${q.optB || '<span class="text-danger">Missing</span>'}<br>
-                        C) ${q.optC || '<span class="text-danger">Missing</span>'}<br>
-                        D) ${q.optD || '<span class="text-danger">Missing</span>'}
-                    </td>
-                    <td class="fw-bold text-success">${q.answer || '<span class="text-danger">?</span>'}</td>
-                </tr>
-            `).join('');
-
-            previewSection.classList.remove('d-none');
-        }
-
-        // Save Bulk Questions to Database
-        document.getElementById('confirmImportBtn').addEventListener('click', async () => {
-            const btn = document.getElementById('confirmImportBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Saving to Database...';
-            btn.disabled = true;
+            if (!confirm(newStatus ? "Publish this test to the Student Dashboard?" : "Hide this test from students?")) return;
 
             try {
-                for (let q of parsedQuestions) {
-                    const { data: newQ, error: qErr } = await supabase.from('questions').insert([{
-                        teacher_id: currentUserId,
-                        class_id: activeTest.class_id,
-                        subject_id: activeTest.subject_id,
-                        question_text: q.question,
-                        option_a: q.optA, option_b: q.optB, option_c: q.optC, option_d: q.optD,
-                        correct_option: q.answer,
-                        marks: q.marks
-                    }]).select('id').single();
-
-                    if (qErr) throw qErr;
-                    await supabase.from('test_questions').insert([{ test_id: activeTest.id, question_id: newQ.id }]);
-                }
-
-                alert(`Successfully imported ${parsedQuestions.length} questions!`);
-                
-                // Switch to manual review tab automatically
-                const triggerEl = document.querySelector('#manual-tab');
-                bootstrap.Tab.getOrCreateInstance(triggerEl).show();
-                
-                await loadExistingQuestions();
-                await loadBankQuestions();
-
-                // Reset import view
-                document.getElementById('extractionPreview').classList.add('d-none');
-                processBtn.classList.add('d-none');
-                processBtn.disabled = false;
-                processBtn.classList.replace('btn-success', 'btn-primary');
-                docxInput.value = '';
-
-            } catch (err) {
-                alert("Database Error during import: " + err.message);
-                btn.innerHTML = '<i class="fas fa-database me-2"></i> Import Questions to Database';
-                btn.disabled = false;
-            }
-        });
-
-        // 5. Load Question Bank
-        async function loadBankQuestions() {
-            const tbody = document.getElementById('bankTbody');
-            tbody.innerHTML = `<tr><td colspan="3" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i> Loading bank...</td></tr>`;
-
-            try {
-                const { data: existingMap, error: mapErr } = await supabase.from('test_questions').select('question_id').eq('test_id', activeTest.id);
-                if (mapErr) throw mapErr;
-                const existingIds = existingMap.map(e => e.question_id);
-
-                const { data: bankQs, error: bankErr } = await supabase
-                    .from('questions')
-                    .select('id, question_text, option_a, option_b, option_c, option_d, correct_option')
-                    .eq('subject_id', activeTest.subject_id)
-                    .eq('class_id', activeTest.class_id);
-                if (bankErr) throw bankErr;
-
-                const availableQs = bankQs.filter(q => !existingIds.includes(q.id));
-
-                if (availableQs.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-muted">No additional questions found in the bank for this subject and class.</td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = availableQs.map(q => `
-                    <tr>
-                        <td class="align-middle"><input type="checkbox" class="bank-checkbox" value="${q.id}"></td>
-                        <td>
-                            <strong>${q.question_text}</strong><br>
-                            <span class="badge bg-light text-dark border mt-1">Ans: ${q.correct_option}</span>
-                        </td>
-                        <td class="small text-muted">
-                            A) ${q.option_a}<br>B) ${q.option_b}<br>C) ${q.option_c}<br>D) ${q.option_d}
-                        </td>
-                    </tr>
-                `).join('');
-
-            } catch (err) {
-                console.error(err);
-                tbody.innerHTML = `<tr><td colspan="3" class="text-center text-danger">Error loading bank questions.</td></tr>`;
-            }
-        }
-
-        window.toggleAllBankCheckboxes = (source) => {
-            const checkboxes = document.querySelectorAll('.bank-checkbox');
-            checkboxes.forEach(cb => cb.checked = source.checked);
-        };
-
-        window.addSelectedFromBank = async () => {
-            const checkboxes = document.querySelectorAll('.bank-checkbox:checked');
-            if (checkboxes.length === 0) return alert("Please select at least one question.");
-
-            const btn = document.getElementById('addFromBankBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Adding...';
-            btn.disabled = true;
-
-            const inserts = Array.from(checkboxes).map(cb => ({
-                test_id: activeTest.id,
-                question_id: parseInt(cb.value)
-            }));
-
-            try {
-                const { error } = await supabase.from('test_questions').insert(inserts);
+                document.getElementById('loadingOverlay').style.display = 'flex';
+                const { error } = await supabase.from('tests').update({ is_published: newStatus }).eq('id', testId);
                 if (error) throw error;
-
-                alert(`Successfully assigned ${inserts.length} questions to the test!`);
-                document.getElementById('selectAllBank').checked = false;
-                
-                await loadExistingQuestions();
-                await loadBankQuestions();
-
-                const triggerEl = document.querySelector('#manual-tab');
-                bootstrap.Tab.getOrCreateInstance(triggerEl).show();
-
+                window.initializePage();
             } catch (err) {
-                alert("Error adding questions: " + err.message);
-            } finally {
-                btn.innerHTML = '<i class="fas fa-plus me-2"></i> Add Selected to Test';
-                btn.disabled = false;
+                alert("Error: " + err.message);
+                document.getElementById('loadingOverlay').style.display = 'none';
             }
         };
 
-        // 6. Load Existing Questions (Manual Review Tab)
-        async function loadExistingQuestions() {
-            const tbody = document.getElementById('questionsTbody');
-            tbody.innerHTML = `<tr><td colspan="3" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>`;
-            
+        // Delete Test
+        window.deleteTest = async (testId) => {
+            if (!confirm("WARNING: Are you sure you want to completely delete this test and all its questions?")) return;
             try {
-                const { data, error } = await supabase
-                    .from('test_questions')
-                    .select(`id, question_id, questions(question_text, option_a, option_b, option_c, option_d, correct_option, marks)`)
-                    .eq('test_id', activeTest.id)
-                    .order('id', { ascending: true });
-
-                if (error) throw error;
-                document.getElementById('questionCount').innerText = `${data.length} Questions`;
-
-                if (data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="3" class="text-center py-4">No questions added yet. Use the Import or Bank tabs to assign questions.</td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = data.map((item, index) => {
-                    const q = item.questions;
-                    return `
-                        <tr>
-                            <td>
-                                <strong>${index + 1}. ${q.question_text}</strong><br>
-                                <span class="badge bg-light text-dark border mt-1">Ans: ${q.correct_option}</span>
-                            </td>
-                            <td class="small text-muted">
-                                A) ${q.option_a}<br>B) ${q.option_b}<br>C) ${q.option_c}<br>D) ${q.option_d}
-                            </td>
-                            <td class="align-middle">
-                                <button onclick="window.deleteQuestion(${item.id}, ${item.question_id})" class="btn btn-sm btn-outline-danger shadow-sm">
-                                    <i class="fas fa-trash"></i> Remove
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
+                document.getElementById('loadingOverlay').style.display = 'flex';
+                await supabase.from('test_results').delete().eq('test_id', testId);
+                await supabase.from('test_questions').delete().eq('test_id', testId);
+                await supabase.from('tests').delete().eq('id', testId);
+                window.initializePage();
             } catch (err) {
-                console.error(err);
+                alert("Error deleting test.");
+                document.getElementById('loadingOverlay').style.display = 'none';
             }
-        }
-
-        window.deleteQuestion = async (testQuestionId, questionId) => {
-            if (!confirm("Remove this question from the active test? (It will remain in the general bank)")) return;
-            
-            // Only delete the mapping, do not delete from the general questions table
-            await supabase.from('test_questions').delete().eq('id', testQuestionId);
-            
-            // --- NEW: AUTO-UNPUBLISH SAFEGUARD ---
-            // If the teacher deletes the very last question, instantly hide the test!
-            const { data: checkQ } = await supabase.from('test_questions').select('id').eq('test_id', activeTest.id).limit(1);
-            if (!checkQ || checkQ.length === 0) {
-                await supabase.from('tests').update({ is_published: false }).eq('id', activeTest.id);
-                activeTest.is_published = false;
-                
-                // Update dropdown JSON data
-                const selectedOption = document.getElementById('testSelect').options[document.getElementById('testSelect').selectedIndex];
-                selectedOption.value = JSON.stringify(activeTest);
-                
-                updatePublishUI();
-            }
-            // -------------------------------------
-
-            await loadExistingQuestions();
-            await loadBankQuestions();
         };
 
-        // 7. Logout
         document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            await supabase.auth.signOut();
-            window.location.href = 'login.html';
+            e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html';
         });
     </script>
 </body>

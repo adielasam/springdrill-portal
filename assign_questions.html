@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - Assign Questions</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
+    <style>
+        body { background-color: #f4f7fa; overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        /* Sidebar Styling (Educare Menu Structure) */
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #1a3c34; color: white; padding-top: 30px; z-index: 1000; }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; display: flex; align-items: center; font-size: 0.95rem; }
+        .nav-link i { width: 25px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; }
+
+        /* Main Content */
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
+        .top-header { background: white; padding: 20px 30px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #007a4d; }
+        
+        .content-card { background: white; border-radius: 4px; padding: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border: 1px solid #dee2e6; margin-bottom: 30px; height: 100%; }
+        
+        /* Input & Forms */
+        .form-label { font-weight: 600; color: #495057; font-size: 0.9rem;}
+        .form-control, .form-select { padding: 10px 15px; border-radius: 4px; border: 1px solid #dee2e6; background-color: #f8f9fa; }
+        .form-control:focus, .form-select:focus { border-color: #007a4d; box-shadow: 0 0 0 0.25rem rgba(0, 122, 77, 0.25); background-color: white; }
+        
+        /* Nav Pills (Tabs) */
+        .nav-pills .nav-link { font-weight: bold; color: #6c757d; border-radius: 4px; margin-right: 5px; padding: 10px 20px;}
+        .nav-pills .nav-link.active { background-color: #007a4d; color: white; }
+        
+        /* Upload Area */
+        .upload-area { border: 2px dashed #cbd3da; border-radius: 8px; padding: 30px 20px; text-align: center; background: #f8f9fa; cursor: pointer; transition: all 0.3s; }
+        .upload-area:hover { border-color: #007a4d; background: #e8f5e9; }
+        .upload-area i { font-size: 2.5rem; color: #aab2bd; margin-bottom: 10px; }
+
+        /* Tables */
+        .table th { border-top: none; color: #6c757d; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; background-color: #f8f9fa; letter-spacing: 0.5px;}
+        .table td { vertical-align: middle; font-size: 0.9rem;}
+        .correct-badge { background-color: #2ecc71; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin-left: 5px;}
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay">
+        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
+        <h4>Loading Exam Workspace...</h4>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h5 class="text-white fw-bold mb-0"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
+        </div>
+        
+        <nav class="nav flex-column mt-3">
+            <a href="teacher_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            
+            <a href="#cbtMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
+                <span><i class="fas fa-laptop-code me-2"></i> CBT</span>
+                <i class="fas fa-caret-down"></i>
+            </a>
+            <div class="collapse show bg-dark mx-2 mt-1 rounded" id="cbtMenu">
+                <a href="#" class="nav-link small py-2 text-muted"><i class="fas fa-database me-2"></i> Question Bank</a>
+                <a href="manage_cbt.html" class="nav-link small py-2 active text-success fw-bold"><i class="fas fa-list me-2"></i> Manage CBT</a>
+                <a href="test_results.html" class="nav-link small py-2"><i class="fas fa-chart-bar me-2"></i> Result Manager</a>
+            </div>
+
+            <hr class="mx-3 my-4 border-secondary">
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <h5 class="text-muted fw-bold mb-4">Home / Cbt / Manage CBT / Assign Questions</h5>
+
+        <div class="top-header">
+            <div>
+                <h4 class="fw-bold mb-0 text-dark"><i class="fas fa-edit text-success me-2"></i> Question Workspace</h4>
+                <p class="text-muted mb-0 mt-1">Add questions, pull from your bank, and publish your exam.</p>
+            </div>
+            
+            <div class="w-25 text-end">
+                <a href="manage_cbt.html" class="btn btn-outline-dark fw-bold"><i class="fas fa-arrow-left me-2"></i> Back to List</a>
+            </div>
+        </div>
+
+        <div id="alertBox" class="alert d-none shadow-sm mb-4" role="alert"></div>
+
+        <div class="row" id="workspaceContainer" style="display: none;">
+            
+            <div class="col-lg-5 mb-4">
+                <div class="content-card shadow-sm">
+                    <h5 class="fw-bold border-bottom pb-3 mb-3 text-success"><i class="fas fa-layer-group me-2"></i> Add Questions</h5>
+                    
+                    <ul class="nav nav-pills mb-4" id="inputTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#manualTab" type="button" role="tab"><i class="fas fa-keyboard me-1"></i> Manual Type</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#bankTab" type="button" role="tab"><i class="fas fa-archive me-1"></i> From Bank</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#docxTab" type="button" role="tab"><i class="fas fa-file-word me-1"></i> Word Import</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="inputTabsContent">
+                        
+                        <div class="tab-pane fade show active" id="manualTab" role="tabpanel">
+                            <form id="addQuestionForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Question Text</label>
+                                    <textarea id="question_text" class="form-control" rows="3" required placeholder="Type the question here..."></textarea>
+                                </div>
+                                <div class="row g-2 mb-3">
+                                    <div class="col-6"><label class="form-label small mb-1">Option A</label><input type="text" id="option_a" class="form-control form-control-sm" required></div>
+                                    <div class="col-6"><label class="form-label small mb-1">Option B</label><input type="text" id="option_b" class="form-control form-control-sm" required></div>
+                                    <div class="col-6"><label class="form-label small mb-1">Option C</label><input type="text" id="option_c" class="form-control form-control-sm" required></div>
+                                    <div class="col-6"><label class="form-label small mb-1">Option D</label><input type="text" id="option_d" class="form-control form-control-sm" required></div>
+                                </div>
+                                <div class="row g-2 mb-4">
+                                    <div class="col-8">
+                                        <label class="form-label">Correct Answer</label>
+                                        <select id="correct_option" class="form-select bg-light fw-bold text-success border-success" required>
+                                            <option value="A">Option A</option><option value="B">Option B</option>
+                                            <option value="C">Option C</option><option value="D">Option D</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label">Marks</label>
+                                        <input type="number" id="marks" class="form-control" step="0.5" value="1" required>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-dark w-100 fw-bold py-2" id="submitManualBtn">
+                                    <i class="fas fa-save me-2"></i> Save to Exam
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="tab-pane fade" id="bankTab" role="tabpanel">
+                            <div class="alert alert-light border small text-muted mb-3">
+                                <i class="fas fa-info-circle me-1"></i> Showing past questions for this Subject/Class that are not yet in this exam.
+                            </div>
+                            <div class="table-responsive border rounded" style="max-height: 350px; overflow-y: auto;">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light sticky-top">
+                                        <tr>
+                                            <th width="10%"><input type="checkbox" id="selectAllBank" onchange="window.toggleAllBankCheckboxes(this)"></th>
+                                            <th width="90%">Select Questions from Bank</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="bankTbody">
+                                        <tr><td colspan="2" class="text-center py-4">Loading bank...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button class="btn btn-primary w-100 fw-bold py-2 mt-3" id="addFromBankBtn" onclick="window.addSelectedFromBank()">
+                                <i class="fas fa-plus-circle me-2"></i> Add Selected to Exam
+                            </button>
+                        </div>
+
+                        <div class="tab-pane fade" id="docxTab" role="tabpanel">
+                            <label for="docxUpload" class="upload-area w-100 mb-3" id="dropZone">
+                                <i class="fas fa-file-word"></i>
+                                <h6 class="fw-bold text-dark mt-2">Click or drag .docx here</h6>
+                                <p class="small text-muted mb-0">Ensure format uses "A) Option" and "Answer: A"</p>
+                                <input type="file" id="docxUpload" accept=".docx" class="d-none">
+                            </label>
+                            <button class="btn btn-secondary w-100 fw-bold py-2 d-none mb-3" id="processDocxBtn">
+                                <i class="fas fa-cogs me-2"></i> Process Document
+                            </button>
+                            
+                            <div id="extractionPreview" class="d-none">
+                                <h6 class="fw-bold text-success border-bottom pb-2">Ready to Import</h6>
+                                <div class="table-responsive border rounded mb-3" style="max-height: 200px; overflow-y: auto;">
+                                    <table class="table table-sm table-hover mb-0">
+                                        <tbody id="previewTbody"></tbody>
+                                    </table>
+                                </div>
+                                <button class="btn btn-success w-100 fw-bold py-2" id="confirmImportBtn">
+                                    <i class="fas fa-database me-2"></i> Import to Exam
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7 mb-4">
+                <div class="content-card shadow-sm border-top border-success border-4">
+                    
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0" id="displayTestTitle">Active Exam Name</h5>
+                            <span class="badge bg-dark mt-1" id="questionCountBadge">0 Questions</span>
+                        </div>
+                        
+                        <div class="form-check form-switch ms-3" style="padding-top: 5px;">
+                            <input class="form-check-input fs-4" type="checkbox" id="publishToggle" style="cursor: pointer;">
+                            <label class="form-check-label ms-2 mt-1" id="publishLabel" for="publishToggle" style="cursor: pointer;">Draft</label>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive rounded border" style="max-height: 600px; overflow-y: auto;">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th width="5%">#</th>
+                                    <th width="50%">Question Text</th>
+                                    <th width="35%">Options & Answer</th>
+                                    <th width="10%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activeQuestionsTbody">
+                                <tr><td colspan="4" class="text-center py-5 text-muted">Loading questions...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        let currentUserId = null;
+        let activeTest = null;
+        let parsedQuestions = []; 
+
+        // 1. Initialize
+        async function initializePage() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = 'login.html';
+                currentUserId = session.user.id;
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const testId = urlParams.get('test_id');
+
+                if (!testId) {
+                    alert("No exam selected. Returning to Test List.");
+                    window.location.href = 'manage_cbt.html';
+                    return;
+                }
+
+                // Fetch the specific test details
+                const { data: test, error } = await supabase
+                    .from('tests')
+                    .select('*, classes(name), subjects(name)')
+                    .eq('id', testId)
+                    .single();
+
+                if (error) throw error;
+                
+                activeTest = test;
+                document.getElementById('workspaceContainer').style.display = 'flex';
+                document.getElementById('displayTestTitle').innerText = `${activeTest.code} (${activeTest.classes.name})`;
+                
+                updatePublishUI();
+                await loadActiveQuestions();
+                await loadBankQuestions();
+
+                document.getElementById('loadingOverlay').style.display = 'none';
+            } catch (err) {
+                console.error(err);
+                alert("Failed to load workspace.");
+                window.location.href = 'manage_cbt.html';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initializePage);
+
+        // 3. Publish UI & Security Lock
+        function updatePublishUI() {
+            const toggle = document.getElementById('publishToggle');
+            const label = document.getElementById('publishLabel');
+            toggle.checked = activeTest.is_published;
+            
+            if (activeTest.is_published) {
+                label.innerHTML = `<span class="text-success fw-bold"><i class="fas fa-globe"></i> Live & Published</span>`;
+                toggle.classList.add('border-success', 'bg-success');
+            } else {
+                label.innerHTML = `<span class="text-muted fw-bold"><i class="fas fa-lock"></i> Hidden (Draft)</span>`;
+                toggle.classList.remove('border-success', 'bg-success');
+            }
+        }
+
+        document.getElementById('publishToggle').addEventListener('change', async (e) => {
+            const newStatus = e.target.checked;
+            const alertBox = document.getElementById('alertBox');
+            
+            // --- STRICT ZERO-QUESTION LOCK ---
+            if (newStatus === true) {
+                try {
+                    const { data: checkQ } = await supabase.from('test_questions').select('id').eq('test_id', activeTest.id).limit(1);
+                    if (!checkQ || checkQ.length === 0) {
+                        e.target.checked = false; // Force switch back
+                        alertBox.className = 'alert alert-danger shadow-sm';
+                        alertBox.classList.remove('d-none');
+                        alertBox.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i> <strong>BLOCKED:</strong> You cannot publish an empty exam. Please add questions first.`;
+                        setTimeout(() => alertBox.classList.add('d-none'), 5000);
+                        return; // Stop execution
+                    }
+                } catch (err) { console.error(err); return; }
+            }
+
+            try {
+                const { error } = await supabase.from('tests').update({ is_published: newStatus }).eq('id', activeTest.id);
+                if (error) throw error;
+                
+                activeTest.is_published = newStatus;
+                updatePublishUI();
+                
+                alertBox.className = `alert ${newStatus ? 'alert-success' : 'alert-warning'} shadow-sm`;
+                alertBox.classList.remove('d-none');
+                alertBox.innerHTML = newStatus 
+                    ? `<i class="fas fa-check-circle me-2"></i> <strong>Exam is Live!</strong> Students can now take this exam.`
+                    : `<i class="fas fa-lock me-2"></i> <strong>Exam Hidden.</strong> Reverted to draft.`;
+                setTimeout(() => alertBox.classList.add('d-none'), 3000);
+            } catch (err) {
+                alert("Error updating status.");
+                e.target.checked = !newStatus;
+                updatePublishUI();
+            }
+        });
+
+        // 4. Load Active Questions
+        async function loadActiveQuestions() {
+            const tbody = document.getElementById('activeQuestionsTbody');
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>`;
+            
+            try {
+                const { data, error } = await supabase
+                    .from('test_questions')
+                    .select(`id, question_id, questions(question_text, option_a, option_b, option_c, option_d, correct_option, marks)`)
+                    .eq('test_id', activeTest.id)
+                    .order('id', { ascending: true });
+
+                if (error) throw error;
+                document.getElementById('questionCountBadge').innerText = `${data.length} Questions`;
+
+                if (data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-muted"><i class="fas fa-box-open fa-2x mb-2 opacity-50"></i><br>This exam is empty. Add questions from the left menu.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = data.map((item, index) => {
+                    const q = item.questions;
+                    return `
+                        <tr>
+                            <td class="fw-bold">${index + 1}</td>
+                            <td>
+                                <strong>${q.question_text}</strong><br>
+                                <small class="text-muted">Marks: ${q.marks}</small>
+                            </td>
+                            <td class="small text-muted">
+                                A) ${q.option_a} ${q.correct_option === 'A' ? '<span class="correct-badge">✓</span>' : ''}<br>
+                                B) ${q.option_b} ${q.correct_option === 'B' ? '<span class="correct-badge">✓</span>' : ''}<br>
+                                C) ${q.option_c} ${q.correct_option === 'C' ? '<span class="correct-badge">✓</span>' : ''}<br>
+                                D) ${q.option_d} ${q.correct_option === 'D' ? '<span class="correct-badge">✓</span>' : ''}
+                            </td>
+                            <td class="align-middle">
+                                <button onclick="window.deleteQuestion(${item.id}, ${item.question_id})" class="btn btn-sm btn-outline-danger" title="Remove from Exam">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (err) { console.error(err); }
+        }
+
+        // 5. Delete & Auto-Unpublish Logic
+        window.deleteQuestion = async (testQuestionId, questionId) => {
+            if (!confirm("Remove this question from the active exam?")) return;
+            
+            await supabase.from('test_questions').delete().eq('id', testQuestionId);
+            
+            // --- AUTO-UNPUBLISH IF EXAM BECOMES EMPTY ---
+            const { data: checkQ } = await supabase.from('test_questions').select('id').eq('test_id', activeTest.id).limit(1);
+            if (!checkQ || checkQ.length === 0) {
+                await supabase.from('tests').update({ is_published: false }).eq('id', activeTest.id);
+                activeTest.is_published = false;
+                updatePublishUI();
+            }
+            
+            await loadActiveQuestions();
+            await loadBankQuestions();
+        };
+
+        // 6. Manual Add Form
+        document.getElementById('addQuestionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitManualBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Saving...';
+            btn.disabled = true;
+
+            const questionData = {
+                teacher_id: currentUserId, class_id: activeTest.class_id, subject_id: activeTest.subject_id,
+                question_text: document.getElementById('question_text').value,
+                option_a: document.getElementById('option_a').value, option_b: document.getElementById('option_b').value,
+                option_c: document.getElementById('option_c').value, option_d: document.getElementById('option_d').value,
+                correct_option: document.getElementById('correct_option').value, marks: parseFloat(document.getElementById('marks').value)
+            };
+
+            try {
+                const { data: newQ, error: qErr } = await supabase.from('questions').insert([questionData]).select('id').single();
+                if (qErr) throw qErr;
+                await supabase.from('test_questions').insert([{ test_id: activeTest.id, question_id: newQ.id }]);
+
+                document.getElementById('addQuestionForm').reset();
+                document.getElementById('correct_option').value = 'A';
+                await loadActiveQuestions();
+            } catch (err) { alert("Failed to save."); } 
+            finally { btn.innerHTML = '<i class="fas fa-save me-2"></i> Save to Exam'; btn.disabled = false; }
+        });
+
+        // 7. Load Bank
+        async function loadBankQuestions() {
+            const tbody = document.getElementById('bankTbody');
+            tbody.innerHTML = `<tr><td colspan="2" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i> Loading bank...</td></tr>`;
+
+            try {
+                const { data: existingMap } = await supabase.from('test_questions').select('question_id').eq('test_id', activeTest.id);
+                const existingIds = existingMap.map(e => e.question_id);
+
+                const { data: bankQs } = await supabase.from('questions')
+                    .select('id, question_text, correct_option')
+                    .eq('subject_id', activeTest.subject_id).eq('class_id', activeTest.class_id);
+
+                const availableQs = bankQs.filter(q => !existingIds.includes(q.id));
+
+                if (availableQs.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="2" class="text-center py-4 text-muted small">No unused questions found in your bank for this subject.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = availableQs.map(q => `
+                    <tr>
+                        <td class="align-middle"><input type="checkbox" class="bank-checkbox form-check-input border-dark" value="${q.id}"></td>
+                        <td class="small">
+                            <div class="fw-bold text-truncate" style="max-width: 300px;">${q.question_text}</div>
+                            <span class="text-success fw-bold" style="font-size: 0.75rem;">Ans: ${q.correct_option}</span>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) { console.error(err); }
+        }
+
+        window.toggleAllBankCheckboxes = (source) => {
+            document.querySelectorAll('.bank-checkbox').forEach(cb => cb.checked = source.checked);
+        };
+
+        window.addSelectedFromBank = async () => {
+            const checkboxes = document.querySelectorAll('.bank-checkbox:checked');
+            if (checkboxes.length === 0) return alert("Select at least one question.");
+            const btn = document.getElementById('addFromBankBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+
+            const inserts = Array.from(checkboxes).map(cb => ({ test_id: activeTest.id, question_id: parseInt(cb.value) }));
+            try {
+                await supabase.from('test_questions').insert(inserts);
+                document.getElementById('selectAllBank').checked = false;
+                await loadActiveQuestions();
+                await loadBankQuestions();
+            } catch (err) { alert("Error adding."); } 
+            finally { btn.innerHTML = '<i class="fas fa-plus-circle me-2"></i> Add Selected to Exam'; btn.disabled = false; }
+        };
+
+        // 8. DOCX Upload
+        const docxInput = document.getElementById('docxUpload');
+        const processBtn = document.getElementById('processDocxBtn');
+
+        docxInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                processBtn.classList.remove('d-none');
+                processBtn.innerHTML = `<i class="fas fa-cogs me-2"></i> Process File`;
+            }
+        });
+
+        processBtn.addEventListener('click', () => {
+            const file = docxInput.files[0];
+            if (!file) return;
+            processBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; processBtn.disabled = true;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                mammoth.extractRawText({ arrayBuffer: event.target.result }).then(parseExtractedText).catch(e => alert("Invalid DOCX"));
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        function parseExtractedText(result) {
+            const lines = result.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            parsedQuestions = []; let currentQ = null;
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                if (/^\d+[\.\)]\s+/.test(line)) {
+                    if (currentQ && currentQ.question) parsedQuestions.push(currentQ);
+                    currentQ = { question: line.replace(/^\d+[\.\)]\s*/, ''), optA: '', optB: '', optC: '', optD: '', answer: '', marks: activeTest.marks_per_question || 1 };
+                } else if (/^[A-D][\.\)]\s+/i.test(line) && currentQ) {
+                    const letter = line.charAt(0).toUpperCase(); const optText = line.substring(2).trim();
+                    if (letter === 'A') currentQ.optA = optText; if (letter === 'B') currentQ.optB = optText;
+                    if (letter === 'C') currentQ.optC = optText; if (letter === 'D') currentQ.optD = optText;
+                } else if (/^Answer:\s*[A-D]/i.test(line) && currentQ) {
+                    currentQ.answer = line.replace(/^Answer:\s*/i, '').trim().charAt(0).toUpperCase();
+                } else if (currentQ && !currentQ.optA) { currentQ.question += " " + line; }
+            }
+            if (currentQ && currentQ.question) parsedQuestions.push(currentQ);
+
+            document.getElementById('extractionPreview').classList.remove('d-none');
+            document.getElementById('previewTbody').innerHTML = parsedQuestions.map((q, i) => `<tr><td>${i+1}</td><td class="small text-truncate" style="max-width:150px;">${q.question}</td><td class="small">A) ${q.optA}</td><td class="fw-bold text-success">${q.answer||'?'}</td></tr>`).join('');
+            processBtn.classList.replace('btn-secondary', 'btn-success'); processBtn.innerHTML = 'Extracted!';
+        }
+
+        document.getElementById('confirmImportBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('confirmImportBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+
+            try {
+                for (let q of parsedQuestions) {
+                    const { data: newQ } = await supabase.from('questions').insert([{
+                        teacher_id: currentUserId, class_id: activeTest.class_id, subject_id: activeTest.subject_id,
+                        question_text: q.question, option_a: q.optA, option_b: q.optB, option_c: q.optC, option_d: q.optD,
+                        correct_option: q.answer, marks: q.marks
+                    }]).select('id').single();
+                    await supabase.from('test_questions').insert([{ test_id: activeTest.id, question_id: newQ.id }]);
+                }
+                document.getElementById('extractionPreview').classList.add('d-none');
+                docxInput.value = ''; processBtn.classList.add('d-none'); processBtn.disabled = false;
+                await loadActiveQuestions(); await loadBankQuestions();
+            } catch (err) { alert("Import error."); }
+            finally { btn.innerHTML = '<i class="fas fa-database me-2"></i> Import to Exam'; btn.disabled = false; }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>
