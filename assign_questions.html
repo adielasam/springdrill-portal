@@ -10,7 +10,7 @@
     <style>
         body { background-color: #f4f7fa; overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
-        /* Sidebar Styling (Educare Menu Structure) */
+        /* Sidebar Styling */
         .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #1a3c34; color: white; padding-top: 30px; z-index: 1000; }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
         .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; display: flex; align-items: center; font-size: 0.95rem; }
@@ -99,13 +99,13 @@
                     
                     <ul class="nav nav-pills mb-4" id="inputTabs" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#manualTab" type="button" role="tab"><i class="fas fa-keyboard me-1"></i> Manual Type</button>
+                            <button class="nav-link active" id="manual-tab" data-bs-toggle="pill" data-bs-target="#manualTab" type="button" role="tab"><i class="fas fa-keyboard me-1"></i> Manual Type</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#bankTab" type="button" role="tab"><i class="fas fa-archive me-1"></i> From Bank</button>
+                            <button class="nav-link" id="bank-tab" data-bs-toggle="pill" data-bs-target="#bankTab" type="button" role="tab"><i class="fas fa-archive me-1"></i> From Bank</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#docxTab" type="button" role="tab"><i class="fas fa-file-word me-1"></i> Word Import</button>
+                            <button class="nav-link" id="docx-tab" data-bs-toggle="pill" data-bs-target="#docxTab" type="button" role="tab"><i class="fas fa-file-word me-1"></i> Word Import</button>
                         </li>
                     </ul>
 
@@ -165,12 +165,33 @@
                         </div>
 
                         <div class="tab-pane fade" id="docxTab" role="tabpanel">
+                            
+                            <div class="alert alert-info border-0 shadow-sm small py-2 mb-3">
+                                <i class="fas fa-tags me-1"></i> Categorize these imported questions so they are easy to find in the Question Bank later!
+                            </div>
+
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small mb-1">Save to Class Bank</label>
+                                    <select id="import_class_id" class="form-select form-select-sm border-primary" required>
+                                        <option value="">Loading...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small mb-1">Save to Subject Bank</label>
+                                    <select id="import_subject_id" class="form-select form-select-sm border-primary" required>
+                                        <option value="">Loading...</option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <label for="docxUpload" class="upload-area w-100 mb-3" id="dropZone">
                                 <i class="fas fa-file-word"></i>
                                 <h6 class="fw-bold text-dark mt-2">Click or drag .docx here</h6>
                                 <p class="small text-muted mb-0">Ensure format uses "A) Option" and "Answer: A"</p>
                                 <input type="file" id="docxUpload" accept=".docx" class="d-none">
                             </label>
+                            
                             <button class="btn btn-secondary w-100 fw-bold py-2 d-none mb-3" id="processDocxBtn">
                                 <i class="fas fa-cogs me-2"></i> Process Document
                             </button>
@@ -235,13 +256,27 @@
         let activeTest = null;
         let parsedQuestions = []; 
 
-        // 1. Initialize
         async function initializePage() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
                 currentUserId = session.user.id;
 
+                // Load Classes and Subjects globally for the new Import Dropdowns
+                const { data: classes } = await supabase.from('classes').select('id, name').order('id');
+                const { data: subjects } = await supabase.from('subjects').select('id, name').order('name');
+                
+                const importClsSelect = document.getElementById('import_class_id');
+                const importSubSelect = document.getElementById('import_subject_id');
+                
+                if (classes) {
+                    importClsSelect.innerHTML = `<option value="">Select Class...</option>` + classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                }
+                if (subjects) {
+                    importSubSelect.innerHTML = `<option value="">Select Subject...</option>` + subjects.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+                }
+
+                // Check URL for test ID
                 const urlParams = new URLSearchParams(window.location.search);
                 const testId = urlParams.get('test_id');
 
@@ -263,6 +298,10 @@
                 document.getElementById('workspaceContainer').style.display = 'flex';
                 document.getElementById('displayTestTitle').innerText = `${activeTest.code} (${activeTest.classes?.name || 'Unassigned'})`;
                 
+                // Pre-fill the Word Import dropdowns to match the active test by default!
+                if (activeTest.class_id) importClsSelect.value = activeTest.class_id;
+                if (activeTest.subject_id) importSubSelect.value = activeTest.subject_id;
+
                 updatePublishUI();
                 await loadActiveQuestions();
                 await loadBankQuestions();
@@ -277,7 +316,6 @@
 
         document.addEventListener('DOMContentLoaded', initializePage);
 
-        // 3. Publish UI & Security Lock
         function updatePublishUI() {
             const toggle = document.getElementById('publishToggle');
             const label = document.getElementById('publishLabel');
@@ -330,7 +368,6 @@
             }
         });
 
-        // 4. Load Active Questions
         async function loadActiveQuestions() {
             const tbody = document.getElementById('activeQuestionsTbody');
             tbody.innerHTML = `<tr><td colspan="4" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>`;
@@ -376,7 +413,6 @@
             } catch (err) { console.error(err); }
         }
 
-        // 5. Delete & Auto-Unpublish Logic
         window.deleteQuestion = async (testQuestionId) => {
             if (!confirm("Remove this question from the active exam?")) return;
             
@@ -393,7 +429,6 @@
             await loadBankQuestions();
         };
 
-        // 6. Manual Add Form
         document.getElementById('addQuestionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitManualBtn');
@@ -420,17 +455,14 @@
             finally { btn.innerHTML = '<i class="fas fa-save me-2"></i> Save to Exam'; btn.disabled = false; }
         });
 
-        // 7. LOAD BANK (UPGRADED: Filters ONLY by Subject, not Class!)
         async function loadBankQuestions() {
             const tbody = document.getElementById('bankTbody');
             tbody.innerHTML = `<tr><td colspan="2" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i> Loading bank...</td></tr>`;
 
             try {
-                // Get IDs already in this test
                 const { data: existingMap } = await supabase.from('test_questions').select('question_id').eq('test_id', activeTest.id);
                 const existingIds = existingMap ? existingMap.map(e => e.question_id) : [];
 
-                // FETCH ALL PAST QUESTIONS FOR THIS SUBJECT
                 const { data: bankQs } = await supabase.from('questions')
                     .select('id, question_text, correct_option, classes(name)')
                     .eq('subject_id', activeTest.subject_id);
@@ -472,9 +504,8 @@
                 await supabase.from('test_questions').insert(inserts);
                 document.getElementById('selectAllBank').checked = false;
                 
-                // Jump to manual tab to see updates
                 const triggerEl = document.querySelector('#manual-tab');
-                bootstrap.Tab.getOrCreateInstance(triggerEl).show();
+                if (triggerEl) bootstrap.Tab.getOrCreateInstance(triggerEl).show();
 
                 await loadActiveQuestions();
                 await loadBankQuestions();
@@ -482,7 +513,6 @@
             finally { btn.innerHTML = '<i class="fas fa-plus-circle me-2"></i> Add Selected to Exam'; btn.disabled = false; }
         };
 
-        // 8. DOCX UPLOAD (UPGRADED: BULK INSERT)
         const docxInput = document.getElementById('docxUpload');
         const processBtn = document.getElementById('processDocxBtn');
 
@@ -529,27 +559,34 @@
             processBtn.classList.replace('btn-secondary', 'btn-success'); processBtn.innerHTML = 'Extracted!';
         }
 
-        // THE BULK IMPORT MAGIC
         document.getElementById('confirmImportBtn').addEventListener('click', async () => {
+            
+            // Read values from the new explicit dropdowns
+            const importClassId = document.getElementById('import_class_id').value;
+            const importSubjectId = document.getElementById('import_subject_id').value;
+
+            if (!importClassId || !importSubjectId) {
+                alert("Please select a Class and Subject to categorize these questions in your Bank.");
+                return;
+            }
+
             const btn = document.getElementById('confirmImportBtn');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importing...'; btn.disabled = true;
 
             try {
-                // Prepare Array for Bulk Insert
                 const questionsToInsert = parsedQuestions.map(q => ({
-                    teacher_id: currentUserId, class_id: activeTest.class_id, subject_id: activeTest.subject_id,
+                    teacher_id: currentUserId, 
+                    class_id: parseInt(importClassId), 
+                    subject_id: parseInt(importSubjectId),
                     question_text: q.question, option_a: q.optA, option_b: q.optB, option_c: q.optC, option_d: q.optD,
                     correct_option: q.answer, marks: q.marks
                 }));
 
-                // BULK INSERT Questions
                 const { data: newQs, error: qErr } = await supabase.from('questions').insert(questionsToInsert).select('id');
                 if (qErr) throw qErr;
 
-                // Prepare Mappings
                 const mappingsToInsert = newQs.map(nq => ({ test_id: activeTest.id, question_id: nq.id }));
                 
-                // BULK INSERT Mappings
                 const { error: mapErr } = await supabase.from('test_questions').insert(mappingsToInsert);
                 if (mapErr) throw mapErr;
 
@@ -557,13 +594,12 @@
                 docxInput.value = ''; processBtn.classList.add('d-none'); processBtn.disabled = false;
                 processBtn.classList.replace('btn-success', 'btn-secondary');
                 
-                // Go back to the manual review tab to see the success!
                 const triggerEl = document.querySelector('#manual-tab');
-                bootstrap.Tab.getOrCreateInstance(triggerEl).show();
+                if (triggerEl) bootstrap.Tab.getOrCreateInstance(triggerEl).show();
 
                 await loadActiveQuestions(); 
                 await loadBankQuestions();
-                alert(`Success! ${parsedQuestions.length} questions instantly added to Exam.`);
+                alert(`Success! ${parsedQuestions.length} questions instantly added to Exam & Bank.`);
 
             } catch (err) { 
                 alert("Import error: " + err.message); 
