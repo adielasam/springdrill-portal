@@ -9,7 +9,6 @@
     <style>
         body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
         
-        /* Sidebar Styling */
         .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding-top: 30px; z-index: 1000; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
         .sidebar-brand i { color: #f1c40f; font-size: 2.5rem; margin-bottom: 10px; }
@@ -17,11 +16,9 @@
         .nav-link i { width: 25px; font-size: 1.1rem; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; transform: translateX(5px); }
 
-        /* Main Content */
         .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
         .top-header { background: white; padding: 20px 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #2ecc71; }
         
-        /* Cards */
         .exam-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #e9ecef; transition: transform 0.2s; margin-bottom: 20px;}
         .exam-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.06); border-color: #1a3c34;}
         .exam-title { font-size: 1.2rem; font-weight: bold; color: #2c3e50; margin-bottom: 10px; }
@@ -59,11 +56,10 @@
                 <h3 class="fw-bold mb-0 text-dark" id="welcomeText">Welcome back!</h3>
                 <p class="text-muted mb-0 mt-1">Class: <strong id="studentClass" class="text-success">Loading...</strong></p>
             </div>
-            <div id="profileImageContainer">
-                </div>
+            <div id="profileImageContainer"></div>
         </div>
 
-        <h5 class="fw-bold mb-4 text-dark"><i class="fas fa-clipboard-list text-warning me-2"></i> Your Assigned Exams</h5>
+        <h5 class="fw-bold mb-4 text-dark"><i class="fas fa-clipboard-list text-warning me-2"></i> Active Exams</h5>
         
         <div class="row" id="examsGrid">
             </div>
@@ -75,66 +71,60 @@
 
         async function initializeDashboard() {
             try {
-                // 1. Verify Student
+                // 1. Verify Student Authentication
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
+                const userId = session.user.id;
 
-                // 2. Fetch Student Profile safely (bypassing .single() errors)
-                const { data: studentRecords, error: stuErr } = await supabase
+                // 2. Fetch basic user details from the core 'users' table as a fallback
+                const { data: authUser } = await supabase.from('users').select('name').eq('id', userId).single();
+                let displayName = authUser ? authUser.name : "Student";
+                let className = "Unassigned";
+
+                // 3. Try to fetch rich details from 'students' table, but DO NOT CRASH if missing!
+                const { data: studentRecords } = await supabase
                     .from('students')
-                    .select('surname, first_name, class_id, passport_url, classes(name), users(name)')
-                    .eq('user_id', session.user.id);
+                    .select('surname, first_name, passport_url, classes(name)')
+                    .eq('user_id', userId);
 
-                if (stuErr) throw stuErr;
-
-                if (!studentRecords || studentRecords.length === 0) {
-                     document.getElementById('welcomeText').innerText = "Profile Incomplete";
-                     document.getElementById('studentClass').innerText = "N/A";
-                     document.getElementById('examsGrid').innerHTML = `<div class="col-12"><div class="alert alert-danger fw-bold"><i class="fas fa-exclamation-triangle me-2"></i> Your student profile is incomplete in the database. Please contact the Admin.</div></div>`;
-                     document.getElementById('loadingOverlay').style.display = 'none';
-                     return;
+                if (studentRecords && studentRecords.length > 0) {
+                    const student = studentRecords[0];
+                    if (student.first_name) {
+                        displayName = `${student.first_name} ${student.surname || ''}`;
+                    }
+                    if (student.classes) {
+                        className = student.classes.name;
+                    }
+                    if (student.passport_url) {
+                        document.getElementById('profileImageContainer').innerHTML = `<img src="${student.passport_url}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #2ecc71;">`;
+                    }
                 }
 
-                // Grab the first matched record safely
-                const student = studentRecords[0];
+                // Update UI Header
+                document.getElementById('welcomeText').innerText = `Welcome, ${displayName}!`;
+                document.getElementById('studentClass').innerText = className;
 
-                // Display Welcome Info
-                const displayName = student.first_name ? `${student.first_name} ${student.surname || ''}` : student.users?.name;
-                document.getElementById('welcomeText').innerText = `Welcome, ${displayName || 'Student'}!`;
-                document.getElementById('studentClass').innerText = student.classes?.name || 'Unassigned';
-
-                if (student.passport_url) {
-                    document.getElementById('profileImageContainer').innerHTML = `<img src="${student.passport_url}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #2ecc71;">`;
-                }
-
-                // 3. Fetch Exams JUST for this Student's Class
-                if (!student.class_id) {
-                    document.getElementById('examsGrid').innerHTML = `<div class="col-12"><div class="alert alert-warning fw-bold"><i class="fas fa-exclamation-triangle me-2"></i> You have not been assigned to a class yet. Please contact the Admin.</div></div>`;
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                    return;
-                }
-
+                // 4. FETCH ALL TESTS (No filters, just show everything available)
                 const { data: tests, error: testErr } = await supabase
                     .from('tests')
                     .select('*')
-                    .eq('class_id', student.class_id)
                     .order('created_at', { ascending: false });
 
                 if (testErr) throw testErr;
 
-                // 4. Check if they already took the test
+                // 5. Fetch past attempts so we can mark tests as 'Completed'
                 const { data: pastAttempts } = await supabase
                     .from('test_results')
                     .select('test_id, score')
-                    .eq('student_id', session.user.id);
+                    .eq('student_id', userId);
                 
                 const takenTestIds = pastAttempts ? pastAttempts.map(a => a.test_id) : [];
 
-                // 5. Render the Grid
+                // 6. Render the Exam Grid safely
                 const grid = document.getElementById('examsGrid');
                 
                 if (!tests || tests.length === 0) {
-                    grid.innerHTML = `<div class="col-12"><div class="exam-card text-center py-5 text-muted"><i class="fas fa-mug-hot fa-3x mb-3 opacity-50"></i><h5>No exams available right now.</h5><p class="small">When your teacher publishes a test for your class, it will appear here.</p></div></div>`;
+                    grid.innerHTML = `<div class="col-12"><div class="exam-card text-center py-5 text-muted"><i class="fas fa-mug-hot fa-3x mb-3 opacity-50"></i><h5>No exams available right now.</h5></div></div>`;
                 } else {
                     grid.innerHTML = tests.map(test => {
                         const hasTaken = takenTestIds.includes(test.id);
@@ -153,7 +143,6 @@
                                     <div class="exam-title">${test.title || 'CBT Assessment'}</div>
                                     <div class="exam-meta">
                                         <div><i class="fas fa-clock"></i> ${test.duration || 30} Minutes</div>
-                                        <div class="mt-1"><i class="fas fa-calendar-alt"></i> Added recently</div>
                                     </div>
                                     ${buttonHtml}
                                 </div>
