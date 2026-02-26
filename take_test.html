@@ -7,391 +7,260 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f7fa; overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
         
-        /* Sidebar Styling */
-        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding-top: 30px; z-index: 1000; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
-        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-brand i { color: #2ecc71; font-size: 2.5rem; margin-bottom: 10px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 15px 25px; margin: 4px 15px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; text-decoration: none; }
-        .nav-link i { width: 25px; font-size: 1.1rem; }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; transform: translateX(5px); }
-        .nav-link.text-danger:hover { background: rgba(220, 53, 69, 0.2); color: #ff6b6b !important; }
-
-        /* Main Content Styling */
-        .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
-        .top-header { background: white; padding: 20px 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
-
-        /* Available Tests Cards */
-        .test-card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: none; border-top: 4px solid #2ecc71; transition: transform 0.3s; height: 100%; display: flex; flex-direction: column; }
-        .test-card.completed { border-top: 4px solid #6c757d; opacity: 0.85; }
-        .test-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        /* Header & Timer */
+        .top-bar { background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .timer-box { background: rgba(255,255,255,0.1); padding: 8px 20px; border-radius: 8px; font-weight: bold; font-family: monospace; font-size: 1.4rem; border: 1px solid rgba(255,255,255,0.2); }
+        .timer-warning { background: rgba(220, 53, 69, 0.2); border-color: #dc3545; color: #ffcccc; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
         
-        /* Active CBT Interface */
-        #activeTestView { display: none; }
-        .cbt-header { background: white; padding: 15px 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 20px; z-index: 100; border: 2px solid #e9ecef; }
-        .timer-badge { background: #ffeaa7; color: #d63031; font-size: 1.5rem; font-weight: bold; padding: 10px 20px; border-radius: 10px; display: flex; align-items: center; gap: 10px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
-        .timer-warning { background: #ff7675 !important; color: white !important; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        /* Exam Container */
+        .exam-container { max-width: 850px; margin: 40px auto; background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 40px; }
+        .question-number { color: #f1c40f; font-weight: bold; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: block; border-bottom: 2px solid #f4f7fa; padding-bottom: 10px;}
+        .question-text { font-size: 1.35rem; color: #2c3e50; font-weight: 600; margin-bottom: 35px; line-height: 1.6; }
         
-        /* Question Card */
-        .question-card { background: white; border-radius: 15px; padding: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); min-height: 400px; }
-        .question-text { font-size: 1.3rem; color: #2d3436; margin-bottom: 30px; line-height: 1.6; font-weight: 500; }
-        .option-label { display: block; padding: 15px 20px; margin-bottom: 15px; background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 10px; cursor: pointer; transition: all 0.2s; font-size: 1.1rem; }
-        .option-label:hover { background: #eef2f5; border-color: #cbd3da; }
-        .option-input:checked + .option-label { background: #e8f5e9; border-color: #2ecc71; color: #155724; font-weight: bold; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.15); }
+        /* Options */
+        .option-label { display: block; padding: 15px 20px; border: 2px solid #e9ecef; border-radius: 10px; margin-bottom: 15px; cursor: pointer; transition: all 0.2s; font-size: 1.1rem; color: #495057; background: white;}
+        .option-label:hover { border-color: #1a3c34; background: #f8f9fa; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.02);}
+        .option-input:checked + .option-label { border-color: #1a3c34; background: #e8f5e9; color: #1a3c34; font-weight: bold; box-shadow: 0 0 0 3px rgba(26,60,52,0.1); }
         .option-input { display: none; }
 
-        /* Navigation Buttons */
-        .cbt-nav { display: flex; justify-content: space-between; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
-        .btn-cbt { padding: 12px 30px; font-weight: bold; border-radius: 8px; font-size: 1.1rem; }
+        /* Navigation */
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 40px; border-top: 2px solid #e9ecef; padding-top: 25px; }
         
-        /* Loading Overlay & Save Indicator */
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        #saveIndicator { position: fixed; bottom: 20px; right: 20px; background: #2d3436; color: white; padding: 10px 20px; border-radius: 50px; font-size: 0.9rem; display: none; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        /* Overlays */
+        #loadingOverlay, #fallbackOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f4f7fa; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        #fallbackOverlay { display: none; }
     </style>
 </head>
 <body>
 
     <div id="loadingOverlay">
-        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
-        <h4>Verifying Student Profile & Exam Records...</h4>
+        <i class="fas fa-spinner fa-spin fa-3x text-warning mb-3"></i>
+        <h4 class="text-dark fw-bold">Verifying Student Profile & Exam Records...</h4>
     </div>
 
-    <div id="saveIndicator">
-        <i class="fas fa-cloud-upload-alt me-2"></i> Saving answer...
-    </div>
-
-    <div class="sidebar" id="sidebarMenu">
-        <div class="sidebar-brand">
-            <i class="fas fa-user-graduate"></i>
-            <h4 class="text-white fw-bold mb-0">STUDENT PORTAL</h4>
+    <div id="fallbackOverlay">
+        <div style="background: white; padding: 40px 30px; border-radius: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 450px;">
+            <i class="fas fa-file-signature fa-4x text-warning mb-3"></i>
+            <h3 style="font-weight: bold; color: #1a3c34; margin-bottom: 10px;">No Exam Selected</h3>
+            <p style="color: #6c757d; margin-bottom: 25px; font-size: 0.95rem;">You have not selected a specific test to take. Please return to your Student Dashboard to view and select from your currently active assigned tests.</p>
+            <a href="student_dashboard.html" class="btn btn-dark w-100 fw-bold py-2"><i class="fas fa-arrow-left me-2"></i> Return to Dashboard</a>
         </div>
-        <nav class="nav flex-column mt-4">
-            <a href="student_dashboard.html" class="nav-link"><i class="fas fa-home"></i> My Dashboard</a>
-            <a href="take_test.html" class="nav-link active"><i class="fas fa-laptop-code"></i> Take a Test</a>
-            <a href="student_results.html" class="nav-link"><i class="fas fa-award"></i> My Results</a>
-            <hr class="mx-3 my-4 border-secondary">
-            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-sign-out-alt"></i> Secure Logout</a>
-        </nav>
     </div>
 
-    <div class="main-content" id="mainContent">
+    <div class="top-bar" id="examHeader" style="display: none;">
+        <div>
+            <h4 class="mb-0 fw-bold text-warning" id="displayTestTitle">Loading Exam...</h4>
+            <small class="opacity-75" id="displayStudentName"><i class="fas fa-user-graduate me-1"></i> Student Candidate</small>
+        </div>
+        <div class="timer-box" id="timerDisplay">
+            <i class="fas fa-clock me-2"></i>--:--
+        </div>
+    </div>
+
+    <div class="exam-container" id="examContent" style="display: none;">
         
-        <div id="testSelectionView">
-            <div class="top-header">
-                <div>
-                    <h3 class="fw-bold mb-0 text-dark"><i class="fas fa-clipboard-list text-success me-2"></i> Available Assessments</h3>
-                    <p class="text-muted mb-0 mt-1">Select an exam below. <strong>Note: You are only permitted ONE attempt per test.</strong></p>
-                </div>
-            </div>
-
-            <div id="alertBox" class="alert d-none shadow-sm mb-4"></div>
-
-            <div class="row g-4" id="availableTestsContainer">
+        <div id="questionArea">
+            <span class="question-number" id="questionCounter">Question 1 of --</span>
+            <div class="question-text" id="questionText">Loading question...</div>
+            
+            <div class="options-container" id="optionsContainer">
                 </div>
         </div>
 
-        <div id="activeTestView">
-            <div class="cbt-header">
-                <div>
-                    <h4 class="fw-bold mb-0 text-dark" id="activeTestTitle">Loading Test...</h4>
-                    <p class="text-muted mb-0" id="questionCounter">Question 1 of --</p>
-                </div>
-                <div class="timer-badge" id="timerDisplay">
-                    <i class="fas fa-stopwatch"></i> <span id="timeRemaining">00:00</span>
-                </div>
-            </div>
-
-            <div class="question-card">
-                <div id="questionContent">
-                    <div class="text-center text-muted py-5"><i class="fas fa-spinner fa-spin fa-2x mb-3"></i><h5>Preparing your exam paper...</h5></div>
-                </div>
-
-                <div class="cbt-nav">
-                    <button class="btn btn-outline-secondary btn-cbt" id="prevBtn" onclick="navigateQuestion(-1)" disabled><i class="fas fa-arrow-left me-2"></i> Previous</button>
-                    <button class="btn btn-primary btn-cbt px-5" id="nextBtn" onclick="navigateQuestion(1)">Next <i class="fas fa-arrow-right ms-2"></i></button>
-                    <button class="btn btn-danger btn-cbt px-5 d-none" id="submitTestBtn" onclick="confirmSubmitTest()">Submit Exam <i class="fas fa-check-double ms-2"></i></button>
-                </div>
-            </div>
+        <div class="nav-buttons">
+            <button class="btn btn-outline-secondary fw-bold px-4" id="prevBtn" onclick="navigate(-1)" disabled><i class="fas fa-chevron-left me-2"></i> Previous</button>
+            <button class="btn btn-dark fw-bold px-4" id="nextBtn" onclick="navigate(1)">Next <i class="fas fa-chevron-right ms-2"></i></button>
+            <button class="btn btn-success fw-bold px-5 shadow-sm" id="submitBtn" style="display: none;" onclick="submitExam()"><i class="fas fa-check-double me-2"></i> Submit Exam</button>
         </div>
-        
     </div>
 
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
-        let currentUserId = null;
-        let studentClassId = null;
-        let completedTestIds = [];
-        
-        let questionsList = [];
-        let currentQuestionIndex = 0;
-        let activeAttemptId = null;
-        let activeTestObj = null;
-        let studentAnswers = {}; 
-        let timerInterval = null;
+        let studentSession = null;
+        let testId = null;
+        let testData = null;
+        let questions = [];
+        let currentIdx = 0;
+        let userAnswers = {}; // Stores chosen options e.g. { 'question_id': 'A' }
+        let timerInterval;
+        let timeRemaining = 0;
 
-        // 1. Initialize Page
-        async function initializePage() {
+        async function initializeExam() {
             try {
+                // 1. Authenticate Student
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
-                currentUserId = session.user.id;
+                studentSession = session;
 
-                const { data: studentProfile, error: profileErr } = await supabase.from('students').select('id, class_id, approved').eq('user_id', currentUserId).single();
-
-                if (profileErr || !studentProfile) {
-                    alert("Access Denied.");
-                    return window.location.href = 'login.html';
+                // Grab student name for header
+                const { data: stuData } = await supabase.from('students').select('surname, first_name, users(name)').eq('user_id', session.user.id).single();
+                if (stuData) {
+                    const name = stuData.surname ? `${stuData.first_name} ${stuData.surname}` : stuData.users.name;
+                    document.getElementById('displayStudentName').innerHTML = `<i class="fas fa-user-graduate me-1"></i> ${name}`;
                 }
 
-                if (!studentProfile.approved) {
-                    document.getElementById('alertBox').className = 'alert alert-danger shadow-sm mb-4';
-                    document.getElementById('alertBox').innerHTML = `<i class="fas fa-lock me-2"></i> <strong>Account Locked:</strong> Awaiting Administrator approval.`;
+                // 2. Check for Test ID in URL
+                const urlParams = new URLSearchParams(window.location.search);
+                testId = urlParams.get('id') || urlParams.get('test_id');
+
+                // If no ID is found, trigger the friendly UI instead of crashing!
+                if (!testId) {
                     document.getElementById('loadingOverlay').style.display = 'none';
-                    return;
+                    document.getElementById('fallbackOverlay').style.display = 'flex';
+                    return; 
                 }
 
-                studentClassId = studentProfile.class_id;
-                await loadAvailableTests();
-
-            } catch (error) {
-                console.error(error);
-                alert("Failed to connect to the examination system.");
-            }
-        }
-
-        // 2. Load Tests & Enforce One Attempt
-        async function loadAvailableTests() {
-            const container = document.getElementById('availableTestsContainer');
-            
-            try {
-                // A) Fetch student's PAST attempts to see what they have already finished
-                const { data: pastAttempts } = await supabase
-                    .from('test_attempts')
-                    .select('test_id')
-                    .eq('student_id', currentUserId)
-                    .not('end_time', 'is', null);
-
-                if (pastAttempts) {
-                    completedTestIds = pastAttempts.map(a => a.test_id);
+                // 3. Prevent retakes
+                const { data: pastAttempt } = await supabase.from('test_results').select('id').eq('student_id', session.user.id).eq('test_id', testId).single();
+                if (pastAttempt) {
+                    alert("You have already submitted this exam. Returning to dashboard.");
+                    return window.location.href = 'student_dashboard.html';
                 }
 
-                // B) Fetch tests matching student's class
-                const { data: tests, error } = await supabase
-                    .from('tests')
-                    .select('id, title, code, duration_minutes, marks_per_question, subjects(name)')
-                    .eq('class_id', studentClassId)
-                    .eq('is_published', true)
-                    .order('created_at', { ascending: false });
+                // 4. Fetch the Test and Questions
+                const { data: tData, error: tErr } = await supabase.from('tests').select('*').eq('id', testId).single();
+                if (tErr) throw new Error("Exam details not found.");
+                testData = tData;
 
-                if (error) throw error;
+                const { data: qData, error: qErr } = await supabase.from('questions').select('*').eq('test_id', testId).order('id');
+                if (qErr || !qData || qData.length === 0) throw new Error("No questions available for this exam.");
+                
+                questions = qData;
+                document.getElementById('displayTestTitle').innerText = testData.title || 'CBT Examination';
+
+                // 5. Start the Timer (assumes testData.duration is in minutes)
+                timeRemaining = (testData.duration || 30) * 60; 
+                startTimer();
+
+                // 6. Reveal the Exam interface
                 document.getElementById('loadingOverlay').style.display = 'none';
-
-                if (tests.length === 0) {
-                    container.innerHTML = `<div class="col-12 text-center py-5"><i class="fas fa-folder-open fa-4x text-muted opacity-25 mb-3"></i><h4 class="text-muted">No exams available</h4></div>`;
-                    return;
-                }
-
-                // C) Render Tests and check lock status
-                container.innerHTML = tests.map(test => {
-                    const hasTaken = completedTestIds.includes(test.id);
-                    
-                    return `
-                    <div class="col-md-6 col-lg-4">
-                        <div class="test-card ${hasTaken ? 'completed' : ''}">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <span class="badge bg-light text-success border border-success">${test.code}</span>
-                                <span class="badge bg-secondary"><i class="fas fa-clock me-1"></i> ${test.duration_minutes} mins</span>
-                            </div>
-                            <h4 class="fw-bold text-dark mb-1">${test.title}</h4>
-                            <p class="text-muted fw-bold small mb-4">${test.subjects?.name || 'General Subject'}</p>
-                            
-                            <div class="mt-auto">
-                                ${hasTaken 
-                                    ? `<button disabled class="btn btn-secondary w-100 fw-bold"><i class="fas fa-lock me-2"></i> Attempt Completed</button>`
-                                    : `<button onclick="window.prepareTest(${test.id})" class="btn btn-success w-100 fw-bold">Start Test <i class="fas fa-play ms-2"></i></button>`
-                                }
-                            </div>
-                        </div>
-                    </div>
-                `}).join('');
-
-            } catch (err) {
-                console.error(err);
-                container.innerHTML = `<div class="col-12"><div class="alert alert-danger">Failed to load tests.</div></div>`;
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', initializePage);
-
-        // 3. Prepare and Start Test
-        window.prepareTest = async (testId) => {
-            const confirmStart = confirm("Are you ready to begin? The timer will start immediately and you cannot retake this exam.");
-            if (!confirmStart) return;
-
-            document.getElementById('loadingOverlay').style.display = 'flex';
-
-            try {
-                const { data: testDetails } = await supabase.from('tests').select('*').eq('id', testId).single();
-                activeTestObj = testDetails;
-
-                const { data: qData } = await supabase.from('test_questions').select(`question_id, questions ( id, question_text, option_a, option_b, option_c, option_d, marks, correct_option )`).eq('test_id', testId);
+                document.getElementById('examHeader').style.display = 'flex';
+                document.getElementById('examContent').style.display = 'block';
                 
-                if (!qData || qData.length === 0) {
-                    alert("This test has no questions assigned to it yet.");
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                    return;
-                }
-
-                questionsList = qData.map(item => item.questions);
-                if (activeTestObj.shuffle_questions) questionsList = questionsList.sort(() => Math.random() - 0.5);
-
-                const { data: attemptData, error: aErr } = await supabase.from('test_attempts').insert([{ test_id: testId, student_id: currentUserId }]).select('id').single();
-                if (aErr) throw aErr;
-                
-                activeAttemptId = attemptData.id;
-
-                document.getElementById('testSelectionView').style.display = 'none';
-                document.getElementById('activeTestView').style.display = 'block';
-                document.getElementById('sidebarMenu').style.display = 'none';
-                document.getElementById('mainContent').style.marginLeft = '0'; 
-                document.getElementById('activeTestTitle').innerText = activeTestObj.title;
-
-                currentQuestionIndex = 0;
-                studentAnswers = {};
                 renderQuestion();
-                startTimer(activeTestObj.duration_minutes);
 
-                document.getElementById('loadingOverlay').style.display = 'none';
             } catch (err) {
                 console.error(err);
-                alert("An error occurred while preparing your exam.");
-                document.getElementById('loadingOverlay').style.display = 'none';
+                alert(err.message || "An error occurred loading the exam.");
+                window.location.href = 'student_dashboard.html';
+            }
+        }
+
+        // Render Question Function
+        window.renderQuestion = () => {
+            const q = questions[currentIdx];
+            document.getElementById('questionCounter').innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+            document.getElementById('questionText').innerText = q.question_text || q.question;
+
+            const savedAns = userAnswers[q.id];
+
+            // Renders Options A, B, C, D dynamically
+            const optionsHtml = ['a', 'b', 'c', 'd'].map(opt => {
+                const optValue = q[`option_${opt}`] || q[opt]; 
+                if (!optValue) return ''; 
+                
+                const isChecked = savedAns === opt.toUpperCase() ? 'checked' : '';
+                
+                return `
+                    <label>
+                        <input type="radio" name="examOption" class="option-input" value="${opt.toUpperCase()}" ${isChecked} onchange="saveAnswer('${q.id}', this.value)">
+                        <div class="option-label"><strong class="me-3">${opt.toUpperCase()}.</strong> ${optValue}</div>
+                    </label>
+                `;
+            }).join('');
+
+            document.getElementById('optionsContainer').innerHTML = optionsHtml;
+
+            // Handle Button Display
+            document.getElementById('prevBtn').disabled = currentIdx === 0;
+            if (currentIdx === questions.length - 1) {
+                document.getElementById('nextBtn').style.display = 'none';
+                document.getElementById('submitBtn').style.display = 'block';
+            } else {
+                document.getElementById('nextBtn').style.display = 'block';
+                document.getElementById('submitBtn').style.display = 'none';
             }
         };
 
-        // 4. Render Current Question
-        function renderQuestion() {
-            const q = questionsList[currentQuestionIndex];
-            document.getElementById('questionCounter').innerText = `Question ${currentQuestionIndex + 1} of ${questionsList.length}`;
-            const savedAns = studentAnswers[q.id] || null;
+        // Temporary save
+        window.saveAnswer = (qId, value) => {
+            userAnswers[qId] = value;
+        };
 
-            document.getElementById('questionContent').innerHTML = `
-                <div class="question-text">${currentQuestionIndex + 1}. ${q.question_text}</div>
-                <div class="options-container">
-                    <input type="radio" name="opt_${q.id}" id="optA_${q.id}" value="A" class="option-input" ${savedAns === 'A' ? 'checked' : ''} onchange="window.handleAnswerSelection(${q.id}, 'A')">
-                    <label for="optA_${q.id}" class="option-label"><strong>A.</strong> ${q.option_a}</label>
-                    <input type="radio" name="opt_${q.id}" id="optB_${q.id}" value="B" class="option-input" ${savedAns === 'B' ? 'checked' : ''} onchange="window.handleAnswerSelection(${q.id}, 'B')">
-                    <label for="optB_${q.id}" class="option-label"><strong>B.</strong> ${q.option_b}</label>
-                    <input type="radio" name="opt_${q.id}" id="optC_${q.id}" value="C" class="option-input" ${savedAns === 'C' ? 'checked' : ''} onchange="window.handleAnswerSelection(${q.id}, 'C')">
-                    <label for="optC_${q.id}" class="option-label"><strong>C.</strong> ${q.option_c}</label>
-                    <input type="radio" name="opt_${q.id}" id="optD_${q.id}" value="D" class="option-input" ${savedAns === 'D' ? 'checked' : ''} onchange="window.handleAnswerSelection(${q.id}, 'D')">
-                    <label for="optD_${q.id}" class="option-label"><strong>D.</strong> ${q.option_d}</label>
-                </div>
-            `;
-            
-            document.getElementById('prevBtn').disabled = (currentQuestionIndex === 0);
-            
-            if (currentQuestionIndex === questionsList.length - 1) {
-                document.getElementById('nextBtn').classList.add('d-none');
-                document.getElementById('submitTestBtn').classList.remove('d-none');
-            } else {
-                document.getElementById('nextBtn').classList.remove('d-none');
-                document.getElementById('submitTestBtn').classList.add('d-none');
-            }
-        }
-
-        window.navigateQuestion = (direction) => {
-            currentQuestionIndex += direction;
-            if (currentQuestionIndex < 0) currentQuestionIndex = 0;
-            if (currentQuestionIndex >= questionsList.length) currentQuestionIndex = questionsList.length - 1;
+        // Next/Prev Navigation
+        window.navigate = (direction) => {
+            currentIdx += direction;
             renderQuestion();
         };
 
-        window.handleAnswerSelection = async (questionId, selectedOption) => {
-            studentAnswers[questionId] = selectedOption;
-            const indicator = document.getElementById('saveIndicator');
-            indicator.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Saving...';
-            indicator.style.display = 'block';
-
-            try {
-                await supabase.from('student_answers').upsert({ attempt_id: activeAttemptId, question_id: questionId, selected_answer: selectedOption }, { onConflict: 'attempt_id, question_id' });
-                indicator.innerHTML = '<i class="fas fa-check text-success me-2"></i> Saved';
-                setTimeout(() => indicator.style.display = 'none', 1500);
-            } catch (err) {
-                indicator.innerHTML = '<i class="fas fa-exclamation-triangle text-danger me-2"></i> Save Failed';
-            }
-        };
-
-        function startTimer(durationMins) {
-            let timeRemaining = durationMins * 60; 
-            const display = document.getElementById('timeRemaining');
-            const timerBadge = document.getElementById('timerDisplay');
-
+        // Timer Function
+        function startTimer() {
+            const display = document.getElementById('timerDisplay');
             timerInterval = setInterval(() => {
-                timeRemaining--;
-                let minutes = Math.floor(timeRemaining / 60);
-                let seconds = timeRemaining % 60;
-                display.innerText = `${minutes < 10 ? "0" + minutes : minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
-
-                if (timeRemaining <= 300 && timeRemaining > 0) timerBadge.classList.add('timer-warning');
-
                 if (timeRemaining <= 0) {
                     clearInterval(timerInterval);
-                    display.innerText = "00:00";
+                    display.innerHTML = `<i class="fas fa-clock me-2"></i>Time's Up!`;
                     alert("Time is up! Your exam will now be submitted automatically.");
-                    processSubmission();
+                    submitExam();
+                    return;
                 }
+
+                timeRemaining--;
+                const m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+                const s = (timeRemaining % 60).toString().padStart(2, '0');
+                display.innerHTML = `<i class="fas fa-clock me-2"></i>${m}:${s}`;
+
+                // Add red warning pulse if less than 5 mins remain
+                if (timeRemaining < 300) display.classList.add('timer-warning');
             }, 1000);
         }
 
-        window.confirmSubmitTest = () => {
-            const answeredCount = Object.keys(studentAnswers).length;
-            const totalCount = questionsList.length;
-            let msg = answeredCount < totalCount ? `WARNING: You still have ${totalCount - answeredCount} unanswered questions.\n\nSubmit anyway?` : `You have answered all questions. Submit exam?`;
-            if (confirm(msg)) processSubmission();
-        };
-
-        async function processSubmission() {
+        // Grading and Submission
+        window.submitExam = async () => {
             clearInterval(timerInterval);
-            document.getElementById('loadingOverlay').style.display = 'flex';
-            document.querySelector('#loadingOverlay h4').innerText = "Grading Examination...";
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Grading & Submitting...';
+            btn.disabled = true;
 
             try {
-                let totalMarksObtained = 0;
-                let maxPossibleMarks = 0;
-
-                questionsList.forEach(q => {
-                    maxPossibleMarks += parseFloat(q.marks);
-                    if (studentAnswers[q.id] && studentAnswers[q.id] === q.correct_option) totalMarksObtained += parseFloat(q.marks);
+                // 1. Calculate Score
+                let score = 0;
+                questions.forEach(q => {
+                    const correctAns = q.correct_option || q.answer; 
+                    if (userAnswers[q.id] === correctAns) {
+                        score++;
+                    }
                 });
 
-                const percentage = (totalMarksObtained / maxPossibleMarks) * 100;
+                // 2. Save Results to Database
+                const { error } = await supabase.from('test_results').insert([{
+                    student_id: studentSession.user.id,
+                    test_id: testId,
+                    score: score,
+                    total_questions: questions.length
+                }]);
 
-                await supabase.from('test_attempts').update({ end_time: new Date().toISOString(), score: totalMarksObtained, total_marks: maxPossibleMarks, percentage: percentage.toFixed(2) }).eq('id', activeAttemptId);
+                if (error) throw error;
 
-                if (!activeTestObj.practice_mode) {
-                    await supabase.from('test_results').upsert({ test_id: activeTestObj.id, student_id: currentUserId, score: totalMarksObtained, percentage: percentage.toFixed(2), remarks: percentage >= 50 ? 'Pass' : 'Fail' }, { onConflict: 'test_id, student_id' });
-                }
-
-                alert(`Exam submitted successfully! Score: ${totalMarksObtained} / ${maxPossibleMarks}`);
-                window.location.href = 'student_results.html';
+                // 3. Success Feedback
+                alert(`Exam submitted successfully! You scored ${score} out of ${questions.length}.`);
+                window.location.href = 'student_dashboard.html';
 
             } catch (err) {
                 console.error(err);
-                alert("Error during submission. Please contact admin.");
-                document.getElementById('loadingOverlay').style.display = 'none';
+                alert("Error submitting exam: " + err.message);
+                btn.innerHTML = '<i class="fas fa-check-double me-2"></i> Submit Exam';
+                btn.disabled = false;
+                startTimer(); // resume timer in case of network drop
             }
-        }
+        };
 
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            if (activeAttemptId && !confirm("Warning: Logging out will abandon your current test. Continue?")) return;
-            await supabase.auth.signOut();
-            window.location.href = 'login.html';
-        });
+        // Fire it up!
+        document.addEventListener('DOMContentLoaded', initializeExam);
     </script>
 </body>
 </html>
