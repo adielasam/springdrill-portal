@@ -3,42 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRINGDRILL - Manage Users</title>
+    <title>SPRINGDRILL - Manage Approvals</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f7fa; overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
         
-        /* Sidebar Styling */
-        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding-top: 30px; z-index: 1000; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
-        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-brand i { color: #f1c40f; font-size: 2.5rem; margin-bottom: 10px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 15px 25px; margin: 4px 15px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; text-decoration: none; }
-        .nav-link i { width: 25px; font-size: 1.1rem; }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; transform: translateX(5px); }
+        /* Sidebar Styling (Educare Clone) */
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1000; }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center;}
+        .nav-link i { width: 25px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
 
-        /* Main Content Styling */
-        .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
-        .top-header { background: white; padding: 20px 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #ffc107; }
-
-        /* Tabs & Tables */
-        .content-card { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: none; margin-bottom: 30px; }
-        .nav-tabs .nav-link { font-weight: 600; color: #6c757d; border: none; border-bottom: 3px solid transparent; padding: 12px 20px; }
-        .nav-tabs .nav-link.active { color: #1a3c34; border-bottom: 3px solid #ffc107; background: transparent; }
-        .nav-tabs { border-bottom: 2px solid #e9ecef; margin-bottom: 25px; }
+        /* Main Content */
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
         
-        /* Comprehensive Table Adjustments */
-        .table th { background-color: #f8f9fa; color: #495057; font-weight: 600; text-transform: uppercase; font-size: 0.80rem; letter-spacing: 0.5px; border-bottom: 2px solid #dee2e6; }
-        .table td { vertical-align: middle; font-size: 0.9rem; }
+        /* Top Navbar */
+        .top-navbar { background: white; padding: 15px 30px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d;}
+
+        /* Tabs Styling */
+        .nav-tabs { border-bottom: 2px solid #e9ecef; margin-bottom: 20px; }
+        .nav-tabs .nav-link { color: #6c757d; font-weight: bold; border: none; border-bottom: 3px solid transparent; padding: 12px 25px; font-size: 1.05rem; }
+        .nav-tabs .nav-link:hover { color: #007a4d; }
+        .nav-tabs .nav-link.active { color: #007a4d; border-bottom: 3px solid #007a4d; background: transparent; }
+
+        /* Edu Card / Tables */
+        .edu-card { background: white; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
+        .edu-header { background-color: #007a4d; color: white; padding: 15px 20px; border-radius: 4px 4px 0 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center;}
         
-        .badge-active { background-color: #d4edda; color: #155724; padding: 5px 8px; border-radius: 6px; font-weight: bold; font-size: 0.8rem; }
-        .badge-suspended { background-color: #f8d7da; color: #721c24; padding: 5px 8px; border-radius: 6px; font-weight: bold; font-size: 0.8rem; }
+        .table th { border-top: none; color: #495057; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; background-color: #f8f9fa; letter-spacing: 0.5px;}
+        .table td { vertical-align: middle; font-size: 0.95rem; }
 
-        .ward-tag { display: inline-block; background: #e9ecef; color: #495057; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; margin: 2px; font-weight: bold; border: 1px solid #ced4da; }
-
-        /* Passport Image Thumbnail */
-        .passport-thumb { width: 55px; height: 55px; object-fit: cover; border-radius: 8px; border: 2px solid #dee2e6; margin-bottom: 5px; background: #f8f9fa; }
-        .passport-placeholder { width: 55px; height: 55px; border-radius: 8px; background: #e9ecef; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; color: #adb5bd; font-size: 1.5rem; margin-left: auto; margin-right: auto;}
+        .role-badge { padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; }
+        .role-student { background-color: #e3f2fd; color: #0d6efd; border: 1px solid #b6d4fe; }
+        .role-teacher { background-color: #f8d7da; color: #dc3545; border: 1px solid #f5c2c7; }
+        .role-admin { background-color: #e8f5e9; color: #198754; border: 1px solid #badbcc; }
 
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
@@ -46,136 +46,112 @@
 <body>
 
     <div id="loadingOverlay">
-        <i class="fas fa-spinner fa-spin fa-3x text-warning mb-3"></i>
-        <h4>Loading User Directory...</h4>
+        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
+        <h4 class="fw-bold text-muted">Loading Directory...</h4>
     </div>
 
     <div class="sidebar">
         <div class="sidebar-brand">
-            <i class="fas fa-shield-alt"></i>
-            <h4 class="text-white fw-bold mb-0">ADMIN PORTAL</h4>
+            <h5 class="text-white fw-bold"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
         </div>
-        
-        <nav class="nav flex-column mt-4">
-            <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard Overview</a>
-            <a href="admin_create_user.html" class="nav-link"><i class="fas fa-user-plus"></i> Generate Accounts</a>
-            <a href="manage_users.html" class="nav-link active"><i class="fas fa-users-cog"></i> Manage Approvals & Data</a>
-            <a href="class_list.html" class="nav-link"><i class="fas fa-clipboard-list"></i> Class Lists & Data</a>
+        <nav class="nav flex-column mt-3">
+            <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            
+            <a href="#usersMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
+                <span><i class="fas fa-users me-2"></i> Accounts</span>
+                <i class="fas fa-caret-down"></i>
+            </a>
+            <div class="collapse show bg-dark mx-2 mt-1 rounded" id="usersMenu">
+                <a href="admin_create_user.html" class="nav-link small py-2"><i class="fas fa-user-plus me-2"></i> Generate Account</a>
+                <a href="manage_users.html" class="nav-link small py-2 active text-success fw-bold"><i class="fas fa-user-check me-2"></i> Approvals</a>
+            </div>
+
+            <a href="class_list.html" class="nav-link mt-2"><i class="fas fa-clipboard-list"></i> Class Data</a>
             <a href="manage_cbt.html" class="nav-link"><i class="fas fa-tasks"></i> Manage CBT</a>
-            <a href="test_analysis.html" class="nav-link"><i class="fas fa-chart-pie"></i> Academic Analysis</a>
+            <a href="test_analysis.html" class="nav-link"><i class="fas fa-chart-pie"></i> Analytics</a>
+
             <hr class="mx-3 my-4 border-secondary">
-            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-sign-out-alt"></i> Secure Logout</a>
+            <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </div>
 
     <div class="main-content">
-        <div class="top-header">
-            <div>
-                <h3 class="fw-bold mb-0 text-dark"><i class="fas fa-users-cog text-warning me-2"></i> User Directory & Data</h3>
-                <p class="text-muted mb-0 mt-1">Review comprehensive profiles, manage access, and link parents.</p>
+        
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-bars me-3 text-muted"></i>
+                <div class="fw-bold text-muted">Security & Access Control</div>
             </div>
-            <a href="admin_create_user.html" class="btn btn-warning fw-bold shadow-sm"><i class="fas fa-plus me-2"></i> Create New Profile</a>
+            <div class="fw-bold text-dark d-flex align-items-center">
+                <span id="adminNameDisplay">Administrator</span>
+                <i class="fas fa-user-shield ms-3 fs-4 text-primary"></i>
+            </div>
         </div>
 
-        <div class="content-card">
-            <ul class="nav nav-tabs" id="userTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button" role="tab"><i class="fas fa-user-graduate me-2"></i> Student Directory</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="teachers-tab" data-bs-toggle="tab" data-bs-target="#teachers" type="button" role="tab"><i class="fas fa-chalkboard-teacher me-2"></i> Staff & Teachers</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="parents-tab" data-bs-toggle="tab" data-bs-target="#parents" type="button" role="tab"><i class="fas fa-user-friends me-2"></i> Parents</button>
-                </li>
-            </ul>
+        <h5 class="text-muted fw-bold mb-4">Home / Accounts / Approvals</h5>
 
-            <div class="tab-content" id="userTabsContent">
-                
-                <div class="tab-pane fade show active" id="students" role="tabpanel">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle table-bordered">
+        <ul class="nav nav-tabs" id="userTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">
+                    <i class="fas fa-clock me-2"></i> Pending Approvals <span class="badge bg-danger ms-1" id="pendingCountBadge">0</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="active-tab" data-bs-toggle="tab" data-bs-target="#activeUsers" type="button" role="tab">
+                    <i class="fas fa-check-circle me-2"></i> Active Directory
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="userTabsContent">
+            
+            <div class="tab-pane fade show active" id="pending" role="tabpanel">
+                <div class="edu-card">
+                    <div class="edu-header bg-warning text-dark">
+                        <span><i class="fas fa-user-clock me-2"></i> Waiting for Admin Approval</span>
+                    </div>
+                    <div class="table-responsive p-0">
+                        <table class="table table-hover mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th width="12%" class="text-center">Profile Data</th>
-                                    <th width="20%">Student Name</th>
-                                    <th width="20%">Parent/Guardian Details</th>
-                                    <th width="20%">Residential Address</th>
-                                    <th width="13%">Class & Status</th>
-                                    <th width="15%" class="text-center">Actions</th>
+                                    <th width="30%">Full Name</th>
+                                    <th width="25%">Email / Username</th>
+                                    <th width="15%" class="text-center">Requested Role</th>
+                                    <th width="30%" class="text-center">Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="studentsTbody">
-                                <tr><td colspan="6" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Fetching records...</td></tr>
+                            <tbody id="pendingListBody">
+                                <tr><td colspan="4" class="text-center py-5">Loading...</td></tr>
                             </tbody>
                         </table>
                     </div>
-                </div>
-
-                <div class="tab-pane fade" id="teachers" role="tabpanel">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead>
-                                <tr>
-                                    <th width="35%">Staff Name</th>
-                                    <th width="30%">Login ID (Email)</th>
-                                    <th width="15%">Status</th>
-                                    <th width="20%">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="teachersTbody">
-                                <tr><td colspan="4" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Fetching records...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="tab-pane fade" id="parents" role="tabpanel">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead>
-                                <tr>
-                                    <th width="25%">Parent Name</th>
-                                    <th width="25%">Login ID (Email)</th>
-                                    <th width="30%">Linked Wards (Students)</th>
-                                    <th width="20%">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="parentsTbody">
-                                <tr><td colspan="4" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Fetching records...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="linkWardModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-warning text-dark border-0">
-                    <h5 class="modal-title fw-bold"><i class="fas fa-link me-2"></i> Link Student to Parent</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <p class="text-muted mb-4">Select a student from the directory to securely link them to <strong id="modalParentName" class="text-dark">--</strong>'s portal.</p>
-                    
-                    <input type="hidden" id="modalParentId">
-                    
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Select Student</label>
-                        <select id="modalStudentSelect" class="form-select border-warning shadow-sm" required>
-                            <option value="">Loading students...</option>
-                        </select>
-                    </div>
-
-                    <button type="button" class="btn btn-dark w-100 fw-bold py-2" id="saveLinkBtn" onclick="window.saveParentLink()">
-                        <i class="fas fa-save me-2"></i> Save Link
-                    </button>
                 </div>
             </div>
+
+            <div class="tab-pane fade" id="activeUsers" role="tabpanel">
+                <div class="edu-card">
+                    <div class="edu-header">
+                        <span><i class="fas fa-users me-2"></i> Official School Directory</span>
+                    </div>
+                    <div class="table-responsive p-0">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="5%" class="text-center">S/N</th>
+                                    <th width="30%">Full Name</th>
+                                    <th width="25%">Email / Username</th>
+                                    <th width="15%" class="text-center">Role</th>
+                                    <th width="25%" class="text-end pe-4">System Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activeListBody">
+                                <tr><td colspan="5" class="text-center py-5">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -183,244 +159,143 @@
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
-        let allStudentsList = []; 
+        let currentAdminId = null;
 
         async function initializePage() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
+                currentAdminId = session.user.id;
 
-                await Promise.all([
-                    loadStudents(),
-                    loadTeachers(),
-                    loadParents()
-                ]);
+                const { data: profile } = await supabase.from('users').select('name').eq('id', currentAdminId).single();
+                if (profile) document.getElementById('adminNameDisplay').innerText = profile.name;
 
-                document.getElementById('loadingOverlay').style.display = 'none';
+                await loadUsers();
+
             } catch (err) {
-                console.error("Initialization Error:", err);
-                alert("Failed to load user directory.");
+                console.error(err);
+                alert("Failed to load user management module.");
             }
         }
+
+        async function loadUsers() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            try {
+                // 1. Fetch Master List of all users
+                const { data: allUsers } = await supabase.from('users').select('*').order('created_at', { ascending: false });
+
+                // 2. Fetch Status from Student and Teacher tables
+                const { data: students } = await supabase.from('students').select('user_id, approved');
+                const { data: teachers } = await supabase.from('teachers').select('user_id, approved');
+
+                const studentMap = {};
+                if (students) students.forEach(s => studentMap[s.user_id] = s.approved);
+
+                const teacherMap = {};
+                if (teachers) teachers.forEach(t => teacherMap[t.user_id] = t.approved);
+
+                let pendingHtml = '';
+                let activeHtml = '';
+                let pendingCount = 0;
+                let activeCount = 1;
+
+                allUsers.forEach(u => {
+                    let isApproved = true; // Admins/Parents default to true for this simple view
+                    
+                    if (u.role === 'student' && studentMap[u.id] === false) isApproved = false;
+                    if (u.role === 'teacher' && teacherMap[u.id] === false) isApproved = false;
+
+                    let roleBadge = '';
+                    if (u.role === 'student') roleBadge = `<span class="role-badge role-student">Student</span>`;
+                    else if (u.role === 'teacher') roleBadge = `<span class="role-badge role-teacher">Teacher</span>`;
+                    else if (u.role === 'admin') roleBadge = `<span class="role-badge role-admin">Admin</span>`;
+                    else roleBadge = `<span class="badge bg-secondary">Other</span>`;
+
+                    if (!isApproved) {
+                        pendingCount++;
+                        pendingHtml += `
+                            <tr>
+                                <td class="fw-bold text-dark">${u.name}</td>
+                                <td class="text-muted">${u.email}</td>
+                                <td class="text-center">${roleBadge}</td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-success fw-bold me-2 px-3 shadow-sm" onclick="window.approveUser('${u.id}', '${u.role}')">
+                                        <i class="fas fa-check"></i> Approve
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger fw-bold px-3" onclick="window.deleteUser('${u.id}')">
+                                        <i class="fas fa-times"></i> Reject
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        // Hide the current admin from the deletion list so they don't lock themselves out
+                        const deleteBtn = (u.id === currentAdminId) 
+                            ? `<span class="text-muted small fw-bold"><i class="fas fa-shield-alt"></i> You (Protected)</span>`
+                            : `<button class="btn btn-sm btn-danger fw-bold shadow-sm" onclick="window.deleteUser('${u.id}')"><i class="fas fa-user-minus me-1"></i> Revoke & Delete</button>`;
+
+                        activeHtml += `
+                            <tr>
+                                <td class="text-center fw-bold text-muted">${activeCount++}</td>
+                                <td class="fw-bold text-dark text-uppercase">${u.name}</td>
+                                <td class="text-muted">${u.email}</td>
+                                <td class="text-center">${roleBadge}</td>
+                                <td class="text-end pe-4">${deleteBtn}</td>
+                            </tr>
+                        `;
+                    }
+                });
+
+                // Update UI
+                document.getElementById('pendingCountBadge').innerText = pendingCount;
+                document.getElementById('pendingListBody').innerHTML = pendingCount > 0 ? pendingHtml : `<tr><td colspan="4" class="text-center py-5 text-muted"><i class="fas fa-check-circle fa-2x mb-2 text-success opacity-50"></i><br>All caught up! No pending approvals.</td></tr>`;
+                document.getElementById('activeListBody').innerHTML = activeHtml;
+
+                document.getElementById('loadingOverlay').style.display = 'none';
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        }
+
+        // Global Action Functions
+        window.approveUser = async function(userId, role) {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            try {
+                if (role === 'student') {
+                    await supabase.from('students').update({ approved: true }).eq('user_id', userId);
+                } else if (role === 'teacher') {
+                    await supabase.from('teachers').update({ approved: true }).eq('user_id', userId);
+                }
+                await loadUsers();
+            } catch (err) {
+                alert("Error approving user.");
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        };
+
+        window.deleteUser = async function(userId) {
+            if (!confirm("WARNING: Are you sure you want to permanently revoke this user's profile data? This will clear them from the school directory.")) return;
+            
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            try {
+                // Delete from profile tables (This revokes their dashboard access via application logic)
+                await supabase.from('students').delete().eq('user_id', userId);
+                await supabase.from('teachers').delete().eq('user_id', userId);
+                await supabase.from('users').delete().eq('id', userId);
+                
+                await loadUsers();
+            } catch (err) {
+                alert("Error deleting user.");
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        };
 
         document.addEventListener('DOMContentLoaded', initializePage);
 
-        // 1. Load Students (Upgraded with full data columns)
-        async function loadStudents() {
-            const tbody = document.getElementById('studentsTbody');
-            try {
-                // Fetching all the new comprehensive columns
-                const { data, error } = await supabase
-                    .from('students')
-                    .select('user_id, approved, surname, first_name, other_name, reg_number, phone_number, address, parent_guardian_name, passport_url, classes(name), users(name, email)')
-                    .order('created_at', { ascending: false });
-
-                if (error) throw error;
-                
-                // Cache for the parent linking modal
-                allStudentsList = data.map(s => ({ id: s.user_id, name: `${s.first_name || ''} ${s.surname || s.users.name}`, class: s.classes?.name || 'No Class' }));
-
-                if (data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-muted">No students found in the database.</td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = data.map(student => {
-                    // Profile Image Setup
-                    const passportImg = student.passport_url 
-                        ? `<img src="${student.passport_url}" class="passport-thumb" alt="Passport">`
-                        : `<div class="passport-placeholder"><i class="fas fa-user"></i></div>`;
-
-                    // Status & Action Buttons
-                    const statusBadge = student.approved 
-                        ? `<span class="badge-active d-block text-center mt-2"><i class="fas fa-check-circle me-1"></i> Active</span>` 
-                        : `<span class="badge-suspended d-block text-center mt-2"><i class="fas fa-lock me-1"></i> Suspended</span>`;
-                    
-                    const actionBtn = student.approved
-                        ? `<button class="btn btn-sm btn-outline-danger w-100 fw-bold" onclick="window.toggleStatus('${student.user_id}', 'students', false)"><i class="fas fa-ban me-1"></i> Suspend</button>`
-                        : `<button class="btn btn-sm btn-success w-100 fw-bold shadow-sm" onclick="window.toggleStatus('${student.user_id}', 'students', true)"><i class="fas fa-check me-1"></i> Approve</button>`;
-
-                    // Display fallback name if comprehensive details aren't filled yet
-                    const displayName = student.surname || student.first_name 
-                        ? `<span class="fw-bold d-block text-dark text-uppercase">${student.surname || ''}</span>
-                           <span>${student.first_name || ''} ${student.other_name || ''}</span>`
-                        : `<span class="fw-bold text-dark">${student.users.name}</span> <br><small class="text-danger">(Incomplete Profile)</small>`;
-
-                    return `
-                        <tr>
-                            <td class="text-center">
-                                ${passportImg}
-                                <div class="small fw-bold text-primary mt-1">${student.reg_number || '--'}</div>
-                            </td>
-                            <td>
-                                ${displayName}
-                                <div class="small text-muted mt-1"><i class="fas fa-envelope me-1"></i> ${student.users.email}</div>
-                                <div class="small text-muted"><i class="fas fa-phone-alt me-1"></i> ${student.phone_number || 'No Phone'}</div>
-                            </td>
-                            <td>
-                                <span class="fw-bold text-dark d-block">${student.parent_guardian_name || 'Not Provided'}</span>
-                            </td>
-                            <td>
-                                <span class="small text-muted">${student.address || 'Not Provided'}</span>
-                            </td>
-                            <td>
-                                <span class="badge bg-light text-dark border d-block text-center p-2 mb-1">${student.classes?.name || 'Unassigned'}</span>
-                                ${statusBadge}
-                            </td>
-                            <td class="text-center">
-                                ${actionBtn}
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-            } catch (err) {
-                console.error(err);
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">Error loading student records.</td></tr>`;
-            }
-        }
-
-        // 2. Load Teachers (Unchanged)
-        async function loadTeachers() {
-            const tbody = document.getElementById('teachersTbody');
-            try {
-                const { data, error } = await supabase.from('teachers').select('user_id, approved, users(name, email)').order('created_at', { ascending: false });
-                if (error) throw error;
-
-                if (data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">No staff found.</td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = data.map(teacher => {
-                    const statusBadge = teacher.approved 
-                        ? `<span class="badge-active"><i class="fas fa-check-circle me-1"></i> Active</span>` 
-                        : `<span class="badge-suspended"><i class="fas fa-lock me-1"></i> Suspended</span>`;
-                    
-                    const actionBtn = teacher.approved
-                        ? `<button class="btn btn-sm btn-outline-danger fw-bold" onclick="window.toggleStatus('${teacher.user_id}', 'teachers', false)"><i class="fas fa-ban me-1"></i> Suspend</button>`
-                        : `<button class="btn btn-sm btn-success fw-bold shadow-sm" onclick="window.toggleStatus('${teacher.user_id}', 'teachers', true)"><i class="fas fa-check me-1"></i> Approve</button>`;
-
-                    return `
-                        <tr>
-                            <td class="fw-bold">${teacher.users.name}</td>
-                            <td class="text-muted small">${teacher.users.email}</td>
-                            <td>${statusBadge}</td>
-                            <td>${actionBtn}</td>
-                        </tr>
-                    `;
-                }).join('');
-            } catch (err) {
-                console.error(err);
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Error loading staff.</td></tr>`;
-            }
-        }
-
-        // 3. Load Parents (Unchanged)
-        async function loadParents() {
-            const tbody = document.getElementById('parentsTbody');
-            try {
-                const { data: parents, error: pErr } = await supabase.from('parents').select('user_id, users(name, email)');
-                if (pErr) throw pErr;
-
-                const { data: links, error: lErr } = await supabase.from('parent_student_link').select('parent_id, users!parent_student_link_student_id_fkey(name)');
-                if (lErr) throw lErr;
-
-                if (parents.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">No parents found.</td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = parents.map(parent => {
-                    const parentLinks = links.filter(l => l.parent_id === parent.user_id);
-                    const wardsHTML = parentLinks.length > 0 
-                        ? parentLinks.map(l => `<span class="ward-tag"><i class="fas fa-user-graduate text-success me-1"></i>${l.users.name}</span>`).join(' ')
-                        : `<span class="text-muted small fst-italic">No students linked</span>`;
-
-                    return `
-                        <tr>
-                            <td class="fw-bold">${parent.users.name}</td>
-                            <td class="text-muted small">${parent.users.email}</td>
-                            <td>${wardsHTML}</td>
-                            <td>
-                                <button class="btn btn-sm btn-warning fw-bold text-dark shadow-sm" onclick="window.openLinkModal('${parent.user_id}', '${parent.users.name}')">
-                                    <i class="fas fa-link me-1"></i> Link Ward
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-            } catch (err) {
-                console.error(err);
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Error loading parents.</td></tr>`;
-            }
-        }
-
-        // 4. Toggle Status (Approve/Suspend)
-        window.toggleStatus = async (userId, table, setApproved) => {
-            const action = setApproved ? "Approve" : "Suspend";
-            if (!confirm(`Are you sure you want to ${action} this account?`)) return;
-
-            try {
-                const { error } = await supabase.from(table).update({ approved: setApproved }).eq('user_id', userId);
-                if (error) throw error;
-                if (table === 'students') await loadStudents();
-                if (table === 'teachers') await loadTeachers();
-            } catch (err) {
-                alert(`Failed to update status: ${err.message}`);
-            }
-        };
-
-        // 5. Parent-Student Linking Logic
-        let modalInstance = null;
-
-        window.openLinkModal = (parentId, parentName) => {
-            document.getElementById('modalParentId').value = parentId;
-            document.getElementById('modalParentName').innerText = parentName;
-
-            const selectEl = document.getElementById('modalStudentSelect');
-            selectEl.innerHTML = `<option value="" disabled selected>-- Select a Student to Link --</option>` + 
-                allStudentsList.map(s => `<option value="${s.id}">${s.name} (${s.class})</option>`).join('');
-
-            if (!modalInstance) {
-                modalInstance = new bootstrap.Modal(document.getElementById('linkWardModal'));
-            }
-            modalInstance.show();
-        };
-
-        window.saveParentLink = async () => {
-            const parentId = document.getElementById('modalParentId').value;
-            const studentId = document.getElementById('modalStudentSelect').value;
-            
-            if (!studentId) return alert("Please select a student from the dropdown.");
-
-            const btn = document.getElementById('saveLinkBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Saving...';
-            btn.disabled = true;
-
-            try {
-                const { error } = await supabase.from('parent_student_link').insert([{ parent_id: parentId, student_id: studentId }]);
-                if (error && error.code === '23505') {
-                    alert("This student is already linked to this parent.");
-                } else if (error) {
-                    throw error;
-                } else {
-                    alert("Student successfully linked to parent!");
-                    modalInstance.hide();
-                    await loadParents();
-                }
-            } catch (err) {
-                alert(`Error linking accounts: ${err.message}`);
-            } finally {
-                btn.innerHTML = '<i class="fas fa-save me-2"></i> Save Link';
-                btn.disabled = false;
-            }
-        };
-
-        // Logout
         document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            await supabase.auth.signOut();
-            window.location.href = 'login.html';
+            e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html';
         });
     </script>
 </body>

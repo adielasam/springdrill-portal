@@ -3,33 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRINGDRILL - Class & Subject Data</title>
+    <title>SPRINGDRILL - Class Data & Results</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f7fa; overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
         
-        /* Sidebar Styling */
-        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding-top: 30px; z-index: 1000; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
-        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-brand i { color: #f1c40f; font-size: 2.5rem; margin-bottom: 10px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 15px 25px; margin: 4px 15px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; text-decoration: none; }
-        .nav-link i { width: 25px; font-size: 1.1rem; }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; transform: translateX(5px); }
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1000; }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center;}
+        .nav-link i { width: 25px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
 
-        /* Main Content Styling */
-        .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
-        .top-header { background: white; padding: 20px 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #0d6efd; }
-
-        /* Data Cards */
-        .content-card { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: none; height: 100%; }
-        .form-control { padding: 12px 15px; border-radius: 8px; border: 1px solid #dee2e6; background-color: #f8f9fa; }
-        .form-control:focus { border-color: #1a3c34; box-shadow: 0 0 0 0.25rem rgba(26, 60, 52, 0.25); background-color: white; }
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
+        .top-navbar { background: white; padding: 15px 30px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d;}
         
-        .list-group-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; font-weight: 500; color: #2c3e50; border-color: #e9ecef; }
-        .list-group-item:hover { background-color: #f8f9fa; }
-        .btn-delete { color: #dc3545; background: none; border: none; transition: transform 0.2s; }
-        .btn-delete:hover { transform: scale(1.1); color: #c82333; }
+        .edu-card { background: white; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
+        .edu-header { background-color: #007a4d; color: white; padding: 12px 20px; border-radius: 4px 4px 0 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center;}
+        .edu-body { padding: 25px; }
+
+        .table th { border-top: none; color: #495057; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; background-color: #f8f9fa; letter-spacing: 0.5px;}
+        .table td { vertical-align: middle; font-size: 0.95rem; }
+
+        .grade-badge { font-weight: bold; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; }
+        .grade-high { background-color: #d4edda; color: #155724; }
+        .grade-mid { background-color: #fff3cd; color: #856404; }
+        .grade-low { background-color: #f8d7da; color: #721c24; }
 
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
@@ -37,81 +36,78 @@
 <body>
 
     <div id="loadingOverlay">
-        <i class="fas fa-spinner fa-spin fa-3x text-primary mb-3"></i>
-        <h4>Loading Academic Data...</h4>
+        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
+        <h4 class="fw-bold text-muted">Loading Directory...</h4>
     </div>
 
     <div class="sidebar">
         <div class="sidebar-brand">
-            <i class="fas fa-shield-alt"></i>
-            <h4 class="text-white fw-bold mb-0">ADMIN PORTAL</h4>
+            <h5 class="text-white fw-bold"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
         </div>
-        
-        <nav class="nav flex-column mt-4">
-            <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard Overview</a>
-            <a href="admin_create_user.html" class="nav-link"><i class="fas fa-user-plus"></i> Generate Accounts</a>
-            <a href="manage_users.html" class="nav-link"><i class="fas fa-users-cog"></i> Manage Approvals</a>
-            <a href="class_list.html" class="nav-link active"><i class="fas fa-clipboard-list"></i> Class Lists & Data</a>
+        <nav class="nav flex-column mt-3">
+            <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="#usersMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2">
+                <span><i class="fas fa-users me-2"></i> Accounts</span><i class="fas fa-caret-down"></i>
+            </a>
+            <div class="collapse bg-dark mx-2 mt-1 rounded" id="usersMenu">
+                <a href="admin_create_user.html" class="nav-link small py-2"><i class="fas fa-user-plus me-2"></i> Generate Account</a>
+                <a href="manage_users.html" class="nav-link small py-2"><i class="fas fa-user-check me-2"></i> Approvals</a>
+            </div>
+            <a href="class_list.html" class="nav-link active mt-2"><i class="fas fa-clipboard-list"></i> Class Data</a>
             <a href="manage_cbt.html" class="nav-link"><i class="fas fa-tasks"></i> Manage CBT</a>
-            <a href="test_analysis.html" class="nav-link"><i class="fas fa-chart-pie"></i> Academic Analysis</a>
+            <a href="test_analysis.html" class="nav-link"><i class="fas fa-chart-pie"></i> Analytics</a>
             <hr class="mx-3 my-4 border-secondary">
-            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-sign-out-alt"></i> Secure Logout</a>
+            <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </div>
 
     <div class="main-content">
-        <div class="top-header">
-            <div>
-                <h3 class="fw-bold mb-0 text-dark"><i class="fas fa-clipboard-list text-primary me-2"></i> Class Lists & Subjects</h3>
-                <p class="text-muted mb-0 mt-1">Manage the core academic data that powers the entire portal.</p>
+        <h5 class="text-muted fw-bold mb-4">Home / Accounts / Class Data & Results</h5>
+
+        <div class="edu-card">
+            <div class="edu-header">
+                <span><i class="fas fa-filter me-2"></i> View Students By Class</span>
             </div>
-        </div>
-
-        <div id="alertBox" class="alert d-none shadow-sm" role="alert"></div>
-
-        <div class="row g-4">
-            <div class="col-lg-6">
-                <div class="content-card">
-                    <h5 class="fw-bold mb-4 border-bottom pb-2"><i class="fas fa-chalkboard text-success me-2"></i> Manage Classes</h5>
-                    
-                    <form id="addClassForm" class="mb-4">
-                        <div class="input-group">
-                            <input type="text" id="classNameInput" class="form-control" placeholder="e.g. Year 7, JSS 2, Grade 10" required>
-                            <button type="submit" class="btn btn-success fw-bold px-4" id="addClassBtn">
-                                <i class="fas fa-plus"></i> Add
-                            </button>
-                        </div>
-                    </form>
-
-                    <div style="max-height: 400px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 8px;">
-                        <ul class="list-group list-group-flush" id="classesList">
-                            <li class="list-group-item text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i> Loading classes...</li>
-                        </ul>
+            <div class="edu-body py-4">
+                <div class="row align-items-end">
+                    <div class="col-md-9">
+                        <label class="form-label fw-bold">Select Class</label>
+                        <select class="form-select border-success fw-bold" id="classSelect">
+                            <option value="">Loading classes...</option>
+                        </select>
                     </div>
-                </div>
-            </div>
-
-            <div class="col-lg-6">
-                <div class="content-card">
-                    <h5 class="fw-bold mb-4 border-bottom pb-2"><i class="fas fa-book text-primary me-2"></i> Manage Subjects</h5>
-                    
-                    <form id="addSubjectForm" class="mb-4">
-                        <div class="input-group">
-                            <input type="text" id="subjectNameInput" class="form-control" placeholder="e.g. Mathematics, ICT, Biology" required>
-                            <button type="submit" class="btn btn-primary fw-bold px-4" id="addSubjectBtn">
-                                <i class="fas fa-plus"></i> Add
-                            </button>
-                        </div>
-                    </form>
-
-                    <div style="max-height: 400px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 8px;">
-                        <ul class="list-group list-group-flush" id="subjectsList">
-                            <li class="list-group-item text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i> Loading subjects...</li>
-                        </ul>
+                    <div class="col-md-3">
+                        <button class="btn btn-success w-100 fw-bold py-2" onclick="window.fetchClassStudents()">
+                            <i class="fas fa-search me-2"></i> Load Students
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="edu-card">
+            <div class="edu-header">
+                <span><i class="fas fa-users me-2"></i> Student Roster & Insights</span>
+            </div>
+            <div class="table-responsive p-0">
+                <table class="table table-hover table-striped mb-0">
+                    <thead class="table-light border-bottom">
+                        <tr>
+                            <th width="5%" class="text-center">S/N</th>
+                            <th width="30%">Student Name</th>
+                            <th width="20%">Reg Number</th>
+                            <th width="15%" class="text-center">CBTs Taken</th>
+                            <th width="15%" class="text-center">Overall Average</th>
+                            <th width="15%" class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentListBody">
+                        <tr><td colspan="6" class="text-center py-5 text-muted">Select a class and click 'Load Students'.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <script type="module">
@@ -122,139 +118,107 @@
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
 
-                await Promise.all([
-                    loadData('classes', 'classesList'),
-                    loadData('subjects', 'subjectsList')
-                ]);
+                const { data: classes } = await supabase.from('classes').select('id, name').order('id');
+                const select = document.getElementById('classSelect');
+                if (classes) {
+                    select.innerHTML = `<option value="" disabled selected>-- Choose a Class --</option>` + 
+                                       classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                }
 
                 document.getElementById('loadingOverlay').style.display = 'none';
             } catch (err) {
-                console.error("Initialization Error:", err);
-                showAlert("Failed to load academic data. Please check your connection.", "danger");
+                console.error(err);
+                document.getElementById('loadingOverlay').style.display = 'none';
             }
         }
 
         document.addEventListener('DOMContentLoaded', initializePage);
 
-        // Utility to display alerts
-        function showAlert(message, type) {
-            const alertBox = document.getElementById('alertBox');
-            alertBox.className = `alert alert-${type} shadow-sm`;
-            alertBox.innerHTML = `<i class="fas ${type === 'danger' ? 'fa-exclamation-triangle' : 'fa-check-circle'} me-2"></i> ${message}`;
-            alertBox.classList.remove('d-none');
-            setTimeout(() => alertBox.classList.add('d-none'), 5000);
-        }
+        window.fetchClassStudents = async function() {
+            const classId = document.getElementById('classSelect').value;
+            if (!classId) return alert("Please select a class first.");
 
-        // 1. Load Data
-        async function loadData(tableName, listId) {
-            const listEl = document.getElementById(listId);
+            const tbody = document.getElementById('studentListBody');
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5"><i class="fas fa-spinner fa-spin me-2"></i> Loading generated accounts...</td></tr>`;
+
             try {
-                const { data, error } = await supabase.from(tableName).select('id, name').order('name', { ascending: true });
+                // 1. Get all students in this class
+                const { data: students, error } = await supabase
+                    .from('students')
+                    .select('user_id, surname, first_name, reg_number, passport_url')
+                    .eq('class_id', classId)
+                    .eq('approved', true)
+                    .order('surname', { ascending: true });
+
                 if (error) throw error;
 
-                if (data.length === 0) {
-                    listEl.innerHTML = `<li class="list-group-item text-muted fst-italic justify-content-center">No ${tableName} found. Add one above.</li>`;
+                if (!students || students.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-muted"><i class="fas fa-user-times fa-3x mb-3 opacity-25"></i><br>No accounts have been generated for this class yet.<br><a href="admin_create_user.html" class="btn btn-sm btn-outline-success mt-2">Go to Account Generator</a></td></tr>`;
                     return;
                 }
 
-                listEl.innerHTML = data.map(item => `
-                    <li class="list-group-item">
-                        <span><i class="fas fa-caret-right text-secondary me-2"></i> ${item.name}</span>
-                        <button class="btn-delete" onclick="window.deleteItem('${tableName}', ${item.id}, '${item.name}')" title="Delete">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </li>
-                `).join('');
+                // 2. Fetch all their test results to calculate averages
+                const studentIds = students.map(s => s.user_id);
+                const { data: results } = await supabase
+                    .from('test_results')
+                    .select('student_id, score, total_questions')
+                    .in('student_id', studentIds);
+
+                // Group results by student
+                const resultStats = {};
+                if (results) {
+                    results.forEach(r => {
+                        if (!resultStats[r.student_id]) resultStats[r.student_id] = { count: 0, totalPercent: 0 };
+                        const percent = (r.score / (r.total_questions || 1)) * 100;
+                        resultStats[r.student_id].count++;
+                        resultStats[r.student_id].totalPercent += percent;
+                    });
+                }
+
+                // 3. Render Table
+                tbody.innerHTML = students.map((s, index) => {
+                    const stats = resultStats[s.user_id] || { count: 0, totalPercent: 0 };
+                    let avg = 0;
+                    let gradeClass = 'grade-low text-muted';
+                    let avgDisplay = 'No Data';
+
+                    if (stats.count > 0) {
+                        avg = Math.round(stats.totalPercent / stats.count);
+                        avgDisplay = `${avg}%`;
+                        if (avg >= 70) gradeClass = 'grade-high';
+                        else if (avg >= 50) gradeClass = 'grade-mid';
+                        else gradeClass = 'grade-low';
+                    }
+
+                    return `
+                        <tr>
+                            <td class="text-center fw-bold text-muted">${index + 1}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="${s.passport_url || `https://ui-avatars.com/api/?name=${s.first_name}+${s.surname}&background=007a4d&color=fff`}" class="rounded-circle me-2" style="width: 35px; height: 35px; object-fit: cover;">
+                                    <span class="fw-bold text-dark text-uppercase">${s.surname || ''} ${s.first_name || ''}</span>
+                                </div>
+                            </td>
+                            <td class="fw-bold text-primary">${s.reg_number || 'N/A'}</td>
+                            <td class="text-center fw-bold">${stats.count}</td>
+                            <td class="text-center"><span class="grade-badge ${gradeClass}">${avgDisplay}</span></td>
+                            <td class="text-center">
+                                <a href="admin_student_report.html?student_id=${s.user_id}" class="btn btn-sm btn-dark fw-bold shadow-sm" title="View Full Result Report">
+                                    <i class="fas fa-file-invoice"></i> View Report
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
             } catch (err) {
-                listEl.innerHTML = `<li class="list-group-item text-danger justify-content-center">Error loading data.</li>`;
                 console.error(err);
-            }
-        }
-
-        // 2. Add Class
-        document.getElementById('addClassForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('addClassBtn');
-            const input = document.getElementById('classNameInput');
-            const name = input.value.trim();
-            
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            btn.disabled = true;
-
-            try {
-                const { error } = await supabase.from('classes').insert([{ name: name }]);
-                if (error) {
-                    if (error.code === '23505') throw new Error("A class with this name already exists.");
-                    throw error;
-                }
-                input.value = '';
-                showAlert(`Class "${name}" added successfully!`, "success");
-                await loadData('classes', 'classesList');
-            } catch (err) {
-                showAlert(err.message, "danger");
-            } finally {
-                btn.innerHTML = '<i class="fas fa-plus"></i> Add';
-                btn.disabled = false;
-            }
-        });
-
-        // 3. Add Subject
-        document.getElementById('addSubjectForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('addSubjectBtn');
-            const input = document.getElementById('subjectNameInput');
-            const name = input.value.trim();
-            
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            btn.disabled = true;
-
-            try {
-                const { error } = await supabase.from('subjects').insert([{ name: name }]);
-                if (error) {
-                    if (error.code === '23505') throw new Error("A subject with this name already exists.");
-                    throw error;
-                }
-                input.value = '';
-                showAlert(`Subject "${name}" added successfully!`, "success");
-                await loadData('subjects', 'subjectsList');
-            } catch (err) {
-                showAlert(err.message, "danger");
-            } finally {
-                btn.innerHTML = '<i class="fas fa-plus"></i> Add';
-                btn.disabled = false;
-            }
-        });
-
-        // 4. Delete Item (Class or Subject)
-        window.deleteItem = async (tableName, id, name) => {
-            if (!confirm(`Are you sure you want to delete "${name}"? \n\nNote: If this is currently being used by students or tests, the system will block the deletion.`)) {
-                return;
-            }
-
-            try {
-                const { error } = await supabase.from(tableName).delete().eq('id', id);
-                
-                // Handle Foreign Key Constraint Violations
-                if (error && error.code === '23503') {
-                    throw new Error(`Cannot delete "${name}" because it is currently assigned to active students, questions, or tests.`);
-                } else if (error) {
-                    throw error;
-                }
-
-                showAlert(`Successfully deleted "${name}".`, "success");
-                const listId = tableName === 'classes' ? 'classesList' : 'subjectsList';
-                await loadData(tableName, listId);
-
-            } catch (err) {
-                showAlert(err.message, "danger");
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">Error loading class data.</td></tr>`;
             }
         };
 
-        // Logout
         document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            await supabase.auth.signOut();
-            window.location.href = 'login.html';
+            e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html';
         });
     </script>
 </body>
