@@ -3,52 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRINGDRILL - Manage Approvals</title>
+    <title>SPRINGDRILL - Approvals</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
-        
-        /* Sidebar Styling (Educare Clone) */
         .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1000; }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
         .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center;}
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
-
-        /* Main Content */
         .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
-        
-        /* Top Navbar */
-        .top-navbar { background: white; padding: 15px 30px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d;}
-
-        /* Tabs Styling */
-        .nav-tabs { border-bottom: 2px solid #e9ecef; margin-bottom: 20px; }
-        .nav-tabs .nav-link { color: #6c757d; font-weight: bold; border: none; border-bottom: 3px solid transparent; padding: 12px 25px; font-size: 1.05rem; }
-        .nav-tabs .nav-link:hover { color: #007a4d; }
+        .nav-tabs { border-bottom: 2px solid #e9ecef; margin-bottom: 20px; margin-top: 20px; }
+        .nav-tabs .nav-link { color: #6c757d; font-weight: bold; border: none; border-bottom: 3px solid transparent; padding: 12px 25px;}
         .nav-tabs .nav-link.active { color: #007a4d; border-bottom: 3px solid #007a4d; background: transparent; }
-
-        /* Edu Card / Tables */
         .edu-card { background: white; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
-        .edu-header { background-color: #007a4d; color: white; padding: 15px 20px; border-radius: 4px 4px 0 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center;}
-        
-        .table th { border-top: none; color: #495057; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; background-color: #f8f9fa; letter-spacing: 0.5px;}
+        .edu-header { background-color: #007a4d; color: white; padding: 15px 20px; border-radius: 4px 4px 0 0; font-weight: bold;}
+        .table th { border-top: none; color: #495057; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; background-color: #f8f9fa;}
         .table td { vertical-align: middle; font-size: 0.95rem; }
-
-        .role-badge { padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; }
-        .role-student { background-color: #e3f2fd; color: #0d6efd; border: 1px solid #b6d4fe; }
-        .role-teacher { background-color: #f8d7da; color: #dc3545; border: 1px solid #f5c2c7; }
-        .role-admin { background-color: #e8f5e9; color: #198754; border: 1px solid #badbcc; }
-
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
 <body>
-
-    <div id="loadingOverlay">
-        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
-        <h4 class="fw-bold text-muted">Loading Directory...</h4>
-    </div>
+    <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i><h4 class="fw-bold text-muted">Loading Directory...</h4></div>
 
     <div class="sidebar">
         <div class="sidebar-brand">
@@ -58,17 +35,13 @@
             <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             
             <a href="#usersMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
-                <span><i class="fas fa-users me-2"></i> Accounts</span>
-                <i class="fas fa-caret-down"></i>
+                <span><i class="fas fa-users me-2"></i> Accounts</span><i class="fas fa-caret-down"></i>
             </a>
             <div class="collapse show bg-dark mx-2 mt-1 rounded" id="usersMenu">
                 <a href="admin_create_user.html" class="nav-link small py-2"><i class="fas fa-user-plus me-2"></i> Generate Account</a>
                 <a href="manage_users.html" class="nav-link small py-2 active text-success fw-bold"><i class="fas fa-user-check me-2"></i> Approvals</a>
+                <a href="class_list.html" class="nav-link small py-2"><i class="fas fa-clipboard-list me-2"></i> Class Data</a>
             </div>
-
-            <a href="class_list.html" class="nav-link mt-2"><i class="fas fa-clipboard-list"></i> Class Data</a>
-            <a href="manage_cbt.html" class="nav-link"><i class="fas fa-tasks"></i> Manage CBT</a>
-            <a href="test_analysis.html" class="nav-link"><i class="fas fa-chart-pie"></i> Analytics</a>
 
             <hr class="mx-3 my-4 border-secondary">
             <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -76,227 +49,95 @@
     </div>
 
     <div class="main-content">
-        
-        <div class="top-navbar">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-bars me-3 text-muted"></i>
-                <div class="fw-bold text-muted">Security & Access Control</div>
-            </div>
-            <div class="fw-bold text-dark d-flex align-items-center">
-                <span id="adminNameDisplay">Administrator</span>
-                <i class="fas fa-user-shield ms-3 fs-4 text-primary"></i>
-            </div>
-        </div>
-
-        <h5 class="text-muted fw-bold mb-4">Home / Accounts / Approvals</h5>
+        <h5 class="text-muted fw-bold mb-4 mt-3">Home / Accounts / Approvals</h5>
 
         <ul class="nav nav-tabs" id="userTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">
-                    <i class="fas fa-clock me-2"></i> Pending Approvals <span class="badge bg-danger ms-1" id="pendingCountBadge">0</span>
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="active-tab" data-bs-toggle="tab" data-bs-target="#activeUsers" type="button" role="tab">
-                    <i class="fas fa-check-circle me-2"></i> Active Directory
-                </button>
-            </li>
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#pending" type="button"><i class="fas fa-clock me-2"></i> Pending Approvals</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#activeUsers" type="button"><i class="fas fa-check-circle me-2"></i> Active Directory</button></li>
         </ul>
 
         <div class="tab-content" id="userTabsContent">
-            
-            <div class="tab-pane fade show active" id="pending" role="tabpanel">
+            <div class="tab-pane fade show active" id="pending">
                 <div class="edu-card">
-                    <div class="edu-header bg-warning text-dark">
-                        <span><i class="fas fa-user-clock me-2"></i> Waiting for Admin Approval</span>
-                    </div>
+                    <div class="edu-header bg-warning text-dark"><i class="fas fa-user-clock me-2"></i> Waiting for Admin Approval</div>
                     <div class="table-responsive p-0">
                         <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th width="30%">Full Name</th>
-                                    <th width="25%">Email / Username</th>
-                                    <th width="15%" class="text-center">Requested Role</th>
-                                    <th width="30%" class="text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pendingListBody">
-                                <tr><td colspan="4" class="text-center py-5">Loading...</td></tr>
-                            </tbody>
+                            <thead class="table-light"><tr><th width="30%">Full Name</th><th width="25%">Email</th><th width="15%" class="text-center">Role</th><th width="30%" class="text-center">Action</th></tr></thead>
+                            <tbody id="pendingListBody"><tr><td colspan="4" class="text-center py-5">Loading...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
             </div>
-
-            <div class="tab-pane fade" id="activeUsers" role="tabpanel">
+            <div class="tab-pane fade" id="activeUsers">
                 <div class="edu-card">
-                    <div class="edu-header">
-                        <span><i class="fas fa-users me-2"></i> Official School Directory</span>
-                    </div>
+                    <div class="edu-header"><i class="fas fa-users me-2"></i> Official School Directory</div>
                     <div class="table-responsive p-0">
                         <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th width="5%" class="text-center">S/N</th>
-                                    <th width="30%">Full Name</th>
-                                    <th width="25%">Email / Username</th>
-                                    <th width="15%" class="text-center">Role</th>
-                                    <th width="25%" class="text-end pe-4">System Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="activeListBody">
-                                <tr><td colspan="5" class="text-center py-5">Loading...</td></tr>
-                            </tbody>
+                            <thead class="table-light"><tr><th width="5%" class="text-center">S/N</th><th width="30%">Full Name</th><th width="25%">Email</th><th width="15%" class="text-center">Role</th><th width="25%" class="text-end pe-4">Action</th></tr></thead>
+                            <tbody id="activeListBody"><tr><td colspan="5" class="text-center py-5">Loading...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
-
         let currentAdminId = null;
 
-        async function initializePage() {
+        async function loadUsers() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
-                if (!session) return window.location.href = 'login.html';
                 currentAdminId = session.user.id;
 
-                const { data: profile } = await supabase.from('users').select('name').eq('id', currentAdminId).single();
-                if (profile) document.getElementById('adminNameDisplay').innerText = profile.name;
-
-                await loadUsers();
-
-            } catch (err) {
-                console.error(err);
-                alert("Failed to load user management module.");
-            }
-        }
-
-        async function loadUsers() {
-            document.getElementById('loadingOverlay').style.display = 'flex';
-            try {
-                // 1. Fetch Master List of all users
                 const { data: allUsers } = await supabase.from('users').select('*').order('created_at', { ascending: false });
-
-                // 2. Fetch Status from Student and Teacher tables
                 const { data: students } = await supabase.from('students').select('user_id, approved');
                 const { data: teachers } = await supabase.from('teachers').select('user_id, approved');
 
-                const studentMap = {};
-                if (students) students.forEach(s => studentMap[s.user_id] = s.approved);
+                const sMap = {}; if (students) students.forEach(s => sMap[s.user_id] = s.approved);
+                const tMap = {}; if (teachers) teachers.forEach(t => tMap[t.user_id] = t.approved);
 
-                const teacherMap = {};
-                if (teachers) teachers.forEach(t => teacherMap[t.user_id] = t.approved);
-
-                let pendingHtml = '';
-                let activeHtml = '';
-                let pendingCount = 0;
-                let activeCount = 1;
+                let pHtml = '', aHtml = '', aCount = 1;
 
                 allUsers.forEach(u => {
-                    let isApproved = true; // Admins/Parents default to true for this simple view
-                    
-                    if (u.role === 'student' && studentMap[u.id] === false) isApproved = false;
-                    if (u.role === 'teacher' && teacherMap[u.id] === false) isApproved = false;
+                    let approved = true;
+                    if (u.role === 'student' && sMap[u.id] === false) approved = false;
+                    if (u.role === 'teacher' && tMap[u.id] === false) approved = false;
 
-                    let roleBadge = '';
-                    if (u.role === 'student') roleBadge = `<span class="role-badge role-student">Student</span>`;
-                    else if (u.role === 'teacher') roleBadge = `<span class="role-badge role-teacher">Teacher</span>`;
-                    else if (u.role === 'admin') roleBadge = `<span class="role-badge role-admin">Admin</span>`;
-                    else roleBadge = `<span class="badge bg-secondary">Other</span>`;
-
-                    if (!isApproved) {
-                        pendingCount++;
-                        pendingHtml += `
-                            <tr>
-                                <td class="fw-bold text-dark">${u.name}</td>
-                                <td class="text-muted">${u.email}</td>
-                                <td class="text-center">${roleBadge}</td>
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-success fw-bold me-2 px-3 shadow-sm" onclick="window.approveUser('${u.id}', '${u.role}')">
-                                        <i class="fas fa-check"></i> Approve
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger fw-bold px-3" onclick="window.deleteUser('${u.id}')">
-                                        <i class="fas fa-times"></i> Reject
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
+                    if (!approved) {
+                        pHtml += `<tr><td class="fw-bold">${u.name}</td><td>${u.email}</td><td class="text-center text-uppercase fw-bold">${u.role}</td><td class="text-center"><button class="btn btn-sm btn-success fw-bold me-2 px-3" onclick="window.approveUser('${u.id}', '${u.role}')">Approve</button></td></tr>`;
                     } else {
-                        // Hide the current admin from the deletion list so they don't lock themselves out
-                        const deleteBtn = (u.id === currentAdminId) 
-                            ? `<span class="text-muted small fw-bold"><i class="fas fa-shield-alt"></i> You (Protected)</span>`
-                            : `<button class="btn btn-sm btn-danger fw-bold shadow-sm" onclick="window.deleteUser('${u.id}')"><i class="fas fa-user-minus me-1"></i> Revoke & Delete</button>`;
-
-                        activeHtml += `
-                            <tr>
-                                <td class="text-center fw-bold text-muted">${activeCount++}</td>
-                                <td class="fw-bold text-dark text-uppercase">${u.name}</td>
-                                <td class="text-muted">${u.email}</td>
-                                <td class="text-center">${roleBadge}</td>
-                                <td class="text-end pe-4">${deleteBtn}</td>
-                            </tr>
-                        `;
+                        const delBtn = (u.id === currentAdminId) ? `<span class="text-muted small fw-bold">You (Protected)</span>` : `<button class="btn btn-sm btn-danger fw-bold" onclick="window.deleteUser('${u.id}')">Delete</button>`;
+                        aHtml += `<tr><td class="text-center fw-bold text-muted">${aCount++}</td><td class="fw-bold">${u.name}</td><td>${u.email}</td><td class="text-center text-uppercase fw-bold">${u.role}</td><td class="text-end pe-4">${delBtn}</td></tr>`;
                     }
                 });
 
-                // Update UI
-                document.getElementById('pendingCountBadge').innerText = pendingCount;
-                document.getElementById('pendingListBody').innerHTML = pendingCount > 0 ? pendingHtml : `<tr><td colspan="4" class="text-center py-5 text-muted"><i class="fas fa-check-circle fa-2x mb-2 text-success opacity-50"></i><br>All caught up! No pending approvals.</td></tr>`;
-                document.getElementById('activeListBody').innerHTML = activeHtml;
-
+                document.getElementById('pendingListBody').innerHTML = pHtml || `<tr><td colspan="4" class="text-center py-5 text-muted">No pending approvals.</td></tr>`;
+                document.getElementById('activeListBody').innerHTML = aHtml;
                 document.getElementById('loadingOverlay').style.display = 'none';
-
-            } catch (err) {
-                console.error(err);
-                document.getElementById('loadingOverlay').style.display = 'none';
-            }
+            } catch (err) { console.error(err); }
         }
 
-        // Global Action Functions
         window.approveUser = async function(userId, role) {
             document.getElementById('loadingOverlay').style.display = 'flex';
-            try {
-                if (role === 'student') {
-                    await supabase.from('students').update({ approved: true }).eq('user_id', userId);
-                } else if (role === 'teacher') {
-                    await supabase.from('teachers').update({ approved: true }).eq('user_id', userId);
-                }
-                await loadUsers();
-            } catch (err) {
-                alert("Error approving user.");
-                document.getElementById('loadingOverlay').style.display = 'none';
-            }
+            if (role === 'student') await supabase.from('students').update({ approved: true }).eq('user_id', userId);
+            else if (role === 'teacher') await supabase.from('teachers').update({ approved: true }).eq('user_id', userId);
+            await loadUsers();
         };
 
         window.deleteUser = async function(userId) {
-            if (!confirm("WARNING: Are you sure you want to permanently revoke this user's profile data? This will clear them from the school directory.")) return;
-            
+            if (!confirm("Are you sure you want to permanently delete this user?")) return;
             document.getElementById('loadingOverlay').style.display = 'flex';
-            try {
-                // Delete from profile tables (This revokes their dashboard access via application logic)
-                await supabase.from('students').delete().eq('user_id', userId);
-                await supabase.from('teachers').delete().eq('user_id', userId);
-                await supabase.from('users').delete().eq('id', userId);
-                
-                await loadUsers();
-            } catch (err) {
-                alert("Error deleting user.");
-                document.getElementById('loadingOverlay').style.display = 'none';
-            }
+            await supabase.from('students').delete().eq('user_id', userId);
+            await supabase.from('teachers').delete().eq('user_id', userId);
+            await supabase.from('users').delete().eq('id', userId);
+            await loadUsers();
         };
 
-        document.addEventListener('DOMContentLoaded', initializePage);
-
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html';
-        });
+        document.addEventListener('DOMContentLoaded', loadUsers);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
     </script>
 </body>
 </html>

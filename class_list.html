@@ -3,42 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRINGDRILL - Class Data & Results</title>
+    <title>SPRINGDRILL - Class Data</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
-        
         .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1000; }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
         .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center;}
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
-
         .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
-        .top-navbar { background: white; padding: 15px 30px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d;}
-        
-        .edu-card { background: white; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
-        .edu-header { background-color: #007a4d; color: white; padding: 12px 20px; border-radius: 4px 4px 0 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center;}
+        .edu-card { background: white; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; margin-top: 20px;}
+        .edu-header { background-color: #007a4d; color: white; padding: 12px 20px; border-radius: 4px 4px 0 0; font-weight: bold;}
         .edu-body { padding: 25px; }
-
-        .table th { border-top: none; color: #495057; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; background-color: #f8f9fa; letter-spacing: 0.5px;}
+        .table th { border-top: none; color: #495057; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; background-color: #f8f9fa;}
         .table td { vertical-align: middle; font-size: 0.95rem; }
-
-        .grade-badge { font-weight: bold; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; }
-        .grade-high { background-color: #d4edda; color: #155724; }
-        .grade-mid { background-color: #fff3cd; color: #856404; }
-        .grade-low { background-color: #f8d7da; color: #721c24; }
-
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
 <body>
-
-    <div id="loadingOverlay">
-        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
-        <h4 class="fw-bold text-muted">Loading Directory...</h4>
-    </div>
+    <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i><h4 class="fw-bold text-muted">Loading Directory...</h4></div>
 
     <div class="sidebar">
         <div class="sidebar-brand">
@@ -46,16 +31,16 @@
         </div>
         <nav class="nav flex-column mt-3">
             <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="#usersMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2">
+            
+            <a href="#usersMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
                 <span><i class="fas fa-users me-2"></i> Accounts</span><i class="fas fa-caret-down"></i>
             </a>
-            <div class="collapse bg-dark mx-2 mt-1 rounded" id="usersMenu">
+            <div class="collapse show bg-dark mx-2 mt-1 rounded" id="usersMenu">
                 <a href="admin_create_user.html" class="nav-link small py-2"><i class="fas fa-user-plus me-2"></i> Generate Account</a>
                 <a href="manage_users.html" class="nav-link small py-2"><i class="fas fa-user-check me-2"></i> Approvals</a>
+                <a href="class_list.html" class="nav-link small py-2 active text-success fw-bold"><i class="fas fa-clipboard-list me-2"></i> Class Data</a>
             </div>
-            <a href="class_list.html" class="nav-link active mt-2"><i class="fas fa-clipboard-list"></i> Class Data</a>
-            <a href="manage_cbt.html" class="nav-link"><i class="fas fa-tasks"></i> Manage CBT</a>
-            <a href="test_analysis.html" class="nav-link"><i class="fas fa-chart-pie"></i> Analytics</a>
+
             <hr class="mx-3 my-4 border-secondary">
             <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
@@ -65,30 +50,22 @@
         <h5 class="text-muted fw-bold mb-4">Home / Accounts / Class Data & Results</h5>
 
         <div class="edu-card">
-            <div class="edu-header">
-                <span><i class="fas fa-filter me-2"></i> View Students By Class</span>
-            </div>
+            <div class="edu-header"><i class="fas fa-filter me-2"></i> View Students By Class</div>
             <div class="edu-body py-4">
                 <div class="row align-items-end">
                     <div class="col-md-9">
                         <label class="form-label fw-bold">Select Class</label>
-                        <select class="form-select border-success fw-bold" id="classSelect">
-                            <option value="">Loading classes...</option>
-                        </select>
+                        <select class="form-select border-success fw-bold" id="classSelect"><option value="">Loading classes...</option></select>
                     </div>
                     <div class="col-md-3">
-                        <button class="btn btn-success w-100 fw-bold py-2" onclick="window.fetchClassStudents()">
-                            <i class="fas fa-search me-2"></i> Load Students
-                        </button>
+                        <button class="btn btn-success w-100 fw-bold py-2" onclick="window.fetchClassStudents()"><i class="fas fa-search me-2"></i> Load Students</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="edu-card">
-            <div class="edu-header">
-                <span><i class="fas fa-users me-2"></i> Student Roster & Insights</span>
-            </div>
+            <div class="edu-header"><i class="fas fa-users me-2"></i> Student Roster & Insights</div>
             <div class="table-responsive p-0">
                 <table class="table table-hover table-striped mb-0">
                     <thead class="table-light border-bottom">
@@ -107,9 +84,9 @@
                 </table>
             </div>
         </div>
-
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
@@ -119,107 +96,57 @@
                 if (!session) return window.location.href = 'login.html';
 
                 const { data: classes } = await supabase.from('classes').select('id, name').order('id');
-                const select = document.getElementById('classSelect');
                 if (classes) {
-                    select.innerHTML = `<option value="" disabled selected>-- Choose a Class --</option>` + 
+                    document.getElementById('classSelect').innerHTML = `<option value="" disabled selected>-- Choose a Class --</option>` + 
                                        classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
                 }
-
                 document.getElementById('loadingOverlay').style.display = 'none';
-            } catch (err) {
-                console.error(err);
-                document.getElementById('loadingOverlay').style.display = 'none';
-            }
+            } catch (err) { console.error(err); }
         }
-
-        document.addEventListener('DOMContentLoaded', initializePage);
 
         window.fetchClassStudents = async function() {
             const classId = document.getElementById('classSelect').value;
             if (!classId) return alert("Please select a class first.");
-
             const tbody = document.getElementById('studentListBody');
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5"><i class="fas fa-spinner fa-spin me-2"></i> Loading generated accounts...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5"><i class="fas fa-spinner fa-spin me-2"></i> Loading...</td></tr>`;
 
             try {
-                // 1. Get all students in this class
-                const { data: students, error } = await supabase
-                    .from('students')
-                    .select('user_id, surname, first_name, reg_number, passport_url')
-                    .eq('class_id', classId)
-                    .eq('approved', true)
-                    .order('surname', { ascending: true });
+                const { data: students, error } = await supabase.from('students').select('user_id, surname, first_name, reg_number, passport_url').eq('class_id', classId).eq('approved', true);
+                if (error || !students || students.length === 0) return tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5">No students found.</td></tr>`;
 
-                if (error) throw error;
-
-                if (!students || students.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-muted"><i class="fas fa-user-times fa-3x mb-3 opacity-25"></i><br>No accounts have been generated for this class yet.<br><a href="admin_create_user.html" class="btn btn-sm btn-outline-success mt-2">Go to Account Generator</a></td></tr>`;
-                    return;
-                }
-
-                // 2. Fetch all their test results to calculate averages
                 const studentIds = students.map(s => s.user_id);
-                const { data: results } = await supabase
-                    .from('test_results')
-                    .select('student_id, score, total_questions')
-                    .in('student_id', studentIds);
+                const { data: results } = await supabase.from('test_results').select('student_id, score, total_questions').in('student_id', studentIds);
 
-                // Group results by student
                 const resultStats = {};
                 if (results) {
                     results.forEach(r => {
                         if (!resultStats[r.student_id]) resultStats[r.student_id] = { count: 0, totalPercent: 0 };
-                        const percent = (r.score / (r.total_questions || 1)) * 100;
                         resultStats[r.student_id].count++;
-                        resultStats[r.student_id].totalPercent += percent;
+                        resultStats[r.student_id].totalPercent += (r.score / (r.total_questions || 1)) * 100;
                     });
                 }
 
-                // 3. Render Table
-                tbody.innerHTML = students.map((s, index) => {
+                tbody.innerHTML = students.map((s, i) => {
                     const stats = resultStats[s.user_id] || { count: 0, totalPercent: 0 };
-                    let avg = 0;
-                    let gradeClass = 'grade-low text-muted';
-                    let avgDisplay = 'No Data';
-
-                    if (stats.count > 0) {
-                        avg = Math.round(stats.totalPercent / stats.count);
-                        avgDisplay = `${avg}%`;
-                        if (avg >= 70) gradeClass = 'grade-high';
-                        else if (avg >= 50) gradeClass = 'grade-mid';
-                        else gradeClass = 'grade-low';
-                    }
-
+                    let avgDisplay = stats.count > 0 ? `${Math.round(stats.totalPercent / stats.count)}%` : 'No Data';
                     return `
                         <tr>
-                            <td class="text-center fw-bold text-muted">${index + 1}</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <img src="${s.passport_url || `https://ui-avatars.com/api/?name=${s.first_name}+${s.surname}&background=007a4d&color=fff`}" class="rounded-circle me-2" style="width: 35px; height: 35px; object-fit: cover;">
-                                    <span class="fw-bold text-dark text-uppercase">${s.surname || ''} ${s.first_name || ''}</span>
-                                </div>
-                            </td>
+                            <td class="text-center fw-bold">${i + 1}</td>
+                            <td><span class="fw-bold text-dark text-uppercase">${s.surname || ''} ${s.first_name || ''}</span></td>
                             <td class="fw-bold text-primary">${s.reg_number || 'N/A'}</td>
                             <td class="text-center fw-bold">${stats.count}</td>
-                            <td class="text-center"><span class="grade-badge ${gradeClass}">${avgDisplay}</span></td>
+                            <td class="text-center fw-bold">${avgDisplay}</td>
                             <td class="text-center">
-                                <a href="admin_student_report.html?student_id=${s.user_id}" class="btn btn-sm btn-dark fw-bold shadow-sm" title="View Full Result Report">
-                                    <i class="fas fa-file-invoice"></i> View Report
-                                </a>
+                                <a href="admin_student_report.html?student_id=${s.user_id}" class="btn btn-sm btn-dark fw-bold"><i class="fas fa-file-invoice"></i> Report</a>
                             </td>
                         </tr>
                     `;
                 }).join('');
-
-            } catch (err) {
-                console.error(err);
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">Error loading class data.</td></tr>`;
-            }
+            } catch (err) { console.error(err); }
         };
 
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html';
-        });
+        document.addEventListener('DOMContentLoaded', initializePage);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
     </script>
 </body>
 </html>

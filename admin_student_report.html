@@ -9,115 +9,69 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body { background-color: #525659; font-family: 'Times New Roman', Times, serif; }
-        
-        .action-bar { background: #2c3e50; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);}
+        .action-bar { background: #1a3c34; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);}
         .action-bar button { font-family: sans-serif; font-weight: bold; padding: 10px 25px; font-size: 1.1rem;}
-
-        /* A4 Paper Styling */
+        
+        /* A4 Report Card Container */
         .report-wrapper { display: flex; justify-content: center; padding: 40px 0; }
         .report-card { background: white; width: 210mm; min-height: 297mm; padding: 40px 50px; box-shadow: 0 0 20px rgba(0,0,0,0.5); position: relative; }
-
-        /* Report Header Styling to Match Image */
+        
         .school-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 20px;}
         .school-title-section { text-align: center; flex-grow: 1; }
-        .school-name { font-size: 36px; font-weight: 900; color: #008000; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000; letter-spacing: 1px; margin-bottom: 5px; font-family: 'Arial Black', sans-serif;}
+        .school-name { font-size: 36px; font-weight: 900; color: #007a4d; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000; letter-spacing: 1px; margin-bottom: 5px; font-family: 'Arial Black', sans-serif;}
         .school-address { font-size: 14px; font-weight: bold; text-transform: uppercase; margin-bottom: 5px;}
         .school-contact { font-size: 14px; margin-bottom: 15px; }
-        .report-title { font-size: 18px; font-weight: bold; color: #008000; text-decoration: underline; text-transform: uppercase;}
-
+        .report-title { font-size: 18px; font-weight: bold; color: #007a4d; text-decoration: underline; text-transform: uppercase;}
+        
         .student-photo { width: 120px; height: 140px; border: 2px solid #000; object-fit: cover; }
         .logo-placeholder { width: 100px; height: 100px; object-fit: contain;}
-
-        /* Student Details Area */
-        .details-row { display: flex; justify-content: space-between; font-size: 15px; font-weight: bold; color: #ff0000; text-transform: uppercase; margin-bottom: 15px;}
-        .details-row span { color: #000; }
         
-        .attendance-area { text-align: center; font-size: 15px; font-weight: bold; color: #ff0000; margin: 20px 0;}
+        .details-row { display: flex; justify-content: space-between; font-size: 15px; font-weight: bold; color: #d9534f; text-transform: uppercase; margin-bottom: 15px;}
+        .details-row span { color: #000; }
+        .attendance-area { text-align: center; font-size: 15px; font-weight: bold; color: #d9534f; margin: 20px 0;}
         .attendance-area span { color: #000; }
-
-        /* The Data Table */
+        
         table.report-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 2px solid #000; }
         table.report-table th, table.report-table td { border: 1px solid #000; padding: 6px; text-align: center; font-size: 13px; font-weight: bold; }
-        table.report-table th { font-size: 12px; }
         table.report-table td.subj-name { text-align: left; text-transform: uppercase; }
-        table.report-table td.teacher-name { text-transform: uppercase; font-size: 11px; }
-
-        /* Footer Remarks */
+        
         .footer-section { border: 2px solid #000; padding: 10px; font-size: 14px; font-weight: bold; text-transform: uppercase; line-height: 1.8;}
     </style>
 </head>
 <body>
-
     <div class="action-bar" id="actionBar">
-        <a href="admin_dashboard.html" class="btn btn-outline-light me-3"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
-        <button class="btn btn-success shadow" onclick="downloadPDF()"><i class="fas fa-file-pdf me-2"></i> Download Official Report Card</button>
+        <a href="class_list.html" class="btn btn-outline-light me-3"><i class="fas fa-arrow-left"></i> Back to Directory</a>
+        <button class="btn btn-success shadow" onclick="window.downloadPDF()"><i class="fas fa-file-pdf me-2"></i> Download Official Report Card</button>
     </div>
 
     <div class="report-wrapper">
         <div class="report-card" id="printableReport">
-            
             <div class="school-header">
-                <img src="" id="photoBox" class="student-photo" alt="Student Photo">
+                <img src="" id="photoBox" class="student-photo">
                 <div class="school-title-section">
-                    <div class="school-name">SPRING VALLEY HIGH SCHOOL</div>
-                    <div class="school-address">PLOT 5 SPRING VALLEY AVENUE, OFF NTA/CHOBA ROAD, PORT HARCOURT</div>
-                    <div class="school-contact">Email : admin@springvalleyschool.com<br>Website: www.springvalleyschool.com.ng</div>
+                    <div class="school-name">SPRINGDRILL ACADEMY</div>
+                    <div class="school-address">123 SPRINGDRILL AVENUE, EDUCATION DISTRICT</div>
+                    <div class="school-contact">Email : admin@springdrill.edu<br>Website: www.springdrill.edu</div>
                     <div class="report-title">PROGRESS REPORT</div>
                 </div>
-                <img src="https://cdn-icons-png.flaticon.com/512/3233/3233483.png" class="logo-placeholder" alt="School Logo">
+                <img src="https://cdn-icons-png.flaticon.com/512/3233/3233483.png" class="logo-placeholder">
             </div>
 
-            <div class="details-row">
-                <div>NAME: <span id="rName">LOADING...</span></div>
-                <div>CLASS: <span id="rClass">LOADING...</span></div>
-            </div>
-            
-            <div class="details-row">
-                <div>STUDENT ID: <span id="rId">--</span></div>
-                <div>TERM: <span>FIRST TERM</span></div>
-            </div>
-            
-            <div class="details-row">
-                <div>WEIGHT: <span>--</span></div>
-                <div>HEIGHT: <span>--</span></div>
-            </div>
-
-            <div class="details-row text-danger">
-                <div>SCHOOL RE-OPENS: <span>TBA</span></div>
-                <div>SESSION: <span>2025/2026</span></div>
-            </div>
-
-            <div class="attendance-area">
-                <div>NO OF TIMES ABSENT: <span>0</span></div>
-                <div class="mt-2">NO OF TIMES SCHOOL OPENED: <span>110</span></div>
-            </div>
+            <div class="details-row"><div>NAME: <span id="rName">LOADING...</span></div><div>CLASS: <span id="rClass">LOADING...</span></div></div>
+            <div class="details-row"><div>STUDENT ID: <span id="rId">--</span></div><div>TERM: <span>FIRST TERM</span></div></div>
+            <div class="details-row text-danger"><div>SCHOOL RE-OPENS: <span>TBA</span></div><div>SESSION: <span>2025/2026</span></div></div>
 
             <table class="report-table">
                 <thead>
-                    <tr>
-                        <th width="3%">S/N</th>
-                        <th width="20%">SUBJECT</th>
-                        <th width="7%">1ST<br>CAT<br>(20%)</th>
-                        <th width="7%">2ND<br>CAT<br>(20%)</th>
-                        <th width="7%">EXAM<br>(60%)</th>
-                        <th width="8%">TOTAL<br>(100%)</th>
-                        <th width="8%">GRADE</th>
-                        <th width="30%">TEACHER</th>
-                        <th width="10%">REMARK</th>
-                    </tr>
+                    <tr><th width="5%">S/N</th><th width="35%">SUBJECT</th><th width="15%">EXAM (100%)</th><th width="15%">GRADE</th><th width="30%">REMARK</th></tr>
                 </thead>
-                <tbody id="reportTbody">
-                    <tr><td colspan="9">Compiling academic records...</td></tr>
-                </tbody>
+                <tbody id="reportTbody"><tr><td colspan="5">Compiling records...</td></tr></tbody>
             </table>
 
             <div class="footer-section">
                 <div>AVERAGE: <span id="rAverage">--</span></div>
-                <div>POSITION IN CLASS: <span id="rPosition">TBD</span></div>
-                <div style="border-top: 1px solid #000; margin-top: 5px; padding-top: 5px;">SUPERVISOR'S REMARK: <span style="font-weight: normal;">Participates in class and enjoys subjects. Needs to maintain focus for better achievement.</span></div>
-                <div style="border-top: 1px solid #000; margin-top: 5px; padding-top: 5px;">PRINCIPAL'S REMARK: <span style="font-weight: normal;">A good result. You can do better with more hard work.</span></div>
+                <div style="border-top: 1px solid #000; margin-top: 5px; padding-top: 5px;">SUPERVISOR'S REMARK: <span style="font-weight: normal;">Participates well. Keep up the good work.</span></div>
             </div>
-
         </div>
     </div>
 
@@ -126,137 +80,40 @@
 
         async function generateReport() {
             try {
-                const urlParams = new URLSearchParams(window.location.search);
-                const targetStudentId = urlParams.get('student_id');
+                const targetStudentId = new URLSearchParams(window.location.search).get('student_id');
+                if (!targetStudentId) return window.location.href = 'class_list.html';
 
-                if (!targetStudentId) {
-                    alert("No student specified.");
-                    return window.location.href = 'admin_dashboard.html';
-                }
-
-                // 1. Fetch Student Profile
-                const { data: student } = await supabase
-                    .from('students')
-                    .select('*, classes(name)')
-                    .eq('user_id', targetStudentId)
-                    .single();
-
-                if (!student) throw new Error("Student not found.");
-
-                // Populate Header
-                document.getElementById('rName').innerText = `${student.surname || ''} ${student.first_name || ''} ${student.other_name || ''}`.trim();
+                const { data: student } = await supabase.from('students').select('*, classes(name)').eq('user_id', targetStudentId).single();
+                document.getElementById('rName').innerText = `${student.surname || ''} ${student.first_name || ''}`;
                 document.getElementById('rClass').innerText = student.classes?.name || 'UNASSIGNED';
                 document.getElementById('rId').innerText = student.reg_number || 'N/A';
-                document.getElementById('photoBox').src = student.passport_url || `https://ui-avatars.com/api/?name=${student.first_name}+${student.surname}&background=007a4d&color=fff`;
 
-                // 2. Fetch All Test Results for this student
-                const { data: rawResults } = await supabase
-                    .from('test_results')
-                    .select('score, total_questions, tests(subject_id, teacher_id, subjects(name), users(name))')
-                    .eq('student_id', targetStudentId);
-
-                const tbody = document.getElementById('reportTbody');
-
-                if (!rawResults || rawResults.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="9">NO ACADEMIC RECORDS FOUND FOR THIS STUDENT IN CBT DATABASE.</td></tr>`;
-                    return;
+                const { data: rawResults } = await supabase.from('test_results').select('score, total_questions, tests(subjects(name))').eq('student_id', targetStudentId);
+                
+                let htmlRows = '', sn = 1, sum = 0, count = 0;
+                
+                if (rawResults) {
+                    rawResults.forEach(r => {
+                        const subj = r.tests?.subjects?.name || 'TEST';
+                        const score = Math.round((r.score / (r.total_questions || 1)) * 100);
+                        sum += score; count++;
+                        let grade = score >= 70 ? 'A' : score >= 60 ? 'B' : score >= 50 ? 'C' : score >= 40 ? 'P' : 'F';
+                        let remark = score >= 70 ? 'EXCELLENT' : score >= 50 ? 'CREDIT' : score >= 40 ? 'PASS' : 'FAIL';
+                        htmlRows += `<tr><td>${sn++}</td><td class="subj-name">${subj}</td><td>${score}</td><td>${grade}</td><td>${remark}</td></tr>`;
+                    });
                 }
-
-                // 3. Aggregate Results by Subject
-                // (If a student took multiple tests in English, we average them together for the final grade)
-                const subjectMap = {};
-
-                rawResults.forEach(r => {
-                    const subjName = r.tests?.subjects?.name || 'GENERAL STUDIES';
-                    const teacherName = r.tests?.users?.name || 'STAFF';
-                    const percentage = (r.score / (r.total_questions || 1)) * 100;
-
-                    if (!subjectMap[subjName]) {
-                        subjectMap[subjName] = { teacher: teacherName, percentages: [] };
-                    }
-                    subjectMap[subjName].percentages.push(percentage);
-                });
-
-                // 4. Calculate Final Rows & Render Table
-                let htmlRows = '';
-                let sn = 1;
-                let sumOfTotals = 0;
-
-                for (const [subj, data] of Object.entries(subjectMap)) {
-                    
-                    // Average the percentage if they took multiple tests in this subject
-                    const avgPercent = data.percentages.reduce((a, b) => a + b, 0) / data.percentages.length;
-                    
-                    // Format math to match image constraints (simulate CAT 1, CAT 2, EXAM breakdown mathematically based on total CBT score)
-                    const totalScore = Math.round(avgPercent);
-                    const examScore = Math.round(totalScore * 0.6); // 60% weight
-                    const cat1Score = Math.round(totalScore * 0.2); // 20% weight
-                    const cat2Score = totalScore - examScore - cat1Score; // Remaining 20% weight
-                    
-                    sumOfTotals += totalScore;
-
-                    // Grading Logic
-                    let grade = 'F';
-                    let remark = 'FAIL';
-                    if (totalScore >= 70) { grade = 'A'; remark = 'EXCELLENT'; }
-                    else if (totalScore >= 60) { grade = 'B'; remark = 'VERY GOOD'; }
-                    else if (totalScore >= 50) { grade = 'C'; remark = 'CREDIT'; }
-                    else if (totalScore >= 40) { grade = 'P'; remark = 'PASS'; }
-
-                    htmlRows += `
-                        <tr>
-                            <td>${sn++}</td>
-                            <td class="subj-name">${subj}</td>
-                            <td>${cat1Score}</td>
-                            <td>${cat2Score}</td>
-                            <td>${examScore}</td>
-                            <td>${totalScore}</td>
-                            <td>${grade}</td>
-                            <td class="teacher-name">${data.teacher}</td>
-                            <td>${remark}</td>
-                        </tr>
-                    `;
-                }
-
-                // Fill empty rows to make table look full (standard report card styling)
-                while (sn <= 15) {
-                    htmlRows += `<tr><td>${sn++}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
-                }
-
-                tbody.innerHTML = htmlRows;
-
-                // Calculate overall average
-                const overallAvg = (sumOfTotals / Object.keys(subjectMap).length).toFixed(2);
-                document.getElementById('rAverage').innerText = overallAvg;
-
-            } catch (err) {
-                console.error(err);
-                alert("Error generating report.");
-            }
+                while (sn <= 10) htmlRows += `<tr><td>${sn++}</td><td></td><td></td><td></td><td></td></tr>`;
+                
+                document.getElementById('reportTbody').innerHTML = htmlRows;
+                document.getElementById('rAverage').innerText = count > 0 ? (sum/count).toFixed(1) : '0';
+            } catch (err) { alert("Error loading report."); }
         }
 
         document.addEventListener('DOMContentLoaded', generateReport);
-
-        // PDF Generation Trigger
         window.downloadPDF = function() {
-            const element = document.getElementById('printableReport');
-            const studentName = document.getElementById('rName').innerText.replace(/\s+/g, '_');
-            
-            // Hide action bar during capture
             document.getElementById('actionBar').style.display = 'none';
-
-            const opt = {
-                margin:       0,
-                filename:     `${studentName}_Report_Card.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            // Generate and restore action bar
-            html2pdf().set(opt).from(element).save().then(() => {
-                document.getElementById('actionBar').style.display = 'block';
-            });
+            html2pdf().set({ margin: 0, filename: `Report_Card.pdf`, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }})
+            .from(document.getElementById('printableReport')).save().then(() => { document.getElementById('actionBar').style.display = 'block'; });
         };
     </script>
 </body>

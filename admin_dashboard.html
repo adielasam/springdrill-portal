@@ -9,46 +9,31 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
-        
         .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1000; }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
         .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center;}
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
-
         .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
-        
         .top-navbar { background: white; padding: 15px 30px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d;}
-        .search-bar { position: relative; width: 300px; }
-        .search-bar input { width: 100%; padding: 8px 15px 8px 35px; border-radius: 20px; border: 1px solid #dee2e6; background: #f8f9fa; font-size: 0.9rem;}
-        .search-bar i { position: absolute; left: 12px; top: 11px; color: #adb5bd; }
-
         .welcome-banner { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .welcome-banner h4 { font-weight: 800; color: #333; text-transform: uppercase; font-size: 1.2rem; margin: 0;}
-        .create-btn { background-color: #007a4d; color: white; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center;}
-
         .stat-card { background: white; border-radius: 4px; padding: 20px; border: 1px solid #eee; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
         .stat-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: white;}
         .stat-info h6 { font-weight: bold; color: #6c757d; margin-bottom: 2px; font-size: 0.8rem; text-transform: uppercase;}
         .stat-info h3 { font-weight: 900; color: #333; margin-bottom: 0; font-size: 1.8rem;}
-
         .bg-stu { background-color: #3498db; } .bg-tch { background-color: #e74c3c; } .bg-cbt { background-color: #f39c12; } .bg-res { background-color: #2ecc71; }
-
         .edu-card { background: white; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
         .edu-header { background-color: #007a4d; color: white; padding: 12px 20px; border-radius: 4px 4px 0 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center;}
         .edu-body { padding: 25px; }
-
         .quick-search-input { border: 2px solid #007a4d; padding: 15px 20px; font-size: 1.1rem; border-radius: 8px; font-weight: bold; width: 100%; }
         .quick-search-input:focus { outline: none; box-shadow: 0 0 0 0.25rem rgba(0, 122, 77, 0.25); }
-
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
 <body>
-
     <div id="loadingOverlay">
-        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
-        <h4 class="fw-bold text-muted">Authenticating Admin...</h4>
+        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i><h4 class="fw-bold text-muted">Authenticating Admin...</h4>
     </div>
 
     <div class="sidebar">
@@ -57,16 +42,16 @@
         </div>
         <nav class="nav flex-column mt-3">
             <a href="admin_dashboard.html" class="nav-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            
             <a href="#usersMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2">
                 <span><i class="fas fa-users me-2"></i> Accounts</span><i class="fas fa-caret-down"></i>
             </a>
             <div class="collapse bg-dark mx-2 mt-1 rounded" id="usersMenu">
                 <a href="admin_create_user.html" class="nav-link small py-2"><i class="fas fa-user-plus me-2"></i> Generate Account</a>
                 <a href="manage_users.html" class="nav-link small py-2"><i class="fas fa-user-check me-2"></i> Approvals</a>
+                <a href="class_list.html" class="nav-link small py-2"><i class="fas fa-clipboard-list me-2"></i> Class Data</a>
             </div>
-            <a href="class_list.html" class="nav-link mt-2"><i class="fas fa-clipboard-list"></i> Class Data</a>
-            <a href="manage_cbt.html" class="nav-link"><i class="fas fa-tasks"></i> Manage CBT</a>
-            <a href="test_analysis.html" class="nav-link"><i class="fas fa-chart-pie"></i> Analytics</a>
+            
             <hr class="mx-3 my-4 border-secondary">
             <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
@@ -74,58 +59,25 @@
 
     <div class="main-content">
         <div class="top-navbar">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-bars me-3 text-muted"></i>
-                <div class="search-bar">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search system...">
-                </div>
-            </div>
-            <div class="fw-bold text-dark d-flex align-items-center">
-                <i class="fas fa-bell text-success me-4 fs-5"></i>
-                <span id="adminName">System Administrator</span>
-                <i class="fas fa-user-shield ms-3 fs-4 text-primary"></i>
-            </div>
+            <div class="d-flex align-items-center"><i class="fas fa-bars me-3 text-muted"></i><div class="fw-bold text-muted">System Administration</div></div>
+            <div class="fw-bold text-dark d-flex align-items-center"><span id="adminName">System Administrator</span><i class="fas fa-user-shield ms-3 fs-4 text-primary"></i></div>
         </div>
 
         <div class="welcome-banner">
             <h4 id="welcomeText">ADMIN COMMAND CENTER</h4>
-            <a href="admin_create_user.html" class="create-btn shadow-sm"><i class="fas fa-plus-circle me-2"></i> Generate New Account</a>
         </div>
 
         <div class="row g-4 mb-5">
-            <div class="col-md-6 col-lg-3">
-                <div class="stat-card">
-                    <div class="stat-icon bg-stu shadow-sm"><i class="fas fa-user-graduate"></i></div>
-                    <div class="stat-info"><h6>Active Students</h6><h3 id="statStudents">--</h3></div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="stat-card">
-                    <div class="stat-icon bg-tch shadow-sm"><i class="fas fa-chalkboard-teacher"></i></div>
-                    <div class="stat-info"><h6>Active Staff</h6><h3 id="statTeachers">--</h3></div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="stat-card">
-                    <div class="stat-icon bg-cbt shadow-sm"><i class="fas fa-laptop-code"></i></div>
-                    <div class="stat-info"><h6>Exams Created</h6><h3 id="statExams">--</h3></div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="stat-card">
-                    <div class="stat-icon bg-res shadow-sm"><i class="fas fa-medal"></i></div>
-                    <div class="stat-info"><h6>Results Logged</h6><h3 id="statResults">--</h3></div>
-                </div>
-            </div>
+            <div class="col-md-6 col-lg-3"><div class="stat-card"><div class="stat-icon bg-stu shadow-sm"><i class="fas fa-user-graduate"></i></div><div class="stat-info"><h6>Active Students</h6><h3 id="statStudents">--</h3></div></div></div>
+            <div class="col-md-6 col-lg-3"><div class="stat-card"><div class="stat-icon bg-tch shadow-sm"><i class="fas fa-chalkboard-teacher"></i></div><div class="stat-info"><h6>Active Staff</h6><h3 id="statTeachers">--</h3></div></div></div>
+            <div class="col-md-6 col-lg-3"><div class="stat-card"><div class="stat-icon bg-cbt shadow-sm"><i class="fas fa-laptop-code"></i></div><div class="stat-info"><h6>Exams Created</h6><h3 id="statExams">--</h3></div></div></div>
+            <div class="col-md-6 col-lg-3"><div class="stat-card"><div class="stat-icon bg-res shadow-sm"><i class="fas fa-medal"></i></div><div class="stat-info"><h6>Results Logged</h6><h3 id="statResults">--</h3></div></div></div>
         </div>
 
         <div class="row">
             <div class="col-lg-7">
                 <div class="edu-card border-success">
-                    <div class="edu-header bg-success">
-                        <span><i class="fas fa-search me-2"></i> Global Student Lookup</span>
-                    </div>
+                    <div class="edu-header bg-success"><span><i class="fas fa-search me-2"></i> Global Student Lookup</span></div>
                     <div class="edu-body text-center py-5">
                         <i class="fas fa-id-card fa-3x text-muted mb-3 opacity-25"></i>
                         <h5 class="fw-bold mb-3">Find Student Results Instantly</h5>
@@ -136,17 +88,14 @@
             </div>
             <div class="col-lg-5">
                 <div class="edu-card">
-                    <div class="edu-header">
-                        <span><i class="fas fa-chart-bar me-2"></i> Student Distribution</span>
-                    </div>
-                    <div class="edu-body">
-                        <div style="position: relative; height:300px; width:100%"><canvas id="studentChart"></canvas></div>
-                    </div>
+                    <div class="edu-header"><span><i class="fas fa-chart-bar me-2"></i> Student Distribution</span></div>
+                    <div class="edu-body"><div style="position: relative; height:300px; width:100%"><canvas id="studentChart"></canvas></div></div>
                 </div>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
@@ -156,10 +105,8 @@
                 if (!session) return window.location.href = 'login.html';
 
                 const { data: profile } = await supabase.from('users').select('name, role').eq('id', session.user.id).single();
-                if (!profile || profile.role !== 'admin') {
-                    alert("Unauthorized Access.");
-                    return window.location.href = 'login.html';
-                }
+                if (!profile || profile.role !== 'admin') return window.location.href = 'login.html';
+                
                 document.getElementById('adminName').innerText = profile.name;
 
                 const { count: studentCount } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', true);
@@ -176,11 +123,7 @@
 
                 await renderClassChart();
                 document.getElementById('loadingOverlay').style.display = 'none';
-
-            } catch (err) {
-                console.error(err);
-                alert("Error loading dashboard.");
-            }
+            } catch (err) { console.error(err); }
         }
 
         async function renderClassChart() {
@@ -201,56 +144,35 @@
                     data: { labels: labels, datasets: [{ label: 'Active Students', data: dataPoints, backgroundColor: '#3498db', borderRadius: 4 }] },
                     options: { responsive: true, maintainAspectRatio: false }
                 });
-            } catch (e) { console.error("Chart error:", e); }
+            } catch (e) { console.error(e); }
         }
 
         window.searchStudent = async function(query) {
             const resultsDiv = document.getElementById('searchResults');
             if (query.length < 2) { resultsDiv.innerHTML = ''; return; }
-            
             resultsDiv.innerHTML = `<div class="text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i> Searching...</div>`;
-            
             try {
-                const { data, error } = await supabase
-                    .from('students')
-                    .select('user_id, first_name, surname, reg_number, classes(name), passport_url')
-                    .or(`first_name.ilike.%${query}%,surname.ilike.%${query}%,reg_number.ilike.%${query}%`)
-                    .limit(5);
+                const { data, error } = await supabase.from('students').select('user_id, first_name, surname, reg_number, classes(name), passport_url')
+                    .or(`first_name.ilike.%${query}%,surname.ilike.%${query}%,reg_number.ilike.%${query}%`).limit(5);
 
-                if (error) throw error;
+                if (!data || data.length === 0) return resultsDiv.innerHTML = `<div class="alert alert-warning small">No student found matching "${query}".</div>`;
 
-                if (!data || data.length === 0) {
-                    resultsDiv.innerHTML = `<div class="alert alert-warning small"><i class="fas fa-info-circle me-1"></i> No student found matching "${query}".</div>`;
-                    return;
-                }
-
-                // Note: The button here links to the Official Admin Report Card, NOT the student dashboard.
                 resultsDiv.innerHTML = data.map(s => `
                     <div class="d-flex align-items-center p-3 mb-2 bg-white border rounded shadow-sm">
-                        <img src="${s.passport_url || `https://ui-avatars.com/api/?name=${s.first_name}+${s.surname}&background=007a4d&color=fff`}" class="rounded-circle me-3" style="width: 45px; height: 45px; object-fit: cover; border: 2px solid #007a4d;">
+                        <img src="${s.passport_url || `https://ui-avatars.com/api/?name=${s.first_name}+${s.surname}&background=007a4d&color=fff`}" class="rounded-circle me-3" style="width: 45px; height: 45px; object-fit: cover;">
                         <div>
                             <h6 class="fw-bold mb-0 text-success">${s.surname || ''} ${s.first_name || ''}</h6>
                             <small class="text-muted fw-bold">${s.reg_number || 'No ID'} • ${s.classes?.name || 'Unassigned'}</small>
                         </div>
                         <div class="ms-auto">
-                            <a href="admin_student_report.html?student_id=${s.user_id}" class="btn btn-sm btn-primary fw-bold">
-                                Get Report <i class="fas fa-arrow-right ms-1"></i>
-                            </a>
+                            <a href="admin_student_report.html?student_id=${s.user_id}" class="btn btn-sm btn-primary fw-bold">Get Report <i class="fas fa-arrow-right ms-1"></i></a>
                         </div>
-                    </div>
-                `).join('');
-
-            } catch (err) {
-                console.error(err);
-                resultsDiv.innerHTML = `<div class="text-danger small">Search failed. Try again.</div>`;
-            }
+                    </div>`).join('');
+            } catch (err) { resultsDiv.innerHTML = `<div class="text-danger small">Search failed.</div>`; }
         };
 
         document.addEventListener('DOMContentLoaded', initializeAdminDashboard);
-
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html';
-        });
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
     </script>
 </body>
 </html>
