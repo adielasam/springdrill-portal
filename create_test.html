@@ -28,7 +28,7 @@
 
     <div id="loadingOverlay">
         <i class="fas fa-spinner fa-spin fa-3x text-warning mb-3"></i>
-        <h4>Verifying Access & Loading Data...</h4>
+        <h4>Verifying Access...</h4>
     </div>
 
     <div class="sidebar">
@@ -49,7 +49,7 @@
     <div class="main-content">
         <div class="top-header">
             <h3 class="fw-bold mb-0 text-dark"><i class="fas fa-edit text-warning me-2"></i> Create Assessment</h3>
-            <p class="text-muted mb-0 mt-1">Configure test parameters, schedule, and CBT rules.</p>
+            <p class="text-muted mb-0 mt-1">Configure test parameters. It will be saved as a Draft until you add questions.</p>
         </div>
 
         <div id="alertBox" class="alert d-none shadow-sm" role="alert"></div>
@@ -60,11 +60,11 @@
                 <h5 class="section-title mt-0"><i class="fas fa-info-circle me-2"></i> Basic Information</h5>
                 <div class="row g-3">
                     <div class="col-md-8">
-                        <label class="form-label">Test Title (e.g., First Term Mathematics Exam)</label>
+                        <label class="form-label">Test Title</label>
                         <input type="text" id="title" class="form-control" required placeholder="Enter clear test title">
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Test Code (Unique Identifier)</label>
+                        <label class="form-label">Test Code</label>
                         <input type="text" id="code" class="form-control" required placeholder="e.g. MTH-JSS1-T1">
                     </div>
                 </div>
@@ -89,12 +89,10 @@
                     <div class="col-md-6">
                         <label class="form-label text-primary"><i class="fas fa-calendar-check me-1"></i> Exam Starts At (Optional)</label>
                         <input type="datetime-local" id="start_time" class="form-control border-primary">
-                        <small class="text-muted">If empty, the exam goes live immediately.</small>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label text-danger"><i class="fas fa-calendar-times me-1"></i> Exam Closes At (Optional)</label>
                         <input type="datetime-local" id="end_time" class="form-control border-danger">
-                        <small class="text-muted">If empty, the exam remains open indefinitely.</small>
                     </div>
                     
                     <div class="col-md-6 mt-4">
@@ -115,7 +113,7 @@
 
                 <div class="mt-4">
                     <label class="form-label">Instructions for Students (Optional)</label>
-                    <textarea id="instructions" class="form-control" rows="3" placeholder="e.g. Attempt all questions. Calculators are not allowed."></textarea>
+                    <textarea id="instructions" class="form-control" rows="3"></textarea>
                 </div>
 
                 <h5 class="section-title"><i class="fas fa-shield-alt me-2"></i> CBT Security & Rules</h5>
@@ -127,13 +125,13 @@
                         </div>
                         <div class="form-check form-switch fs-5">
                             <input class="form-check-input" type="checkbox" id="shuffle_answers" checked>
-                            <label class="form-check-label fs-6 text-dark mt-1">Shuffle Options (A, B, C, D)</label>
+                            <label class="form-check-label fs-6 text-dark mt-1">Shuffle Options</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-check form-switch fs-5 mb-2">
                             <input class="form-check-input" type="checkbox" id="publish_result">
-                            <label class="form-check-label fs-6 text-dark mt-1">Publish result immediately</label>
+                            <label class="form-check-label fs-6 text-dark mt-1">Publish scores to students immediately</label>
                         </div>
                         <div class="form-check form-switch fs-5">
                             <input class="form-check-input" type="checkbox" id="practice_mode">
@@ -144,9 +142,8 @@
 
                 <hr class="mt-5 mb-4">
                 <div class="d-flex justify-content-end gap-3">
-                    <button type="reset" class="btn btn-outline-secondary px-4 py-2">Clear Form</button>
                     <button type="submit" class="btn btn-dark px-5 py-2 fw-bold" id="submitBtn">
-                        <i class="fas fa-save me-2"></i> Save Test Configuration
+                        <i class="fas fa-save me-2"></i> Save & Add Questions
                     </button>
                 </div>
             </form>
@@ -164,12 +161,6 @@
                 if (!session) return window.location.href = 'login.html';
                 currentUserId = session.user.id;
 
-                const { data: profile } = await supabase.from('users').select('role').eq('id', currentUserId).single();
-                if (profile.role !== 'teacher' && profile.role !== 'admin') {
-                    alert("Access Denied.");
-                    return window.location.href = 'login.html';
-                }
-
                 await Promise.all([
                     loadDropdown('classes', 'class_id'),
                     loadDropdown('subjects', 'subject_id'),
@@ -179,18 +170,15 @@
                 document.getElementById('loadingOverlay').style.display = 'none';
             } catch (error) {
                 console.error(error);
-                alert("Failed to initialize system.");
             }
         }
 
         async function loadDropdown(table, selectId) {
-            const { data, error } = await supabase.from(table).select('id, name').order('id', { ascending: true });
+            const { data } = await supabase.from(table).select('id, name').order('id', { ascending: true });
             const selectEl = document.getElementById(selectId);
             if (data && data.length > 0) {
                 selectEl.innerHTML = `<option value="" disabled selected>Select an option...</option>` + 
                                      data.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
-            } else {
-                selectEl.innerHTML = `<option value="">No data available</option>`;
             }
         }
 
@@ -202,11 +190,10 @@
             const btn = document.getElementById('submitBtn');
             const alertBox = document.getElementById('alertBox');
             
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Saving...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Creating Test...';
             btn.disabled = true;
             alertBox.classList.add('d-none');
 
-            // Collect schedule times properly or leave null
             const startTimeVal = document.getElementById('start_time').value;
             const endTimeVal = document.getElementById('end_time').value;
 
@@ -225,27 +212,31 @@
                 publish_result: document.getElementById('publish_result').checked,
                 practice_mode: document.getElementById('practice_mode').checked,
                 start_time: startTimeVal ? new Date(startTimeVal).toISOString() : null,
-                end_time: endTimeVal ? new Date(endTimeVal).toISOString() : null
+                end_time: endTimeVal ? new Date(endTimeVal).toISOString() : null,
+                is_published: false // <--- Saves as Draft!
             };
 
             try {
-                const { error } = await supabase.from('tests').insert([testData]).select();
+                const { data, error } = await supabase.from('tests').insert([testData]).select();
                 if (error) {
                     if (error.code === '23505') throw new Error("A test with this Code already exists.");
                     throw error;
                 }
 
                 alertBox.className = 'alert alert-success shadow-sm mb-4';
-                alertBox.innerHTML = `<i class="fas fa-check-circle me-2"></i> <strong>Success!</strong> Test created. You can now add questions to it.`;
-                document.getElementById('createTestForm').reset();
+                alertBox.innerHTML = `<i class="fas fa-check-circle me-2"></i> <strong>Success!</strong> Redirecting to Question Bank...`;
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                // Instantly redirect to the Question Bank and pass the Test ID!
+                setTimeout(() => {
+                    window.location.href = `manage_questions.html?test_id=${data[0].id}`;
+                }, 1500);
 
             } catch (err) {
                 alertBox.className = 'alert alert-danger shadow-sm mb-4';
                 alertBox.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i> ${err.message}`;
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-            } finally {
-                btn.innerHTML = '<i class="fas fa-save me-2"></i> Save Test Configuration';
+                btn.innerHTML = '<i class="fas fa-save me-2"></i> Save & Add Questions';
                 btn.disabled = false;
             }
         });

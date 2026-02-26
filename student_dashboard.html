@@ -8,23 +8,19 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body { background-color: #f4f7fa; overflow-x: hidden; }
-        
         .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding-top: 30px; z-index: 1000; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
         .sidebar-brand i { color: #f1c40f; font-size: 2.5rem; margin-bottom: 10px; }
         .nav-link { color: rgba(255,255,255,0.8); padding: 15px 25px; margin: 4px 15px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; text-decoration: none; font-weight: 500;}
         .nav-link i { width: 25px; font-size: 1.1rem; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; transform: translateX(5px); }
-
         .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
         .top-header { background: white; padding: 20px 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #2ecc71; }
-        
         .exam-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #e9ecef; transition: transform 0.2s; margin-bottom: 20px;}
         .exam-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.06); border-color: #1a3c34;}
         .exam-title { font-size: 1.2rem; font-weight: bold; color: #2c3e50; margin-bottom: 10px; }
         .exam-meta { font-size: 0.85rem; color: #6c757d; margin-bottom: 15px; }
         .exam-meta i { width: 20px; text-align: center; }
-
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
@@ -40,7 +36,6 @@
             <i class="fas fa-graduation-cap"></i>
             <h4 class="text-white fw-bold mb-0">STUDENT</h4>
         </div>
-        
         <nav class="nav flex-column mt-4">
             <a href="student_dashboard.html" class="nav-link active"><i class="fas fa-home"></i> My Dashboard</a>
             <a href="take_test.html" class="nav-link"><i class="fas fa-laptop-code"></i> Active Exams</a>
@@ -60,7 +55,6 @@
         </div>
 
         <h5 class="fw-bold mb-4 text-dark"><i class="fas fa-clipboard-list text-warning me-2"></i> Assigned Exams</h5>
-        
         <div class="row" id="examsGrid"></div>
     </div>
 
@@ -69,24 +63,23 @@
 
         async function initializeDashboard() {
             try {
-                // 1. Verify Student Authentication
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
                 const userId = session.user.id;
 
-                // 2. Fetch basic user details
                 const { data: authUser } = await supabase.from('users').select('name').eq('id', userId).single();
                 let displayName = authUser ? authUser.name : "Student";
                 let className = "Unassigned";
+                let studentClassId = null;
 
-                // 3. Try to fetch rich details from 'students' table safely
                 const { data: studentRecords } = await supabase
                     .from('students')
-                    .select('surname, first_name, passport_url, classes(name)')
+                    .select('surname, first_name, passport_url, class_id, classes(name)')
                     .eq('user_id', userId);
 
                 if (studentRecords && studentRecords.length > 0) {
                     const student = studentRecords[0];
+                    studentClassId = student.class_id;
                     if (student.first_name) displayName = `${student.first_name} ${student.surname || ''}`;
                     if (student.classes) className = student.classes.name;
                     if (student.passport_url) {
@@ -97,15 +90,25 @@
                 document.getElementById('welcomeText').innerText = `Welcome, ${displayName}!`;
                 document.getElementById('studentClass').innerText = className;
 
-                // 4. FETCH ALL TESTS
+                const grid = document.getElementById('examsGrid');
+
+                // ONLY FETCH IF STUDENT HAS A CLASS ASSIGNED
+                if (!studentClassId) {
+                    grid.innerHTML = `<div class="col-12"><div class="alert alert-warning"><i class="fas fa-info-circle me-2"></i> You have not been assigned to a class. Please contact your Admin.</div></div>`;
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    return;
+                }
+
+                // FETCH ONLY PUBLISHED TESTS FOR THIS SPECIFIC CLASS
                 const { data: tests, error: testErr } = await supabase
                     .from('tests')
                     .select('*')
+                    .eq('is_published', true)
+                    .eq('class_id', studentClassId)
                     .order('created_at', { ascending: false });
 
                 if (testErr) throw testErr;
 
-                // 5. Fetch past attempts
                 const { data: pastAttempts } = await supabase
                     .from('test_results')
                     .select('test_id, score')
@@ -113,17 +116,13 @@
                 
                 const takenTestIds = pastAttempts ? pastAttempts.map(a => a.test_id) : [];
 
-                // 6. Render the Exam Grid with Scheduling Logic
-                const grid = document.getElementById('examsGrid');
-                const now = new Date(); // Current time for comparison
+                const now = new Date();
                 
                 if (!tests || tests.length === 0) {
-                    grid.innerHTML = `<div class="col-12"><div class="exam-card text-center py-5 text-muted"><i class="fas fa-mug-hot fa-3x mb-3 opacity-50"></i><h5>No exams available right now.</h5></div></div>`;
+                    grid.innerHTML = `<div class="col-12"><div class="exam-card text-center py-5 text-muted"><i class="fas fa-mug-hot fa-3x mb-3 opacity-50"></i><h5>No exams available for your class right now.</h5></div></div>`;
                 } else {
                     grid.innerHTML = tests.map(test => {
                         const hasTaken = takenTestIds.includes(test.id);
-                        
-                        // Smart Schedule Logic
                         const startTime = test.start_time ? new Date(test.start_time) : null;
                         const endTime = test.end_time ? new Date(test.end_time) : null;
                         
@@ -138,7 +137,6 @@
                             timeStatusHtml = `<div class="mt-2 text-danger fw-bold"><i class="fas fa-times-circle"></i> Closed: ${endTime.toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>`;
                         }
                         
-                        // Button Logic based on schedule and past attempts
                         let buttonHtml = '';
                         if (hasTaken) {
                             const result = pastAttempts.find(a => a.test_id === test.id);

@@ -7,135 +7,30 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f4f7fa;
-            overflow-x: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        body { background-color: #f4f7fa; overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
-        /* Sidebar Styling */
-        .sidebar {
-            width: 280px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%);
-            color: white;
-            padding-top: 30px;
-            z-index: 1000;
-            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
-        }
-        .sidebar-brand {
-            text-align: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 20px;
-        }
-        .sidebar-brand i {
-            color: #3498db;
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        .nav-link {
-            color: rgba(255,255,255,0.8);
-            padding: 15px 25px;
-            margin: 4px 15px;
-            border-radius: 8px;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-        }
-        .nav-link i {
-            width: 25px;
-            font-size: 1.1rem;
-        }
-        .nav-link:hover, .nav-link.active {
-            background: rgba(255,255,255,0.15);
-            color: white;
-            transform: translateX(5px);
-        }
-        .nav-link.text-danger:hover {
-            background: rgba(220, 53, 69, 0.2);
-            color: #ff6b6b !important;
-        }
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding-top: 30px; z-index: 1000; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-brand i { color: #3498db; font-size: 2.5rem; margin-bottom: 10px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 15px 25px; margin: 4px 15px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; text-decoration: none; }
+        .nav-link i { width: 25px; font-size: 1.1rem; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; transform: translateX(5px); }
+        .nav-link.text-danger:hover { background: rgba(220, 53, 69, 0.2); color: #ff6b6b !important; }
 
-        /* Main Content Styling */
-        .main-content {
-            margin-left: 280px;
-            padding: 40px;
-            min-height: 100vh;
-        }
-        .top-header {
-            background: white;
-            padding: 20px 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
+        .top-header { background: white; padding: 20px 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
         
-        /* Card Styling */
-        .content-card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            border: none;
-            margin-bottom: 30px;
-        }
-        .form-label {
-            font-weight: 600;
-            color: #495057;
-        }
-        .form-control, .form-select {
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 1px solid #dee2e6;
-            background-color: #f8f9fa;
-        }
-        .form-control:focus, .form-select:focus {
-            border-color: #3498db;
-            box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
-            background-color: white;
-        }
-        .correct-option-select {
-            background-color: #e8f5e9;
-            border-color: #2ecc71;
-            font-weight: bold;
-            color: #155724;
-        }
+        .content-card { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: none; margin-bottom: 30px; }
+        .form-label { font-weight: 600; color: #495057; }
+        .form-control, .form-select { padding: 10px 15px; border-radius: 8px; border: 1px solid #dee2e6; background-color: #f8f9fa; }
+        .form-control:focus, .form-select:focus { border-color: #3498db; box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25); background-color: white; }
+        .correct-option-select { background-color: #e8f5e9; border-color: #2ecc71; font-weight: bold; color: #155724; }
         
-        /* Table Styling */
-        .table th {
-            border-top: none;
-            color: #6c757d;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            background-color: #f8f9fa;
-        }
-        .table td {
-            vertical-align: middle;
-        }
-        .correct-badge {
-            background-color: #2ecc71;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
+        .table th { border-top: none; color: #6c757d; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; background-color: #f8f9fa; }
+        .table td { vertical-align: middle; }
+        .correct-badge { background-color: #2ecc71; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
         
-        /* Loading Overlay */
-        #loadingOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.9); z-index: 9999; display: flex;
-            align-items: center; justify-content: center; flex-direction: column;
-        }
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
 <body>
@@ -152,27 +47,12 @@
         </div>
         
         <nav class="nav flex-column mt-4">
-            <a href="teacher_dashboard.html" class="nav-link">
-                <i class="fas fa-home"></i> Dashboard Home
-            </a>
-            <a href="create_test.html" class="nav-link">
-                <i class="fas fa-plus-circle"></i> Create New Test
-            </a>
-            <a href="manage_questions.html" class="nav-link active">
-                <i class="fas fa-list-ul"></i> Question Bank
-            </a>
-            <a href="test_results.html" class="nav-link">
-                <i class="fas fa-poll"></i> Student Results
-            </a>
-            <a href="report_scores.html" class="nav-link">
-                <i class="fas fa-file-signature"></i> Report Scores
-            </a>
-            
+            <a href="teacher_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard Home</a>
+            <a href="create_test.html" class="nav-link"><i class="fas fa-plus-circle"></i> Create New Test</a>
+            <a href="manage_questions.html" class="nav-link active"><i class="fas fa-list-ul"></i> Question Bank</a>
+            <a href="test_results.html" class="nav-link"><i class="fas fa-poll"></i> Student Results</a>
             <hr class="mx-3 my-4 border-secondary">
-            
-            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto">
-                <i class="fas fa-sign-out-alt"></i> Secure Logout
-            </a>
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-sign-out-alt"></i> Secure Logout</a>
         </nav>
     </div>
 
@@ -180,7 +60,7 @@
         <div class="top-header">
             <div>
                 <h3 class="fw-bold mb-0 text-dark"><i class="fas fa-list-ul text-primary me-2"></i> Question Bank</h3>
-                <p class="text-muted mb-0 mt-1">Add and review questions for your CBT exams.</p>
+                <p class="text-muted mb-0 mt-1">Add questions and publish your exams.</p>
             </div>
             
             <div class="w-50">
@@ -191,7 +71,7 @@
             </div>
         </div>
 
-        <div id="alertBox" class="alert d-none shadow-sm" role="alert"></div>
+        <div id="alertBox" class="alert d-none shadow-sm mb-4" role="alert"></div>
 
         <div class="row">
             <div class="col-lg-4">
@@ -248,7 +128,15 @@
                 <div class="content-card">
                     <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
                         <h5 class="fw-bold mb-0"><i class="fas fa-database text-primary me-2"></i> Questions in Test</h5>
-                        <span class="badge bg-primary rounded-pill" id="questionCount">0 Questions</span>
+                        
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="badge bg-primary rounded-pill" id="questionCount">0 Questions</span>
+                            
+                            <div class="form-check form-switch ms-3" id="publishContainer" style="display: none; padding-top: 5px;">
+                                <input class="form-check-input fs-5 border-secondary" type="checkbox" id="publishToggle" style="cursor: pointer;">
+                                <label class="form-check-label ms-1" id="publishLabel" for="publishToggle" style="cursor: pointer;">Draft Mode</label>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
@@ -288,26 +176,32 @@
         async function initializePage() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
-                if (!session) {
-                    window.location.href = 'login.html';
-                    return;
-                }
+                if (!session) return window.location.href = 'login.html';
                 currentUserId = session.user.id;
 
                 // Load Teacher's Tests into Dropdown
                 const { data: tests, error } = await supabase
                     .from('tests')
-                    .select('id, title, code, class_id, subject_id')
+                    .select('id, title, code, class_id, subject_id, is_published')
                     .eq('teacher_id', currentUserId)
                     .order('created_at', { ascending: false });
 
                 const testSelect = document.getElementById('testSelect');
-                
                 if (error) throw error;
+
+                // Check URL for auto-redirect ID
+                const urlParams = new URLSearchParams(window.location.search);
+                const autoTestId = urlParams.get('test_id');
 
                 if (tests && tests.length > 0) {
                     testSelect.innerHTML = `<option value="" disabled selected>-- Select a Test --</option>` + 
-                        tests.map(t => `<option value="${t.id}" data-class="${t.class_id}" data-subject="${t.subject_id}">[${t.code}] ${t.title}</option>`).join('');
+                        tests.map(t => `<option value="${t.id}" data-class="${t.class_id}" data-subject="${t.subject_id}" data-published="${t.is_published}">[${t.code}] ${t.title}</option>`).join('');
+                    
+                    // Auto-select the test if we just came from create_test.html
+                    if (autoTestId) {
+                        testSelect.value = autoTestId;
+                        testSelect.dispatchEvent(new Event('change')); 
+                    }
                 } else {
                     testSelect.innerHTML = `<option value="">No tests found. Create a test first.</option>`;
                 }
@@ -329,29 +223,105 @@
             
             currentClassId = selectedOption.getAttribute('data-class');
             currentSubjectId = selectedOption.getAttribute('data-subject');
+            const isPublished = selectedOption.getAttribute('data-published') === 'true';
             
             if (selectedTestId) {
                 document.getElementById('submitBtn').disabled = false;
+                
+                // Show and update Publish Toggle UI
+                document.getElementById('publishContainer').style.display = 'flex';
+                updatePublishUI(isPublished);
+
                 await loadExistingQuestions(selectedTestId);
             }
         });
 
-        // 3. Load Questions for Selected Test
+        // Toggle UI Helper Function
+        function updatePublishUI(isPublished) {
+            const toggle = document.getElementById('publishToggle');
+            const label = document.getElementById('publishLabel');
+            toggle.checked = isPublished;
+            
+            if (isPublished) {
+                label.innerHTML = `<span class="text-success fw-bold"><i class="fas fa-globe"></i> Live / Published</span>`;
+                toggle.classList.remove('border-secondary');
+                toggle.classList.add('border-success');
+            } else {
+                label.innerHTML = `<span class="text-muted fw-bold"><i class="fas fa-lock"></i> Draft Mode</span>`;
+                toggle.classList.remove('border-success');
+                toggle.classList.add('border-secondary');
+            }
+        }
+
+        // 3. Handle Publish Toggle Switch (WITH SECURITY LOCK)
+        document.getElementById('publishToggle').addEventListener('change', async (e) => {
+            if (!selectedTestId) return;
+            
+            const newStatus = e.target.checked;
+            const alertBox = document.getElementById('alertBox');
+            
+            // --- NEW SECURITY LOCK ---
+            if (newStatus === true) {
+                try {
+                    const { data: checkQ, error: checkErr } = await supabase
+                        .from('test_questions')
+                        .select('id')
+                        .eq('test_id', selectedTestId)
+                        .limit(1); // Only need to check if at least 1 exists
+                        
+                    if (checkErr || !checkQ || checkQ.length === 0) {
+                        alertBox.className = 'alert alert-danger mt-3 shadow-sm';
+                        alertBox.classList.remove('d-none');
+                        alertBox.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i> <strong>Action Blocked:</strong> You cannot publish an empty test. Please add at least one question first.`;
+                        
+                        e.target.checked = false; // Revert switch visually
+                        updatePublishUI(false);
+                        setTimeout(() => alertBox.classList.add('d-none'), 5000);
+                        return; // Stop execution!
+                    }
+                } catch (err) {
+                    console.error("Validation error:", err);
+                }
+            }
+            // --- END SECURITY LOCK ---
+
+            try {
+                // Update Supabase
+                const { error } = await supabase.from('tests').update({ is_published: newStatus }).eq('id', selectedTestId);
+                if (error) throw error;
+
+                // Update the hidden data attribute so it stays accurate if they click away
+                const selectedOption = document.getElementById('testSelect').options[document.getElementById('testSelect').selectedIndex];
+                selectedOption.setAttribute('data-published', newStatus);
+
+                updatePublishUI(newStatus);
+                
+                // Success message
+                alertBox.className = `alert ${newStatus ? 'alert-success' : 'alert-warning'} mt-3 shadow-sm`;
+                alertBox.classList.remove('d-none');
+                alertBox.innerHTML = newStatus 
+                    ? `<i class="fas fa-check-circle me-2"></i> <strong>Exam is Live!</strong> Students can now see it on their dashboard.`
+                    : `<i class="fas fa-info-circle me-2"></i> <strong>Exam Hidden.</strong> It is now saved as a draft.`;
+                
+                setTimeout(() => alertBox.classList.add('d-none'), 4000);
+
+            } catch (err) {
+                console.error(err);
+                alert("Failed to update status.");
+                e.target.checked = !newStatus; // Revert switch if it fails
+                updatePublishUI(!newStatus);
+            }
+        });
+
+        // 4. Load Questions for Selected Test
         async function loadExistingQuestions(testId) {
             const tbody = document.getElementById('questionsTbody');
             tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Loading questions...</td></tr>`;
             
             try {
-                // Fetch from test_questions mapping table joined with questions
                 const { data, error } = await supabase
                     .from('test_questions')
-                    .select(`
-                        id,
-                        question_id,
-                        questions (
-                            question_text, option_a, option_b, option_c, option_d, correct_option, marks
-                        )
-                    `)
+                    .select(`id, question_id, questions (question_text, option_a, option_b, option_c, option_d, correct_option, marks)`)
                     .eq('test_id', testId)
                     .order('id', { ascending: true });
 
@@ -394,14 +364,11 @@
             }
         }
 
-        // 4. Handle Form Submission (Add Question)
+        // 5. Handle Form Submission (Add Question)
         document.getElementById('addQuestionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            if (!selectedTestId) {
-                alert("Please select a test from the dropdown first.");
-                return;
-            }
+            if (!selectedTestId) return alert("Please select a test from the dropdown first.");
 
             const btn = document.getElementById('submitBtn');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Saving...';
@@ -421,40 +388,26 @@
             };
 
             try {
-                // Step A: Insert into questions table
-                const { data: newQuestion, error: qError } = await supabase
-                    .from('questions')
-                    .insert([questionData])
-                    .select('id')
-                    .single();
-                
+                const { data: newQuestion, error: qError } = await supabase.from('questions').insert([questionData]).select('id').single();
                 if (qError) throw qError;
 
-                // Step B: Link to test in test_questions table
-                const { error: linkError } = await supabase
-                    .from('test_questions')
-                    .insert([{ 
-                        test_id: selectedTestId, 
-                        question_id: newQuestion.id 
-                    }]);
-
+                const { error: linkError } = await supabase.from('test_questions').insert([{ test_id: selectedTestId, question_id: newQuestion.id }]);
                 if (linkError) throw linkError;
 
-                // Success: Reset form and reload table
                 document.getElementById('addQuestionForm').reset();
-                document.getElementById('correct_option').value = 'A'; // Reset default
+                document.getElementById('correct_option').value = 'A';
                 await loadExistingQuestions(selectedTestId);
                 
-                // Show brief success alert
                 const alertBox = document.getElementById('alertBox');
-                alertBox.className = 'alert alert-success mt-3';
+                alertBox.className = 'alert alert-success mt-3 shadow-sm';
+                alertBox.classList.remove('d-none');
                 alertBox.innerHTML = `<i class="fas fa-check-circle me-2"></i> Question added successfully!`;
                 setTimeout(() => alertBox.classList.add('d-none'), 3000);
 
             } catch (err) {
-                console.error("Save Error:", err);
                 const alertBox = document.getElementById('alertBox');
-                alertBox.className = 'alert alert-danger mt-3';
+                alertBox.className = 'alert alert-danger mt-3 shadow-sm';
+                alertBox.classList.remove('d-none');
                 alertBox.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i> Failed to save: ${err.message}`;
             } finally {
                 btn.innerHTML = '<i class="fas fa-save me-2"></i> Save Question';
@@ -462,27 +415,31 @@
             }
         });
 
-        // 5. Delete Question Logic
+        // 6. Delete Question Logic
         window.deleteQuestion = async (testQuestionId, questionId) => {
             if (!confirm("Are you sure you want to remove this question from the test?")) return;
-            
             try {
-                // Remove link from test_questions mapping
                 const { error: tqError } = await supabase.from('test_questions').delete().eq('id', testQuestionId);
                 if (tqError) throw tqError;
 
-                // Remove actual question from questions table
                 const { error: qError } = await supabase.from('questions').delete().eq('id', questionId);
                 if (qError) throw qError;
 
                 await loadExistingQuestions(selectedTestId);
+                
+                // --- NEW SAFGUARD: Check if test is now empty, and unpublish if it is! ---
+                const { data: checkQ } = await supabase.from('test_questions').select('id').eq('test_id', selectedTestId).limit(1);
+                if (!checkQ || checkQ.length === 0) {
+                    await supabase.from('tests').update({ is_published: false }).eq('id', selectedTestId);
+                    updatePublishUI(false);
+                }
                 
             } catch (err) {
                 alert("Error deleting question: " + err.message);
             }
         };
 
-        // 6. Logout handler
+        // 7. Logout handler
         document.getElementById('logoutBtn').addEventListener('click', async (e) => {
             e.preventDefault();
             await supabase.auth.signOut();
