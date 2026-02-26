@@ -144,9 +144,9 @@
 
                         <div class="tab-pane fade" id="bankTab" role="tabpanel">
                             <div class="alert alert-light border small text-muted mb-3">
-                                <i class="fas fa-info-circle me-1"></i> Showing past questions for this Subject/Class that are not yet in this exam.
+                                <i class="fas fa-info-circle me-1"></i> Showing ALL past questions for this <strong>Subject</strong> across all classes.
                             </div>
-                            <div class="table-responsive border rounded" style="max-height: 350px; overflow-y: auto;">
+                            <div class="table-responsive border rounded" style="max-height: 400px; overflow-y: auto;">
                                 <table class="table table-hover mb-0">
                                     <thead class="table-light sticky-top">
                                         <tr>
@@ -159,7 +159,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <button class="btn btn-primary w-100 fw-bold py-2 mt-3" id="addFromBankBtn" onclick="window.addSelectedFromBank()">
+                            <button class="btn btn-primary w-100 fw-bold py-2 mt-3 shadow-sm" id="addFromBankBtn" onclick="window.addSelectedFromBank()">
                                 <i class="fas fa-plus-circle me-2"></i> Add Selected to Exam
                             </button>
                         </div>
@@ -182,8 +182,8 @@
                                         <tbody id="previewTbody"></tbody>
                                     </table>
                                 </div>
-                                <button class="btn btn-success w-100 fw-bold py-2" id="confirmImportBtn">
-                                    <i class="fas fa-database me-2"></i> Import to Exam
+                                <button class="btn btn-success w-100 fw-bold py-2 shadow-sm" id="confirmImportBtn">
+                                    <i class="fas fa-bolt me-2"></i> Bulk Import to Exam
                                 </button>
                             </div>
                         </div>
@@ -251,7 +251,6 @@
                     return;
                 }
 
-                // Fetch the specific test details
                 const { data: test, error } = await supabase
                     .from('tests')
                     .select('*, classes(name), subjects(name)')
@@ -262,7 +261,7 @@
                 
                 activeTest = test;
                 document.getElementById('workspaceContainer').style.display = 'flex';
-                document.getElementById('displayTestTitle').innerText = `${activeTest.code} (${activeTest.classes.name})`;
+                document.getElementById('displayTestTitle').innerText = `${activeTest.code} (${activeTest.classes?.name || 'Unassigned'})`;
                 
                 updatePublishUI();
                 await loadActiveQuestions();
@@ -297,17 +296,16 @@
             const newStatus = e.target.checked;
             const alertBox = document.getElementById('alertBox');
             
-            // --- STRICT ZERO-QUESTION LOCK ---
             if (newStatus === true) {
                 try {
                     const { data: checkQ } = await supabase.from('test_questions').select('id').eq('test_id', activeTest.id).limit(1);
                     if (!checkQ || checkQ.length === 0) {
-                        e.target.checked = false; // Force switch back
+                        e.target.checked = false; 
                         alertBox.className = 'alert alert-danger shadow-sm';
                         alertBox.classList.remove('d-none');
                         alertBox.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i> <strong>BLOCKED:</strong> You cannot publish an empty exam. Please add questions first.`;
                         setTimeout(() => alertBox.classList.add('d-none'), 5000);
-                        return; // Stop execution
+                        return; 
                     }
                 } catch (err) { console.error(err); return; }
             }
@@ -368,7 +366,7 @@
                                 D) ${q.option_d} ${q.correct_option === 'D' ? '<span class="correct-badge">✓</span>' : ''}
                             </td>
                             <td class="align-middle">
-                                <button onclick="window.deleteQuestion(${item.id}, ${item.question_id})" class="btn btn-sm btn-outline-danger" title="Remove from Exam">
+                                <button onclick="window.deleteQuestion(${item.id})" class="btn btn-sm btn-outline-danger" title="Remove from Exam">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </td>
@@ -379,12 +377,11 @@
         }
 
         // 5. Delete & Auto-Unpublish Logic
-        window.deleteQuestion = async (testQuestionId, questionId) => {
+        window.deleteQuestion = async (testQuestionId) => {
             if (!confirm("Remove this question from the active exam?")) return;
             
             await supabase.from('test_questions').delete().eq('id', testQuestionId);
             
-            // --- AUTO-UNPUBLISH IF EXAM BECOMES EMPTY ---
             const { data: checkQ } = await supabase.from('test_questions').select('id').eq('test_id', activeTest.id).limit(1);
             if (!checkQ || checkQ.length === 0) {
                 await supabase.from('tests').update({ is_published: false }).eq('id', activeTest.id);
@@ -423,20 +420,22 @@
             finally { btn.innerHTML = '<i class="fas fa-save me-2"></i> Save to Exam'; btn.disabled = false; }
         });
 
-        // 7. Load Bank
+        // 7. LOAD BANK (UPGRADED: Filters ONLY by Subject, not Class!)
         async function loadBankQuestions() {
             const tbody = document.getElementById('bankTbody');
             tbody.innerHTML = `<tr><td colspan="2" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i> Loading bank...</td></tr>`;
 
             try {
+                // Get IDs already in this test
                 const { data: existingMap } = await supabase.from('test_questions').select('question_id').eq('test_id', activeTest.id);
-                const existingIds = existingMap.map(e => e.question_id);
+                const existingIds = existingMap ? existingMap.map(e => e.question_id) : [];
 
+                // FETCH ALL PAST QUESTIONS FOR THIS SUBJECT
                 const { data: bankQs } = await supabase.from('questions')
-                    .select('id, question_text, correct_option')
-                    .eq('subject_id', activeTest.subject_id).eq('class_id', activeTest.class_id);
+                    .select('id, question_text, correct_option, classes(name)')
+                    .eq('subject_id', activeTest.subject_id);
 
-                const availableQs = bankQs.filter(q => !existingIds.includes(q.id));
+                const availableQs = bankQs ? bankQs.filter(q => !existingIds.includes(q.id)) : [];
 
                 if (availableQs.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="2" class="text-center py-4 text-muted small">No unused questions found in your bank for this subject.</td></tr>`;
@@ -447,8 +446,11 @@
                     <tr>
                         <td class="align-middle"><input type="checkbox" class="bank-checkbox form-check-input border-dark" value="${q.id}"></td>
                         <td class="small">
-                            <div class="fw-bold text-truncate" style="max-width: 300px;">${q.question_text}</div>
-                            <span class="text-success fw-bold" style="font-size: 0.75rem;">Ans: ${q.correct_option}</span>
+                            <div class="fw-bold" style="white-space: pre-wrap;">${q.question_text}</div>
+                            <div class="mt-1">
+                                <span class="text-success fw-bold me-3" style="font-size: 0.8rem;">Ans: ${q.correct_option}</span>
+                                <span class="badge bg-light text-secondary border" style="font-size: 0.7rem;">Orig: ${q.classes?.name || 'Gen'}</span>
+                            </div>
                         </td>
                     </tr>
                 `).join('');
@@ -469,13 +471,18 @@
             try {
                 await supabase.from('test_questions').insert(inserts);
                 document.getElementById('selectAllBank').checked = false;
+                
+                // Jump to manual tab to see updates
+                const triggerEl = document.querySelector('#manual-tab');
+                bootstrap.Tab.getOrCreateInstance(triggerEl).show();
+
                 await loadActiveQuestions();
                 await loadBankQuestions();
             } catch (err) { alert("Error adding."); } 
             finally { btn.innerHTML = '<i class="fas fa-plus-circle me-2"></i> Add Selected to Exam'; btn.disabled = false; }
         };
 
-        // 8. DOCX Upload
+        // 8. DOCX UPLOAD (UPGRADED: BULK INSERT)
         const docxInput = document.getElementById('docxUpload');
         const processBtn = document.getElementById('processDocxBtn');
 
@@ -522,24 +529,47 @@
             processBtn.classList.replace('btn-secondary', 'btn-success'); processBtn.innerHTML = 'Extracted!';
         }
 
+        // THE BULK IMPORT MAGIC
         document.getElementById('confirmImportBtn').addEventListener('click', async () => {
             const btn = document.getElementById('confirmImportBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importing...'; btn.disabled = true;
 
             try {
-                for (let q of parsedQuestions) {
-                    const { data: newQ } = await supabase.from('questions').insert([{
-                        teacher_id: currentUserId, class_id: activeTest.class_id, subject_id: activeTest.subject_id,
-                        question_text: q.question, option_a: q.optA, option_b: q.optB, option_c: q.optC, option_d: q.optD,
-                        correct_option: q.answer, marks: q.marks
-                    }]).select('id').single();
-                    await supabase.from('test_questions').insert([{ test_id: activeTest.id, question_id: newQ.id }]);
-                }
+                // Prepare Array for Bulk Insert
+                const questionsToInsert = parsedQuestions.map(q => ({
+                    teacher_id: currentUserId, class_id: activeTest.class_id, subject_id: activeTest.subject_id,
+                    question_text: q.question, option_a: q.optA, option_b: q.optB, option_c: q.optC, option_d: q.optD,
+                    correct_option: q.answer, marks: q.marks
+                }));
+
+                // BULK INSERT Questions
+                const { data: newQs, error: qErr } = await supabase.from('questions').insert(questionsToInsert).select('id');
+                if (qErr) throw qErr;
+
+                // Prepare Mappings
+                const mappingsToInsert = newQs.map(nq => ({ test_id: activeTest.id, question_id: nq.id }));
+                
+                // BULK INSERT Mappings
+                const { error: mapErr } = await supabase.from('test_questions').insert(mappingsToInsert);
+                if (mapErr) throw mapErr;
+
                 document.getElementById('extractionPreview').classList.add('d-none');
                 docxInput.value = ''; processBtn.classList.add('d-none'); processBtn.disabled = false;
-                await loadActiveQuestions(); await loadBankQuestions();
-            } catch (err) { alert("Import error."); }
-            finally { btn.innerHTML = '<i class="fas fa-database me-2"></i> Import to Exam'; btn.disabled = false; }
+                processBtn.classList.replace('btn-success', 'btn-secondary');
+                
+                // Go back to the manual review tab to see the success!
+                const triggerEl = document.querySelector('#manual-tab');
+                bootstrap.Tab.getOrCreateInstance(triggerEl).show();
+
+                await loadActiveQuestions(); 
+                await loadBankQuestions();
+                alert(`Success! ${parsedQuestions.length} questions instantly added to Exam.`);
+
+            } catch (err) { 
+                alert("Import error: " + err.message); 
+            } finally { 
+                btn.innerHTML = '<i class="fas fa-bolt me-2"></i> Bulk Import to Exam'; btn.disabled = false; 
+            }
         });
 
         document.getElementById('logoutBtn').addEventListener('click', async (e) => {
