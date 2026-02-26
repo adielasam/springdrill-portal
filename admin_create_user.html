@@ -29,9 +29,6 @@
         .credentials-card { background: #e8f5e9; border: 2px dashed #2ecc71; border-radius: 12px; padding: 25px; text-align: center; display: none; }
         .cred-box { background: white; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 1.2rem; font-weight: bold; color: #2c3e50; border: 1px solid #ced4da; margin-bottom: 10px;}
 
-        /* Section Headers */
-        .section-title { font-size: 0.9rem; font-weight: 700; color: #6c757d; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; margin-top: 20px; border-bottom: 2px solid #e9ecef; padding-bottom: 5px; }
-
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
@@ -109,8 +106,8 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold small">Registration / ID Number</label>
-                                    <input type="text" id="stuRegNumber" class="form-control" placeholder="e.g. 2024/2025/001">
+                                    <label class="form-label fw-bold small text-success">Reg Number (Auto-Generated) <span class="text-danger">*</span></label>
+                                    <input type="text" id="stuRegNumber" class="form-control border-success fw-bold" placeholder="e.g. SD/2026/001">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold small">Assign Class <span class="text-danger">*</span></label>
@@ -136,7 +133,6 @@
                                 <div class="col-12 mt-3 pt-3 border-top">
                                     <label class="form-label fw-bold small text-primary"><i class="fas fa-camera me-1"></i> Optional Passport Upload</label>
                                     <input type="file" id="stuPassport" class="form-control" accept="image/png, image/jpeg, image/jpg">
-                                    <small class="text-muted">You can upload the student's passport now, or they can upload it later from their own dashboard.</small>
                                 </div>
                             </div>
                         </div>
@@ -152,7 +148,7 @@
                 <div class="credentials-card shadow-sm" id="credentialsCard">
                     <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
                     <h4 class="fw-bold text-dark">Profile Created!</h4>
-                    <p class="text-muted small">Please provide these credentials to the user. They will use this Login ID instead of an email.</p>
+                    <p class="text-muted small">Please provide these credentials to the user.</p>
                     
                     <div class="mt-4 text-start">
                         <label class="text-muted small fw-bold">Generated Login ID (Username):</label>
@@ -166,12 +162,6 @@
                         <i class="fas fa-plus me-2"></i> Create Another User
                     </button>
                 </div>
-
-                <div class="alert alert-info border-0 shadow-sm">
-                    <h6 class="fw-bold"><i class="fas fa-info-circle me-2"></i> How this works</h6>
-                    <p class="small mb-2">Accounts created here are automatically marked as <strong>Approved</strong>. The system generates a unique school Login ID ending in <i>@springdrill.edu</i> to serve as their username.</p>
-                    <p class="small mb-0">For students, filling out the comprehensive data ensures their Term Report Cards are instantly ready for printing.</p>
-                </div>
             </div>
         </div>
     </div>
@@ -181,14 +171,12 @@
 
         let adminSession = null;
 
-        // 1. Initialize Page
         async function initializePage() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
-                adminSession = session; // Save admin session for restoration
+                adminSession = session; 
 
-                // Load classes for the student dropdown
                 const { data: classes } = await supabase.from('classes').select('*').order('id');
                 const classDropdown = document.getElementById('stuClassSelect');
                 if (classes) {
@@ -204,7 +192,7 @@
 
         document.addEventListener('DOMContentLoaded', initializePage);
 
-        // 2. Dynamic Form Toggling
+        // Dynamic Form Toggling & Auto-ID Generation
         document.getElementById('roleSelect').addEventListener('change', (e) => {
             const role = e.target.value;
             const basicDiv = document.getElementById('basicDetailsSection');
@@ -221,18 +209,27 @@
                 document.getElementById('stuSurname').required = true;
                 document.getElementById('stuFirstName').required = true;
                 document.getElementById('stuClassSelect').required = true;
+                document.getElementById('stuRegNumber').required = true;
+
+                // --- NEW: AUTO-GENERATE REGISTRATION NUMBER ---
+                const currentYear = new Date().getFullYear();
+                const randomDigit = Math.floor(1000 + Math.random() * 9000);
+                document.getElementById('stuRegNumber').value = `SD/${currentYear}/${randomDigit}`;
+                // ----------------------------------------------
+
             } else {
                 studentDiv.style.display = 'none';
                 document.getElementById('stuSurname').required = false;
                 document.getElementById('stuFirstName').required = false;
                 document.getElementById('stuClassSelect').required = false;
+                document.getElementById('stuRegNumber').required = false;
 
                 basicDiv.style.display = 'block';
                 document.getElementById('basicFullName').required = true;
             }
         });
 
-        // 3. Form Submission & User Generation
+        // Form Submission
         document.getElementById('createUserForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -248,13 +245,11 @@
             try {
                 let finalPassportUrl = null;
 
-                // --- DATA PREPARATION based on role ---
                 if (role === 'student') {
                     const surname = document.getElementById('stuSurname').value.trim();
                     const firstName = document.getElementById('stuFirstName').value.trim();
                     fullName = `${firstName} ${surname}`;
                     
-                    // Handle Passport Upload if provided by Admin
                     const passportFile = document.getElementById('stuPassport').files[0];
                     if (passportFile) {
                         const fileExt = passportFile.name.split('.').pop();
@@ -270,14 +265,11 @@
                     fullName = document.getElementById('basicFullName').value.trim();
                 }
 
-                // Generate Secure Credentials
                 const nameClean = fullName.replace(/\s+/g, '.').toLowerCase();
                 const randomNum = Math.floor(1000 + Math.random() * 9000);
                 generatedEmail = `${nameClean}${randomNum}@springdrill.edu`;
                 generatedPassword = `Spring${randomNum}!`;
 
-                // --- DATABASE INSERTS ---
-                // Step A: Create User in Supabase Auth
                 const { data: authData, error: authErr } = await supabase.auth.signUp({
                     email: generatedEmail,
                     password: generatedPassword,
@@ -285,7 +277,6 @@
                 if (authErr) throw authErr;
                 const newUserId = authData.user.id;
 
-                // Step B: Insert into core users table
                 await supabase.from('users').insert([{
                     id: newUserId,
                     name: fullName,
@@ -294,7 +285,6 @@
                     username: generatedEmail.split('@')[0]
                 }]);
 
-                // Step C: Insert Role-Specific Data
                 if (role === 'student') {
                     await supabase.from('students').insert([{ 
                         user_id: newUserId, 
@@ -315,11 +305,9 @@
                     await supabase.from('parents').insert([{ user_id: newUserId }]);
                 }
 
-                // Step D: Restore Admin Session
                 await supabase.auth.signOut();
                 await supabase.auth.setSession({ access_token: adminSession.access_token, refresh_token: adminSession.refresh_token });
 
-                // Display Success
                 document.getElementById('displayLoginId').innerText = generatedEmail;
                 document.getElementById('displayPassword').innerText = generatedPassword;
                 document.getElementById('credentialsCard').style.display = 'block';
@@ -336,7 +324,6 @@
             }
         });
 
-        // Reset Form UI
         window.resetGenerator = () => {
             document.getElementById('createUserForm').reset();
             document.getElementById('basicDetailsSection').style.display = 'none';
@@ -346,7 +333,6 @@
             document.getElementById('createUserForm').style.display = 'block';
         };
 
-        // Logout
         document.getElementById('logoutBtn').addEventListener('click', async (e) => {
             e.preventDefault();
             await supabase.auth.signOut();
