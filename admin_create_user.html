@@ -7,27 +7,39 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f7fa; overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
         
-        /* Sidebar Styling */
-        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding-top: 30px; z-index: 1000; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
-        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-brand i { color: #f1c40f; font-size: 2.5rem; margin-bottom: 10px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 15px 25px; margin: 4px 15px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; text-decoration: none; }
-        .nav-link i { width: 25px; font-size: 1.1rem; }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; transform: translateX(5px); }
+        /* Sidebar Styling (Educare Clone) */
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1000; }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center;}
+        .nav-link i { width: 25px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
 
         /* Main Content */
-        .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
-        .top-header { background: white; padding: 20px 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #f1c40f; }
-
-        .content-card { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: none; margin-bottom: 30px; }
-        .form-control, .form-select { padding: 12px 15px; border-radius: 8px; border: 1px solid #dee2e6; background-color: #f8f9fa; }
-        .form-control:focus, .form-select:focus { border-color: #1a3c34; box-shadow: 0 0 0 0.25rem rgba(26, 60, 52, 0.25); background-color: white; }
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
         
-        /* Credentials Display */
-        .credentials-card { background: #e8f5e9; border: 2px dashed #2ecc71; border-radius: 12px; padding: 25px; text-align: center; display: none; }
-        .cred-box { background: white; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 1.2rem; font-weight: bold; color: #2c3e50; border: 1px solid #ced4da; margin-bottom: 10px;}
+        /* Top Navbar */
+        .top-navbar { background: white; padding: 15px 30px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d;}
+        .search-bar { position: relative; width: 300px; }
+        .search-bar input { width: 100%; padding: 8px 15px 8px 35px; border-radius: 20px; border: 1px solid #dee2e6; background: #f8f9fa; font-size: 0.9rem;}
+        .search-bar i { position: absolute; left: 12px; top: 11px; color: #adb5bd; }
+
+        /* Edu Card Layout */
+        .edu-card { background: white; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
+        .edu-header { background-color: #007a4d; color: white; padding: 15px 20px; border-radius: 4px 4px 0 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center;}
+        .edu-body { padding: 30px; }
+
+        /* Form Styling */
+        .form-label { font-weight: 600; color: #495057; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;}
+        .form-control, .form-select { padding: 10px 15px; border-radius: 4px; border: 1px solid #ced4da; background-color: #f8f9fa; }
+        .form-control:focus, .form-select:focus { border-color: #007a4d; box-shadow: 0 0 0 0.25rem rgba(0, 122, 77, 0.25); background-color: white; }
+        
+        .student-section { background: #f8f9fa; padding: 25px; border-radius: 8px; border: 1px dashed #cbd3da; margin-bottom: 25px; }
+
+        /* Credentials Display Card */
+        .credentials-card { background: #e8f5e9; border: 2px solid #2ecc71; border-radius: 8px; padding: 30px; text-align: center; display: none; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.15);}
+        .cred-box { background: white; padding: 12px; border-radius: 4px; font-family: monospace; font-size: 1.1rem; font-weight: bold; color: #007a4d; border: 1px dashed #2ecc71; margin-bottom: 15px;}
 
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
@@ -35,131 +47,153 @@
 <body>
 
     <div id="loadingOverlay">
-        <i class="fas fa-spinner fa-spin fa-3x text-warning mb-3"></i>
-        <h4>Loading Admin Tools...</h4>
+        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
+        <h4 class="fw-bold text-muted">Loading System Setup...</h4>
     </div>
 
     <div class="sidebar">
         <div class="sidebar-brand">
-            <i class="fas fa-shield-alt"></i>
-            <h4 class="text-white fw-bold mb-0">ADMIN PORTAL</h4>
+            <h5 class="text-white fw-bold"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
         </div>
-        
-        <nav class="nav flex-column mt-4">
-            <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard Overview</a>
-            <a href="admin_create_user.html" class="nav-link active"><i class="fas fa-user-plus"></i> Generate Accounts</a>
-            <a href="manage_users.html" class="nav-link"><i class="fas fa-users-cog"></i> Manage Approvals</a>
-            <a href="class_list.html" class="nav-link"><i class="fas fa-clipboard-list"></i> Class Lists & Data</a>
+        <nav class="nav flex-column mt-3">
+            <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            
+            <a href="#usersMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
+                <span><i class="fas fa-users me-2"></i> Accounts</span>
+                <i class="fas fa-caret-down"></i>
+            </a>
+            <div class="collapse show bg-dark mx-2 mt-1 rounded" id="usersMenu">
+                <a href="admin_create_user.html" class="nav-link small py-2 active text-success fw-bold"><i class="fas fa-user-plus me-2"></i> Generate Account</a>
+                <a href="manage_users.html" class="nav-link small py-2"><i class="fas fa-user-check me-2"></i> Approvals</a>
+            </div>
+
+            <a href="class_list.html" class="nav-link mt-2"><i class="fas fa-clipboard-list"></i> Class Data</a>
             <a href="manage_cbt.html" class="nav-link"><i class="fas fa-tasks"></i> Manage CBT</a>
-            <a href="test_analysis.html" class="nav-link"><i class="fas fa-chart-pie"></i> Academic Analysis</a>
+            <a href="test_analysis.html" class="nav-link"><i class="fas fa-chart-pie"></i> Analytics</a>
+
             <hr class="mx-3 my-4 border-secondary">
-            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-sign-out-alt"></i> Secure Logout</a>
+            <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </div>
 
     <div class="main-content">
-        <div class="top-header">
-            <div>
-                <h3 class="fw-bold mb-0 text-dark"><i class="fas fa-user-shield text-warning me-2"></i> Account Generator</h3>
-                <p class="text-muted mb-0 mt-1">Officially provision comprehensive accounts for the school database.</p>
+        
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-bars me-3 text-muted"></i>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search system...">
+                </div>
+            </div>
+            <div class="fw-bold text-dark d-flex align-items-center">
+                <i class="fas fa-bell text-success me-4 fs-5"></i> 
+                <span id="adminNameDisplay">Administrator</span>
+                <i class="fas fa-user-shield ms-3 fs-4 text-primary"></i>
             </div>
         </div>
 
+        <h5 class="text-muted fw-bold mb-4">Home / Accounts / Generate Account</h5>
+
         <div class="row">
             <div class="col-lg-8">
-                <div class="content-card">
-                    <h5 class="fw-bold mb-4 border-bottom pb-2">Create New User Profile</h5>
+                <div class="edu-card">
+                    <div class="edu-header">
+                        <span><i class="fas fa-user-plus me-2"></i> Provision New User Profile</span>
+                    </div>
                     
-                    <form id="createUserForm">
-                        <div class="mb-4">
-                            <label class="form-label fw-bold text-primary">Account Role</label>
-                            <select id="roleSelect" class="form-select border-primary fw-bold" required>
-                                <option value="" disabled selected>-- Select Role to Expand Form --</option>
-                                <option value="student">Student</option>
-                                <option value="teacher">Teacher / Staff</option>
-                                <option value="parent">Parent / Guardian</option>
-                            </select>
-                        </div>
-
-                        <div id="basicDetailsSection" style="display: none;">
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Full Name</label>
-                                <input type="text" id="basicFullName" class="form-control" placeholder="e.g. John Doe">
+                    <div class="edu-body">
+                        <form id="createUserForm">
+                            <div class="mb-4 pb-3 border-bottom">
+                                <label class="form-label text-success">Select Account Role</label>
+                                <select id="roleSelect" class="form-select border-success fw-bold text-dark fs-5" required>
+                                    <option value="" disabled selected>-- Choose Role to Expand Form --</option>
+                                    <option value="student">Student</option>
+                                    <option value="teacher">Teacher / Staff</option>
+                                    <option value="parent">Parent / Guardian</option>
+                                </select>
                             </div>
-                        </div>
 
-                        <div id="studentDetailsSection" style="display: none; background: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #dee2e6; margin-bottom: 25px;">
-                            <h6 class="fw-bold text-dark mb-3"><i class="fas fa-id-card me-2"></i> Comprehensive Student Data</h6>
-                            
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold small">Surname <span class="text-danger">*</span></label>
-                                    <input type="text" id="stuSurname" class="form-control" placeholder="Surname">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold small">First Name <span class="text-danger">*</span></label>
-                                    <input type="text" id="stuFirstName" class="form-control" placeholder="First Name">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold small">Other Name</label>
-                                    <input type="text" id="stuOtherName" class="form-control" placeholder="Middle Name">
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold small text-success">Reg Number (Auto-Generated) <span class="text-danger">*</span></label>
-                                    <input type="text" id="stuRegNumber" class="form-control border-success fw-bold" placeholder="e.g. SD/2026/001">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold small">Assign Class <span class="text-danger">*</span></label>
-                                    <select id="stuClassSelect" class="form-select">
-                                        <option value="">Loading classes...</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold small">Phone Number</label>
-                                    <input type="text" id="stuPhone" class="form-control" placeholder="Contact number">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold small">Parent/Guardian Name</label>
-                                    <input type="text" id="stuParentName" class="form-control" placeholder="Name of primary contact">
-                                </div>
-
-                                <div class="col-12">
-                                    <label class="form-label fw-bold small">Residential Address</label>
-                                    <input type="text" id="stuAddress" class="form-control" placeholder="Full home address">
-                                </div>
-
-                                <div class="col-12 mt-3 pt-3 border-top">
-                                    <label class="form-label fw-bold small text-primary"><i class="fas fa-camera me-1"></i> Optional Passport Upload</label>
-                                    <input type="file" id="stuPassport" class="form-control" accept="image/png, image/jpeg, image/jpg">
+                            <div id="basicDetailsSection" style="display: none;">
+                                <div class="mb-4">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" id="basicFullName" class="form-control" placeholder="e.g. John Doe">
                                 </div>
                             </div>
-                        </div>
 
-                        <button type="submit" class="btn btn-dark w-100 py-3 fw-bold fs-5" id="generateBtn" style="display: none;">
-                            <i class="fas fa-cogs me-2"></i> Generate Login ID & Save Profile
-                        </button>
-                    </form>
+                            <div id="studentDetailsSection" class="student-section" style="display: none;">
+                                <h6 class="fw-bold text-dark mb-4 border-bottom pb-2"><i class="fas fa-id-card me-2 text-primary"></i> Official Student Data</h6>
+                                
+                                <div class="row g-4">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Surname <span class="text-danger">*</span></label>
+                                        <input type="text" id="stuSurname" class="form-control" placeholder="Last Name">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                        <input type="text" id="stuFirstName" class="form-control" placeholder="Given Name">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Middle Name</label>
+                                        <input type="text" id="stuOtherName" class="form-control" placeholder="Optional">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label text-primary">Reg Number (Auto-Generated) <span class="text-danger">*</span></label>
+                                        <input type="text" id="stuRegNumber" class="form-control border-primary fw-bold text-primary" placeholder="e.g. SD/2026/001" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Assign Class <span class="text-danger">*</span></label>
+                                        <select id="stuClassSelect" class="form-select">
+                                            <option value="">Loading classes...</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Parent/Guardian Name</label>
+                                        <input type="text" id="stuParentName" class="form-control" placeholder="Name of primary contact">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Phone Number</label>
+                                        <input type="text" id="stuPhone" class="form-control" placeholder="Contact number">
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label class="form-label">Residential Address</label>
+                                        <input type="text" id="stuAddress" class="form-control" placeholder="Full home address">
+                                    </div>
+
+                                    <div class="col-12 mt-4 pt-3 border-top">
+                                        <label class="form-label text-success"><i class="fas fa-camera me-1"></i> Student Passport (Optional)</label>
+                                        <input type="file" id="stuPassport" class="form-control" accept="image/png, image/jpeg, image/jpg">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-dark w-100 py-3 fw-bold fs-6" id="generateBtn" style="display: none;">
+                                <i class="fas fa-cogs me-2"></i> GENERATE LOGIN & SAVE PROFILE
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
 
             <div class="col-lg-4">
-                <div class="credentials-card shadow-sm" id="credentialsCard">
-                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                    <h4 class="fw-bold text-dark">Profile Created!</h4>
-                    <p class="text-muted small">Please provide these credentials to the user.</p>
+                <div class="credentials-card" id="credentialsCard">
+                    <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                    <h4 class="fw-bold text-dark">Profile Activated!</h4>
+                    <p class="text-muted small mb-4">Please provide these credentials to the user immediately.</p>
                     
-                    <div class="mt-4 text-start">
-                        <label class="text-muted small fw-bold">Generated Login ID (Username):</label>
+                    <div class="text-start">
+                        <label class="form-label text-muted">Generated Username / Email</label>
                         <div class="cred-box" id="displayLoginId">--</div>
                         
-                        <label class="text-muted small fw-bold mt-2">Default Password:</label>
+                        <label class="form-label text-muted mt-2">Default Password</label>
                         <div class="cred-box" id="displayPassword">--</div>
                     </div>
 
-                    <button class="btn btn-outline-success w-100 mt-4 fw-bold" onclick="resetGenerator()">
-                        <i class="fas fa-plus me-2"></i> Create Another User
+                    <button class="btn btn-success w-100 mt-4 fw-bold shadow-sm py-2" onclick="window.resetGenerator()">
+                        <i class="fas fa-user-plus me-2"></i> Register Another User
                     </button>
                 </div>
             </div>
@@ -177,6 +211,11 @@
                 if (!session) return window.location.href = 'login.html';
                 adminSession = session; 
 
+                // Fetch Admin Name for Navbar
+                const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
+                if (profile) document.getElementById('adminNameDisplay').innerText = profile.name;
+
+                // Load Classes for Student Form
                 const { data: classes } = await supabase.from('classes').select('*').order('id');
                 const classDropdown = document.getElementById('stuClassSelect');
                 if (classes) {
@@ -187,6 +226,7 @@
                 document.getElementById('loadingOverlay').style.display = 'none';
             } catch (err) {
                 console.error(err);
+                document.getElementById('loadingOverlay').style.display = 'none';
             }
         }
 
@@ -211,11 +251,10 @@
                 document.getElementById('stuClassSelect').required = true;
                 document.getElementById('stuRegNumber').required = true;
 
-                // --- NEW: AUTO-GENERATE REGISTRATION NUMBER ---
+                // Auto-Generate Registration Number
                 const currentYear = new Date().getFullYear();
                 const randomDigit = Math.floor(1000 + Math.random() * 9000);
                 document.getElementById('stuRegNumber').value = `SD/${currentYear}/${randomDigit}`;
-                // ----------------------------------------------
 
             } else {
                 studentDiv.style.display = 'none';
@@ -229,12 +268,12 @@
             }
         });
 
-        // Form Submission
+        // Form Submission Logic
         document.getElementById('createUserForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const btn = document.getElementById('generateBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Processing...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Registering...';
             btn.disabled = true;
 
             const role = document.getElementById('roleSelect').value;
@@ -265,11 +304,13 @@
                     fullName = document.getElementById('basicFullName').value.trim();
                 }
 
+                // Create Credentials
                 const nameClean = fullName.replace(/\s+/g, '.').toLowerCase();
                 const randomNum = Math.floor(1000 + Math.random() * 9000);
                 generatedEmail = `${nameClean}${randomNum}@springdrill.edu`;
                 generatedPassword = `Spring${randomNum}!`;
 
+                // Register with Supabase Auth
                 const { data: authData, error: authErr } = await supabase.auth.signUp({
                     email: generatedEmail,
                     password: generatedPassword,
@@ -277,6 +318,7 @@
                 if (authErr) throw authErr;
                 const newUserId = authData.user.id;
 
+                // Insert into main users table
                 await supabase.from('users').insert([{
                     id: newUserId,
                     name: fullName,
@@ -285,11 +327,12 @@
                     username: generatedEmail.split('@')[0]
                 }]);
 
+                // Insert into specific role tables
                 if (role === 'student') {
                     await supabase.from('students').insert([{ 
                         user_id: newUserId, 
                         class_id: document.getElementById('stuClassSelect').value, 
-                        approved: true,
+                        approved: true, // Auto-approve admin creations
                         surname: document.getElementById('stuSurname').value.trim(),
                         first_name: document.getElementById('stuFirstName').value.trim(),
                         other_name: document.getElementById('stuOtherName').value.trim(),
@@ -305,9 +348,12 @@
                     await supabase.from('parents').insert([{ user_id: newUserId }]);
                 }
 
+                // CRITICAL HACK: Restoring Admin Session 
+                // (Supabase logs the admin out when creating a new user on the client side)
                 await supabase.auth.signOut();
                 await supabase.auth.setSession({ access_token: adminSession.access_token, refresh_token: adminSession.refresh_token });
 
+                // Display Success UI
                 document.getElementById('displayLoginId').innerText = generatedEmail;
                 document.getElementById('displayPassword').innerText = generatedPassword;
                 document.getElementById('credentialsCard').style.display = 'block';
@@ -319,11 +365,12 @@
                     await supabase.auth.setSession({ access_token: adminSession.access_token, refresh_token: adminSession.refresh_token });
                 }
             } finally {
-                btn.innerHTML = '<i class="fas fa-cogs me-2"></i> Generate Login ID & Save Profile';
+                btn.innerHTML = '<i class="fas fa-cogs me-2"></i> GENERATE LOGIN & SAVE PROFILE';
                 btn.disabled = false;
             }
         });
 
+        // Reset UI for next user
         window.resetGenerator = () => {
             document.getElementById('createUserForm').reset();
             document.getElementById('basicDetailsSection').style.display = 'none';
@@ -333,6 +380,7 @@
             document.getElementById('createUserForm').style.display = 'block';
         };
 
+        // Secure Logout
         document.getElementById('logoutBtn').addEventListener('click', async (e) => {
             e.preventDefault();
             await supabase.auth.signOut();
