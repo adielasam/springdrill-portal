@@ -79,18 +79,28 @@
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
 
-                // 2. Fetch Student Profile & Class info
-                const { data: student, error: stuErr } = await supabase
+                // 2. Fetch Student Profile safely (bypassing .single() errors)
+                const { data: studentRecords, error: stuErr } = await supabase
                     .from('students')
                     .select('surname, first_name, class_id, passport_url, classes(name), users(name)')
-                    .eq('user_id', session.user.id)
-                    .single();
+                    .eq('user_id', session.user.id);
 
                 if (stuErr) throw stuErr;
 
+                if (!studentRecords || studentRecords.length === 0) {
+                     document.getElementById('welcomeText').innerText = "Profile Incomplete";
+                     document.getElementById('studentClass').innerText = "N/A";
+                     document.getElementById('examsGrid').innerHTML = `<div class="col-12"><div class="alert alert-danger fw-bold"><i class="fas fa-exclamation-triangle me-2"></i> Your student profile is incomplete in the database. Please contact the Admin.</div></div>`;
+                     document.getElementById('loadingOverlay').style.display = 'none';
+                     return;
+                }
+
+                // Grab the first matched record safely
+                const student = studentRecords[0];
+
                 // Display Welcome Info
-                const displayName = student.first_name ? `${student.first_name} ${student.surname || ''}` : student.users.name;
-                document.getElementById('welcomeText').innerText = `Welcome, ${displayName}!`;
+                const displayName = student.first_name ? `${student.first_name} ${student.surname || ''}` : student.users?.name;
+                document.getElementById('welcomeText').innerText = `Welcome, ${displayName || 'Student'}!`;
                 document.getElementById('studentClass').innerText = student.classes?.name || 'Unassigned';
 
                 if (student.passport_url) {
@@ -134,7 +144,6 @@
                             const result = pastAttempts.find(a => a.test_id === test.id);
                             buttonHtml = `<button class="btn btn-outline-success w-100 fw-bold" disabled><i class="fas fa-check-circle me-1"></i> Completed (Score: ${result.score})</button>`;
                         } else {
-                            // This button passes the Test ID seamlessly to our take_test page!
                             buttonHtml = `<a href="take_test.html?id=${test.id}" class="btn btn-dark w-100 fw-bold"><i class="fas fa-play me-2"></i> Start Exam</a>`;
                         }
 
