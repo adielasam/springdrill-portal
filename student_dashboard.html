@@ -7,55 +7,100 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f7fa; overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding-top: 30px; z-index: 1000; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
-        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-brand i { color: #f1c40f; font-size: 2.5rem; margin-bottom: 10px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 15px 25px; margin: 4px 15px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; text-decoration: none; font-weight: 500;}
-        .nav-link i { width: 25px; font-size: 1.1rem; }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; transform: translateX(5px); }
-        .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
-        .top-header { background: white; padding: 20px 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #2ecc71; }
-        .exam-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #e9ecef; transition: transform 0.2s; margin-bottom: 20px;}
-        .exam-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.06); border-color: #1a3c34;}
-        .exam-title { font-size: 1.2rem; font-weight: bold; color: #2c3e50; margin-bottom: 10px; }
-        .exam-meta { font-size: 0.85rem; color: #6c757d; margin-bottom: 15px; }
-        .exam-meta i { width: 20px; text-align: center; }
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
+        
+        /* Sidebar Styling */
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1000; }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; }
+        .nav-link i { width: 25px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
+
+        /* Main Content */
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
+        
+        /* Top Navbar */
+        .top-navbar { background: white; padding: 15px 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        
+        /* Student Profile Card */
+        .profile-section { display: flex; align-items: center; gap: 30px; padding: 20px; background: white; border-radius: 8px; border-top: 4px solid #007a4d; box-shadow: 0 2px 5px rgba(0,0,0,0.02); margin-bottom: 30px;}
+        .profile-img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #f4f7fa; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .profile-info h3 { font-weight: 800; color: #333; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;}
+        .profile-info p { color: #666; font-size: 1.1rem; margin: 0; }
+
+        /* Icon Grid */
+        .icon-grid { display: flex; flex-wrap: wrap; gap: 20px; }
+        .icon-card { background: white; width: 140px; padding: 25px 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03); cursor: pointer; transition: all 0.3s; text-decoration: none; color: inherit; border: 1px solid #eee;}
+        .icon-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.08); border-color: #007a4d; }
+        .icon-circle { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; font-size: 2rem; color: white; }
+        
+        .ic-subjects { background: #3498db; }
+        .ic-assignments { background: #f39c12; }
+        .ic-cbt { background: #e74c3c; }
+        .ic-eclassroom { background: #34495e; }
+        .ic-results { background: #2ecc71; }
+
+        .icon-card h6 { font-weight: 600; font-size: 0.9rem; color: #444; margin: 0; }
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
 <body>
 
     <div id="loadingOverlay">
         <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
-        <h4>Loading your Portal...</h4>
+        <h4 class="fw-bold text-muted">Loading Portal...</h4>
     </div>
 
     <div class="sidebar">
         <div class="sidebar-brand">
-            <i class="fas fa-graduation-cap"></i>
-            <h4 class="text-white fw-bold mb-0">STUDENT</h4>
+            <h5 class="text-white fw-bold"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
         </div>
-        <nav class="nav flex-column mt-4">
-            <a href="student_dashboard.html" class="nav-link active"><i class="fas fa-home"></i> My Dashboard</a>
-            <a href="take_test.html" class="nav-link"><i class="fas fa-laptop-code"></i> Active Exams</a>
-            <a href="student_results.html" class="nav-link"><i class="fas fa-chart-line"></i> My Results</a>
+        <nav class="nav flex-column mt-3">
+            <a href="student_dashboard.html" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="student_cbt.html" class="nav-link"><i class="fas fa-laptop-code"></i> CBT / Exams</a>
+            <a href="student_results.html" class="nav-link"><i class="fas fa-chart-line"></i> Result Manager</a>
             <hr class="mx-3 my-4 border-secondary">
-            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-sign-out-alt"></i> Secure Logout</a>
+            <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </div>
 
     <div class="main-content">
-        <div class="top-header">
-            <div>
-                <h3 class="fw-bold mb-0 text-dark" id="welcomeText">Welcome back!</h3>
-                <p class="text-muted mb-0 mt-1">Class: <strong id="studentClass" class="text-success">Loading...</strong></p>
-            </div>
-            <div id="profileImageContainer"></div>
+        <div class="top-navbar">
+            <div class="fw-bold text-muted"><i class="fas fa-bars me-3"></i> Student Portal</div>
+            <div class="fw-bold text-dark" id="headerName">Loading...</div>
         </div>
 
-        <h5 class="fw-bold mb-4 text-dark"><i class="fas fa-clipboard-list text-warning me-2"></i> Assigned Exams</h5>
-        <div class="row" id="examsGrid"></div>
+        <div class="profile-section">
+            <img src="https://ui-avatars.com/api/?name=Student&background=007a4d&color=fff" id="profileImage" class="profile-img">
+            <div class="profile-info">
+                <h3 id="studentName">LOADING...</h3>
+                <p id="studentClass">Class: Verifying...</p>
+            </div>
+        </div>
+
+        <div class="icon-grid">
+            <a href="#" class="icon-card">
+                <div class="icon-circle ic-subjects"><i class="fas fa-book"></i></div>
+                <h6>Subjects</h6>
+            </a>
+            <a href="#" class="icon-card">
+                <div class="icon-circle ic-assignments"><i class="fas fa-edit"></i></div>
+                <h6>Assignments</h6>
+            </a>
+            <a href="student_cbt.html" class="icon-card" style="border: 2px solid #e74c3c;">
+                <div class="icon-circle ic-cbt"><i class="fas fa-laptop-code"></i></div>
+                <h6>CBT</h6>
+            </a>
+            <a href="#" class="icon-card">
+                <div class="icon-circle ic-eclassroom"><i class="fas fa-video"></i></div>
+                <h6>eClassroom</h6>
+            </a>
+            <a href="student_results.html" class="icon-card">
+                <div class="icon-circle ic-results"><i class="fas fa-award"></i></div>
+                <h6>Results</h6>
+            </a>
+        </div>
     </div>
 
     <script type="module">
@@ -67,125 +112,32 @@
                 if (!session) return window.location.href = 'login.html';
                 const userId = session.user.id;
 
-                const { data: authUser } = await supabase.from('users').select('name').eq('id', userId).single();
-                let displayName = authUser ? authUser.name : "Student";
+                let displayName = "Student";
                 let className = "Unassigned";
-                let studentClassId = null;
+                let avatarUrl = `https://ui-avatars.com/api/?name=Student&background=007a4d&color=fff`;
 
                 const { data: studentRecords } = await supabase
                     .from('students')
-                    .select('surname, first_name, passport_url, class_id, classes(name)')
+                    .select('surname, first_name, passport_url, classes(name)')
                     .eq('user_id', userId);
 
                 if (studentRecords && studentRecords.length > 0) {
                     const student = studentRecords[0];
-                    studentClassId = student.class_id;
-                    if (student.first_name) displayName = `${student.first_name} ${student.surname || ''}`;
-                    if (student.classes) className = student.classes.name;
-                    if (student.passport_url) {
-                        document.getElementById('profileImageContainer').innerHTML = `<img src="${student.passport_url}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #2ecc71;">`;
+                    if (student.first_name) {
+                        displayName = `${student.first_name} ${student.surname || ''}`;
+                        avatarUrl = student.passport_url || `https://ui-avatars.com/api/?name=${student.first_name}+${student.surname}&background=007a4d&color=fff`;
                     }
+                    if (student.classes) className = student.classes.name;
                 }
 
-                document.getElementById('welcomeText').innerText = `Welcome, ${displayName}!`;
+                document.getElementById('headerName').innerText = displayName;
+                document.getElementById('studentName').innerText = displayName;
                 document.getElementById('studentClass').innerText = className;
-
-                const grid = document.getElementById('examsGrid');
-
-                // 1. Check if student has a class
-                if (!studentClassId) {
-                    grid.innerHTML = `<div class="col-12"><div class="alert alert-warning"><i class="fas fa-info-circle me-2"></i> You have not been assigned to a class. Please contact your Admin.</div></div>`;
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                    return;
-                }
-
-                // 2. Fetch PUBLISHED tests for this class
-                const { data: rawTests, error: testErr } = await supabase
-                    .from('tests')
-                    .select('*')
-                    .eq('is_published', true)
-                    .eq('class_id', studentClassId)
-                    .order('created_at', { ascending: false });
-
-                if (testErr) throw testErr;
-
-                // --- 3. THE IRON-CLAD FILTER: VERIFY QUESTIONS EXIST ---
-                let validTests = [];
-                if (rawTests && rawTests.length > 0) {
-                    const testIds = rawTests.map(t => t.id);
-                    
-                    // Ask the database which of these tests actually have questions mapped to them
-                    const { data: testQs } = await supabase
-                        .from('test_questions')
-                        .select('test_id')
-                        .in('test_id', testIds);
-                        
-                    // Create a strict list of Test IDs that have at least 1 question
-                    const validTestIds = new Set(testQs ? testQs.map(tq => tq.test_id) : []);
-                    
-                    // Filter the raw tests to ONLY include the valid ones
-                    validTests = rawTests.filter(t => validTestIds.has(t.id));
-                }
-                // -------------------------------------------------------
-
-                // 4. Fetch past attempts
-                const { data: pastAttempts } = await supabase
-                    .from('test_results')
-                    .select('test_id, score')
-                    .eq('student_id', userId);
-                
-                const takenTestIds = pastAttempts ? pastAttempts.map(a => a.test_id) : [];
-                const now = new Date();
-                
-                // 5. Render Valid Tests
-                if (!validTests || validTests.length === 0) {
-                    grid.innerHTML = `<div class="col-12"><div class="exam-card text-center py-5 text-muted"><i class="fas fa-mug-hot fa-3x mb-3 opacity-50"></i><h5>No exams available for your class right now.</h5></div></div>`;
-                } else {
-                    grid.innerHTML = validTests.map(test => {
-                        const hasTaken = takenTestIds.includes(test.id);
-                        const startTime = test.start_time ? new Date(test.start_time) : null;
-                        const endTime = test.end_time ? new Date(test.end_time) : null;
-                        
-                        let isLive = true;
-                        let timeStatusHtml = `<div class="mt-2 text-success fw-bold"><i class="fas fa-satellite-dish"></i> Status: Active & Live</div>`;
-
-                        if (startTime && now < startTime) {
-                            isLive = false;
-                            timeStatusHtml = `<div class="mt-2 text-warning fw-bold"><i class="fas fa-lock"></i> Opens: ${startTime.toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>`;
-                        } else if (endTime && now > endTime) {
-                            isLive = false;
-                            timeStatusHtml = `<div class="mt-2 text-danger fw-bold"><i class="fas fa-times-circle"></i> Closed: ${endTime.toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</div>`;
-                        }
-                        
-                        let buttonHtml = '';
-                        if (hasTaken) {
-                            const result = pastAttempts.find(a => a.test_id === test.id);
-                            buttonHtml = `<button class="btn btn-outline-success w-100 fw-bold" disabled><i class="fas fa-check-circle me-1"></i> Completed (Score: ${result.score})</button>`;
-                        } else if (!isLive) {
-                            buttonHtml = `<button class="btn btn-secondary w-100 fw-bold opacity-75" disabled><i class="fas fa-lock me-2"></i> Locked</button>`;
-                        } else {
-                            buttonHtml = `<a href="take_test.html?id=${test.id}" class="btn btn-dark w-100 fw-bold"><i class="fas fa-play me-2"></i> Start Exam</a>`;
-                        }
-
-                        return `
-                            <div class="col-md-6 col-lg-4">
-                                <div class="exam-card">
-                                    <div class="exam-title">${test.title || 'CBT Assessment'}</div>
-                                    <div class="exam-meta">
-                                        <div><i class="fas fa-clock text-dark"></i> ${test.duration_minutes || test.duration || 30} Minutes</div>
-                                        ${timeStatusHtml}
-                                    </div>
-                                    ${buttonHtml}
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-                }
+                document.getElementById('profileImage').src = avatarUrl;
 
                 document.getElementById('loadingOverlay').style.display = 'none';
             } catch (err) {
                 console.error(err);
-                alert("Error loading dashboard: " + err.message);
                 document.getElementById('loadingOverlay').style.display = 'none';
             }
         }
