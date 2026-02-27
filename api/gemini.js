@@ -5,10 +5,10 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    // Securely pull the key from Vercel's hidden environment variables
+    // Securely pull the key from Vercel
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-        return res.status(500).json({ error: 'API key is missing on the server.' });
+        return res.status(500).json({ error: 'API key is missing in Vercel Environment Variables.' });
     }
 
     const promptText = req.body.prompt;
@@ -20,16 +20,21 @@ export default async function handler(req, res) {
             body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
         });
 
+        const data = await response.json();
+
+        // If Google rejects it, tell us EXACTLY why!
         if (!response.ok) {
-            throw new Error("Failed to connect to Google AI.");
+            console.error("Google Error:", data);
+            return res.status(500).json({ 
+                error: `Google API Error: ${data.error?.message || 'Check Vercel Logs'}` 
+            });
         }
 
-        const data = await response.json();
+        // Success! Send the data back to the teacher
         res.status(200).json(data);
         
     } catch (error) {
         console.error("Server Error:", error);
-        res.status(500).json({ error: 'Failed to generate content' });
+        res.status(500).json({ error: `Server catch error: ${error.message}` });
     }
-
 }
