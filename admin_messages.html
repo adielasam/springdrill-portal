@@ -17,24 +17,25 @@
         .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
         .top-navbar { background: white; padding: 15px 30px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d;}
         
+        .nav-tabs { border-bottom: 2px solid #e9ecef; margin-bottom: 20px; }
+        .nav-tabs .nav-link { color: #6c757d; font-weight: bold; border: none; border-bottom: 3px solid transparent; padding: 12px 25px;}
+        .nav-tabs .nav-link.active { color: #007a4d; border-bottom: 3px solid #007a4d; background: transparent; }
+
         .edu-card { background: white; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
         .edu-header { background-color: #007a4d; color: white; padding: 15px 20px; border-radius: 4px 4px 0 0; font-weight: bold;}
         .edu-body { padding: 25px; }
         
-        .form-label { font-weight: 600; font-size: 0.85rem; text-transform: uppercase; color: #555;}
+        .msg-row { cursor: pointer; transition: 0.2s; }
+        .msg-row:hover { background-color: #f8f9fa; }
+        .msg-unread { font-weight: 800; background-color: #f1f8ff; border-left: 4px solid #0d6efd;}
+        
         .form-control, .form-select { padding: 10px 15px; border-radius: 4px; border: 1px solid #ced4da; background-color: #f8f9fa; }
         .form-control:focus, .form-select:focus { border-color: #007a4d; box-shadow: 0 0 0 0.25rem rgba(0, 122, 77, 0.25); background-color: white; }
-
-        .table th { border-top: none; color: #495057; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; background-color: #f8f9fa;}
-        .table td { vertical-align: middle; font-size: 0.9rem; }
-        
-        .msg-preview { max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; color: #6c757d;}
 
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
 <body>
-
     <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i><h4 class="fw-bold text-muted">Loading Mail System...</h4></div>
 
     <div class="sidebar">
@@ -43,7 +44,6 @@
         </div>
         <nav class="nav flex-column mt-3">
             <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            
             <a href="#usersMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2">
                 <span><i class="fas fa-users me-2"></i> Accounts</span><i class="fas fa-caret-down"></i>
             </a>
@@ -52,9 +52,7 @@
                 <a href="manage_users.html" class="nav-link small py-2"><i class="fas fa-user-check me-2"></i> Approvals</a>
                 <a href="class_list.html" class="nav-link small py-2"><i class="fas fa-clipboard-list me-2"></i> Class Data</a>
             </div>
-
-            <a href="admin_messages.html" class="nav-link active mt-2"><i class="fas fa-envelope me-2"></i> Internal Mail</a>
-            
+            <a href="admin_messages.html" class="nav-link active mt-2"><i class="fas fa-envelope me-2"></i> Internal Mail <span class="badge bg-danger ms-auto" id="navUnread" style="display:none;">0</span></a>
             <hr class="mx-3 my-4 border-secondary">
             <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
@@ -66,55 +64,59 @@
             <div class="fw-bold text-dark d-flex align-items-center"><span id="adminNameDisplay">System Admin</span><i class="fas fa-user-shield ms-3 fs-4 text-primary"></i></div>
         </div>
 
-        <h5 class="text-muted fw-bold mb-4">Home / Internal Mail</h5>
+        <ul class="nav nav-tabs" id="mailTabs" role="tablist">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#inboxTab" type="button"><i class="fas fa-inbox me-2"></i> Inbox <span class="badge bg-danger ms-1" id="tabUnread">0</span></button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#sentTab" type="button"><i class="fas fa-paper-plane me-2"></i> Sent Mail</button></li>
+            <li class="nav-item"><button class="nav-link text-success" data-bs-toggle="tab" data-bs-target="#composeTab" type="button" id="composeTabBtn"><i class="fas fa-pen me-2"></i> Compose</button></li>
+        </ul>
 
-        <div class="row">
-            <div class="col-lg-5">
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="inboxTab">
+                <div class="edu-card">
+                    <div class="edu-header bg-dark"><span><i class="fas fa-inbox me-2"></i> My Inbox</span></div>
+                    <div class="table-responsive p-0"><table class="table mb-0"><tbody id="inboxBody"></tbody></table></div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="sentTab">
+                <div class="edu-card">
+                    <div class="edu-header"><span><i class="fas fa-history me-2"></i> Sent Messages</span></div>
+                    <div class="table-responsive p-0"><table class="table mb-0"><tbody id="sentBody"></tbody></table></div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="composeTab">
                 <div class="edu-card border-success">
-                    <div class="edu-header bg-success"><span><i class="fas fa-paper-plane me-2"></i> Compose Message</span></div>
+                    <div class="edu-header bg-success"><span><i class="fas fa-pen me-2"></i> Write a Message</span></div>
                     <div class="edu-body">
-                        <form id="composeMailForm">
+                        <form id="composeForm">
                             <div class="mb-3">
-                                <label class="form-label text-success">To: (Select Recipient) <span class="text-danger">*</span></label>
-                                <select id="recipientSelect" class="form-select border-success fw-bold" required>
-                                    <option value="">Loading users...</option>
-                                </select>
+                                <label class="form-label text-success">To: <span class="text-danger">*</span></label>
+                                <select id="recipientSelect" class="form-select border-success fw-bold" required><option value="">Loading users...</option></select>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">Subject <span class="text-danger">*</span></label>
-                                <input type="text" id="mailSubject" class="form-control" placeholder="e.g. Disciplinary Warning / Important Notice" required>
-                            </div>
-                            <div class="mb-4">
-                                <label class="form-label">Message Body <span class="text-danger">*</span></label>
-                                <textarea id="mailBody" class="form-control" rows="6" placeholder="Type your message here..." required></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-dark w-100 fw-bold py-2 shadow-sm" id="sendBtn">
-                                <i class="fas fa-paper-plane me-2"></i> Send Message
-                            </button>
+                            <div class="mb-3"><label class="form-label">Subject <span class="text-danger">*</span></label><input type="text" id="mailSubject" class="form-control" required></div>
+                            <div class="mb-4"><label class="form-label">Message <span class="text-danger">*</span></label><textarea id="mailBody" class="form-control" rows="6" required></textarea></div>
+                            <button type="submit" class="btn btn-dark w-100 fw-bold py-2" id="sendBtn"><i class="fas fa-paper-plane me-2"></i> Send Message</button>
                         </form>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <div class="col-lg-7">
-                <div class="edu-card">
-                    <div class="edu-header"><span><i class="fas fa-history me-2"></i> Sent Messages Log</span></div>
-                    <div class="table-responsive p-0" style="max-height: 500px; overflow-y: auto;">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light sticky-top">
-                                <tr>
-                                    <th width="25%">Sent To</th>
-                                    <th width="25%">Subject</th>
-                                    <th width="35%">Message Snippet</th>
-                                    <th width="15%" class="text-center">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="sentMailBody">
-                                <tr><td colspan="4" class="text-center py-5">Loading outbox...</td></tr>
-                            </tbody>
-                        </table>
+    <div class="modal fade" id="readModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header bg-dark text-white"><h5 class="modal-title fw-bold" id="mSubject">Subject</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body p-4">
+                    <div class="d-flex justify-content-between border-bottom pb-3 mb-3">
+                        <div><small class="text-muted fw-bold d-block">USER:</small><span class="fw-bold text-success" id="mUser">Name</span></div>
+                        <div class="text-end"><small class="text-muted fw-bold d-block">DATE:</small><span class="fw-bold" id="mDate">Date</span></div>
                     </div>
+                    <div style="white-space: pre-wrap; font-size: 1.05rem;" id="mBody">Body</div>
                 </div>
+                <div class="modal-footer bg-light" id="modalFooter">
+                    </div>
             </div>
         </div>
     </div>
@@ -122,81 +124,92 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
-        let currentAdminId = null;
+        let currentId = null; let allUsers = {}; let inboxMsgs = []; let sentMsgs = []; let readModal = null;
 
-        async function initMailSystem() {
+        async function initMail() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
-                currentAdminId = session.user.id;
+                currentId = session.user.id;
+                readModal = new bootstrap.Modal(document.getElementById('readModal'));
 
-                // Load all users into dropdown
-                const { data: users } = await supabase.from('users').select('id, name, role').neq('id', currentAdminId).order('name');
-                const select = document.getElementById('recipientSelect');
+                // Fetch Users for Dropdown (Admin can message anyone)
+                const { data: users } = await supabase.from('users').select('id, name, role').neq('id', currentId).order('name');
                 if (users) {
-                    select.innerHTML = `<option value="" disabled selected>-- Select a User --</option>` + 
+                    users.forEach(u => allUsers[u.id] = u);
+                    document.getElementById('recipientSelect').innerHTML = `<option value="">-- Select Recipient --</option>` + 
                         users.map(u => `<option value="${u.id}">${u.name} (${u.role.toUpperCase()})</option>`).join('');
                 }
-
-                await loadSentMessages();
+                
+                await loadMail();
                 document.getElementById('loadingOverlay').style.display = 'none';
             } catch (err) { console.error(err); }
         }
 
-        async function loadSentMessages() {
-            try {
-                // 1. Fetch Sent Messages
-                const { data: msgs } = await supabase.from('messages').select('*').eq('sender_id', currentAdminId).order('created_at', { ascending: false });
-                
-                const tbody = document.getElementById('sentMailBody');
-                if (!msgs || msgs.length === 0) return tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-muted">You have not sent any messages.</td></tr>`;
+        async function loadMail() {
+            // Inbox
+            const { data: inbox } = await supabase.from('messages').select('*').eq('receiver_id', currentId).order('created_at', { ascending: false });
+            inboxMsgs = inbox || [];
+            let unread = 0;
+            document.getElementById('inboxBody').innerHTML = inboxMsgs.length ? inboxMsgs.map((m, i) => {
+                if (!m.is_read) unread++;
+                return `<tr class="msg-row ${m.is_read?'':'msg-unread'} border-bottom" onclick="openMsg(${i}, 'inbox')">
+                    <td width="20%" class="ps-4">${allUsers[m.sender_id]?.name || 'Unknown'}</td>
+                    <td width="60%"><strong>${m.subject}</strong> <span class="text-muted small">- ${m.body.substring(0,30)}...</span></td>
+                    <td width="20%" class="text-end pe-4 text-muted small">${new Date(m.created_at).toLocaleDateString()}</td>
+                </tr>`;
+            }).join('') : `<tr><td class="text-center py-5 text-muted">Inbox is empty.</td></tr>`;
 
-                // 2. Fetch Receiver Names manually to avoid Join errors
-                const receiverIds = [...new Set(msgs.map(m => m.receiver_id))];
-                const { data: users } = await supabase.from('users').select('id, name').in('id', receiverIds);
-                const userMap = {};
-                if (users) users.forEach(u => userMap[u.id] = u.name);
+            document.getElementById('tabUnread').innerText = unread;
+            const navBadge = document.getElementById('navUnread');
+            navBadge.innerText = unread; navBadge.style.display = unread > 0 ? 'inline-block' : 'none';
 
-                // 3. Render Table
-                tbody.innerHTML = msgs.map(m => {
-                    const statusBadge = m.is_read ? `<span class="badge bg-success">Read</span>` : `<span class="badge bg-warning text-dark">Unread</span>`;
-                    return `
-                        <tr>
-                            <td class="fw-bold text-dark">${userMap[m.receiver_id] || 'Unknown User'}</td>
-                            <td class="fw-bold">${m.subject}</td>
-                            <td><span class="msg-preview">${m.body}</span></td>
-                            <td class="text-center">${statusBadge}</td>
-                        </tr>
-                    `;
-                }).join('');
-
-            } catch (err) { console.error(err); }
+            // Sent
+            const { data: sent } = await supabase.from('messages').select('*').eq('sender_id', currentId).order('created_at', { ascending: false });
+            sentMsgs = sent || [];
+            document.getElementById('sentBody').innerHTML = sentMsgs.length ? sentMsgs.map((m, i) => {
+                return `<tr class="msg-row border-bottom" onclick="openMsg(${i}, 'sent')">
+                    <td width="20%" class="ps-4">To: ${allUsers[m.receiver_id]?.name || 'Unknown'}</td>
+                    <td width="60%"><strong>${m.subject}</strong> <span class="text-muted small">- ${m.body.substring(0,30)}...</span></td>
+                    <td width="20%" class="text-end pe-4 text-muted small">${new Date(m.created_at).toLocaleDateString()}</td>
+                </tr>`;
+            }).join('') : `<tr><td class="text-center py-5 text-muted">No sent messages.</td></tr>`;
         }
 
-        // Send Message
-        document.getElementById('composeMailForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('sendBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Sending...';
-            btn.disabled = true;
+        window.openMsg = async (index, type) => {
+            const m = type === 'inbox' ? inboxMsgs[index] : sentMsgs[index];
+            document.getElementById('mSubject').innerText = m.subject;
+            document.getElementById('mBody').innerText = m.body;
+            document.getElementById('mDate').innerText = new Date(m.created_at).toLocaleString();
+            
+            if (type === 'inbox') {
+                document.getElementById('mUser').innerText = `From: ${allUsers[m.sender_id]?.name || 'Unknown'}`;
+                document.getElementById('modalFooter').innerHTML = `<button class="btn btn-primary fw-bold" onclick="prepReply('${m.sender_id}', '${m.subject}')"><i class="fas fa-reply me-1"></i> Reply</button><button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>`;
+                if (!m.is_read) { await supabase.from('messages').update({ is_read: true }).eq('id', m.id); loadMail(); }
+            } else {
+                document.getElementById('mUser').innerText = `To: ${allUsers[m.receiver_id]?.name || 'Unknown'}`;
+                document.getElementById('modalFooter').innerHTML = `<button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>`;
+            }
+            readModal.show();
+        };
 
+        window.prepReply = (userId, oldSubject) => {
+            readModal.hide();
+            document.getElementById('recipientSelect').value = userId;
+            document.getElementById('mailSubject').value = oldSubject.startsWith('Re:') ? oldSubject : `Re: ${oldSubject}`;
+            const triggerEl = document.getElementById('composeTabBtn');
+            bootstrap.Tab.getOrCreateInstance(triggerEl).show();
+        };
+
+        document.getElementById('composeForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); const btn = document.getElementById('sendBtn'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
             try {
-                await supabase.from('messages').insert([{
-                    sender_id: currentAdminId,
-                    receiver_id: document.getElementById('recipientSelect').value,
-                    subject: document.getElementById('mailSubject').value.trim(),
-                    body: document.getElementById('mailBody').value.trim()
-                }]);
-                
-                document.getElementById('composeMailForm').reset();
-                await loadSentMessages();
-                alert("Message successfully sent to the user's portal!");
-
-            } catch (err) { alert("Failed to send message."); } 
-            finally { btn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Send Message'; btn.disabled = false; }
+                await supabase.from('messages').insert([{ sender_id: currentId, receiver_id: document.getElementById('recipientSelect').value, subject: document.getElementById('mailSubject').value, body: document.getElementById('mailBody').value }]);
+                document.getElementById('composeForm').reset(); await loadMail(); alert("Sent!");
+            } catch (err) { alert("Failed"); } finally { btn.innerHTML = 'Send Message'; btn.disabled = false; }
         });
 
-        document.addEventListener('DOMContentLoaded', initMailSystem);
+        document.addEventListener('DOMContentLoaded', initMail);
         document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
     </script>
 </body>

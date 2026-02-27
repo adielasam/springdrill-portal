@@ -3,50 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRINGDRILL - My Inbox</title>
+    <title>SPRINGDRILL - Student Mail</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
-        
         .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1000; }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center;}
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
-
         .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
-        .page-header-card { background: white; border-radius: 8px; border-left: 5px solid #007a4d; padding: 20px 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
-        
+        .top-navbar { background: white; padding: 15px 30px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d;}
+        .nav-tabs { border-bottom: 2px solid #e9ecef; margin-bottom: 20px; }
+        .nav-tabs .nav-link { color: #6c757d; font-weight: bold; border: none; border-bottom: 3px solid transparent; padding: 12px 25px;}
+        .nav-tabs .nav-link.active { color: #007a4d; border-bottom: 3px solid #007a4d; background: transparent; }
         .edu-card { background: white; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
-        .edu-header { background-color: #2c3e50; color: white; padding: 15px 20px; border-radius: 4px 4px 0 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center;}
-        
-        /* Message Row Styles */
+        .edu-header { background-color: #007a4d; color: white; padding: 15px 20px; border-radius: 4px 4px 0 0; font-weight: bold;}
+        .edu-body { padding: 25px; }
         .msg-row { cursor: pointer; transition: 0.2s; }
         .msg-row:hover { background-color: #f8f9fa; }
         .msg-unread { font-weight: 800; background-color: #f1f8ff; border-left: 4px solid #0d6efd;}
-        .msg-read { color: #6c757d; border-left: 4px solid transparent;}
-        
-        .modal-body-mail { padding: 30px; white-space: pre-wrap; font-size: 1.05rem; line-height: 1.6; color: #333;}
-
+        .form-control, .form-select { padding: 10px 15px; border-radius: 4px; border: 1px solid #ced4da; background-color: #f8f9fa; }
+        .form-control:focus, .form-select:focus { border-color: #007a4d; box-shadow: 0 0 0 0.25rem rgba(0, 122, 77, 0.25); background-color: white; }
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
 <body>
-
-    <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-primary mb-3"></i><h4 class="fw-bold text-muted">Checking Inbox...</h4></div>
+    <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i><h4 class="fw-bold text-muted">Loading Inbox...</h4></div>
 
     <div class="sidebar">
         <div class="sidebar-brand">
             <h5 class="text-white fw-bold"><i class="fas fa-graduation-cap text-warning me-2"></i> STUDENT PORTAL</h5>
         </div>
         <nav class="nav flex-column mt-3">
-            <a href="student_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
-            <a href="student_eclassroom.html" class="nav-link"><i class="fas fa-play"></i> eClassroom</a>
-            <a href="student_cbt.html" class="nav-link"><i class="fas fa-laptop-code"></i> CBT / Exams</a>
-            <a href="student_results.html" class="nav-link"><i class="fas fa-award"></i> Result Manager</a>
+            <a href="student_dashboard.html" class="nav-link"><i class="fas fa-home me-2"></i> Dashboard</a>
+            <a href="student_eclassroom.html" class="nav-link"><i class="fas fa-play me-2"></i> eClassroom</a>
+            <a href="student_cbt.html" class="nav-link"><i class="fas fa-laptop-code me-2"></i> CBT / Exams</a>
+            <a href="student_results.html" class="nav-link"><i class="fas fa-award me-2"></i> Result Manager</a>
             
-            <a href="student_messages.html" class="nav-link active mt-2"><i class="fas fa-envelope"></i> My Inbox <span class="badge bg-danger ms-auto" id="navUnreadCount" style="display: none;">0</span></a>
+            <a href="student_messages.html" class="nav-link active mt-2"><i class="fas fa-envelope me-2"></i> My Inbox <span class="badge bg-danger ms-auto" id="navUnread" style="display:none;">0</span></a>
             
             <hr class="mx-3 my-4 border-secondary">
             <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -54,56 +50,61 @@
     </div>
 
     <div class="main-content">
-        <div class="page-header-card d-flex justify-content-between align-items-center">
-            <div>
-                <h4 class="mb-1"><i class="fas fa-envelope-open-text text-primary me-2"></i> Official Mailbox</h4>
-                <p class="text-muted mb-0">Secure communication from School Administration.</p>
-            </div>
-            <div class="text-end">
-                <h3 class="fw-bold text-dark mb-0" id="topUnreadCount">0</h3>
-                <small class="text-muted fw-bold text-uppercase">Unread Messages</small>
-            </div>
+        <div class="top-navbar">
+            <div class="d-flex align-items-center"><i class="fas fa-bars me-3 text-muted"></i><div class="fw-bold text-muted">Official Mailbox</div></div>
+            <div class="fw-bold text-dark d-flex align-items-center"><i class="fas fa-user-graduate text-primary me-2"></i> Student Portal</div>
         </div>
 
-        <div class="edu-card">
-            <div class="edu-header">
-                <span><i class="fas fa-inbox me-2"></i> Inbox</span>
+        <ul class="nav nav-tabs" id="mailTabs">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#inboxTab" type="button"><i class="fas fa-inbox me-2"></i> Inbox <span class="badge bg-danger ms-1" id="tabUnread">0</span></button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#sentTab" type="button"><i class="fas fa-paper-plane me-2"></i> Sent Mail</button></li>
+            <li class="nav-item"><button class="nav-link text-success" data-bs-toggle="tab" data-bs-target="#composeTab" type="button" id="composeTabBtn"><i class="fas fa-pen me-2"></i> Contact Staff</button></li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="inboxTab">
+                <div class="edu-card">
+                    <div class="edu-header bg-dark"><span><i class="fas fa-inbox me-2"></i> My Inbox</span></div>
+                    <div class="table-responsive p-0"><table class="table mb-0"><tbody id="inboxBody"></tbody></table></div>
+                </div>
             </div>
-            <div class="table-responsive p-0">
-                <table class="table mb-0">
-                    <tbody id="inboxBody">
-                        <tr><td class="text-center py-5">Loading your mail...</td></tr>
-                    </tbody>
-                </table>
+            <div class="tab-pane fade" id="sentTab">
+                <div class="edu-card">
+                    <div class="edu-header"><span><i class="fas fa-history me-2"></i> Sent Messages</span></div>
+                    <div class="table-responsive p-0"><table class="table mb-0"><tbody id="sentBody"></tbody></table></div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="composeTab">
+                <div class="edu-card border-success">
+                    <div class="edu-header bg-success"><span><i class="fas fa-pen me-2"></i> Ask a Question</span></div>
+                    <div class="edu-body">
+                        <form id="composeForm">
+                            <div class="mb-3">
+                                <label class="form-label text-success">To: (Select Teacher or Admin) <span class="text-danger">*</span></label>
+                                <select id="recipientSelect" class="form-select border-success fw-bold" required><option value="">Loading...</option></select>
+                            </div>
+                            <div class="mb-3"><label class="form-label">Subject</label><input type="text" id="mailSubject" class="form-control" required></div>
+                            <div class="mb-4"><label class="form-label">Message</label><textarea id="mailBody" class="form-control" rows="6" required></textarea></div>
+                            <button type="submit" class="btn btn-dark w-100 fw-bold py-2" id="sendBtn">Send Message</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="readMessageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="readModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content shadow-lg border-0">
-                <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title fw-bold" id="modalSubject">Subject</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
+                <div class="modal-header bg-dark text-white"><h5 class="modal-title fw-bold" id="mSubject"></h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body p-4">
                     <div class="d-flex justify-content-between border-bottom pb-3 mb-3">
-                        <div>
-                            <small class="text-muted fw-bold d-block">FROM:</small>
-                            <span class="fw-bold text-success" id="modalSender">Admin</span>
-                        </div>
-                        <div class="text-end">
-                            <small class="text-muted fw-bold d-block">DATE:</small>
-                            <span class="fw-bold" id="modalDate">Date</span>
-                        </div>
+                        <div><small class="text-muted fw-bold d-block">USER:</small><span class="fw-bold text-success" id="mUser"></span></div>
+                        <div class="text-end"><small class="text-muted fw-bold d-block">DATE:</small><span class="fw-bold" id="mDate"></span></div>
                     </div>
-                    <div class="modal-body-mail" id="modalBodyText">
-                        Loading content...
-                    </div>
+                    <div style="white-space: pre-wrap; font-size: 1.05rem;" id="mBody"></div>
                 </div>
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-secondary fw-bold px-4" data-bs-dismiss="modal">Close</button>
-                </div>
+                <div class="modal-footer bg-light" id="modalFooter"></div>
             </div>
         </div>
     </div>
@@ -111,87 +112,86 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
-        
-        let currentUserId = null;
-        let mailModal = null;
-        let allMessages = [];
+        let currentId = null; let allUsers = {}; let inboxMsgs = []; let sentMsgs = []; let readModal = null;
 
-        async function initInbox() {
+        async function initMail() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
-                currentUserId = session.user.id;
-                
-                mailModal = new bootstrap.Modal(document.getElementById('readMessageModal'));
+                currentId = session.user.id;
+                readModal = new bootstrap.Modal(document.getElementById('readModal'));
 
-                await fetchMessages();
+                // Students can only message Admins and Teachers
+                const { data: users } = await supabase.from('users').select('id, name, role').in('role', ['admin', 'teacher']).neq('id', currentId).order('name');
+                if (users) {
+                    users.forEach(u => allUsers[u.id] = u);
+                    document.getElementById('recipientSelect').innerHTML = `<option value="">-- Select Recipient --</option>` + 
+                        users.map(u => `<option value="${u.id}">${u.name} (${u.role.toUpperCase()})</option>`).join('');
+                }
+                
+                await loadMail();
                 document.getElementById('loadingOverlay').style.display = 'none';
             } catch (err) { console.error(err); }
         }
 
-        async function fetchMessages() {
-            try {
-                const { data: msgs } = await supabase.from('messages').select('*').eq('receiver_id', currentUserId).order('created_at', { ascending: false });
-                
-                const tbody = document.getElementById('inboxBody');
-                if (!msgs || msgs.length === 0) return tbody.innerHTML = `<tr><td class="text-center py-5 text-muted"><i class="fas fa-envelope-open fa-3x mb-3 opacity-25"></i><br>Your inbox is empty.</td></tr>`;
+        async function loadMail() {
+            const { data: inbox } = await supabase.from('messages').select('*').eq('receiver_id', currentId).order('created_at', { ascending: false });
+            inboxMsgs = inbox || []; let unread = 0;
+            document.getElementById('inboxBody').innerHTML = inboxMsgs.length ? inboxMsgs.map((m, i) => {
+                if (!m.is_read) unread++;
+                return `<tr class="msg-row ${m.is_read?'':'msg-unread'} border-bottom" onclick="openMsg(${i}, 'inbox')">
+                    <td width="20%" class="ps-4">${allUsers[m.sender_id]?.name || 'Unknown'}</td>
+                    <td width="60%"><strong>${m.subject}</strong> <span class="text-muted small">- ${m.body.substring(0,30)}...</span></td>
+                    <td width="20%" class="text-end pe-4 text-muted small">${new Date(m.created_at).toLocaleDateString()}</td>
+                </tr>`;
+            }).join('') : `<tr><td class="text-center py-5 text-muted">Inbox is empty.</td></tr>`;
 
-                allMessages = msgs; // Store globally for modal access
+            document.getElementById('tabUnread').innerText = unread;
+            document.getElementById('navUnread').innerText = unread; document.getElementById('navUnread').style.display = unread > 0 ? 'inline-block' : 'none';
 
-                // Fetch Senders Manually
-                const senderIds = [...new Set(msgs.map(m => m.sender_id))];
-                const { data: users } = await supabase.from('users').select('id, name, role').in('id', senderIds);
-                const userMap = {};
-                if (users) users.forEach(u => userMap[u.id] = { name: u.name, role: u.role });
-
-                let unreadCount = 0;
-
-                tbody.innerHTML = msgs.map((m, index) => {
-                    if (!m.is_read) unreadCount++;
-                    const rowClass = m.is_read ? 'msg-read' : 'msg-unread';
-                    const sender = userMap[m.sender_id] ? `${userMap[m.sender_id].name} (${userMap[m.sender_id].role.toUpperCase()})` : 'System Admin';
-                    const dateStr = new Date(m.created_at).toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
-
-                    return `
-                        <tr class="msg-row ${rowClass} border-bottom" onclick="window.openMessage(${index})">
-                            <td width="20%" class="ps-4">${sender}</td>
-                            <td width="60%"><strong>${m.subject}</strong> <span class="text-muted ms-2 fw-normal">- ${m.body.substring(0, 40)}...</span></td>
-                            <td width="20%" class="text-end pe-4 text-muted small">${dateStr}</td>
-                        </tr>
-                    `;
-                }).join('');
-
-                // Update Notification Badges
-                document.getElementById('topUnreadCount').innerText = unreadCount;
-                const navBadge = document.getElementById('navUnreadCount');
-                if (unreadCount > 0) {
-                    navBadge.innerText = unreadCount;
-                    navBadge.style.display = 'inline-block';
-                } else {
-                    navBadge.style.display = 'none';
-                }
-
-            } catch (err) { console.error(err); }
+            const { data: sent } = await supabase.from('messages').select('*').eq('sender_id', currentId).order('created_at', { ascending: false });
+            sentMsgs = sent || [];
+            document.getElementById('sentBody').innerHTML = sentMsgs.length ? sentMsgs.map((m, i) => {
+                return `<tr class="msg-row border-bottom" onclick="openMsg(${i}, 'sent')">
+                    <td width="20%" class="ps-4">To: ${allUsers[m.receiver_id]?.name || 'Unknown'}</td>
+                    <td width="60%"><strong>${m.subject}</strong> <span class="text-muted small">- ${m.body.substring(0,30)}...</span></td>
+                    <td width="20%" class="text-end pe-4 text-muted small">${new Date(m.created_at).toLocaleDateString()}</td>
+                </tr>`;
+            }).join('') : `<tr><td class="text-center py-5 text-muted">No sent messages.</td></tr>`;
         }
 
-        window.openMessage = async function(index) {
-            const m = allMessages[index];
+        window.openMsg = async (index, type) => {
+            const m = type === 'inbox' ? inboxMsgs[index] : sentMsgs[index];
+            document.getElementById('mSubject').innerText = m.subject;
+            document.getElementById('mBody').innerText = m.body;
+            document.getElementById('mDate').innerText = new Date(m.created_at).toLocaleString();
             
-            document.getElementById('modalSubject').innerText = m.subject;
-            document.getElementById('modalBodyText').innerText = m.body;
-            document.getElementById('modalDate').innerText = new Date(m.created_at).toLocaleString();
-            
-            // Mark as read in Database if unread
-            if (!m.is_read) {
-                await supabase.from('messages').update({ is_read: true }).eq('id', m.id);
-                m.is_read = true;
-                await fetchMessages(); // Refresh UI in background
+            if (type === 'inbox') {
+                document.getElementById('mUser').innerText = `From: ${allUsers[m.sender_id]?.name || 'Unknown'}`;
+                document.getElementById('modalFooter').innerHTML = `<button class="btn btn-primary fw-bold" onclick="prepReply('${m.sender_id}', '${m.subject}')"><i class="fas fa-reply me-1"></i> Reply</button><button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>`;
+                if (!m.is_read) { await supabase.from('messages').update({ is_read: true }).eq('id', m.id); loadMail(); }
+            } else {
+                document.getElementById('mUser').innerText = `To: ${allUsers[m.receiver_id]?.name || 'Unknown'}`;
+                document.getElementById('modalFooter').innerHTML = `<button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>`;
             }
-            
-            mailModal.show();
+            readModal.show();
         };
 
-        document.addEventListener('DOMContentLoaded', initInbox);
+        window.prepReply = (userId, oldSubject) => {
+            readModal.hide(); document.getElementById('recipientSelect').value = userId;
+            document.getElementById('mailSubject').value = oldSubject.startsWith('Re:') ? oldSubject : `Re: ${oldSubject}`;
+            bootstrap.Tab.getOrCreateInstance(document.getElementById('composeTabBtn')).show();
+        };
+
+        document.getElementById('composeForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); const btn = document.getElementById('sendBtn'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+            try {
+                await supabase.from('messages').insert([{ sender_id: currentId, receiver_id: document.getElementById('recipientSelect').value, subject: document.getElementById('mailSubject').value, body: document.getElementById('mailBody').value }]);
+                document.getElementById('composeForm').reset(); await loadMail(); alert("Sent!");
+            } catch (err) { alert("Failed"); } finally { btn.innerHTML = 'Send Message'; btn.disabled = false; }
+        });
+
+        document.addEventListener('DOMContentLoaded', initMail);
         document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
     </script>
 </body>
