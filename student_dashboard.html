@@ -12,7 +12,7 @@
         /* Sidebar Styling */
         .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1000; }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center; }
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
 
@@ -30,7 +30,7 @@
 
         /* Icon Grid */
         .icon-grid { display: flex; flex-wrap: wrap; gap: 20px; }
-        .icon-card { background: white; width: 140px; padding: 25px 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03); cursor: pointer; transition: all 0.3s; text-decoration: none; color: inherit; border: 1px solid #eee;}
+        .icon-card { background: white; width: 140px; padding: 25px 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03); cursor: pointer; transition: all 0.3s; text-decoration: none; color: inherit; border: 1px solid #eee; position: relative;}
         .icon-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.08); border-color: #007a4d; }
         .icon-circle { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; font-size: 2rem; color: white; }
         
@@ -39,8 +39,11 @@
         .ic-cbt { background: #e74c3c; }
         .ic-eclassroom { background: #34495e; }
         .ic-results { background: #2ecc71; }
+        .ic-mail { background: #9b59b6; } /* Purple for Inbox */
 
         .icon-card h6 { font-weight: 600; font-size: 0.9rem; color: #444; margin: 0; }
+        
+        .notification-badge { position: absolute; top: 15px; right: 15px; background: #e74c3c; color: white; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 50%; display: none; border: 2px solid white;}
 
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
@@ -58,8 +61,13 @@
         </div>
         <nav class="nav flex-column mt-3">
             <a href="student_dashboard.html" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
+            
+            <a href="student_eclassroom.html" class="nav-link"><i class="fas fa-play"></i> eClassroom</a>
             <a href="student_cbt.html" class="nav-link"><i class="fas fa-laptop-code"></i> CBT / Exams</a>
-            <a href="student_results.html" class="nav-link"><i class="fas fa-chart-line"></i> Result Manager</a>
+            <a href="student_results.html" class="nav-link"><i class="fas fa-award"></i> Result Manager</a>
+            
+            <a href="student_messages.html" class="nav-link mt-2"><i class="fas fa-envelope"></i> My Inbox <span class="badge bg-danger ms-auto" id="sidebarBadge" style="display: none;">0</span></a>
+
             <hr class="mx-3 my-4 border-secondary">
             <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
@@ -80,6 +88,28 @@
         </div>
 
         <div class="icon-grid">
+            
+            <a href="student_messages.html" class="icon-card">
+                <div class="notification-badge" id="cardBadge">0</div>
+                <div class="icon-circle ic-mail"><i class="fas fa-envelope"></i></div>
+                <h6>My Inbox</h6>
+            </a>
+
+            <a href="student_eclassroom.html" class="icon-card">
+                <div class="icon-circle ic-eclassroom"><i class="fas fa-video"></i></div>
+                <h6>eClassroom</h6>
+            </a>
+
+            <a href="student_cbt.html" class="icon-card" style="border: 2px solid #e74c3c;">
+                <div class="icon-circle ic-cbt"><i class="fas fa-laptop-code"></i></div>
+                <h6>CBT / Exams</h6>
+            </a>
+
+            <a href="student_results.html" class="icon-card">
+                <div class="icon-circle ic-results"><i class="fas fa-award"></i></div>
+                <h6>Results</h6>
+            </a>
+
             <a href="#" class="icon-card">
                 <div class="icon-circle ic-subjects"><i class="fas fa-book"></i></div>
                 <h6>Subjects</h6>
@@ -87,18 +117,6 @@
             <a href="#" class="icon-card">
                 <div class="icon-circle ic-assignments"><i class="fas fa-edit"></i></div>
                 <h6>Assignments</h6>
-            </a>
-            <a href="student_cbt.html" class="icon-card" style="border: 2px solid #e74c3c;">
-                <div class="icon-circle ic-cbt"><i class="fas fa-laptop-code"></i></div>
-                <h6>CBT</h6>
-            </a>
-            <a href="#" class="icon-card">
-                <div class="icon-circle ic-eclassroom"><i class="fas fa-video"></i></div>
-                <h6>eClassroom</h6>
-            </a>
-            <a href="student_results.html" class="icon-card">
-                <div class="icon-circle ic-results"><i class="fas fa-award"></i></div>
-                <h6>Results</h6>
             </a>
         </div>
     </div>
@@ -116,6 +134,7 @@
                 let className = "Unassigned";
                 let avatarUrl = `https://ui-avatars.com/api/?name=Student&background=007a4d&color=fff`;
 
+                // 1. Fetch Profile Data
                 const { data: studentRecords } = await supabase
                     .from('students')
                     .select('surname, first_name, passport_url, classes(name)')
@@ -134,6 +153,25 @@
                 document.getElementById('studentName').innerText = displayName;
                 document.getElementById('studentClass').innerText = className;
                 document.getElementById('profileImage').src = avatarUrl;
+
+                // 2. Check for Unread Messages
+                const { count: unreadCount, error: msgErr } = await supabase
+                    .from('messages')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('receiver_id', userId)
+                    .eq('is_read', false);
+
+                if (!msgErr && unreadCount > 0) {
+                    // Update Sidebar Badge
+                    const sidebarBadge = document.getElementById('sidebarBadge');
+                    sidebarBadge.innerText = unreadCount;
+                    sidebarBadge.style.display = 'inline-block';
+
+                    // Update Card Badge
+                    const cardBadge = document.getElementById('cardBadge');
+                    cardBadge.innerText = unreadCount;
+                    cardBadge.style.display = 'inline-block';
+                }
 
                 document.getElementById('loadingOverlay').style.display = 'none';
             } catch (err) {

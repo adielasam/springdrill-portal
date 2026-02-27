@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - Teacher eClassroom</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1000; }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; display: flex; align-items: center; font-size: 0.95rem; }
+        .nav-link i { width: 25px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
+        .edu-card { background: white; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
+        .edu-header { background-color: #007a4d; color: white; padding: 15px 20px; border-radius: 4px 4px 0 0; font-weight: bold; }
+        .edu-body { padding: 30px; }
+        .form-label { font-weight: 600; color: #495057; font-size: 0.85rem; text-transform: uppercase;}
+        .form-control, .form-select { padding: 10px 15px; border-radius: 4px; border: 1px solid #ced4da; background-color: #f8f9fa; }
+        .table th { border-top: none; color: #495057; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; background-color: #f8f9fa;}
+        .table td { vertical-align: middle; font-size: 0.95rem; }
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay">
+        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
+        <h4 class="fw-bold text-muted">Loading eClassroom...</h4>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h5 class="text-white fw-bold"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
+        </div>
+        <nav class="nav flex-column mt-3">
+            <a href="teacher_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="teacher_eclassroom.html" class="nav-link active"><i class="fas fa-play"></i> eClassroom Notes</a>
+            <a href="#cbtMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2">
+                <span><i class="fas fa-laptop-code me-2"></i> CBT</span><i class="fas fa-caret-down"></i>
+            </a>
+            <div class="collapse bg-dark mx-2 mt-1 rounded" id="cbtMenu">
+                <a href="manage_cbt.html" class="nav-link small py-2"><i class="fas fa-list me-2"></i> Manage CBT</a>
+                <a href="test_results.html" class="nav-link small py-2"><i class="fas fa-chart-bar me-2"></i> Result Manager</a>
+            </div>
+            <hr class="mx-3 my-4 border-secondary">
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <h5 class="text-muted fw-bold mb-4">Home / eClassroom / Upload Materials</h5>
+
+        <div class="row">
+            <div class="col-lg-5">
+                <div class="edu-card border-success">
+                    <div class="edu-header bg-success">
+                        <span><i class="fas fa-upload me-2"></i> Share Lesson Note</span>
+                    </div>
+                    <div class="edu-body">
+                        <form id="uploadNoteForm">
+                            <div class="mb-3">
+                                <label class="form-label">Note Title / Topic <span class="text-danger">*</span></label>
+                                <input type="text" id="noteTitle" class="form-control" placeholder="e.g. Week 1: Intro to Algebra" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Target Class <span class="text-danger">*</span></label>
+                                <select id="classSelect" class="form-select" required><option value="">Loading...</option></select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Subject <span class="text-danger">*</span></label>
+                                <select id="subjectSelect" class="form-select" required><option value="">Loading...</option></select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label text-primary"><i class="fas fa-file-pdf me-1"></i> Attach Document (PDF/Docx) <span class="text-danger">*</span></label>
+                                <input type="file" id="fileInput" class="form-control" accept=".pdf,.doc,.docx" required>
+                            </div>
+                            <button type="submit" class="btn btn-dark w-100 fw-bold py-2" id="uploadBtn">
+                                <i class="fas fa-cloud-upload-alt me-2"></i> Upload to eClassroom
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="edu-card">
+                    <div class="edu-header">
+                        <span><i class="fas fa-history me-2"></i> My Upload History</span>
+                    </div>
+                    <div class="table-responsive p-0" style="max-height: 500px; overflow-y: auto;">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th width="40%">Topic / Title</th>
+                                    <th width="20%">Class</th>
+                                    <th width="25%">Subject</th>
+                                    <th width="15%" class="text-end pe-4">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyBody">
+                                <tr><td colspan="4" class="text-center py-5">Loading records...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+        let currentUserId = null;
+
+        async function initializePage() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = 'login.html';
+                currentUserId = session.user.id;
+
+                // Load dropdowns
+                const { data: classes } = await supabase.from('classes').select('*').order('id');
+                const { data: subjects } = await supabase.from('subjects').select('*').order('name');
+                
+                if (classes) document.getElementById('classSelect').innerHTML = `<option value="" disabled selected>Select Class</option>` + classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                if (subjects) document.getElementById('subjectSelect').innerHTML = `<option value="" disabled selected>Select Subject</option>` + subjects.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+
+                await loadHistory();
+                document.getElementById('loadingOverlay').style.display = 'none';
+            } catch (err) { console.error(err); }
+        }
+
+        async function loadHistory() {
+            try {
+                const { data: notes, error } = await supabase
+                    .from('lesson_notes')
+                    .select('id, title, file_url, classes(name), subjects(name)')
+                    .eq('teacher_id', currentUserId)
+                    .order('created_at', { ascending: false });
+
+                const tbody = document.getElementById('historyBody');
+                if (!notes || notes.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-muted">You haven't uploaded any notes yet.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = notes.map(n => `
+                    <tr>
+                        <td class="fw-bold text-dark"><a href="${n.file_url}" target="_blank" class="text-decoration-none text-primary"><i class="fas fa-file-alt me-2"></i>${n.title}</a></td>
+                        <td class="small text-muted fw-bold">${n.classes?.name || 'Any'}</td>
+                        <td class="small text-muted fw-bold">${n.subjects?.name || 'Any'}</td>
+                        <td class="text-end pe-3">
+                            <button class="btn btn-sm btn-danger shadow-sm" onclick="window.deleteNote(${n.id}, '${n.file_url}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) { console.error(err); }
+        }
+
+        document.getElementById('uploadNoteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('uploadBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Uploading...';
+            btn.disabled = true;
+
+            try {
+                const file = document.getElementById('fileInput').files[0];
+                const fileExt = file.name.split('.').pop();
+                const safeName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+                // 1. Upload to Storage
+                const { error: uploadErr } = await supabase.storage.from('lesson_notes').upload(safeName, file);
+                if (uploadErr) throw new Error("File upload failed: " + uploadErr.message);
+
+                // 2. Get Public URL
+                const { data: pubData } = supabase.storage.from('lesson_notes').getPublicUrl(safeName);
+                const publicUrl = pubData.publicUrl;
+
+                // 3. Save to Database
+                const { error: dbErr } = await supabase.from('lesson_notes').insert([{
+                    teacher_id: currentUserId,
+                    class_id: document.getElementById('classSelect').value,
+                    subject_id: document.getElementById('subjectSelect').value,
+                    title: document.getElementById('noteTitle').value.trim(),
+                    file_url: publicUrl
+                }]);
+                if (dbErr) throw dbErr;
+
+                document.getElementById('uploadNoteForm').reset();
+                await loadHistory();
+                alert("Lesson note successfully shared with students!");
+
+            } catch (err) {
+                alert(err.message);
+            } finally {
+                btn.innerHTML = '<i class="fas fa-cloud-upload-alt me-2"></i> Upload to eClassroom';
+                btn.disabled = false;
+            }
+        });
+
+        window.deleteNote = async (noteId, fileUrl) => {
+            if (!confirm("Remove this note from the students' portal?")) return;
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            try {
+                // Extract filename from URL to delete from storage bucket
+                const urlParts = fileUrl.split('/');
+                const fileName = urlParts[urlParts.length - 1];
+                await supabase.storage.from('lesson_notes').remove([fileName]);
+                
+                // Delete from DB
+                await supabase.from('lesson_notes').delete().eq('id', noteId);
+                await loadHistory();
+            } catch (err) { alert("Error deleting."); }
+            document.getElementById('loadingOverlay').style.display = 'none';
+        };
+
+        document.addEventListener('DOMContentLoaded', initializePage);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
+    </script>
+</body>
+</html>

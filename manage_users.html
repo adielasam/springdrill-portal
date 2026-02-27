@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRINGDRILL - Approvals</title>
+    <title>SPRINGDRILL - Approvals & Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -13,14 +13,24 @@
         .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center;}
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
+        
         .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
+        
         .nav-tabs { border-bottom: 2px solid #e9ecef; margin-bottom: 20px; margin-top: 20px; }
         .nav-tabs .nav-link { color: #6c757d; font-weight: bold; border: none; border-bottom: 3px solid transparent; padding: 12px 25px;}
         .nav-tabs .nav-link.active { color: #007a4d; border-bottom: 3px solid #007a4d; background: transparent; }
+        
         .edu-card { background: white; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
         .edu-header { background-color: #007a4d; color: white; padding: 15px 20px; border-radius: 4px 4px 0 0; font-weight: bold;}
+        
         .table th { border-top: none; color: #495057; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; background-color: #f8f9fa;}
         .table td { vertical-align: middle; font-size: 0.95rem; }
+
+        /* Custom Modal Styling */
+        .modal-header.bg-success { background-color: #007a4d !important; }
+        .profile-img-lg { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #007a4d; margin-bottom: 15px;}
+        .form-label { font-weight: 600; font-size: 0.85rem; color: #555; margin-bottom: 0.2rem;}
+        
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
@@ -33,23 +43,21 @@
         </div>
         <nav class="nav flex-column mt-3">
             <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            
             <a href="#usersMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
                 <span><i class="fas fa-users me-2"></i> Accounts</span><i class="fas fa-caret-down"></i>
             </a>
             <div class="collapse show bg-dark mx-2 mt-1 rounded" id="usersMenu">
                 <a href="admin_create_user.html" class="nav-link small py-2"><i class="fas fa-user-plus me-2"></i> Generate Account</a>
-                <a href="manage_users.html" class="nav-link small py-2 active text-success fw-bold"><i class="fas fa-user-check me-2"></i> Approvals</a>
+                <a href="manage_users.html" class="nav-link small py-2 active text-success fw-bold"><i class="fas fa-user-check me-2"></i> Approvals & Mgmt</a>
                 <a href="class_list.html" class="nav-link small py-2"><i class="fas fa-clipboard-list me-2"></i> Class Data</a>
             </div>
-
             <hr class="mx-3 my-4 border-secondary">
             <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </div>
 
     <div class="main-content">
-        <h5 class="text-muted fw-bold mb-4 mt-3">Home / Accounts / Approvals</h5>
+        <h5 class="text-muted fw-bold mb-4 mt-3">Home / Accounts / Approvals & Management</h5>
 
         <ul class="nav nav-tabs" id="userTabs" role="tablist">
             <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#pending" type="button"><i class="fas fa-clock me-2"></i> Pending Approvals</button></li>
@@ -68,12 +76,13 @@
                     </div>
                 </div>
             </div>
+            
             <div class="tab-pane fade" id="activeUsers">
                 <div class="edu-card">
                     <div class="edu-header"><i class="fas fa-users me-2"></i> Official School Directory</div>
                     <div class="table-responsive p-0">
                         <table class="table table-hover mb-0">
-                            <thead class="table-light"><tr><th width="5%" class="text-center">S/N</th><th width="30%">Full Name</th><th width="25%">Email</th><th width="15%" class="text-center">Role</th><th width="25%" class="text-end pe-4">Action</th></tr></thead>
+                            <thead class="table-light"><tr><th width="5%" class="text-center">S/N</th><th width="30%">Full Name</th><th width="25%">Email / Username</th><th width="15%" class="text-center">Role</th><th width="25%" class="text-end pe-4">System Actions</th></tr></thead>
                             <tbody id="activeListBody"><tr><td colspan="5" class="text-center py-5">Loading...</td></tr></tbody>
                         </table>
                     </div>
@@ -82,15 +91,80 @@
         </div>
     </div>
 
+    <div class="modal fade" id="userProfileModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-user-edit me-2"></i> User Profile & Settings</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 bg-light">
+                    
+                    <div class="text-center mb-4 border-bottom pb-3">
+                        <img src="" id="modalProfileImg" class="profile-img-lg d-none">
+                        <h4 class="fw-bold text-dark mb-0" id="modalNameDisplay">Loading...</h4>
+                        <span class="badge bg-secondary text-uppercase mt-2" id="modalRoleBadge">Role</span>
+                    </div>
+
+                    <form id="editUserForm">
+                        <input type="hidden" id="editUserId">
+                        <input type="hidden" id="editUserRole">
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Email / Username (Cannot be changed)</label>
+                            <input type="text" class="form-control fw-bold bg-white" id="modalEmail" readonly disabled>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control border-success" id="modalName" required>
+                        </div>
+
+                        <div id="studentExtraFields" style="display: none;">
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <label class="form-label">Reg Number</label>
+                                    <input type="text" class="form-control" id="modalRegNum" readonly disabled>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Class</label>
+                                    <input type="text" class="form-control" id="modalClass" readonly disabled>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Phone Number</label>
+                                <input type="text" class="form-control" id="modalPhone">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Home Address</label>
+                                <textarea class="form-control" id="modalAddress" rows="2"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="button" class="btn btn-warning fw-bold shadow-sm" onclick="sendPasswordReset()"><i class="fas fa-key me-1"></i> Send Password Reset</button>
+                            <button type="submit" class="btn btn-success fw-bold shadow-sm" id="saveProfileBtn"><i class="fas fa-save me-1"></i> Update Details</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
+        
         let currentAdminId = null;
+        let profileModal = null;
 
         async function loadUsers() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 currentAdminId = session.user.id;
+                
+                // Initialize Bootstrap Modal
+                profileModal = new bootstrap.Modal(document.getElementById('userProfileModal'));
 
                 const { data: allUsers } = await supabase.from('users').select('*').order('created_at', { ascending: false });
                 const { data: students } = await supabase.from('students').select('user_id, approved');
@@ -107,18 +181,146 @@
                     if (u.role === 'teacher' && tMap[u.id] === false) approved = false;
 
                     if (!approved) {
-                        pHtml += `<tr><td class="fw-bold">${u.name}</td><td>${u.email}</td><td class="text-center text-uppercase fw-bold">${u.role}</td><td class="text-center"><button class="btn btn-sm btn-success fw-bold me-2 px-3" onclick="window.approveUser('${u.id}', '${u.role}')">Approve</button></td></tr>`;
+                        pHtml += `<tr>
+                            <td class="fw-bold">${u.name}</td>
+                            <td>${u.email}</td>
+                            <td class="text-center text-uppercase fw-bold text-muted">${u.role}</td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-success fw-bold me-2 px-3 shadow-sm" onclick="window.approveUser('${u.id}', '${u.role}')">Approve</button>
+                            </td>
+                        </tr>`;
                     } else {
-                        const delBtn = (u.id === currentAdminId) ? `<span class="text-muted small fw-bold">You (Protected)</span>` : `<button class="btn btn-sm btn-danger fw-bold" onclick="window.deleteUser('${u.id}')">Delete</button>`;
-                        aHtml += `<tr><td class="text-center fw-bold text-muted">${aCount++}</td><td class="fw-bold">${u.name}</td><td>${u.email}</td><td class="text-center text-uppercase fw-bold">${u.role}</td><td class="text-end pe-4">${delBtn}</td></tr>`;
+                        let actionBtns = '';
+                        if (u.id === currentAdminId) {
+                            actionBtns = `<span class="text-muted small fw-bold"><i class="fas fa-shield-alt"></i> Active Admin</span>`;
+                        } else {
+                            // NEW: Adding Profile/Edit button next to Delete
+                            actionBtns = `
+                                <button class="btn btn-sm btn-primary fw-bold shadow-sm me-2" onclick="window.openProfileModal('${u.id}', '${u.role}', '${u.email}', '${u.name}')">
+                                    <i class="fas fa-user-edit"></i> Profile
+                                </button>
+                                <button class="btn btn-sm btn-danger fw-bold shadow-sm" onclick="window.deleteUser('${u.id}')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            `;
+                        }
+                        
+                        aHtml += `<tr>
+                            <td class="text-center fw-bold text-muted">${aCount++}</td>
+                            <td class="fw-bold text-dark text-uppercase">${u.name}</td>
+                            <td class="text-muted">${u.email}</td>
+                            <td class="text-center text-uppercase fw-bold text-secondary">${u.role}</td>
+                            <td class="text-end pe-4">${actionBtns}</td>
+                        </tr>`;
                     }
                 });
 
-                document.getElementById('pendingListBody').innerHTML = pHtml || `<tr><td colspan="4" class="text-center py-5 text-muted">No pending approvals.</td></tr>`;
+                document.getElementById('pendingListBody').innerHTML = pHtml || `<tr><td colspan="4" class="text-center py-5 text-muted"><i class="fas fa-check-circle fa-2x mb-2 text-success opacity-50"></i><br>No pending approvals.</td></tr>`;
                 document.getElementById('activeListBody').innerHTML = aHtml;
                 document.getElementById('loadingOverlay').style.display = 'none';
             } catch (err) { console.error(err); }
         }
+
+        // --- NEW: MODAL LOGIC ---
+        window.openProfileModal = async function(userId, role, email, name) {
+            document.getElementById('editUserId').value = userId;
+            document.getElementById('editUserRole').value = role;
+            document.getElementById('modalEmail').value = email;
+            document.getElementById('modalName').value = name;
+            document.getElementById('modalNameDisplay').innerText = name;
+            
+            const badge = document.getElementById('modalRoleBadge');
+            badge.innerText = role;
+            badge.className = role === 'student' ? 'badge bg-primary text-uppercase mt-2' : 'badge bg-danger text-uppercase mt-2';
+            
+            const studentFields = document.getElementById('studentExtraFields');
+            const imgBox = document.getElementById('modalProfileImg');
+
+            // Reset specific fields
+            document.getElementById('modalPhone').value = '';
+            document.getElementById('modalAddress').value = '';
+            imgBox.classList.add('d-none');
+
+            if (role === 'student') {
+                studentFields.style.display = 'block';
+                // Fetch extra student data from DB
+                const { data: stu } = await supabase.from('students').select('*, classes(name)').eq('user_id', userId).single();
+                if (stu) {
+                    document.getElementById('modalRegNum').value = stu.reg_number || 'N/A';
+                    document.getElementById('modalClass').value = stu.classes?.name || 'Unassigned';
+                    document.getElementById('modalPhone').value = stu.phone_number || '';
+                    document.getElementById('modalAddress').value = stu.address || '';
+                    
+                    if (stu.passport_url) {
+                        imgBox.src = stu.passport_url;
+                        imgBox.classList.remove('d-none');
+                    } else {
+                        imgBox.src = `https://ui-avatars.com/api/?name=${name.replace(' ', '+')}&background=007a4d&color=fff`;
+                        imgBox.classList.remove('d-none');
+                    }
+                }
+            } else {
+                studentFields.style.display = 'none';
+            }
+
+            profileModal.show();
+        };
+
+        // Update Profile Details logic
+        document.getElementById('editUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('saveProfileBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            btn.disabled = true;
+
+            const userId = document.getElementById('editUserId').value;
+            const role = document.getElementById('editUserRole').value;
+            const newName = document.getElementById('modalName').value.trim();
+
+            try {
+                // Update Main Users Table
+                await supabase.from('users').update({ name: newName }).eq('id', userId);
+
+                // If Student, update students table details
+                if (role === 'student') {
+                    // Update student table. Splitting name roughly for first/last.
+                    const nameParts = newName.split(' ');
+                    const first = nameParts[0];
+                    const sur = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+                    
+                    await supabase.from('students').update({ 
+                        first_name: first,
+                        surname: sur,
+                        phone_number: document.getElementById('modalPhone').value.trim(),
+                        address: document.getElementById('modalAddress').value.trim()
+                    }).eq('user_id', userId);
+                }
+
+                profileModal.hide();
+                await loadUsers(); // Refresh the table behind the modal
+                alert("Profile successfully updated!");
+
+            } catch (err) {
+                alert("Failed to update: " + err.message);
+            } finally {
+                btn.innerHTML = '<i class="fas fa-save me-1"></i> Update Details';
+                btn.disabled = false;
+            }
+        });
+
+        // Trigger Password Reset Email via Supabase
+        window.sendPasswordReset = async function() {
+            const email = document.getElementById('modalEmail').value;
+            if (!confirm(`Are you sure you want to send a password reset link to ${email}?`)) return;
+            
+            try {
+                const { error } = await supabase.auth.resetPasswordForEmail(email);
+                if (error) throw error;
+                alert("Success! A password recovery email has been sent to " + email);
+            } catch (err) {
+                alert("Failed to send reset link. Ensure the user has a valid, real email address setup in Supabase. Error: " + err.message);
+            }
+        };
 
         window.approveUser = async function(userId, role) {
             document.getElementById('loadingOverlay').style.display = 'flex';
@@ -128,7 +330,7 @@
         };
 
         window.deleteUser = async function(userId) {
-            if (!confirm("Are you sure you want to permanently delete this user?")) return;
+            if (!confirm("Are you sure you want to permanently delete this user's data from the directory?")) return;
             document.getElementById('loadingOverlay').style.display = 'flex';
             await supabase.from('students').delete().eq('user_id', userId);
             await supabase.from('teachers').delete().eq('user_id', userId);

@@ -9,7 +9,7 @@
     <style>
         body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
         
-        /* Sidebar Styling (Educare Clone) */
+        /* Sidebar Styling */
         .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1000; }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
         .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; }
@@ -73,6 +73,8 @@
         <nav class="nav flex-column mt-3">
             <a href="teacher_dashboard.html" class="nav-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             
+            <a href="teacher_eclassroom.html" class="nav-link"><i class="fas fa-play"></i> eClassroom Notes</a>
+
             <a href="#cbtMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2">
                 <span><i class="fas fa-laptop-code me-2"></i> CBT</span>
                 <i class="fas fa-caret-down"></i>
@@ -101,7 +103,7 @@
         </div>
 
         <div class="icon-grid">
-            <a href="#" class="icon-card">
+            <a href="teacher_eclassroom.html" class="icon-card">
                 <div class="icon-circle ic-eclassroom"><i class="fas fa-play"></i></div>
                 <h6>eClassroom</h6>
             </a>
@@ -205,15 +207,12 @@
                 if (!session) return window.location.href = 'login.html';
                 currentUserId = session.user.id;
 
-                // Fetch Teacher Name
                 const { data: profile } = await supabase.from('users').select('name').eq('id', currentUserId).single();
                 if (profile) {
                     document.getElementById('headerName').innerText = profile.name;
                     document.getElementById('welcomeText').innerText = `WELCOME ${profile.name}`;
                 }
 
-                // Fetch Subjects for the Table
-                // Note: We are fetching generic subjects/classes for the display to match the screenshot
                 const { data: subjects } = await supabase.from('subjects').select('*').limit(5);
                 const { data: classes } = await supabase.from('classes').select('*').limit(5);
                 
@@ -221,9 +220,7 @@
                 
                 if (subjects && subjects.length > 0) {
                     tbody.innerHTML = subjects.map((sub, index) => {
-                        // Just pairing it with a random class for display purposes
                         const cls = classes[index % classes.length];
-                        
                         return `
                             <tr>
                                 <td class="text-center fw-bold text-muted">${index + 1}</td>
@@ -254,36 +251,18 @@
 
         document.addEventListener('DOMContentLoaded', initializeDashboard);
 
-        // Upload Logic for Scheme of Work
         const fileInput = document.getElementById('schemeUploadInput');
         
         window.triggerUpload = (subjectName) => {
             selectedSubjectForUpload = subjectName;
-            fileInput.click(); // Open the computer's file browser
+            fileInput.click(); 
         };
 
         fileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            // UI Feedback
             alert(`Preparing to upload "${file.name}" for ${selectedSubjectForUpload}...\n\n(Note: To permanently save PDFs, ensure you have created a Supabase Storage Bucket named 'schemes').`);
-            
-            // Note for Developer: If you create a Supabase Storage Bucket named 'schemes', 
-            // you can uncomment and use the code below to actually save the files!
-            
-            /*
-            try {
-                const filePath = `${currentUserId}/${Date.now()}_${file.name}`;
-                const { data, error } = await supabase.storage.from('schemes').upload(filePath, file);
-                if (error) throw error;
-                alert("Upload successful!");
-            } catch (err) {
-                alert("Upload failed: " + err.message);
-            }
-            */
-            
-            // Reset input so they can upload again if needed
             fileInput.value = '';
         });
 
