@@ -237,20 +237,18 @@
             } catch (err) { console.error(err); document.getElementById('loadingOverlay').style.display = 'none'; }
         }
 
-        // --- BROWSER-VAULT AI LOGIC ---
+        // --- BULLETPROOF AI LOGIC WITH SMART FALLBACK ---
         document.getElementById('aiPlannerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
             let apiKey = localStorage.getItem('SPRINGDRILL_GEMINI_KEY');
             
             if (!apiKey) {
-                apiKey = prompt("To activate the AI Planner securely, please paste your Google Gemini API Key here.\n\n(It will be encrypted and saved only in your browser, keeping it 100% safe from GitHub!)");
-                
+                apiKey = prompt("To activate the AI Planner securely, please paste your Google Gemini API Key here.\n\n(It will be saved only in your browser, keeping it 100% safe from GitHub!)");
                 if (!apiKey) {
                     alert("API Key is required to use the AI Planner.");
                     return; 
                 }
-                
                 localStorage.setItem('SPRINGDRILL_GEMINI_KEY', apiKey.trim());
             }
 
@@ -266,7 +264,6 @@
             document.getElementById('btnCopyAI').style.display = 'none';
             document.getElementById('aiLoadingState').style.display = 'block';
 
-            // Notice: The prompt has been updated per your design guidelines!
             const promptText = `Act as an expert, professional school teacher. Generate a highly structured, comprehensive lesson plan for a ${targetClass} class. 
             Subject: ${subject}. 
             Topic: ${topic}. 
@@ -279,12 +276,22 @@
             - Conclusion & Homework`;
 
             try {
-                // CHANGED MODEL TO 'gemini-pro'
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+                // 1. FIRST ATTEMPT: Try the newest 2.5 Flash model
+                let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
                 });
+
+                // 2. SMART FALLBACK: If 2.5 is not found (404 error), silently switch to the rock-solid 1.5-flash
+                if (response.status === 404) {
+                    console.log("Model 2.5 not found in your region. Activating smart fallback to 1.5-flash...");
+                    response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
+                    });
+                }
 
                 const data = await response.json();
 
