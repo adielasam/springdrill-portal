@@ -70,6 +70,11 @@
                     </div>
                 </div>
 
+                <div class="alert alert-warning fw-bold shadow-sm" id="hostWarningAlert" style="display: none; border-left: 5px solid #f39c12; font-size: 0.95rem;">
+                    <i class="fas fa-exclamation-triangle me-2 text-danger"></i> 
+                    <strong>TEACHER REQUIREMENT:</strong> Because you are the Host, you must click the blue <span class="badge bg-primary mx-1">Log-in</span> button inside the video screen below to open this room. Once you log in, your waiting students will automatically drop into the class!
+                </div>
+
                 <div class="setup-card" id="setupFormArea" style="max-width: 600px; margin: 0 auto;">
                     <div class="text-center mb-4"><i class="fas fa-video fa-3x text-danger mb-3"></i><h3 class="fw-bold">Start Virtual Class</h3></div>
                     <form id="startClassForm">
@@ -162,6 +167,7 @@
 
                 document.getElementById('setupFormArea').style.display = 'none';
                 document.getElementById('liveControls').style.display = 'flex';
+                document.getElementById('hostWarningAlert').style.display = 'block'; // SHOW THE NEW WARNING BANNER
                 document.getElementById('jitsi-container').style.display = 'block';
                 document.getElementById('displaySubject').innerText = subject;
                 document.getElementById('displayRoomCode').innerText = roomCode;
