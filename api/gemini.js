@@ -14,7 +14,8 @@ export default async function handler(req, res) {
     const promptText = req.body.prompt;
 
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        // CHANGED MODEL TO gemini-pro TO ENSURE UNIVERSAL FREE-TIER COMPATIBILITY
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
