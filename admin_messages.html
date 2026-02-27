@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRINGDRILL - Admin Mail</title>
+    <title>SPRINGDRILL - Admin Mail & Monitor</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -20,6 +20,7 @@
         .nav-tabs { border-bottom: 2px solid #e9ecef; margin-bottom: 20px; }
         .nav-tabs .nav-link { color: #6c757d; font-weight: bold; border: none; border-bottom: 3px solid transparent; padding: 12px 25px;}
         .nav-tabs .nav-link.active { color: #007a4d; border-bottom: 3px solid #007a4d; background: transparent; }
+        .nav-tabs .nav-link.text-danger.active { color: #dc3545; border-bottom: 3px solid #dc3545; }
 
         .edu-card { background: white; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
         .edu-header { background-color: #007a4d; color: white; padding: 15px 20px; border-radius: 4px 4px 0 0; font-weight: bold;}
@@ -36,7 +37,7 @@
     </style>
 </head>
 <body>
-    <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i><h4 class="fw-bold text-muted">Loading Mail System...</h4></div>
+    <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i><h4 class="fw-bold text-muted">Loading System...</h4></div>
 
     <div class="sidebar">
         <div class="sidebar-brand">
@@ -68,6 +69,8 @@
             <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#inboxTab" type="button"><i class="fas fa-inbox me-2"></i> Inbox <span class="badge bg-danger ms-1" id="tabUnread">0</span></button></li>
             <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#sentTab" type="button"><i class="fas fa-paper-plane me-2"></i> Sent Mail</button></li>
             <li class="nav-item"><button class="nav-link text-success" data-bs-toggle="tab" data-bs-target="#composeTab" type="button" id="composeTabBtn"><i class="fas fa-pen me-2"></i> Compose</button></li>
+            
+            <li class="nav-item ms-auto"><button class="nav-link text-danger fw-bold" data-bs-toggle="tab" data-bs-target="#monitorTab" type="button"><i class="fas fa-eye me-2"></i> System Monitor</button></li>
         </ul>
 
         <div class="tab-content">
@@ -101,6 +104,31 @@
                     </div>
                 </div>
             </div>
+
+            <div class="tab-pane fade" id="monitorTab">
+                <div class="edu-card border-danger">
+                    <div class="edu-header bg-danger">
+                        <span><i class="fas fa-shield-alt me-2"></i> Global Message Monitor (Admin Only)</span>
+                    </div>
+                    <div class="table-responsive p-0">
+                        <table class="table mb-0 table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="20%">Sender</th>
+                                    <th width="20%">Recipient</th>
+                                    <th width="35%">Subject & Preview</th>
+                                    <th width="15%" class="text-center">Date</th>
+                                    <th width="10%" class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="monitorBody">
+                                <tr><td colspan="5" class="text-center py-5">Loading global database...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -110,13 +138,13 @@
                 <div class="modal-header bg-dark text-white"><h5 class="modal-title fw-bold" id="mSubject">Subject</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body p-4">
                     <div class="d-flex justify-content-between border-bottom pb-3 mb-3">
-                        <div><small class="text-muted fw-bold d-block">USER:</small><span class="fw-bold text-success" id="mUser">Name</span></div>
+                        <div><small class="text-muted fw-bold d-block" id="mUserLabel">USER:</small><span class="fw-bold text-success" id="mUser">Name</span></div>
                         <div class="text-end"><small class="text-muted fw-bold d-block">DATE:</small><span class="fw-bold" id="mDate">Date</span></div>
                     </div>
                     <div style="white-space: pre-wrap; font-size: 1.05rem;" id="mBody">Body</div>
                 </div>
                 <div class="modal-footer bg-light" id="modalFooter">
-                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -124,7 +152,12 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
-        let currentId = null; let allUsers = {}; let inboxMsgs = []; let sentMsgs = []; let readModal = null;
+        let currentId = null; 
+        let allUsers = {}; 
+        let inboxMsgs = []; 
+        let sentMsgs = []; 
+        let monitorMsgs = [];
+        let readModal = null;
 
         async function initMail() {
             try {
@@ -133,12 +166,14 @@
                 currentId = session.user.id;
                 readModal = new bootstrap.Modal(document.getElementById('readModal'));
 
-                // Fetch Users for Dropdown (Admin can message anyone)
-                const { data: users } = await supabase.from('users').select('id, name, role').neq('id', currentId).order('name');
+                // Fetch All Users globally
+                const { data: users } = await supabase.from('users').select('id, name, role').order('name');
                 if (users) {
                     users.forEach(u => allUsers[u.id] = u);
+                    
+                    // Populate compose dropdown (exclude admin's own self)
                     document.getElementById('recipientSelect').innerHTML = `<option value="">-- Select Recipient --</option>` + 
-                        users.map(u => `<option value="${u.id}">${u.name} (${u.role.toUpperCase()})</option>`).join('');
+                        users.filter(u => u.id !== currentId).map(u => `<option value="${u.id}">${u.name} (${u.role.toUpperCase()})</option>`).join('');
                 }
                 
                 await loadMail();
@@ -147,9 +182,12 @@
         }
 
         async function loadMail() {
-            // Inbox
-            const { data: inbox } = await supabase.from('messages').select('*').eq('receiver_id', currentId).order('created_at', { ascending: false });
-            inboxMsgs = inbox || [];
+            // Fetch literally every message in the database
+            const { data: allMessages, error } = await supabase.from('messages').select('*').order('created_at', { ascending: false });
+            if (error) { console.error(error); return; }
+
+            // 1. Filter for Admin's Inbox
+            inboxMsgs = allMessages.filter(m => m.receiver_id === currentId);
             let unread = 0;
             document.getElementById('inboxBody').innerHTML = inboxMsgs.length ? inboxMsgs.map((m, i) => {
                 if (!m.is_read) unread++;
@@ -164,9 +202,8 @@
             const navBadge = document.getElementById('navUnread');
             navBadge.innerText = unread; navBadge.style.display = unread > 0 ? 'inline-block' : 'none';
 
-            // Sent
-            const { data: sent } = await supabase.from('messages').select('*').eq('sender_id', currentId).order('created_at', { ascending: false });
-            sentMsgs = sent || [];
+            // 2. Filter for Admin's Sent Mail
+            sentMsgs = allMessages.filter(m => m.sender_id === currentId);
             document.getElementById('sentBody').innerHTML = sentMsgs.length ? sentMsgs.map((m, i) => {
                 return `<tr class="msg-row border-bottom" onclick="openMsg(${i}, 'sent')">
                     <td width="20%" class="ps-4">To: ${allUsers[m.receiver_id]?.name || 'Unknown'}</td>
@@ -174,22 +211,50 @@
                     <td width="20%" class="text-end pe-4 text-muted small">${new Date(m.created_at).toLocaleDateString()}</td>
                 </tr>`;
             }).join('') : `<tr><td class="text-center py-5 text-muted">No sent messages.</td></tr>`;
+
+            // 3. Populate the God Mode System Monitor
+            monitorMsgs = allMessages;
+            document.getElementById('monitorBody').innerHTML = monitorMsgs.length ? monitorMsgs.map((m, i) => {
+                return `<tr class="border-bottom">
+                    <td class="fw-bold text-dark ps-3" onclick="openMsg(${i}, 'monitor')" style="cursor:pointer;">${allUsers[m.sender_id]?.name || 'Unknown'}</td>
+                    <td class="text-muted" onclick="openMsg(${i}, 'monitor')" style="cursor:pointer;">${allUsers[m.receiver_id]?.name || 'Unknown'}</td>
+                    <td onclick="openMsg(${i}, 'monitor')" style="cursor:pointer;"><strong>${m.subject}</strong> <span class="text-muted small d-block">${m.body.substring(0,35)}...</span></td>
+                    <td class="text-center text-muted small" onclick="openMsg(${i}, 'monitor')" style="cursor:pointer;">${new Date(m.created_at).toLocaleDateString()}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-danger shadow-sm" onclick="deleteAnyMessage('${m.id}')" title="Permanently Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('') : `<tr><td colspan="5" class="text-center py-5 text-muted">No messages found in the entire database.</td></tr>`;
         }
 
         window.openMsg = async (index, type) => {
-            const m = type === 'inbox' ? inboxMsgs[index] : sentMsgs[index];
+            let m;
+            if (type === 'inbox') m = inboxMsgs[index];
+            else if (type === 'sent') m = sentMsgs[index];
+            else m = monitorMsgs[index];
+
             document.getElementById('mSubject').innerText = m.subject;
             document.getElementById('mBody').innerText = m.body;
             document.getElementById('mDate').innerText = new Date(m.created_at).toLocaleString();
             
             if (type === 'inbox') {
-                document.getElementById('mUser').innerText = `From: ${allUsers[m.sender_id]?.name || 'Unknown'}`;
-                document.getElementById('modalFooter').innerHTML = `<button class="btn btn-primary fw-bold" onclick="prepReply('${m.sender_id}', '${m.subject}')"><i class="fas fa-reply me-1"></i> Reply</button><button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>`;
+                document.getElementById('mUserLabel').innerText = "FROM:";
+                document.getElementById('mUser').innerText = `${allUsers[m.sender_id]?.name || 'Unknown'}`;
+                document.getElementById('modalFooter').innerHTML = `<button class="btn btn-primary fw-bold" onclick="prepReply('${m.sender_id}', '${m.subject.replace(/'/g, "\\'")}')"><i class="fas fa-reply me-1"></i> Reply</button><button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>`;
+                
                 if (!m.is_read) { await supabase.from('messages').update({ is_read: true }).eq('id', m.id); loadMail(); }
-            } else {
-                document.getElementById('mUser').innerText = `To: ${allUsers[m.receiver_id]?.name || 'Unknown'}`;
+            } else if (type === 'sent') {
+                document.getElementById('mUserLabel').innerText = "TO:";
+                document.getElementById('mUser').innerText = `${allUsers[m.receiver_id]?.name || 'Unknown'}`;
                 document.getElementById('modalFooter').innerHTML = `<button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>`;
+            } else if (type === 'monitor') {
+                document.getElementById('mUserLabel').innerText = "TRANSACTION:";
+                document.getElementById('mUser').innerText = `${allUsers[m.sender_id]?.name || 'Unknown'}  ➔  ${allUsers[m.receiver_id]?.name || 'Unknown'}`;
+                document.getElementById('modalFooter').innerHTML = `<button class="btn btn-danger fw-bold" onclick="deleteAnyMessage('${m.id}'); bootstrap.Modal.getInstance(document.getElementById('readModal')).hide();"><i class="fas fa-trash me-1"></i> Delete Record</button><button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>`;
             }
+            
             readModal.show();
         };
 
@@ -197,16 +262,45 @@
             readModal.hide();
             document.getElementById('recipientSelect').value = userId;
             document.getElementById('mailSubject').value = oldSubject.startsWith('Re:') ? oldSubject : `Re: ${oldSubject}`;
-            const triggerEl = document.getElementById('composeTabBtn');
-            bootstrap.Tab.getOrCreateInstance(triggerEl).show();
+            bootstrap.Tab.getOrCreateInstance(document.getElementById('composeTabBtn')).show();
         };
 
-        document.getElementById('composeForm').addEventListener('submit', async (e) => {
-            e.preventDefault(); const btn = document.getElementById('sendBtn'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+        // NEW: Permanent Database Deletion
+        window.deleteAnyMessage = async function(msgId) {
+            if(!confirm("WARNING: Are you sure you want to permanently delete this message from the database to save space? This action cannot be undone.")) return;
+            
+            document.getElementById('loadingOverlay').style.display = 'flex';
             try {
-                await supabase.from('messages').insert([{ sender_id: currentId, receiver_id: document.getElementById('recipientSelect').value, subject: document.getElementById('mailSubject').value, body: document.getElementById('mailBody').value }]);
-                document.getElementById('composeForm').reset(); await loadMail(); alert("Sent!");
-            } catch (err) { alert("Failed"); } finally { btn.innerHTML = 'Send Message'; btn.disabled = false; }
+                const { error } = await supabase.from('messages').delete().eq('id', msgId);
+                if (error) throw error;
+                await loadMail();
+            } catch(err) {
+                alert("Error deleting message: " + err.message);
+            }
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        document.getElementById('composeForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            const btn = document.getElementById('sendBtn'); 
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; 
+            btn.disabled = true;
+            try {
+                await supabase.from('messages').insert([{ 
+                    sender_id: currentId, 
+                    receiver_id: document.getElementById('recipientSelect').value, 
+                    subject: document.getElementById('mailSubject').value, 
+                    body: document.getElementById('mailBody').value 
+                }]);
+                document.getElementById('composeForm').reset(); 
+                await loadMail(); 
+                alert("Sent!");
+            } catch (err) { 
+                alert("Failed"); 
+            } finally { 
+                btn.innerHTML = 'Send Message'; 
+                btn.disabled = false; 
+            }
         });
 
         document.addEventListener('DOMContentLoaded', initMail);

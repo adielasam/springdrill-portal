@@ -9,46 +9,34 @@
     <style>
         body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
         
-        /* Sidebar Styling */
         .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1000; }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
         .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center; }
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
 
-        /* Main Content */
         .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
-        
-        /* Top Navbar */
         .top-navbar { background: white; padding: 15px 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d;}
         
-        /* Welcome Banner */
         .welcome-banner { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .welcome-banner h4 { font-weight: 800; color: #333; text-transform: uppercase; font-size: 1.2rem; margin: 0;}
         .attendance-btn { background-color: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; margin-left: 10px;}
 
-        /* Big Circle Icons Section */
         .icon-grid { display: flex; gap: 30px; margin-bottom: 40px; justify-content: center; flex-wrap: wrap;}
         .icon-card { background: white; width: 140px; padding: 25px 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03); cursor: pointer; text-decoration: none; color: inherit; transition: transform 0.2s; border: 1px solid #eee; position: relative;}
         .icon-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.08); border-color: #007a4d; }
         .icon-circle { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; font-size: 2rem; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
-        .ic-eclassroom { background: #e74c3c; } 
-        .ic-assignments { background: #2ecc71; } 
-        .ic-cbt { background: #c0392b; border: 2px solid #e74c3c;} 
-        .ic-mail { background: #9b59b6; } /* New Mail Icon Color */
-
+        .ic-eclassroom { background: #e74c3c; } .ic-assignments { background: #2ecc71; } .ic-cbt { background: #c0392b; border: 2px solid #e74c3c;} .ic-mail { background: #9b59b6; }
         .icon-card h6 { font-weight: 700; font-size: 0.9rem; color: #444; margin: 0; }
         
         .notification-badge { position: absolute; top: 10px; right: 10px; background: #e74c3c; color: white; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 50%; display: none; border: 2px solid white;}
 
-        /* Tabs Styling */
         .nav-tabs { border-bottom: 2px solid #e9ecef; margin-bottom: 20px; }
         .nav-tabs .nav-link { color: #6c757d; font-weight: bold; border: none; border-bottom: 3px solid transparent; padding: 12px 25px; font-size: 1.05rem; }
         .nav-tabs .nav-link:hover { color: #007a4d; }
         .nav-tabs .nav-link.active { color: #007a4d; border-bottom: 3px solid #007a4d; background: transparent; }
 
-        /* Edu Card / Tables */
         .edu-card { background: white; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
         .edu-header { background-color: #007a4d; color: white; padding: 12px 20px; border-radius: 4px 4px 0 0; font-weight: bold; }
         .edu-body { padding: 25px; }
@@ -75,20 +63,15 @@
         </div>
         <nav class="nav flex-column mt-3">
             <a href="teacher_dashboard.html" class="nav-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            
             <a href="teacher_messages.html" class="nav-link"><i class="fas fa-envelope"></i> Communications <span class="badge bg-danger ms-auto" id="sidebarBadge" style="display: none;">0</span></a>
-
             <a href="teacher_eclassroom.html" class="nav-link"><i class="fas fa-play"></i> eClassroom Notes</a>
-
             <a href="#cbtMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2">
-                <span><i class="fas fa-laptop-code me-2"></i> CBT</span>
-                <i class="fas fa-caret-down"></i>
+                <span><i class="fas fa-laptop-code me-2"></i> CBT</span><i class="fas fa-caret-down"></i>
             </a>
             <div class="collapse bg-dark mx-2 mt-1 rounded" id="cbtMenu">
                 <a href="manage_cbt.html" class="nav-link small py-2"><i class="fas fa-list me-2"></i> Manage CBT</a>
                 <a href="test_results.html" class="nav-link small py-2"><i class="fas fa-chart-bar me-2"></i> Result Manager</a>
             </div>
-
             <hr class="mx-3 my-4 border-secondary">
             <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
@@ -108,69 +91,35 @@
         </div>
 
         <div class="icon-grid">
-            
             <a href="teacher_messages.html" class="icon-card">
                 <div class="notification-badge" id="cardBadge">0</div>
                 <div class="icon-circle ic-mail"><i class="fas fa-envelope"></i></div>
                 <h6>Mailbox</h6>
             </a>
-
-            <a href="teacher_eclassroom.html" class="icon-card">
-                <div class="icon-circle ic-eclassroom"><i class="fas fa-video"></i></div>
-                <h6>eClassroom</h6>
-            </a>
-            
-            <a href="#" class="icon-card">
-                <div class="icon-circle ic-assignments"><i class="fas fa-file-signature"></i></div>
-                <h6>Assignments</h6>
-            </a>
-            
-            <a href="manage_cbt.html" class="icon-card">
-                <div class="icon-circle ic-cbt"><i class="fas fa-award"></i></div>
-                <h6>Manage CBT</h6>
-            </a>
+            <a href="teacher_eclassroom.html" class="icon-card"><div class="icon-circle ic-eclassroom"><i class="fas fa-video"></i></div><h6>eClassroom</h6></a>
+            <a href="#" class="icon-card"><div class="icon-circle ic-assignments"><i class="fas fa-file-signature"></i></div><h6>Assignments</h6></a>
+            <a href="manage_cbt.html" class="icon-card"><div class="icon-circle ic-cbt"><i class="fas fa-award"></i></div><h6>Manage CBT</h6></a>
         </div>
 
         <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">Overview</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="subjects-tab" data-bs-toggle="tab" data-bs-target="#subjects" type="button" role="tab">My Subjects</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" type="button" role="tab">Weekly Reflection</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" type="button" role="tab">My Students</button>
-            </li>
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#overview" type="button">Overview</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#subjects" type="button">My Subjects</button></li>
+            <li class="nav-item"><button class="nav-link" type="button">Weekly Reflection</button></li>
+            <li class="nav-item"><button class="nav-link" type="button">My Students</button></li>
         </ul>
 
-        <div class="tab-content" id="dashboardTabsContent">
-            
-            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="overview">
                 <div class="row">
-                    <div class="col-md-8">
-                        <div class="edu-card h-100">
-                            <div class="edu-body">
-                                <textarea class="form-control bg-light border-0" rows="10" placeholder="Type your notes or announcements here..."></textarea>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="col-md-8"><div class="edu-card h-100"><div class="edu-body"><textarea class="form-control bg-light border-0" rows="10" placeholder="Type your notes or announcements here..."></textarea></div></div></div>
                     <div class="col-md-4">
-                        <div class="edu-card mb-4">
-                            <div class="edu-header bg-light text-dark border-bottom"><i class="fas fa-calendar-check text-success me-2"></i> Upcoming Lessons</div>
-                            <div class="edu-body py-4 text-center text-muted">No Lessons</div>
-                        </div>
-                        <div class="edu-card">
-                            <div class="edu-header bg-light text-dark border-bottom"><i class="fas fa-birthday-cake text-warning me-2"></i> Upcoming Birthdays</div>
-                            <div class="edu-body py-4 text-center text-muted small">Upcoming birthdays for this month</div>
-                        </div>
+                        <div class="edu-card mb-4"><div class="edu-header bg-light text-dark border-bottom"><i class="fas fa-calendar-check text-success me-2"></i> Upcoming Lessons</div><div class="edu-body py-4 text-center text-muted">No Lessons</div></div>
+                        <div class="edu-card"><div class="edu-header bg-light text-dark border-bottom"><i class="fas fa-birthday-cake text-warning me-2"></i> Upcoming Birthdays</div><div class="edu-body py-4 text-center text-muted small">Upcoming birthdays for this month</div></div>
                     </div>
                 </div>
             </div>
 
-            <div class="tab-pane fade" id="subjects" role="tabpanel">
+            <div class="tab-pane fade" id="subjects">
                 <div class="edu-card">
                     <div class="edu-header">Select Session</div>
                     <div class="edu-body py-3 d-flex justify-content-center">
@@ -182,20 +131,19 @@
                 </div>
 
                 <div class="edu-card">
-                    <div class="edu-header">My Subject</div>
-                    <div class="table-responsive p-3">
-                        <table class="table table-hover table-bordered mb-0">
-                            <thead class="table-light">
+                    <div class="edu-header"><i class="fas fa-book me-2"></i> Academic Subjects</div>
+                    <div class="table-responsive p-0">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light border-bottom">
                                 <tr>
                                     <th width="5%" class="text-center">#</th>
-                                    <th width="30%">Subject</th>
-                                    <th width="25%">Class Name</th>
-                                    <th width="25%" class="text-center">Scheme of Work</th>
-                                    <th width="15%" class="text-center">Lesson Plan</th>
+                                    <th width="40%">Subject Name</th>
+                                    <th width="30%" class="text-center">Scheme of Work</th>
+                                    <th width="25%" class="text-center">Lesson Plan</th>
                                 </tr>
                             </thead>
                             <tbody id="subjectsBody">
-                                <tr><td colspan="5" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i> Fetching Subjects...</td></tr>
+                                <tr><td colspan="4" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i> Fetching Subjects...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -204,14 +152,51 @@
         </div>
     </div>
 
-    <input type="file" id="schemeUploadInput" accept=".pdf,.docx" style="display: none;">
+    <div class="modal fade" id="uploadSchemeModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-cloud-upload-alt me-2"></i> Upload Scheme of Work</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="schemeUploadForm">
+                        <input type="hidden" id="modalSubjectId">
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Selected Subject</label>
+                            <input type="text" id="modalSubjectName" class="form-control fw-bold bg-light" readonly>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-primary">Target Class <span class="text-danger">*</span></label>
+                            <select id="modalClassSelect" class="form-select border-primary fw-bold" required>
+                                <option value="">Loading classes...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Attach File (Any Format) <span class="text-danger">*</span></label>
+                            <input type="file" id="modalFileInput" class="form-control" required>
+                            <small class="text-muted mt-1 d-block"><i class="fas fa-info-circle me-1"></i> Word, PDF, Excel, PowerPoint, etc.</small>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2" id="submitSchemeBtn">
+                            <i class="fas fa-upload me-2"></i> Upload to Database
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
         let currentUserId = null;
-        let selectedSubjectForUpload = null;
+        let globalClasses = [];
+        let uploadModalInstance = null;
 
         async function initializeDashboard() {
             try {
@@ -219,54 +204,54 @@
                 if (!session) return window.location.href = 'login.html';
                 currentUserId = session.user.id;
 
+                uploadModalInstance = new bootstrap.Modal(document.getElementById('uploadSchemeModal'));
+
+                // Fetch Profile
                 const { data: profile } = await supabase.from('users').select('name').eq('id', currentUserId).single();
                 if (profile) {
                     document.getElementById('headerName').innerText = profile.name;
                     document.getElementById('welcomeText').innerText = `WELCOME ${profile.name}`;
                 }
 
-                // 1. Fetch Unread Messages for Notification Badges
-                const { count: unreadCount, error: msgErr } = await supabase
-                    .from('messages')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('receiver_id', currentUserId)
-                    .eq('is_read', false);
-
+                // Unread Mail Check
+                const { count: unreadCount, error: msgErr } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('receiver_id', currentUserId).eq('is_read', false);
                 if (!msgErr && unreadCount > 0) {
-                    const sidebarBadge = document.getElementById('sidebarBadge');
-                    if(sidebarBadge) { sidebarBadge.innerText = unreadCount; sidebarBadge.style.display = 'inline-block'; }
-
-                    const cardBadge = document.getElementById('cardBadge');
-                    if(cardBadge) { cardBadge.innerText = unreadCount; cardBadge.style.display = 'inline-block'; }
+                    document.getElementById('sidebarBadge').innerText = unreadCount; document.getElementById('sidebarBadge').style.display = 'inline-block';
+                    document.getElementById('cardBadge').innerText = unreadCount; document.getElementById('cardBadge').style.display = 'inline-block';
                 }
 
-                // 2. Fetch Subjects
-                const { data: subjects } = await supabase.from('subjects').select('*').limit(5);
-                const { data: classes } = await supabase.from('classes').select('*').limit(5);
-                
+                // Pre-fetch Classes for the Modal
+                const { data: classesData } = await supabase.from('classes').select('*').order('id');
+                if (classesData) {
+                    globalClasses = classesData;
+                    document.getElementById('modalClassSelect').innerHTML = `<option value="" disabled selected>-- Select a Class --</option>` + 
+                        globalClasses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                }
+
+                // Fetch ALL Subjects
+                const { data: subjects } = await supabase.from('subjects').select('*').order('name');
                 const tbody = document.getElementById('subjectsBody');
                 
                 if (subjects && subjects.length > 0) {
                     tbody.innerHTML = subjects.map((sub, index) => {
-                        const cls = classes[index % classes.length];
+                        const safeName = sub.name.replace(/'/g, "\\'"); 
                         return `
                             <tr>
                                 <td class="text-center fw-bold text-muted">${index + 1}</td>
-                                <td>${sub.name}</td>
-                                <td>${cls ? cls.name : 'All Classes'}</td>
+                                <td class="fw-bold text-dark">${sub.name}</td>
                                 <td class="text-center">
-                                    <button class="btn-manage" onclick="triggerUpload('${sub.name}')">
-                                        <i class="fas fa-upload me-1"></i> Upload (.pdf)
+                                    <button class="btn-manage" onclick="window.openSchemeModal(${sub.id}, '${safeName}')">
+                                        <i class="fas fa-cloud-upload-alt me-1"></i> Upload Scheme
                                     </button>
                                 </td>
                                 <td class="text-center">
-                                    <button class="btn btn-sm btn-light border fw-bold text-muted px-3">Manage</button>
+                                    <button class="btn btn-sm btn-light border fw-bold text-muted px-3" disabled>Pending</button>
                                 </td>
                             </tr>
                         `;
                     }).join('');
                 } else {
-                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">No subjects found in database.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-danger fw-bold">No subjects found in the database. Please run the SQL setup script.</td></tr>`;
                 }
 
                 document.getElementById('loadingOverlay').style.display = 'none';
@@ -277,27 +262,63 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', initializeDashboard);
-
-        const fileInput = document.getElementById('schemeUploadInput');
-        
-        window.triggerUpload = (subjectName) => {
-            selectedSubjectForUpload = subjectName;
-            fileInput.click(); 
+        // Trigger the Modal
+        window.openSchemeModal = (subjectId, subjectName) => {
+            document.getElementById('modalSubjectId').value = subjectId;
+            document.getElementById('modalSubjectName').value = subjectName;
+            document.getElementById('schemeUploadForm').reset();
+            uploadModalInstance.show();
         };
 
-        fileInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
+        // Handle the Upload
+        document.getElementById('schemeUploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('submitSchemeBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Uploading...';
+            btn.disabled = true;
 
-            alert(`Preparing to upload "${file.name}" for ${selectedSubjectForUpload}...\n\n(Note: To permanently save PDFs, ensure you have created a Supabase Storage Bucket named 'schemes').`);
-            fileInput.value = '';
+            try {
+                const subjectId = document.getElementById('modalSubjectId').value;
+                const classId = document.getElementById('modalClassSelect').value;
+                const file = document.getElementById('modalFileInput').files[0];
+
+                // Generate safe file name
+                const fileExt = file.name.split('.').pop();
+                const safeName = `scheme_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+                // REPLACED 'schemes' with 'lesson_notes' SO IT USES YOUR EXISTING BUCKET
+                const { error: uploadErr } = await supabase.storage.from('lesson_notes').upload(safeName, file);
+                if (uploadErr) throw new Error("File upload failed. Error: " + uploadErr.message);
+
+                // Get Public URL from 'lesson_notes'
+                const { data: pubData } = supabase.storage.from('lesson_notes').getPublicUrl(safeName);
+                const publicUrl = pubData.publicUrl;
+
+                // Save Record to Database Table
+                const { error: dbErr } = await supabase.from('schemes_of_work').insert([{
+                    teacher_id: currentUserId,
+                    subject_id: subjectId,
+                    class_id: classId,
+                    file_name: file.name,
+                    file_url: publicUrl
+                }]);
+                if (dbErr) throw dbErr;
+
+                uploadModalInstance.hide();
+                alert("Success! Scheme of Work has been published for students to download.");
+
+            } catch (err) {
+                alert(err.message);
+            } finally {
+                btn.innerHTML = '<i class="fas fa-upload me-2"></i> Upload to Database';
+                btn.disabled = false;
+            }
         });
 
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
         document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            await supabase.auth.signOut();
-            window.location.href = 'login.html';
+            e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html';
         });
     </script>
 </body>

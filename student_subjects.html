@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - My Subjects</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
+        
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1000; }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center;}
+        .nav-link i { width: 25px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
+
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
+        .page-header-card { background: white; border-radius: 8px; border-left: 5px solid #007a4d; padding: 20px 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
+        
+        .edu-card { background: white; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
+        .edu-header { background-color: #2c3e50; color: white; padding: 15px 20px; border-radius: 4px 4px 0 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center;}
+        
+        .table th { border-top: none; color: #495057; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; background-color: #f8f9fa;}
+        .table td { vertical-align: middle; font-size: 0.95rem; }
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-primary mb-3"></i><h4 class="fw-bold text-muted">Loading Subjects...</h4></div>
+
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h5 class="text-white fw-bold"><i class="fas fa-graduation-cap text-warning me-2"></i> STUDENT PORTAL</h5>
+        </div>
+        <nav class="nav flex-column mt-3">
+            <a href="student_dashboard.html" class="nav-link"><i class="fas fa-home me-2"></i> Dashboard</a>
+            <a href="student_eclassroom.html" class="nav-link"><i class="fas fa-play me-2"></i> eClassroom</a>
+            <a href="student_cbt.html" class="nav-link"><i class="fas fa-laptop-code me-2"></i> CBT / Exams</a>
+            <a href="student_results.html" class="nav-link"><i class="fas fa-award me-2"></i> Result Manager</a>
+            
+            <a href="student_messages.html" class="nav-link mt-2"><i class="fas fa-envelope me-2"></i> My Inbox <span class="badge bg-danger ms-auto" id="navUnread" style="display:none;">0</span></a>
+            
+            <a href="student_subjects.html" class="nav-link active mt-2"><i class="fas fa-book me-2"></i> My Subjects</a>
+
+            <hr class="mx-3 my-4 border-secondary">
+            <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="page-header-card d-flex justify-content-between align-items-center">
+            <div>
+                <h4 class="mb-1"><i class="fas fa-book text-primary me-2"></i> Academic Subjects</h4>
+                <p class="text-muted mb-0">View all subjects and download your Schemes of Work.</p>
+            </div>
+            <div class="text-end">
+                <h5 class="fw-bold text-success mb-0" id="studentClassDisplay">Class: Loading...</h5>
+            </div>
+        </div>
+
+        <div class="edu-card">
+            <div class="edu-header">
+                <span><i class="fas fa-list me-2"></i> Course Directory & Materials</span>
+            </div>
+            <div class="table-responsive p-0">
+                <table class="table table-hover table-striped mb-0">
+                    <thead class="table-light border-bottom">
+                        <tr>
+                            <th width="10%" class="text-center">S/N</th>
+                            <th width="45%">Subject Title</th>
+                            <th width="45%" class="text-center">Scheme of Work</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subjectsBody">
+                        <tr><td colspan="3" class="text-center py-5">Fetching your subjects...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+        
+        let currentUserId = null;
+
+        async function initSubjects() {
+            try {
+                // 1. Authenticate
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = 'login.html';
+                currentUserId = session.user.id;
+
+                // 2. Check for Unread Messages (To keep the sidebar badge updated)
+                const { count: unreadCount, error: msgErr } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('receiver_id', currentUserId).eq('is_read', false);
+                if (!msgErr && unreadCount > 0) {
+                    const navBadge = document.getElementById('navUnread');
+                    navBadge.innerText = unreadCount;
+                    navBadge.style.display = 'inline-block';
+                }
+
+                // 3. Get Student's Class ID and Name
+                const { data: student } = await supabase.from('students').select('class_id, classes(name)').eq('user_id', currentUserId).single();
+                
+                if (!student || !student.class_id) {
+                    document.getElementById('studentClassDisplay').innerText = "Class: Unassigned";
+                    document.getElementById('subjectsBody').innerHTML = `<tr><td colspan="3" class="text-center py-5 text-danger fw-bold"><i class="fas fa-exclamation-triangle fa-2x mb-2"></i><br>You have not been assigned to a class yet. Please contact the Admin.</td></tr>`;
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    return;
+                }
+
+                document.getElementById('studentClassDisplay').innerText = `Class: ${student.classes.name}`;
+                const classId = student.class_id;
+
+                // 4. Fetch all standard Subjects
+                const { data: subjects } = await supabase.from('subjects').select('*').order('name');
+                
+                // 5. Fetch all uploaded Schemes specifically for this student's class
+                const { data: schemes } = await supabase.from('schemes_of_work').select('*').eq('class_id', classId);
+
+                // Create a map to quickly look up if a scheme exists for a subject
+                const schemeMap = {};
+                if (schemes) {
+                    schemes.forEach(s => {
+                        // If a teacher uploaded multiple, we keep the newest one based on created_at date
+                        if (!schemeMap[s.subject_id] || new Date(s.created_at) > new Date(schemeMap[s.subject_id].created_at)) {
+                            schemeMap[s.subject_id] = s;
+                        }
+                    });
+                }
+
+                // 6. Render the Table
+                const tbody = document.getElementById('subjectsBody');
+                if (subjects && subjects.length > 0) {
+                    tbody.innerHTML = subjects.map((sub, index) => {
+                        const scheme = schemeMap[sub.id];
+                        
+                        // If scheme exists, show a green download button. If not, show a grey badge.
+                        let actionHtml = `<span class="badge bg-secondary py-2 px-3">Pending Upload</span>`;
+                        if (scheme) {
+                            actionHtml = `
+                                <a href="${scheme.file_url}" target="_blank" class="btn btn-sm btn-success fw-bold shadow-sm">
+                                    <i class="fas fa-file-download me-1"></i> Download Scheme
+                                </a>
+                            `;
+                        }
+
+                        return `
+                            <tr>
+                                <td class="text-center fw-bold text-muted">${index + 1}</td>
+                                <td class="fw-bold text-dark fs-6">${sub.name}</td>
+                                <td class="text-center">${actionHtml}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="3" class="text-center py-5 text-muted">No subjects found in the database.</td></tr>`;
+                }
+
+                document.getElementById('loadingOverlay').style.display = 'none';
+
+            } catch (err) { 
+                console.error(err); 
+                document.getElementById('loadingOverlay').style.display = 'none';
+                alert("Failed to load subjects.");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initSubjects);
+        
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { 
+            e.preventDefault(); 
+            await supabase.auth.signOut(); 
+            window.location.href = 'login.html'; 
+        });
+    </script>
+</body>
+</html>

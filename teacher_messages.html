@@ -65,7 +65,9 @@
 
         <ul class="nav nav-tabs" id="mailTabs">
             <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#inboxTab" type="button"><i class="fas fa-inbox me-2"></i> Inbox <span class="badge bg-danger ms-1" id="tabUnread">0</span></button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#sentTab" type="button"><i class="fas fa-paper-plane me-2"></i> Sent Mail</button></li>
+            
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#sentTab" type="button" id="sentTabBtn"><i class="fas fa-paper-plane me-2"></i> Sent Mail</button></li>
+            
             <li class="nav-item"><button class="nav-link text-success" data-bs-toggle="tab" data-bs-target="#composeTab" type="button" id="composeTabBtn"><i class="fas fa-pen me-2"></i> Compose</button></li>
         </ul>
 
@@ -93,7 +95,7 @@
                             </div>
                             <div class="mb-3"><label class="form-label">Subject</label><input type="text" id="mailSubject" class="form-control" required></div>
                             <div class="mb-4"><label class="form-label">Message</label><textarea id="mailBody" class="form-control" rows="6" required></textarea></div>
-                            <button type="submit" class="btn btn-dark w-100 fw-bold py-2" id="sendBtn">Send Message</button>
+                            <button type="submit" class="btn btn-dark w-100 fw-bold py-2" id="sendBtn"><i class="fas fa-paper-plane me-2"></i> Send Message</button>
                         </form>
                     </div>
                 </div>
@@ -129,17 +131,13 @@
 
         async function initMail() {
             try {
-                // 1. Verify Session First
                 const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-                if (sessionError || !session) {
-                    console.log("No session found, redirecting to login.");
-                    return window.location.href = 'login.html';
-                }
+                if (sessionError || !session) return window.location.href = 'login.html';
                 
                 currentId = session.user.id;
                 readModal = new bootstrap.Modal(document.getElementById('readModal'));
 
-                // 2. Fetch Users (Safer Query without complex nested filters)
+                // Teachers can message Admins and Students
                 const { data: users, error: userError } = await supabase
                     .from('users')
                     .select('id, name, role')
@@ -149,21 +147,17 @@
                 if (userError) throw userError;
 
                 if (users) {
-                    // Filter in javascript to prevent Supabase query crashes
                     const allowedUsers = users.filter(u => u.role === 'admin' || u.role === 'student');
-                    
                     users.forEach(u => allUsers[u.id] = u);
                     document.getElementById('recipientSelect').innerHTML = `<option value="">-- Select Recipient --</option>` + 
                         allowedUsers.map(u => `<option value="${u.id}">${u.name} (${u.role.toUpperCase()})</option>`).join('');
                 }
                 
-                // 3. Load Mails
                 await loadMail();
                 document.getElementById('loadingOverlay').style.display = 'none';
 
             } catch (err) { 
                 console.error("Initialization Error:", err);
-                alert("Failed to connect to the mail server. Please refresh the page.");
                 document.getElementById('loadingOverlay').style.display = 'none';
             }
         }
@@ -230,31 +224,44 @@
             bootstrap.Tab.getOrCreateInstance(document.getElementById('composeTabBtn')).show();
         };
 
+        // FULLY REWRITTEN SECURE SUBMIT HANDLER
         document.getElementById('composeForm').addEventListener('submit', async (e) => {
             e.preventDefault(); 
+            
             const btn = document.getElementById('sendBtn'); 
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; 
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Sending...'; 
             btn.disabled = true;
             
             try {
+                // Securely extract string values
+                const receiverIdVal = document.getElementById('recipientSelect').value;
+                const subjectVal = document.getElementById('mailSubject').value.trim();
+                const bodyVal = document.getElementById('mailBody').value.trim();
+
                 const { error } = await supabase.from('messages').insert([{ 
                     sender_id: currentId, 
-                    receiver_id: document.getElementById('recipientSelect').value, 
-                    subject: document.getElementById('mailSubject').value, 
-                    body: document.getElementById('mailBody').value 
+                    receiver_id: receiverIdVal, 
+                    subject: subjectVal, 
+                    body: bodyVal 
                 }]);
                 
                 if (error) throw error;
 
+                // Reset form and reload
                 document.getElementById('composeForm').reset(); 
                 await loadMail(); 
                 alert("Message Sent Successfully!");
-                bootstrap.Tab.getOrCreateInstance(document.getElementById('sentTab')).show();
+                
+                // Safely switch to the Sent Mail Tab
+                const sentTabButton = document.getElementById('sentTabBtn');
+                if (sentTabButton) {
+                    bootstrap.Tab.getOrCreateInstance(sentTabButton).show();
+                }
 
             } catch (err) { 
                 alert("Failed to send message: " + err.message); 
             } finally { 
-                btn.innerHTML = 'Send Message'; 
+                btn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Send Message'; 
                 btn.disabled = false; 
             }
         });
