@@ -31,4 +31,5 @@ export default async function handler(req, res) {
         console.error("Server Error:", error);
         res.status(500).json({ error: 'Failed to generate content' });
     }
+
 }
