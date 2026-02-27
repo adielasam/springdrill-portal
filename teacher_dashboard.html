@@ -12,7 +12,7 @@
         /* Sidebar Styling */
         .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1000; }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center; }
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
 
@@ -20,7 +20,7 @@
         .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
         
         /* Top Navbar */
-        .top-navbar { background: white; padding: 15px 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .top-navbar { background: white; padding: 15px 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d;}
         
         /* Welcome Banner */
         .welcome-banner { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
@@ -28,16 +28,19 @@
         .attendance-btn { background-color: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; margin-left: 10px;}
 
         /* Big Circle Icons Section */
-        .icon-grid { display: flex; gap: 40px; margin-bottom: 40px; justify-content: center; }
-        .icon-card { text-align: center; cursor: pointer; text-decoration: none; color: inherit; transition: transform 0.2s;}
-        .icon-card:hover { transform: translateY(-5px); }
-        .icon-circle { width: 90px; height: 90px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; font-size: 2.5rem; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .icon-grid { display: flex; gap: 30px; margin-bottom: 40px; justify-content: center; flex-wrap: wrap;}
+        .icon-card { background: white; width: 140px; padding: 25px 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03); cursor: pointer; text-decoration: none; color: inherit; transition: transform 0.2s; border: 1px solid #eee; position: relative;}
+        .icon-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.08); border-color: #007a4d; }
+        .icon-circle { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; font-size: 2rem; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
-        .ic-eclassroom { background: #e74c3c; } /* Red */
-        .ic-assignments { background: #2ecc71; } /* Green */
-        .ic-cbt { background: #c0392b; border: 4px solid #fff; outline: 3px solid #c0392b; } /* Deep Red with double border */
+        .ic-eclassroom { background: #e74c3c; } 
+        .ic-assignments { background: #2ecc71; } 
+        .ic-cbt { background: #c0392b; border: 2px solid #e74c3c;} 
+        .ic-mail { background: #9b59b6; } /* New Mail Icon Color */
 
-        .icon-card h6 { font-weight: 700; font-size: 1rem; color: #444; margin: 0; }
+        .icon-card h6 { font-weight: 700; font-size: 0.9rem; color: #444; margin: 0; }
+        
+        .notification-badge { position: absolute; top: 10px; right: 10px; background: #e74c3c; color: white; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 50%; display: none; border: 2px solid white;}
 
         /* Tabs Styling */
         .nav-tabs { border-bottom: 2px solid #e9ecef; margin-bottom: 20px; }
@@ -73,6 +76,8 @@
         <nav class="nav flex-column mt-3">
             <a href="teacher_dashboard.html" class="nav-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             
+            <a href="teacher_messages.html" class="nav-link"><i class="fas fa-envelope"></i> Communications <span class="badge bg-danger ms-auto" id="sidebarBadge" style="display: none;">0</span></a>
+
             <a href="teacher_eclassroom.html" class="nav-link"><i class="fas fa-play"></i> eClassroom Notes</a>
 
             <a href="#cbtMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2">
@@ -91,7 +96,7 @@
 
     <div class="main-content">
         <div class="top-navbar">
-            <div class="fw-bold text-muted"><i class="fas fa-bars me-3"></i> Spring Valley School</div>
+            <div class="fw-bold text-muted"><i class="fas fa-bars me-3"></i> SPRINGDRILL ACADEMY</div>
             <div class="fw-bold text-dark"><i class="fas fa-bell text-success me-3"></i> <span id="headerName">Loading...</span></div>
         </div>
 
@@ -103,17 +108,26 @@
         </div>
 
         <div class="icon-grid">
+            
+            <a href="teacher_messages.html" class="icon-card">
+                <div class="notification-badge" id="cardBadge">0</div>
+                <div class="icon-circle ic-mail"><i class="fas fa-envelope"></i></div>
+                <h6>Mailbox</h6>
+            </a>
+
             <a href="teacher_eclassroom.html" class="icon-card">
-                <div class="icon-circle ic-eclassroom"><i class="fas fa-play"></i></div>
+                <div class="icon-circle ic-eclassroom"><i class="fas fa-video"></i></div>
                 <h6>eClassroom</h6>
             </a>
+            
             <a href="#" class="icon-card">
                 <div class="icon-circle ic-assignments"><i class="fas fa-file-signature"></i></div>
                 <h6>Assignments</h6>
             </a>
+            
             <a href="manage_cbt.html" class="icon-card">
                 <div class="icon-circle ic-cbt"><i class="fas fa-award"></i></div>
-                <h6>CBT</h6>
+                <h6>Manage CBT</h6>
             </a>
         </div>
 
@@ -157,7 +171,6 @@
             </div>
 
             <div class="tab-pane fade" id="subjects" role="tabpanel">
-                
                 <div class="edu-card">
                     <div class="edu-header">Select Session</div>
                     <div class="edu-body py-3 d-flex justify-content-center">
@@ -187,7 +200,6 @@
                         </table>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -213,6 +225,22 @@
                     document.getElementById('welcomeText').innerText = `WELCOME ${profile.name}`;
                 }
 
+                // 1. Fetch Unread Messages for Notification Badges
+                const { count: unreadCount, error: msgErr } = await supabase
+                    .from('messages')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('receiver_id', currentUserId)
+                    .eq('is_read', false);
+
+                if (!msgErr && unreadCount > 0) {
+                    const sidebarBadge = document.getElementById('sidebarBadge');
+                    if(sidebarBadge) { sidebarBadge.innerText = unreadCount; sidebarBadge.style.display = 'inline-block'; }
+
+                    const cardBadge = document.getElementById('cardBadge');
+                    if(cardBadge) { cardBadge.innerText = unreadCount; cardBadge.style.display = 'inline-block'; }
+                }
+
+                // 2. Fetch Subjects
                 const { data: subjects } = await supabase.from('subjects').select('*').limit(5);
                 const { data: classes } = await supabase.from('classes').select('*').limit(5);
                 
