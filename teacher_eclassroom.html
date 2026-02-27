@@ -66,7 +66,7 @@
                     <div>
                         <span class="badge bg-danger pulse me-2">LIVE NOW</span>
                         <span class="fw-bold text-dark fs-4 d-block mt-2" id="displaySubject">Subject</span>
-                        <div class="text-muted small mt-1">Students can now join this class from their dashboard.</div>
+                        <div class="text-primary small mt-1 fw-bold"><i class="fas fa-info-circle me-1"></i> Tip: If a student cannot unmute, ask them to check their browser settings and allow Microphone access!</div>
                     </div>
                     <div class="d-flex align-items-center gap-3">
                         <div class="text-end me-2"><small class="text-muted d-block fw-bold">JOIN CODE</small><div class="room-code-badge" id="displayRoomCode">XXXX</div></div>
@@ -149,7 +149,6 @@
             } catch (err) { console.error(err); alert("Error loading module."); }
         }
 
-        // --- TAB 1: NEW WINDOW LOGIC ---
         document.getElementById('startClassForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('startBtn'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...'; btn.disabled = true;
@@ -165,25 +164,21 @@
                 
                 activeRoomId = liveData.id;
                 
-                // Set the unrestricted direct URL
-                activeRoomUrl = `https://meet.jit.si/${jitsiRoomName}`;
+                // AUTO INJECT TEACHER NAME INTO URL
+                const safeName = encodeURIComponent(`Teacher: ${currentUserName}`);
+                activeRoomUrl = `https://meet.jit.si/${jitsiRoomName}#userInfo.displayName=${safeName}`;
 
                 document.getElementById('setupFormArea').style.display = 'none';
                 document.getElementById('liveControls').style.display = 'flex';
                 document.getElementById('displaySubject').innerText = subject;
                 document.getElementById('displayRoomCode').innerText = roomCode;
 
-                // Auto-launch the room
                 launchVideoRoom();
 
             } catch (err) { alert(err.message); btn.innerHTML = '<i class="fas fa-satellite-dish me-2"></i> CREATE LIVE ROOM'; btn.disabled = false; }
         });
 
-        window.launchVideoRoom = () => {
-            if (activeRoomUrl) {
-                window.open(activeRoomUrl, '_blank');
-            }
-        };
+        window.launchVideoRoom = () => { if (activeRoomUrl) window.open(activeRoomUrl, '_blank'); };
 
         window.endLiveClass = async () => {
             if(!confirm("End live class? This will close the room for all students.")) return;

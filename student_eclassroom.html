@@ -65,8 +65,10 @@
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="liveTab">
                     
-                    <div class="alert alert-info fw-bold shadow-sm mb-4">
-                        <i class="fas fa-info-circle me-2"></i> When you join a class, it will securely open in a new Dedicated Video Tab. When the class ends, simply close the tab to return here!
+                    <div class="alert alert-warning fw-bold shadow-sm mb-4">
+                        <i class="fas fa-microphone me-2 text-danger fa-lg"></i> 
+                        <strong>IMPORTANT:</strong> When the video room opens, your browser (like Brave or Chrome) will ask for Microphone permission. 
+                        <strong>You MUST click "Allow"</strong> on that popup, otherwise your microphone will be permanently disabled for the class!
                     </div>
 
                     <div class="dashboard-area">
@@ -104,7 +106,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
-        let currentUserId = null; let studentClassId = null;
+        let currentUserId = null; let currentUserName = "Student"; let studentClassId = null;
 
         async function initStudentClassroom() {
             try {
@@ -114,13 +116,13 @@
 
                 const { data: student } = await supabase.from('students').select('first_name, surname, class_id').eq('user_id', currentUserId).single();
                 if (student) {
-                    document.getElementById('studentName').innerText = `${student.first_name} ${student.surname || ''}`.trim();
+                    currentUserName = `${student.first_name} ${student.surname || ''}`.trim();
+                    document.getElementById('studentName').innerText = currentUserName;
                     studentClassId = student.class_id;
                 }
 
                 if (!studentClassId) {
                     document.getElementById('liveClassesList').innerHTML = `<div class="alert alert-danger fw-bold">You are not assigned to a class.</div>`;
-                    document.getElementById('notesBody').innerHTML = `<tr><td colspan="3" class="text-center text-danger fw-bold">No class assigned.</td></tr>`;
                     document.getElementById('loadingOverlay').style.display = 'none';
                     return;
                 }
@@ -143,13 +145,12 @@
                 } else {
                     listDiv.innerHTML = `<div class="text-center py-5 text-muted"><i class="fas fa-bed fa-3x mb-3 opacity-25"></i><h5>No live classes right now.</h5></div>`;
                 }
-            } catch (e) { console.error("Could not fetch live classes. Table might be missing."); }
+            } catch (e) { console.error("Could not fetch live classes."); }
         }
 
         async function fetchLessonNotes() {
             try {
-                const { data: notes, error } = await supabase.from('lesson_notes').select('*').eq('class_id', studentClassId).order('created_at', { ascending: false });
-                if (error) throw error;
+                const { data: notes } = await supabase.from('lesson_notes').select('*').eq('class_id', studentClassId).order('created_at', { ascending: false });
                 document.getElementById('notesBody').innerHTML = (notes && notes.length) ? notes.map(n => `<tr><td class="fw-bold"><i class="fas fa-file-pdf text-danger me-2"></i>${n.title}</td><td>${n.subject_name}</td><td><a href="${n.file_url}" target="_blank" class="btn btn-sm btn-success fw-bold"><i class="fas fa-download me-1"></i> Download</a></td></tr>`).join('') : `<tr><td colspan="3" class="text-center text-muted py-4">Your teachers have not uploaded any notes yet.</td></tr>`;
             } catch (e) { console.error("Notes table error."); }
         }
@@ -159,10 +160,11 @@
             joinMeeting(document.getElementById('manualCode').value.trim()); 
         });
 
-        // LAUNCH JITSI IN A NEW UNRESTRICTED TAB
+        // AUTO INJECT STUDENT NAME AND ENABLE AUDIO INIT
         window.joinMeeting = (roomCode) => {
             const jitsiRoomName = `Springdrill_${roomCode.replace(/-/g, '')}`;
-            window.open(`https://meet.jit.si/${jitsiRoomName}`, '_blank');
+            const safeName = encodeURIComponent(currentUserName);
+            window.open(`https://meet.jit.si/${jitsiRoomName}#userInfo.displayName=${safeName}&config.startWithAudioMuted=true`, '_blank');
         };
 
         document.addEventListener('DOMContentLoaded', initStudentClassroom);
