@@ -8,59 +8,110 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> 
     <style>
-        body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
+        :root {
+            --bg-color: #f4f7fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --text-muted: #6c757d;
+            --border-color: #e9ecef;
+            --input-bg: #f8f9fa;
+        }
+
+        /* DARK MODE VARIABLES */
+        body.dark-mode {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --border-color: #333333;
+            --input-bg: #2c2c2c;
+        }
+
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
         
-        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1000; }
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1050; transition: transform 0.3s ease; }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
         .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center; }
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
 
-        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
-        .top-navbar { background: white; padding: 15px 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d;}
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
         
-        .welcome-banner { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .welcome-banner h4 { font-weight: 800; color: #333; text-transform: uppercase; font-size: 1.2rem; margin: 0;}
-        .attendance-btn { background-color: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; margin-left: 10px;}
+        /* HEADER & WIDGETS */
+        .top-navbar { background: var(--card-bg); padding: 15px 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d; transition: all 0.3s; }
+        .search-bar { max-width: 350px; width: 100%; }
+        .search-bar .form-control { background-color: var(--input-bg); color: var(--text-color); border-color: var(--border-color); }
+        .search-bar .form-control:focus { box-shadow: none; border-color: #007a4d; }
+        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .dark-toggle-btn:hover { transform: scale(1.1); }
 
-        .icon-grid { display: flex; gap: 30px; margin-bottom: 40px; justify-content: center; flex-wrap: wrap;}
-        .icon-card { background: white; width: 140px; padding: 25px 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03); cursor: pointer; text-decoration: none; color: inherit; transition: transform 0.2s; border: 1px solid #eee; position: relative;}
+        .welcome-banner { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
+        .welcome-banner h4 { font-weight: 800; color: var(--text-color); text-transform: uppercase; font-size: 1.2rem; margin: 0;}
+        .attendance-btn { background-color: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
+
+        /* CARDS */
+        .icon-grid { display: flex; gap: 20px; margin-bottom: 40px; justify-content: center; flex-wrap: wrap;}
+        .icon-card { background: var(--card-bg); width: 140px; padding: 25px 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03); cursor: pointer; text-decoration: none; color: var(--text-color); transition: transform 0.2s, background-color 0.3s; border: 1px solid var(--border-color); position: relative;}
         .icon-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.08); border-color: #007a4d; }
         .icon-circle { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; font-size: 2rem; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        
         .ic-eclassroom { background: #e74c3c; } .ic-ai { background: #8e44ad; border: 2px solid #9b59b6; } .ic-cbt { background: #c0392b;} .ic-mail { background: #3498db; }
-        .icon-card h6 { font-weight: 700; font-size: 0.9rem; color: #444; margin: 0; }
-        
-        .notification-badge { position: absolute; top: 10px; right: 10px; background: #e74c3c; color: white; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 50%; display: none; border: 2px solid white;}
+        .icon-card h6 { font-weight: 700; font-size: 0.9rem; margin: 0; color: inherit; }
+        .notification-badge { position: absolute; top: 10px; right: 10px; background: #e74c3c; color: white; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 50%; display: none; border: 2px solid var(--card-bg);}
 
-        .nav-tabs { border-bottom: 2px solid #e9ecef; margin-bottom: 20px; }
-        .nav-tabs .nav-link { color: #6c757d; font-weight: bold; border: none; border-bottom: 3px solid transparent; padding: 12px 25px; font-size: 1.05rem; }
+        /* TABS & CONTAINERS */
+        .nav-tabs { border-bottom: 2px solid var(--border-color); margin-bottom: 20px; }
+        .nav-tabs .nav-link { color: var(--text-muted); font-weight: bold; border: none; border-bottom: 3px solid transparent; padding: 12px 25px; font-size: 1.05rem; }
         .nav-tabs .nav-link:hover { color: #007a4d; }
         .nav-tabs .nav-link.active { color: #007a4d; border-bottom: 3px solid #007a4d; background: transparent; }
         .nav-tabs .nav-link.active.text-purple { color: #8e44ad !important; border-bottom: 3px solid #8e44ad; }
 
-        .edu-card { background: white; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
-        .edu-header { background-color: #007a4d; color: white; padding: 12px 20px; border-radius: 4px 4px 0 0; font-weight: bold; }
-        .edu-body { padding: 25px; }
-
-        .table th { border-top: none; color: #495057; font-weight: bold; font-size: 0.85rem; background-color: #f8f9fa; }
+        .edu-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; transition: all 0.3s; }
+        .edu-header { background-color: #007a4d; color: white; padding: 12px 20px; border-radius: 6px 6px 0 0; font-weight: bold; }
+        .edu-header.light-header { background-color: var(--input-bg); color: var(--text-color); border-bottom: 1px solid var(--border-color); }
+        .edu-body { padding: 25px; color: var(--text-color); }
+        
+        .list-group-item { background-color: transparent; color: var(--text-color); border-color: var(--border-color); }
+        .form-control { background-color: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); }
+        .form-control:focus { background-color: var(--card-bg); color: var(--text-color); }
+        .table { color: var(--text-color); border-color: var(--border-color); }
+        .table th { border-top: none; font-weight: bold; font-size: 0.85rem; background-color: var(--input-bg); color: var(--text-color); }
         
         /* AI Generator Styles */
         .ai-generate-btn { background: linear-gradient(135deg, #8e44ad, #9b59b6); border: none; color: white; transition: 0.3s; }
         .ai-generate-btn:hover { background: linear-gradient(135deg, #732d91, #8e44ad); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(142, 68, 173, 0.3); }
-        .ai-output-box { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 25px; min-height: 300px; display: none; }
-        .ai-output-content { font-size: 1rem; line-height: 1.6; color: #333; }
-        .ai-output-content h3 { color: #8e44ad; font-weight: bold; margin-top: 20px; font-size: 1.3rem; }
+        .ai-output-box { background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 25px; min-height: 300px; display: none; }
+        .ai-output-content { font-size: 1rem; line-height: 1.6; color: var(--text-color); }
+        .ai-output-content h3, .ai-output-content h4 { color: #8e44ad; font-weight: bold; margin-top: 20px; }
 
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+
+        /* MOBILE OPTIMIZATION */
+        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-color); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
+        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
+        
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); box-shadow: 2px 0 15px rgba(0,0,0,0.3); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .mobile-menu-toggle { display: inline-block; }
+            .sidebar-brand { margin-top: 10px; }
+            .top-navbar { padding: 15px; flex-direction: column; gap: 15px; align-items: stretch; }
+            .search-bar { max-width: 100%; }
+            .header-profile-section { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i><h4 class="fw-bold text-muted">Loading Dashboard...</h4></div>
+    <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i><h4 class="fw-bold" style="color: var(--text-muted);">Loading Dashboard...</h4></div>
 
-    <div class="sidebar">
-        <div class="sidebar-brand"><h5 class="text-white fw-bold"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5></div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
+            <h5 class="text-white fw-bold m-0"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
+            <button class="btn btn-sm btn-link text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        </div>
         <nav class="nav flex-column mt-3">
             <a href="teacher_dashboard.html" class="nav-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="teacher_messages.html" class="nav-link"><i class="fas fa-envelope"></i> Communications <span class="badge bg-danger ms-auto" id="sidebarBadge" style="display: none;">0</span></a>
@@ -79,8 +130,28 @@
 
     <div class="main-content">
         <div class="top-navbar">
-            <div class="fw-bold text-muted"><i class="fas fa-bars me-3"></i> SPRINGDRILL ACADEMY</div>
-            <div class="fw-bold text-dark"><i class="fas fa-bell text-success me-3"></i> <span id="headerName">Loading...</span></div>
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="fw-bold" style="color: var(--text-muted);"><i class="fas fa-school me-2 d-none d-lg-inline"></i> SPRINGDRILL ACADEMY</div>
+            </div>
+
+            <div class="search-bar input-group">
+                <input type="text" class="form-control form-control-sm" placeholder="Quick Search (Students, Classes...)">
+                <button class="btn btn-outline-secondary btn-sm" type="button"><i class="fas fa-search"></i></button>
+            </div>
+
+            <div class="header-profile-section mt-3 mt-lg-0">
+                <div class="d-flex align-items-center">
+                    <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
+                    
+                    <i class="fas fa-bell text-success me-3 position-relative">
+                        <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" style="display:none;" id="topBellBadge"></span>
+                    </i> 
+                    <span id="headerName" class="fw-bold">Loading...</span>
+                </div>
+            </div>
         </div>
 
         <div class="welcome-banner">
@@ -94,15 +165,13 @@
                 <div class="icon-circle ic-mail"><i class="fas fa-envelope"></i></div><h6>Mailbox</h6>
             </a>
             <a href="teacher_eclassroom.html" class="icon-card"><div class="icon-circle ic-eclassroom"><i class="fas fa-video"></i></div><h6>eClassroom</h6></a>
-            
             <a href="#" onclick="bootstrap.Tab.getOrCreateInstance(document.getElementById('ai-tab')).show();" class="icon-card" style="border: 2px solid #8e44ad;">
                 <div class="icon-circle ic-ai"><i class="fas fa-robot"></i></div><h6 class="text-purple fw-bold">AI Planner</h6>
             </a>
-            
             <a href="manage_cbt.html" class="icon-card"><div class="icon-circle ic-cbt"><i class="fas fa-award"></i></div><h6>Manage CBT</h6></a>
         </div>
 
-        <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+        <ul class="nav nav-tabs flex-nowrap overflow-auto" id="dashboardTabs" role="tablist" style="white-space: nowrap;">
             <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#overview" type="button">Overview</button></li>
             <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#subjects" type="button">My Subjects</button></li>
             <li class="nav-item"><button class="nav-link text-purple" id="ai-tab" data-bs-toggle="tab" data-bs-target="#aiPlanner" type="button"><i class="fas fa-magic me-1"></i> AI Lesson Planner</button></li>
@@ -112,9 +181,47 @@
         <div class="tab-content">
             <div class="tab-pane fade show active" id="overview">
                 <div class="row">
-                    <div class="col-md-8"><div class="edu-card h-100"><div class="edu-body"><textarea class="form-control bg-light border-0" rows="10" placeholder="Type your notes or announcements here..."></textarea></div></div></div>
-                    <div class="col-md-4">
-                        <div class="edu-card mb-4"><div class="edu-header bg-light text-dark border-bottom"><i class="fas fa-calendar-check text-success me-2"></i> Upcoming Lessons</div><div class="edu-body py-4 text-center text-muted">No Lessons</div></div>
+                    <div class="col-lg-8">
+                        <div class="edu-card mb-4">
+                            <div class="edu-header light-header"><i class="fas fa-edit text-primary me-2"></i> Quick Notes / Announcements</div>
+                            <div class="edu-body p-0">
+                                <textarea class="form-control border-0 rounded-0" rows="4" placeholder="Type your notes or announcements here..." style="resize: none;"></textarea>
+                            </div>
+                            <div class="p-2 border-top text-end" style="border-color: var(--border-color) !important;">
+                                <button class="btn btn-sm btn-primary px-4 fw-bold">Post Note</button>
+                            </div>
+                        </div>
+
+                        <div class="edu-card mb-4">
+                            <div class="edu-header light-header"><i class="fas fa-history text-secondary me-2"></i> Recent Activity Feed</div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                    <div><i class="fas fa-robot text-purple me-3"></i> <strong>AI Lesson Plan</strong> generated for JSS 1 Mathematics</div>
+                                    <small style="color: var(--text-muted);">10 mins ago</small>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                    <div><i class="fas fa-envelope text-primary me-3"></i> <strong>Message Received</strong> from Principal's Office</div>
+                                    <small style="color: var(--text-muted);">2 hours ago</small>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                    <div><i class="fas fa-check-circle text-success me-3"></i> <strong>Attendance Marked</strong> for Year 8 Science</div>
+                                    <small style="color: var(--text-muted);">Yesterday</small>
+                                </li>
+                            </ul>
+                            <div class="p-2 border-top text-center" style="border-color: var(--border-color) !important;">
+                                <a href="#" class="small text-decoration-none">View All Activity</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="edu-card mb-4">
+                            <div class="edu-header light-header"><i class="fas fa-calendar-check text-success me-2"></i> Upcoming Lessons</div>
+                            <div class="edu-body py-5 text-center" style="color: var(--text-muted);">
+                                <i class="fas fa-calendar-times mb-3 fa-2x" style="opacity: 0.5;"></i><br>
+                                No Lessons Scheduled Today
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -124,7 +231,7 @@
                     <div class="edu-header"><i class="fas fa-book me-2"></i> Academic Subjects</div>
                     <div class="table-responsive p-0">
                         <table class="table table-hover mb-0">
-                            <thead class="table-light border-bottom"><tr><th width="5%" class="text-center">#</th><th width="40%">Subject Name</th><th width="30%" class="text-center">Scheme of Work</th><th width="25%" class="text-center">Lesson Plan</th></tr></thead>
+                            <thead class="table-light"><tr><th width="5%" class="text-center">#</th><th width="40%">Subject Name</th><th width="30%" class="text-center">Scheme of Work</th><th width="25%" class="text-center">Lesson Plan</th></tr></thead>
                             <tbody id="subjectsBody"><tr><td colspan="4" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i> Fetching Subjects...</td></tr></tbody>
                         </table>
                     </div>
@@ -137,27 +244,27 @@
                         <div class="edu-card" style="border-top: 4px solid #8e44ad;">
                             <div class="edu-body">
                                 <h5 class="fw-bold mb-3" style="color: #8e44ad;"><i class="fas fa-robot me-2"></i> Lesson Assistant</h5>
-                                <p class="text-muted small mb-4">Let Springdrill AI generate a comprehensive, structured lesson note for your class in seconds.</p>
+                                <p class="small mb-4" style="color: var(--text-muted);">Let Springdrill AI generate a massive, structured lesson note for your class.</p>
                                 
                                 <form id="aiPlannerForm">
                                     <div class="mb-3">
-                                        <label class="fw-bold text-muted small text-uppercase">Target Class</label>
-                                        <input type="text" id="aiClass" class="form-control" placeholder="e.g. Year 8" required>
+                                        <label class="fw-bold small text-uppercase" style="color: var(--text-muted);">Target Class</label>
+                                        <input type="text" id="aiClass" class="form-control" placeholder="e.g. JSS 1" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="fw-bold text-muted small text-uppercase">Subject</label>
-                                        <input type="text" id="aiSubject" class="form-control" placeholder="e.g. Mathematics" required>
+                                        <label class="fw-bold small text-uppercase" style="color: var(--text-muted);">Subject</label>
+                                        <input type="text" id="aiSubject" class="form-control" placeholder="e.g. Computer Studies" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="fw-bold text-muted small text-uppercase">Specific Topic</label>
-                                        <input type="text" id="aiTopic" class="form-control fw-bold border-dark" placeholder="e.g. Introduction to Algebra" required>
+                                        <label class="fw-bold small text-uppercase" style="color: var(--text-muted);">Specific Topic</label>
+                                        <input type="text" id="aiTopic" class="form-control fw-bold border-secondary" placeholder="e.g. Early Counting Devices" required>
                                     </div>
                                     <div class="mb-4">
-                                        <label class="fw-bold text-muted small text-uppercase">Extra Instructions (Optional)</label>
-                                        <textarea id="aiExtra" class="form-control" rows="2" placeholder="e.g. Expand extensively on each sub-topic with facts, descriptions, and examples"></textarea>
+                                        <label class="fw-bold small text-uppercase" style="color: var(--text-muted);">Extra Instructions (Optional)</label>
+                                        <textarea id="aiExtra" class="form-control" rows="3" placeholder="e.g. Expand extensively on each sub-topic with facts, descriptions, and examples"></textarea>
                                     </div>
                                     <button type="submit" class="btn ai-generate-btn w-100 fw-bold py-2 shadow-sm" id="btnGenerateAI">
-                                        <i class="fas fa-magic me-2"></i> Generate Lesson Note
+                                        <i class="fas fa-magic me-2"></i> Generate Rich Lesson Note
                                     </button>
                                 </form>
                             </div>
@@ -165,24 +272,24 @@
                     </div>
                     
                     <div class="col-lg-8">
-                        <div class="edu-card h-100">
-                            <div class="edu-header bg-dark d-flex justify-content-between align-items-center">
-                                <span><i class="fas fa-file-alt me-2"></i> Generated Output</span>
+                        <div class="edu-card h-100 mb-0">
+                            <div class="edu-header bg-dark d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <span><i class="fas fa-file-alt me-2 text-white"></i> <span class="text-white">Generated Output</span></span>
                                 <button class="btn btn-sm btn-light fw-bold" id="btnCopyAI" style="display:none;" onclick="copyAIText()">
-                                    <i class="fas fa-copy me-1"></i> Copy Text
+                                    <i class="fas fa-copy me-1"></i> Copy to MS Word
                                 </button>
                             </div>
                             <div class="edu-body">
-                                <div id="aiEmptyState" class="text-center py-5 text-muted">
-                                    <i class="fas fa-bolt fa-3x mb-3" style="color: #e9ecef;"></i>
+                                <div id="aiEmptyState" class="text-center py-5" style="color: var(--text-muted);">
+                                    <i class="fas fa-bolt fa-3x mb-3" style="opacity: 0.3;"></i>
                                     <h5>Ready to generate</h5>
                                     <p>Fill out the details on the left and hit generate.</p>
                                 </div>
                                 
                                 <div id="aiLoadingState" class="text-center py-5" style="display: none;">
                                     <i class="fas fa-circle-notch fa-spin fa-3x mb-3" style="color: #8e44ad;"></i>
-                                    <h5 class="fw-bold text-dark">AI is thinking...</h5>
-                                    <p class="text-muted">Drafting your NERDC lesson plan.</p>
+                                    <h5 class="fw-bold">AI is thinking...</h5>
+                                    <p style="color: var(--text-muted);">Drafting a comprehensive, rich NERDC lesson plan.</p>
                                 </div>
 
                                 <div id="aiOutputBox" class="ai-output-box">
@@ -196,13 +303,34 @@
         </div>
     </div>
 
-    <input type="file" id="schemeUploadInput" accept=".pdf,.docx" style="display: none;">
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
         let currentUserId = null;
+
+        // UI toggles
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+            const overlay = document.getElementById('sidebarOverlay');
+            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+        };
+
+        window.toggleTheme = () => {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            
+            const icon = document.getElementById('themeIcon');
+            icon.className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+
+        // Initialize Theme from storage
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
+        }
 
         async function initializeDashboard() {
             try {
@@ -220,13 +348,14 @@
                 if (!msgErr && unreadCount > 0) {
                     const sb = document.getElementById('sidebarBadge'); if(sb) { sb.innerText = unreadCount; sb.style.display = 'inline-block'; }
                     const cb = document.getElementById('cardBadge'); if(cb) { cb.innerText = unreadCount; cb.style.display = 'inline-block'; }
+                    const tb = document.getElementById('topBellBadge'); if(tb) { tb.style.display = 'block'; }
                 }
 
                 const { data: subjects } = await supabase.from('subjects').select('*').order('name');
                 const tbody = document.getElementById('subjectsBody');
                 if (subjects && subjects.length > 0) {
                     tbody.innerHTML = subjects.map((sub, index) => {
-                        return `<tr><td class="text-center fw-bold text-muted">${index + 1}</td><td class="fw-bold text-dark">${sub.name}</td><td class="text-center"><button class="btn btn-sm btn-primary fw-bold px-3"><i class="fas fa-upload me-1"></i> Upload</button></td><td class="text-center"><button class="btn btn-sm btn-light border fw-bold text-muted px-3" disabled>Pending</button></td></tr>`;
+                        return `<tr><td class="text-center fw-bold text-muted">${index + 1}</td><td class="fw-bold">${sub.name}</td><td class="text-center"><button class="btn btn-sm btn-primary fw-bold px-3"><i class="fas fa-upload me-1"></i> Upload</button></td><td class="text-center"><button class="btn btn-sm btn-secondary border fw-bold px-3" disabled>Pending</button></td></tr>`;
                     }).join('');
                 }
 
@@ -254,7 +383,7 @@
             const outputBox = document.getElementById('aiOutputBox');
             const copyBtn = document.getElementById('btnCopyAI');
 
-            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Generating NERDC Lesson Plan...';
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Generating Rich Note...';
             generateBtn.disabled = true;
             emptyState.style.display = 'none';
             outputBox.style.display = 'none';
@@ -283,7 +412,7 @@
                 loadingState.style.display = 'none';
                 emptyState.style.display = 'block';
             } finally {
-                generateBtn.innerHTML = '<i class="fas fa-magic me-2"></i> Generate Lesson Note';
+                generateBtn.innerHTML = '<i class="fas fa-magic me-2"></i> Generate Rich Lesson Note';
                 generateBtn.disabled = false;
             }
         });
@@ -306,7 +435,7 @@
                 
                 const btn = document.getElementById('btnCopyAI');
                 const original = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check text-success me-1"></i> Copied with Formatting!';
+                btn.innerHTML = '<i class="fas fa-check text-success me-1"></i> Copied to MS Word!';
                 
                 setTimeout(() => { btn.innerHTML = original; }, 2500);
             } catch (err) {
