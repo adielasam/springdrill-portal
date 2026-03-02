@@ -3,274 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRINGDRILL - Generate Accounts</title>
+    <title>SPRINGDRILL - Create Account</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
-        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1000; }
+        :root { --bg-color: #f4f7fa; --card-bg: #ffffff; --text-color: #333333; --border-color: #e9ecef; --input-bg: #f8f9fa; }
+        body.dark-mode { --bg-color: #121212; --card-bg: #1e1e1e; --text-color: #e0e0e0; --border-color: #333333; --input-bg: #2c2c2c; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', sans-serif; }
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1050; }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center;}
-        .nav-link i { width: 25px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; font-size: 0.95rem; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
         .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
-        .top-navbar { background: white; padding: 15px 30px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d;}
-        .edu-card { background: white; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
-        .edu-header { background-color: #007a4d; color: white; padding: 15px 20px; border-radius: 4px 4px 0 0; font-weight: bold;}
-        .edu-body { padding: 30px; }
-        .form-label { font-weight: 600; font-size: 0.85rem; text-transform: uppercase;}
-        .form-control, .form-select { padding: 10px 15px; border-radius: 4px; border: 1px solid #ced4da; background-color: #f8f9fa; }
-        .credentials-card { background: #e8f5e9; border: 2px solid #2ecc71; border-radius: 8px; padding: 30px; text-align: center; display: none; }
-        .cred-box { background: white; padding: 12px; border-radius: 4px; font-family: monospace; font-size: 1.1rem; font-weight: bold; color: #007a4d; border: 1px dashed #2ecc71; margin-bottom: 15px;}
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d;}
+        .edu-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .edu-header { background-color: #007a4d; color: white; padding: 12px 20px; border-radius: 4px 4px 0 0; font-weight: bold; }
+        .form-control, .form-select { background-color: var(--input-bg); color: var(--text-color); border-color: var(--border-color); }
+        .form-control:focus, .form-select:focus { background-color: var(--card-bg); color: var(--text-color); }
+        #classAssignmentSection { display: none; background: rgba(0, 122, 77, 0.05); padding: 20px; border-radius: 8px; border: 1px dashed #007a4d; }
     </style>
 </head>
 <body>
-    <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i><h4 class="fw-bold text-muted">Loading System Setup...</h4></div>
-
     <div class="sidebar">
-        <div class="sidebar-brand">
-            <h5 class="text-white fw-bold"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
-        </div>
+        <div class="sidebar-brand"><h5 class="text-white fw-bold"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5></div>
         <nav class="nav flex-column mt-3">
-            <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            
-            <a href="#usersMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
-                <span><i class="fas fa-users me-2"></i> Accounts</span><i class="fas fa-caret-down"></i>
-            </a>
-            <div class="collapse show bg-dark mx-2 mt-1 rounded" id="usersMenu">
-                <a href="admin_create_user.html" class="nav-link small py-2 active text-success fw-bold"><i class="fas fa-user-plus me-2"></i> Generate Account</a>
-                <a href="manage_users.html" class="nav-link small py-2"><i class="fas fa-user-check me-2"></i> Approvals</a>
-                <a href="class_list.html" class="nav-link small py-2"><i class="fas fa-clipboard-list me-2"></i> Class Data</a>
-            </div>
-
-            <a href="admin_messages.html" class="nav-link mt-2"><i class="fas fa-envelope me-2"></i> Internal Mail</a>
-
+            <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
+            <a href="admin_create_user.html" class="nav-link active"><i class="fas fa-user-plus me-2"></i> Generate Account</a>
+            <a href="manage_users.html" class="nav-link"><i class="fas fa-user-check me-2"></i> Approvals</a>
             <hr class="mx-3 my-4 border-secondary">
-            <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
         </nav>
     </div>
 
     <div class="main-content">
         <div class="top-navbar">
-            <div class="d-flex align-items-center"><i class="fas fa-bars me-3 text-muted"></i><div class="fw-bold text-muted">System Administration</div></div>
-            <div class="fw-bold text-dark d-flex align-items-center"><span id="adminNameDisplay">System Administrator</span><i class="fas fa-user-shield ms-3 fs-4 text-primary"></i></div>
+            <div class="fw-bold text-muted"><i class="fas fa-shield-alt me-2"></i> System Administration</div>
+            <div class="fw-bold text-dark"><span id="adminName">Loading...</span><i class="fas fa-user-shield ms-3 text-primary"></i></div>
         </div>
 
-        <h5 class="text-muted fw-bold mb-4 mt-4">Home / Accounts / Generate Account</h5>
-
-        <div class="row">
+        <div class="row justify-content-center">
             <div class="col-lg-8">
-                <div class="edu-card border-success">
-                    <div class="edu-header bg-success"><span><i class="fas fa-user-plus me-2"></i> Provision New User Profile</span></div>
-                    <div class="edu-body">
+                <div class="edu-card">
+                    <div class="edu-header"><i class="fas fa-user-plus me-2"></i> Generate New Account</div>
+                    <div class="p-4">
                         <form id="createUserForm">
-                            <div class="mb-4 pb-3 border-bottom">
-                                <label class="form-label text-success">Select Account Role</label>
-                                <select id="roleSelect" class="form-select border-success fw-bold text-dark fs-5" required>
-                                    <option value="" disabled selected>-- Choose Role --</option>
-                                    <option value="student">Student</option>
-                                    <option value="teacher">Teacher / Staff</option>
-                                    <option value="parent">Parent / Guardian</option>
-                                </select>
-                            </div>
-
-                            <div id="basicDetailsSection" style="display: none;">
-                                <div class="mb-4"><label class="form-label">Full Name</label><input type="text" id="basicFullName" class="form-control"></div>
-                            </div>
-
-                            <div id="studentDetailsSection" style="display: none;">
-                                <div class="row g-4">
-                                    <div class="col-md-4"><label class="form-label">Surname <span class="text-danger">*</span></label><input type="text" id="stuSurname" class="form-control"></div>
-                                    <div class="col-md-4"><label class="form-label">First Name <span class="text-danger">*</span></label><input type="text" id="stuFirstName" class="form-control"></div>
-                                    <div class="col-md-4"><label class="form-label">Middle Name</label><input type="text" id="stuOtherName" class="form-control"></div>
-                                    
-                                    <div class="col-md-6"><label class="form-label text-primary">Reg Number (Auto)</label><input type="text" id="stuRegNumber" class="form-control border-primary fw-bold text-primary" readonly></div>
-                                    <div class="col-md-6"><label class="form-label">Assign Class <span class="text-danger">*</span></label><select id="stuClassSelect" class="form-select"></select></div>
-                                    
-                                    <div class="col-md-6"><label class="form-label">Parent/Guardian Name</label><input type="text" id="stuParentName" class="form-control"></div>
-                                    <div class="col-md-6"><label class="form-label">Phone Number</label><input type="text" id="stuPhone" class="form-control"></div>
-                                    
-                                    <div class="col-12"><label class="form-label">Residential Address</label><input type="text" id="stuAddress" class="form-control"></div>
-                                    
-                                    <div class="col-12 mt-4 pt-3 border-top">
-                                        <label class="form-label text-success"><i class="fas fa-camera me-1"></i> Student Passport (Optional)</label>
-                                        <input type="file" id="stuPassport" class="form-control" accept="image/png, image/jpeg, image/jpg">
-                                    </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Full Name</label>
+                                    <input type="text" id="userName" class="form-control" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Email Address</label>
+                                    <input type="email" id="userEmail" class="form-control" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Password</label>
+                                    <input type="password" id="userPassword" class="form-control" required minlength="6">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Account Role</label>
+                                    <select id="roleSelect" class="form-select" required>
+                                        <option value="" disabled selected>Select Role...</option>
+                                        <option value="student">Student</option>
+                                        <option value="teacher">Teacher</option>
+                                        <option value="admin">Administrator</option>
+                                    </select>
                                 </div>
                             </div>
-                            
-                            <button type="submit" class="btn btn-dark w-100 py-3 mt-4 fw-bold shadow-sm" id="generateBtn" style="display: none;">GENERATE LOGIN & SAVE</button>
+
+                            <div id="classAssignmentSection" class="mb-4 mt-2">
+                                <h6 class="fw-bold text-success mb-3"><i class="fas fa-chalkboard-teacher me-2"></i> Assign Classes to this Teacher</h6>
+                                <p class="small text-muted mb-3">Tick all the classes this teacher is responsible for. They will only see students from these classes in their dashboard.</p>
+                                <div id="classCheckboxes" class="d-flex flex-wrap gap-3">
+                                    <div class="text-muted"><i class="fas fa-spinner fa-spin me-1"></i> Loading classes...</div>
+                                </div>
+                            </div>
+
+                            <button type="submit" id="btnSubmit" class="btn btn-success w-100 fw-bold py-2 mt-3">
+                                <i class="fas fa-save me-2"></i> Create Account
+                            </button>
                         </form>
                     </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4">
-                <div class="credentials-card shadow" id="credentialsCard">
-                    <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
-                    <h4 class="fw-bold text-dark">Profile Activated!</h4>
-                    <div class="text-start mt-4">
-                        <label class="form-label text-muted">Username / Email</label><div class="cred-box" id="displayLoginId">--</div>
-                        <label class="form-label text-muted">Default Password</label><div class="cred-box" id="displayPassword">--</div>
-                    </div>
-                    <button class="btn btn-success w-100 mt-4 fw-bold" onclick="window.resetGenerator()">Register Another</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
-        let adminSession = null;
 
-        async function initializePage() {
-            try {
-                const { data: { session } } = await supabase.auth.getSession();
-                if (!session) return window.location.href = 'login.html';
-                adminSession = session; 
-                
-                // Fetch Admin Name
-                const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
-                if (profile) document.getElementById('adminNameDisplay').innerText = profile.name;
+        // Initialize Dark Mode based on Admin Preference
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') document.body.classList.add('dark-mode');
 
-                // Fetch Classes
-                const { data: classes } = await supabase.from('classes').select('*').order('id');
-                if (classes) document.getElementById('stuClassSelect').innerHTML = `<option value="" disabled selected>-- Select Class --</option>` + classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-                
-                document.getElementById('loadingOverlay').style.display = 'none';
-            } catch (err) { console.error(err); }
+        async function loadClasses() {
+            const { data: classes, error } = await supabase.from('classes').select('id, name').order('name');
+            const container = document.getElementById('classCheckboxes');
+            
+            if (error || !classes.length) {
+                container.innerHTML = '<span class="text-danger small">No classes found in the database.</span>';
+                return;
+            }
+
+            container.innerHTML = classes.map(c => `
+                <div class="form-check form-check-inline bg-white px-3 py-2 border rounded shadow-sm" style="border-color: var(--border-color) !important;">
+                    <input class="form-check-input class-cb" type="checkbox" id="class_${c.id}" value="${c.id}">
+                    <label class="form-check-label fw-bold ms-1" for="class_${c.id}" style="cursor:pointer;">${c.name}</label>
+                </div>
+            `).join('');
         }
 
-        document.addEventListener('DOMContentLoaded', initializePage);
-
         document.getElementById('roleSelect').addEventListener('change', (e) => {
-            const role = e.target.value;
-            document.getElementById('generateBtn').style.display = 'block';
-            if (role === 'student') {
-                document.getElementById('basicDetailsSection').style.display = 'none';
-                document.getElementById('basicFullName').required = false;
-
-                document.getElementById('studentDetailsSection').style.display = 'block';
-                document.getElementById('stuSurname').required = true;
-                document.getElementById('stuFirstName').required = true;
-                document.getElementById('stuClassSelect').required = true;
-
-                document.getElementById('stuRegNumber').value = `SD/${new Date().getFullYear()}/${Math.floor(1000 + Math.random() * 9000)}`;
-            } else {
-                document.getElementById('studentDetailsSection').style.display = 'none';
-                document.getElementById('stuSurname').required = false;
-                document.getElementById('stuFirstName').required = false;
-                document.getElementById('stuClassSelect').required = false;
-
-                document.getElementById('basicDetailsSection').style.display = 'block';
-                document.getElementById('basicFullName').required = true;
-            }
+            document.getElementById('classAssignmentSection').style.display = e.target.value === 'teacher' ? 'block' : 'none';
         });
 
         document.getElementById('createUserForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('generateBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            const btn = document.getElementById('btnSubmit');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Creating...';
             btn.disabled = true;
 
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+            const password = document.getElementById('userPassword').value;
             const role = document.getElementById('roleSelect').value;
-            let fullName = "";
-            let generatedEmail = "";
-            let generatedPassword = "";
+
+            // Gather selected classes if role is teacher
+            let assigned_classes = [];
+            if (role === 'teacher') {
+                assigned_classes = Array.from(document.querySelectorAll('.class-cb:checked')).map(cb => cb.value);
+            }
 
             try {
-                let finalPassportUrl = null;
+                // Register user in Auth
+                const { data: authData, error: authErr } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: { data: { name: name, role: role } }
+                });
 
-                // Handle Passport Upload for Students
-                if (role === 'student') {
-                    fullName = `${document.getElementById('stuFirstName').value.trim()} ${document.getElementById('stuSurname').value.trim()}`;
-                    
-                    const passportFile = document.getElementById('stuPassport').files[0];
-                    if (passportFile) {
-                        const fileExt = passportFile.name.split('.').pop();
-                        const fileName = `admin_upload_${Date.now()}.${fileExt}`;
-                        
-                        const { error: uploadErr } = await supabase.storage.from('passports').upload(fileName, passportFile);
-                        if (uploadErr) throw new Error("Image upload failed: " + uploadErr.message);
-                        
-                        const { data: pubData } = supabase.storage.from('passports').getPublicUrl(fileName);
-                        finalPassportUrl = pubData.publicUrl;
-                    }
-                } else {
-                    fullName = document.getElementById('basicFullName').value.trim();
-                }
-
-                // Generate Credentials
-                generatedEmail = `${fullName.replace(/\s+/g, '.').toLowerCase()}${Math.floor(1000 + Math.random() * 9000)}@springdrill.edu`;
-                generatedPassword = `Spring${Math.floor(1000 + Math.random() * 9000)}!`;
-
-                // 1. Create Auth User
-                const { data: authData, error: authErr } = await supabase.auth.signUp({ email: generatedEmail, password: generatedPassword });
                 if (authErr) throw authErr;
 
-                // 2. Save Main User Profile
-                await supabase.from('users').insert([{ id: authData.user.id, name: fullName, email: generatedEmail, role: role, username: generatedEmail.split('@')[0] }]);
+                // Update the user's profile with their assigned classes
+                const { error: dbErr } = await supabase.from('users').update({
+                    assigned_classes: assigned_classes
+                }).eq('id', authData.user.id);
 
-                // 3. Save Specific Role Data (RESTORED FULL DATA)
-                if (role === 'student') {
-                    await supabase.from('students').insert([{ 
-                        user_id: authData.user.id, 
-                        class_id: document.getElementById('stuClassSelect').value, 
-                        approved: true,
-                        surname: document.getElementById('stuSurname').value.trim(), 
-                        first_name: document.getElementById('stuFirstName').value.trim(),
-                        other_name: document.getElementById('stuOtherName').value.trim(),
-                        reg_number: document.getElementById('stuRegNumber').value.trim(),
-                        parent_guardian_name: document.getElementById('stuParentName').value.trim(),
-                        phone_number: document.getElementById('stuPhone').value.trim(),
-                        address: document.getElementById('stuAddress').value.trim(),
-                        passport_url: finalPassportUrl
-                    }]);
-                } else if (role === 'teacher') {
-                    await supabase.from('teachers').insert([{ user_id: authData.user.id, approved: true }]);
-                } else if (role === 'parent') {
-                    await supabase.from('parents').insert([{ user_id: authData.user.id }]);
-                }
+                if (dbErr) throw dbErr;
 
-                // 4. Restore Admin Session
-                await supabase.auth.signOut();
-                await supabase.auth.setSession({ access_token: adminSession.access_token, refresh_token: adminSession.refresh_token });
+                alert("Account created successfully!");
+                document.getElementById('createUserForm').reset();
+                document.getElementById('classAssignmentSection').style.display = 'none';
 
-                // 5. Update UI
-                document.getElementById('displayLoginId').innerText = generatedEmail;
-                document.getElementById('displayPassword').innerText = generatedPassword;
-                document.getElementById('credentialsCard').style.display = 'block';
-                document.getElementById('createUserForm').style.display = 'none';
-
-            } catch (err) { 
-                alert(err.message); 
-                // Attempt to restore session on failure
-                if (adminSession) {
-                    await supabase.auth.setSession({ access_token: adminSession.access_token, refresh_token: adminSession.refresh_token });
-                }
-            } finally { 
-                btn.innerHTML = 'GENERATE LOGIN & SAVE'; 
-                btn.disabled = false; 
+            } catch (err) {
+                alert("Error: " + err.message);
+            } finally {
+                btn.innerHTML = '<i class="fas fa-save me-2"></i> Create Account';
+                btn.disabled = false;
             }
         });
 
-        window.resetGenerator = () => {
-            document.getElementById('createUserForm').reset();
-            document.getElementById('credentialsCard').style.display = 'none';
-            document.getElementById('createUserForm').style.display = 'block';
-            document.getElementById('studentDetailsSection').style.display = 'none';
-            document.getElementById('basicDetailsSection').style.display = 'none';
-            document.getElementById('generateBtn').style.display = 'none';
-            // Re-select default dropdown
-            document.getElementById('roleSelect').value = "";
-        };
-
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => { 
-            e.preventDefault(); 
-            await supabase.auth.signOut(); 
-            window.location.href = 'login.html'; 
+        document.addEventListener('DOMContentLoaded', loadClasses);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html';
         });
     </script>
 </body>
