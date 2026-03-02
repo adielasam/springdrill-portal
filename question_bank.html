@@ -3,128 +3,282 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRING DRILL - Question Bank</title>
+    <title>SPRINGDRILL - Question Bank</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f6f9; }
-        .content { padding: 20px; max-width: 1400px; margin: 0 auto; }
-        .header { background-color: #1a3c34; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .edit-form { background-color: #ffffff; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-top: 4px solid #1a3c34; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .edit-form h4 { color: #1a3c34; margin-bottom: 20px; font-weight: 600; }
-        .table-container { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .selected-row { background-color: #e3f2fd !important; }
-        #editQuestionSection { display: none; }
+        /* GLOBAL DARK MODE ENGINE */
+        :root { 
+            --bg-color: #f4f7fa; 
+            --card-bg: #ffffff; 
+            --text-color: #333333; 
+            --text-muted: #6c757d; 
+            --border-color: #e9ecef; 
+            --input-bg: #f8f9fa; 
+            --in-test-bg: #f1f3f5;
+        }
+        body.dark-mode { 
+            --bg-color: #121212; 
+            --card-bg: #1e1e1e; 
+            --text-color: #e0e0e0; 
+            --text-muted: #a0a0a0; 
+            --border-color: #333333; 
+            --input-bg: #2c2c2c; 
+            --in-test-bg: #2a2a2a;
+        }
+
+        body { background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; transition: background-color 0.3s, color 0.3s; }
+        
+        /* Sidebar Styling */
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #1a3c34; color: white; padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; display: flex; align-items: center; text-decoration: none; font-size: 0.95rem; }
+        .nav-link i { width: 25px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; }
+        .nav-link.text-danger:hover { background: rgba(220, 53, 69, 0.2); color: #ff6b6b !important; }
+
+        /* Main Content */
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        
+        /* Top Navbar */
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #007a4d; transition: all 0.3s; }
+        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .dark-toggle-btn:hover { transform: scale(1.1); }
+
+        /* Cards */
+        .edu-card { background: var(--card-bg); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border-color); margin-bottom: 30px; transition: all 0.3s; }
+        .edu-header { background-color: #007a4d; color: white; padding: 15px 20px; border-radius: 8px 8px 0 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .edu-body { padding: 25px; color: var(--text-color); }
+        
+        /* Form Elements */
+        .form-label { font-weight: 600; color: var(--text-color); }
+        .form-control, .form-select { padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); transition: all 0.3s; }
+        .form-control:focus, .form-select:focus { border-color: #3498db; box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25); background-color: var(--card-bg); color: var(--text-color); }
+        
+        /* Tables */
+        .table { color: var(--text-color); border-color: var(--border-color); margin-bottom: 0; }
+        .table th { border-top: none; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; background-color: var(--input-bg); }
+        .table td { vertical-align: middle; }
+        .table-hover tbody tr:hover { background-color: var(--input-bg); color: var(--text-color); }
+        
+        .already-in-test { background-color: var(--in-test-bg) !important; color: var(--text-muted) !important; }
+
+        #editQuestionSection, #importSection { display: none; }
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+
+        /* MOBILE OPTIMIZATION */
+        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
+        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
+        
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); box-shadow: 2px 0 15px rgba(0,0,0,0.3); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .mobile-menu-toggle { display: inline-block; }
+            .top-navbar { padding: 15px; flex-direction: column; gap: 15px; align-items: stretch; text-align: center; }
+            .top-navbar .d-flex { justify-content: center; width: 100%; }
+        }
     </style>
 </head>
 <body>
-    <div class="content">
-        <div class="header">
-            <h2 id="pageTitle">Question Bank</h2>
-            <div>
-                <button class="btn btn-outline-light me-2" onclick="window.toggleSection('importSection')">Bulk Import</button>
-                <button class="btn btn-outline-light" onclick="window.history.back()">Back</button>
-            </div>
-        </div>
 
-        <div id="alertBox" class="alert d-none"></div>
-
-        <div id="importSection" class="edit-form">
-            <h4>Import Questions Manually</h4>
-            <form id="importForm">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Class</label>
-                        <select class="form-select class-dropdown" id="importClassId" required><option value="">Loading...</option></select>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Subject</label>
-                        <select class="form-select subject-dropdown" id="importSubjectId" required><option value="">Loading...</option></select>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Enter Questions (Format: Question|Option A|Option B|Option C|Option D|Correct Option)</label>
-                    <textarea class="form-control" id="manualQuestions" rows="5" placeholder="What is 2 + 2?|3|4|5|6|B" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-success" id="btnImport">Import Questions</button>
-            </form>
-        </div>
-
-        <div id="editQuestionSection" class="edit-form">
-            <h4>Edit Question</h4>
-            <form id="editForm">
-                <input type="hidden" id="editQuestionId">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Class</label>
-                        <select class="form-select class-dropdown" id="editClassId" required></select>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Subject</label>
-                        <select class="form-select subject-dropdown" id="editSubjectId" required></select>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Question Text</label>
-                    <textarea class="form-control" id="editQuestionText" rows="2" required></textarea>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3"><label class="form-label">Option A</label><input type="text" id="editOptA" class="form-control" required></div>
-                    <div class="col-md-6 mb-3"><label class="form-label">Option B</label><input type="text" id="editOptB" class="form-control" required></div>
-                    <div class="col-md-6 mb-3"><label class="form-label">Option C</label><input type="text" id="editOptC" class="form-control" required></div>
-                    <div class="col-md-6 mb-3"><label class="form-label">Option D</label><input type="text" id="editOptD" class="form-control" required></div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Correct Option</label>
-                    <select class="form-select" id="editCorrectOpt" required>
-                        <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-success" id="btnUpdate">Save Changes</button>
-                <button type="button" class="btn btn-secondary" onclick="window.cancelEdit()">Cancel</button>
-            </form>
-        </div>
-
-        <div class="table-container">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="mb-0">Your Repository</h4>
-                <button id="btnAddToTest" class="btn btn-primary d-none" onclick="window.addSelectedToTest()">Add Selected to Test</button>
-            </div>
-            
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th id="thSelect" class="d-none">Select</th>
-                            <th>Question</th>
-                            <th>Class</th>
-                            <th>Subject</th>
-                            <th>Answer</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="questionsTbody">
-                        <tr><td colspan="6" class="text-center py-4">Loading questions...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <div id="loadingOverlay">
+        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
+        <h4 style="color: var(--text-muted);">Loading Repository...</h4>
     </div>
 
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
+            <h5 class="text-white fw-bold mb-0"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
+            <button class="btn btn-sm btn-link text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <nav class="nav flex-column mt-3">
+            <a href="teacher_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard Home</a>
+            
+            <a href="#cbtMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
+                <span><i class="fas fa-laptop-code me-2"></i> CBT</span>
+                <i class="fas fa-caret-down"></i>
+            </a>
+            <div class="collapse show bg-dark mx-2 mt-1 rounded" id="cbtMenu">
+                <a href="question_bank.html" class="nav-link small py-2 active text-success fw-bold"><i class="fas fa-database me-2"></i> Question Bank</a>
+                <a href="manage_cbt.html" class="nav-link small py-2"><i class="fas fa-list me-2"></i> Manage CBT</a>
+                <a href="test_results.html" class="nav-link small py-2"><i class="fas fa-chart-bar me-2"></i> Result Manager</a>
+            </div>
+
+            <hr class="mx-3 my-4 border-secondary">
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-sign-out-alt"></i> Secure Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <h5 class="fw-bold mb-4" style="color: var(--text-muted);">Home / CBT / Question Repository</h5>
+
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="text-start">
+                    <h4 class="fw-bold mb-0" style="color: var(--text-color);" id="pageTitle"><i class="fas fa-database text-success me-2"></i> Question Bank</h4>
+                </div>
+            </div>
+            
+            <div class="d-flex gap-2 align-items-center mt-3 mt-md-0 flex-wrap justify-content-center">
+                <button class="dark-toggle-btn me-2" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                <button class="btn btn-outline-success fw-bold shadow-sm" onclick="window.toggleSection('importSection')">
+                    <i class="fas fa-file-import me-1"></i> Bulk Import
+                </button>
+                <button class="btn btn-outline-secondary fw-bold shadow-sm" style="color: var(--text-color); border-color: var(--border-color);" onclick="window.history.back()">
+                    <i class="fas fa-arrow-left me-1"></i> Back
+                </button>
+            </div>
+        </div>
+
+        <div id="alertBox" class="alert d-none shadow-sm mb-4" role="alert"></div>
+
+        <div id="importSection" class="edu-card border-success">
+            <div class="edu-header bg-success">
+                <span><i class="fas fa-file-import me-2"></i> Import Questions Manually</span>
+            </div>
+            <div class="edu-body">
+                <form id="importForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Class</label>
+                            <select class="form-select class-dropdown" id="importClassId" required><option value="">Loading...</option></select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Subject</label>
+                            <select class="form-select subject-dropdown" id="importSubjectId" required><option value="">Loading...</option></select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Enter Questions (Format: Question|Option A|Option B|Option C|Option D|Correct Option)</label>
+                        <textarea class="form-control" id="manualQuestions" rows="5" placeholder="What is 2 + 2?|3|4|5|6|B" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success fw-bold px-4" id="btnImport">
+                        <i class="fas fa-check me-2"></i> Import Questions
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div id="editQuestionSection" class="edu-card border-warning">
+            <div class="edu-header bg-warning text-dark border-bottom border-warning">
+                <span><i class="fas fa-edit me-2"></i> Edit Question</span>
+            </div>
+            <div class="edu-body">
+                <form id="editForm">
+                    <input type="hidden" id="editQuestionId">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Class</label>
+                            <select class="form-select class-dropdown" id="editClassId" required></select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Subject</label>
+                            <select class="form-select subject-dropdown" id="editSubjectId" required></select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Question Text</label>
+                        <textarea class="form-control" id="editQuestionText" rows="2" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3"><label class="form-label">Option A</label><input type="text" id="editOptA" class="form-control" required></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Option B</label><input type="text" id="editOptB" class="form-control" required></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Option C</label><input type="text" id="editOptC" class="form-control" required></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Option D</label><input type="text" id="editOptD" class="form-control" required></div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Correct Option</label>
+                        <select class="form-select fw-bold text-success border-success" id="editCorrectOpt" required>
+                            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-warning text-dark fw-bold px-4" id="btnUpdate">Save Changes</button>
+                    <button type="button" class="btn btn-secondary fw-bold px-4 ms-2" onclick="window.cancelEdit()">Cancel</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="edu-card">
+            <div class="edu-header bg-dark border-bottom border-secondary">
+                <span><i class="fas fa-archive me-2"></i> Your Repository</span>
+                <button id="btnAddToTest" class="btn btn-sm btn-light text-success fw-bold px-3 d-none shadow-sm" onclick="window.addSelectedToTest()">
+                    <i class="fas fa-plus-circle me-1"></i> Add Selected to Exam
+                </button>
+            </div>
+            <div class="edu-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="border-bottom" style="border-color: var(--border-color) !important;">
+                            <tr>
+                                <th id="thSelect" class="d-none px-4" width="5%">Select</th>
+                                <th width="45%" class="ps-4">Question</th>
+                                <th width="15%">Class</th>
+                                <th width="15%">Subject</th>
+                                <th width="10%">Answer</th>
+                                <th width="10%" class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="questionsTbody">
+                            <tr><td colspan="6" class="text-center py-5" style="color: var(--text-muted);"><i class="fas fa-spinner fa-spin me-2"></i> Loading questions...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
         let currentUserId = null;
         let activeTestId = null;
-        let testQuestionIds = []; // Array to store IDs of questions already in the test
+        let testQuestionIds = []; 
+
+        // === UI TOGGLES ===
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+            const overlay = document.getElementById('sidebarOverlay');
+            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+        };
+
+        window.toggleTheme = () => {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
+        }
+
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'SPRINGDRILL_THEME') {
+                const isDark = event.newValue === 'dark';
+                isDark ? document.body.classList.add('dark-mode') : document.body.classList.remove('dark-mode');
+                document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+            }
+        });
 
         // UI Helpers
         const alertBox = document.getElementById('alertBox');
         function showAlert(msg, isSuccess = true) {
-            alertBox.className = `alert ${isSuccess ? 'alert-success' : 'alert-danger'} d-block`;
-            alertBox.textContent = msg;
+            alertBox.className = `alert ${isSuccess ? 'alert-success' : 'alert-danger'} d-block shadow-sm`;
+            alertBox.innerHTML = `<i class="fas ${isSuccess ? 'fa-check-circle' : 'fa-exclamation-triangle'} me-2"></i> ${msg}`;
             setTimeout(() => { alertBox.classList.add('d-none'); }, 4000);
-            window.scrollTo(0,0);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         window.toggleSection = (id) => {
@@ -134,27 +288,25 @@
 
         // Initialize App
         async function init() {
-            // Check Auth
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) { window.location.href = 'login.html'; return; }
             currentUserId = user.id;
 
-            // Check if we are adding to a specific test
             const urlParams = new URLSearchParams(window.location.search);
             activeTestId = urlParams.get('test_id');
 
             if (activeTestId) {
-                document.getElementById('pageTitle').textContent = `Add Questions to Test`;
+                document.getElementById('pageTitle').innerHTML = `<i class="fas fa-download text-success me-2"></i> Add Questions to Exam`;
                 document.getElementById('thSelect').classList.remove('d-none');
                 document.getElementById('btnAddToTest').classList.remove('d-none');
                 
-                // Fetch existing test questions to disable checkboxes
                 const { data: tq } = await supabase.from('test_questions').select('question_id').eq('test_id', activeTestId);
                 if (tq) testQuestionIds = tq.map(row => row.question_id);
             }
 
             await loadDropdowns();
             await loadQuestions();
+            document.getElementById('loadingOverlay').style.display = 'none';
         }
 
         // Load Classes and Subjects
@@ -184,38 +336,39 @@
             const tbody = document.getElementById('questionsTbody');
             
             if (error || !data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">No questions found. Add some above!</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5" style="color: var(--text-muted);">No questions found. Add some above!</td></tr>';
                 return;
             }
 
             tbody.innerHTML = data.map(q => {
                 const isAlreadyInTest = testQuestionIds.includes(q.id);
                 const checkboxHtml = activeTestId ? `
-                    <td>
-                        <input type="checkbox" class="q-checkbox form-check-input" value="${q.id}" ${isAlreadyInTest ? 'checked disabled' : ''}>
+                    <td class="px-4">
+                        <input type="checkbox" class="q-checkbox form-check-input" style="border-color: var(--border-color);" value="${q.id}" ${isAlreadyInTest ? 'checked disabled' : ''}>
                     </td>` : '';
 
                 return `
-                    <tr id="row-${q.id}" class="${isAlreadyInTest ? 'table-light text-muted' : ''}">
+                    <tr id="row-${q.id}" class="${isAlreadyInTest ? 'already-in-test' : ''}" style="border-bottom: 1px solid var(--border-color);">
                         ${checkboxHtml}
-                        <td style="max-width: 400px;" class="text-truncate" title="${q.question_text}">${q.question_text}</td>
+                        <td class="ps-4 text-truncate" style="max-width: 400px;" title="${q.question_text}"><strong>${q.question_text}</strong></td>
                         <td>${q.classes?.name || 'N/A'}</td>
                         <td>${q.subjects?.name || 'N/A'}</td>
-                        <td><span class="badge bg-secondary">${q.correct_option}</span></td>
-                        <td>
-                            <button onclick="window.editQuestion(${q.id})" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button>
-                            <button onclick="window.deleteQuestion(${q.id})" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                        <td><span class="badge" style="background-color: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">${q.correct_option}</span></td>
+                        <td class="text-end pe-4">
+                            <button onclick="window.editQuestion(${q.id})" class="btn btn-sm btn-outline-primary" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button onclick="window.deleteQuestion(${q.id})" class="btn btn-sm btn-outline-danger" title="Delete"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
             }).join('');
         }
 
-        // 1. Bulk Import Logic (Matching the PHP parsing logic)
+        // 1. Bulk Import Logic
         document.getElementById('importForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnImport');
             btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Importing...';
 
             const classId = document.getElementById('importClassId').value;
             const subjectId = document.getElementById('importSubjectId').value;
@@ -238,6 +391,7 @@
 
             if (insertPayload.length === 0) {
                 showAlert('No valid questions parsed. Check format.', false);
+                btn.innerHTML = '<i class="fas fa-check me-2"></i> Import Questions';
                 btn.disabled = false;
                 return;
             }
@@ -251,6 +405,7 @@
                 window.toggleSection('importSection');
                 loadQuestions();
             }
+            btn.innerHTML = '<i class="fas fa-check me-2"></i> Import Questions';
             btn.disabled = false;
         });
 
@@ -277,6 +432,10 @@
 
         document.getElementById('editForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = document.getElementById('btnUpdate');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Saving...';
+            btn.disabled = true;
+
             const id = document.getElementById('editQuestionId').value;
             const payload = {
                 class_id: document.getElementById('editClassId').value,
@@ -297,13 +456,15 @@
                 window.cancelEdit();
                 loadQuestions();
             }
+            btn.innerHTML = 'Save Changes';
+            btn.disabled = false;
         });
 
         // 3. Delete Logic
         window.deleteQuestion = async (id) => {
-            if (!confirm('Delete this question permanently?')) return;
+            if (!confirm('WARNING: Delete this question permanently from the bank?')) return;
             const { error } = await supabase.from('questions').delete().eq('id', id);
-            if (error) showAlert('Cannot delete question. It might be linked to existing tests.', false);
+            if (error) showAlert('Cannot delete question. It is currently linked to an active exam.', false);
             else { showAlert('Deleted successfully.'); loadQuestions(); }
         };
 
@@ -319,22 +480,27 @@
                 return;
             }
 
+            const btn = document.getElementById('btnAddToTest');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+            btn.disabled = true;
+
             const payload = selectedIds.map(qId => ({ test_id: activeTestId, question_id: qId }));
             
-            // Insert Ignore alternative in Supabase (upsert ignores if unique constraint fails)
             const { error } = await supabase.from('test_questions').upsert(payload, { onConflict: 'test_id, question_id', ignoreDuplicates: true });
 
             if (error) showAlert(error.message, false);
             else {
-                showAlert(`${selectedIds.length} questions added to test!`);
-                // Add to local state so UI updates instantly
+                showAlert(`${selectedIds.length} questions successfully added to the exam!`);
                 selectedIds.forEach(id => testQuestionIds.push(parseInt(id)));
-                loadQuestions(); // Re-render to show them disabled/grayed out
+                loadQuestions(); 
             }
+            
+            btn.innerHTML = '<i class="fas fa-plus-circle me-1"></i> Add Selected to Exam';
+            btn.disabled = false;
         };
 
-        // Run
         document.addEventListener('DOMContentLoaded', init);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
     </script>
 </body>
 </html>

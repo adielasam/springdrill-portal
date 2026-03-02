@@ -7,64 +7,124 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
+        /* GLOBAL DARK MODE ENGINE */
+        :root { 
+            --bg-color: #f4f7fa; 
+            --card-bg: #ffffff; 
+            --text-color: #333333; 
+            --text-muted: #6c757d; 
+            --border-color: #e9ecef; 
+            --input-bg: #f8f9fa; 
+            --stat-icon-bg: #e8f5e9;
+        }
+        body.dark-mode { 
+            --bg-color: #121212; 
+            --card-bg: #1e1e1e; 
+            --text-color: #e0e0e0; 
+            --text-muted: #a0a0a0; 
+            --border-color: #333333; 
+            --input-bg: #2c2c2c; 
+            --stat-icon-bg: #1a2e21;
+        }
+
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
         
-        /* Sidebar Styling (Matches your Educare theme) */
-        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1000; }
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1050; transition: transform 0.3s ease; }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center; }
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
 
-        /* Main Content */
-        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
         
-        /* Cards */
-        .page-header-card { background: white; border-radius: 8px; border-left: 5px solid #2ecc71; padding: 20px 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
-        .page-header-card h4 { font-weight: 800; color: #333; margin-bottom: 5px; }
-        .page-header-card p { color: #6c757d; margin-bottom: 0; font-size: 0.9rem; }
+        /* Top Navbar */
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d; transition: all 0.3s; }
+        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .dark-toggle-btn:hover { transform: scale(1.1); }
 
-        .stat-card { background: white; border-radius: 8px; padding: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 20px; border: 1px solid #eee; height: 100%; }
+        /* Page Header Card */
+        .page-header-card { background: var(--card-bg); border-radius: 8px; border-left: 5px solid #2ecc71; padding: 20px 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; transition: all 0.3s; }
+        .page-header-card h4 { font-weight: 800; color: var(--text-color); margin-bottom: 5px; }
+        .page-header-card p { color: var(--text-muted); margin-bottom: 0; font-size: 0.9rem; }
+
+        /* Stat Cards */
+        .stat-card { background: var(--card-bg); border-radius: 8px; padding: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 20px; border: 1px solid var(--border-color); height: 100%; transition: all 0.3s; }
         .stat-icon { width: 60px; height: 60px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
-        .stat-icon.bg-light-success { background-color: #e8f5e9; color: #2ecc71; }
-        .stat-icon.bg-light-primary { background-color: #e3f2fd; color: #3498db; }
+        .stat-icon.bg-light-success { background-color: var(--stat-icon-bg); color: #2ecc71; }
+        .stat-icon.bg-light-primary { background-color: var(--input-bg); color: #3498db; }
         
-        .stat-info h6 { font-weight: bold; color: #6c757d; margin-bottom: 5px; font-size: 0.85rem; letter-spacing: 0.5px;}
-        .stat-info h2 { font-weight: 900; color: #333; margin-bottom: 0; }
+        .stat-info h6 { font-weight: bold; color: var(--text-muted); margin-bottom: 5px; font-size: 0.85rem; letter-spacing: 0.5px;}
+        .stat-info h2 { font-weight: 900; color: var(--text-color); margin-bottom: 0; }
 
-        .table-card { background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border: 1px solid #eee; margin-top: 30px; padding: 25px; }
-        .table-card h5 { font-weight: bold; color: #333; border-bottom: 2px solid #f4f7fa; padding-bottom: 15px; margin-bottom: 20px; }
+        /* Table Card */
+        .table-card { background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border: 1px solid var(--border-color); margin-top: 30px; padding: 25px; transition: all 0.3s; }
+        .table-card h5 { font-weight: bold; color: var(--text-color); border-bottom: 2px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px; }
         
-        .table th { border-top: none; color: #6c757d; font-weight: bold; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; background-color: white;}
+        .table { color: var(--text-color); border-color: var(--border-color); }
+        .table th { border-top: none; color: var(--text-muted); font-weight: bold; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; background-color: var(--input-bg);}
         .table td { vertical-align: middle; font-size: 0.95rem; }
+        .table-hover tbody tr:hover { background-color: var(--input-bg); color: var(--text-color); }
         
-        .badge-pass { background-color: #d4edda; color: #155724; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
-        .badge-fail { background-color: #f8d7da; color: #721c24; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
+        .badge-pass { background-color: rgba(46, 204, 113, 0.15); color: #2ecc71; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
+        .badge-fail { background-color: rgba(231, 76, 60, 0.15); color: #e74c3c; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
 
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+
+        /* MOBILE OPTIMIZATION */
+        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
+        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
+        
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); box-shadow: 2px 0 15px rgba(0,0,0,0.3); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .mobile-menu-toggle { display: inline-block; }
+            .top-navbar { padding: 15px; flex-direction: column; gap: 10px; }
+            .header-profile-section { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        }
     </style>
 </head>
 <body>
 
     <div id="loadingOverlay">
         <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
-        <h4 class="fw-bold text-muted">Fetching Your Records...</h4>
+        <h4 class="fw-bold" style="color: var(--text-muted);">Fetching Your Records...</h4>
     </div>
 
-    <div class="sidebar">
-        <div class="sidebar-brand">
-            <h5 class="text-white fw-bold"><i class="fas fa-graduation-cap text-warning me-2"></i> STUDENT PORTAL</h5>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
+            <h5 class="text-white fw-bold m-0"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
+            <button class="btn btn-sm btn-link text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
         </div>
         <nav class="nav flex-column mt-3">
-            <a href="student_dashboard.html" class="nav-link"><i class="fas fa-home"></i> My Dashboard</a>
-            <a href="student_cbt.html" class="nav-link"><i class="fas fa-laptop-code"></i> Take a Test</a>
-            <a href="student_results.html" class="nav-link active"><i class="fas fa-award"></i> My Results</a>
+            <a href="student_dashboard.html" class="nav-link"><i class="fas fa-home me-2"></i> My Dashboard</a>
+            <a href="student_cbt.html" class="nav-link"><i class="fas fa-laptop-code me-2"></i> Take a Test</a>
+            <a href="student_results.html" class="nav-link active"><i class="fas fa-award me-2"></i> My Results</a>
             <hr class="mx-3 my-4 border-secondary">
-            <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Secure Logout</a>
+            <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </div>
 
     <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="fw-bold d-none d-md-block" style="color: var(--text-muted);"><i class="fas fa-chart-line me-2"></i> Academic Performance Hub</div>
+            </div>
+
+            <div class="header-profile-section mt-lg-0">
+                <div class="d-flex align-items-center ms-auto">
+                    <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
+                    <div class="fw-bold d-flex align-items-center" style="color: var(--text-color);">
+                        <span id="studentNameDisplay">Student</span><i class="fas fa-user-circle ms-3 fs-4 text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
         
         <div class="page-header-card">
             <h4><i class="fas fa-medal text-success me-2"></i> My Examination Results</h4>
@@ -97,7 +157,7 @@
             
             <div class="table-responsive">
                 <table class="table table-hover mb-0">
-                    <thead>
+                    <thead style="background-color: var(--input-bg);">
                         <tr>
                             <th width="35%">Exam Title</th>
                             <th width="20%">Date Taken</th>
@@ -108,26 +168,57 @@
                     </thead>
                     <tbody id="resultsBody">
                         <tr>
-                            <td colspan="5" class="text-center py-5">Loading records...</td>
+                            <td colspan="5" class="text-center py-5" style="color: var(--text-muted);">Loading records...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
+        // === UI TOGGLES ===
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+            const overlay = document.getElementById('sidebarOverlay');
+            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+        };
+
+        window.toggleTheme = () => {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
+        }
+
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'SPRINGDRILL_THEME') {
+                const isDark = event.newValue === 'dark';
+                isDark ? document.body.classList.add('dark-mode') : document.body.classList.remove('dark-mode');
+                document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+            }
+        });
+
+        // === LOGIC ===
         async function loadResults() {
             try {
-                // 1. Verify Student
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
                 const userId = session.user.id;
 
-                // 2. Fetch Results from database and join with the tests table to get the Test Title
+                // Fetch student name for UI
+                const { data: profile } = await supabase.from('users').select('name').eq('id', userId).single();
+                if(profile) document.getElementById('studentNameDisplay').innerText = profile.name;
+
                 const { data: results, error } = await supabase
                     .from('test_results')
                     .select(`
@@ -143,12 +234,11 @@
 
                 const tbody = document.getElementById('resultsBody');
                 
-                // If no results, show the empty folder state
                 if (!results || results.length === 0) {
                     tbody.innerHTML = `
                         <tr>
-                            <td colspan="5" class="text-center py-5 text-muted">
-                                <i class="fas fa-folder-open fa-3x mb-3" style="color: #ccc;"></i><br>
+                            <td colspan="5" class="text-center py-5" style="color: var(--text-muted);">
+                                <i class="fas fa-folder-open fa-3x mb-3" style="opacity: 0.3;"></i><br>
                                 You have not completed any exams yet.
                             </td>
                         </tr>
@@ -157,46 +247,34 @@
                     return;
                 }
 
-                // 3. Calculate Stats and Render Rows
                 let totalPercentageSum = 0;
 
                 tbody.innerHTML = results.map(row => {
                     const title = row.tests?.title || 'Unknown Assessment';
-                    
-                    // Format Date nicely (e.g., Feb 26, 2026)
                     const dateObj = new Date(row.created_at);
                     const formattedDate = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
                     
-                    // Scores
                     const rawScore = row.score || 0;
-                    const totalQs = row.total_questions || 1; // Fallback to 1 to prevent division by zero error
-                    
-                    // Calculate Percentage
+                    const totalQs = row.total_questions || 1;
                     const percentage = Math.round((rawScore / totalQs) * 100);
                     totalPercentageSum += percentage;
 
-                    // Pass/Fail Logic (Assuming 50% is the pass mark)
-                    let statusBadge = '';
-                    if (percentage >= 50) {
-                        statusBadge = `<span class="badge-pass">PASSED</span>`;
-                    } else {
-                        statusBadge = `<span class="badge-fail">FAILED</span>`;
-                    }
+                    let statusBadge = (percentage >= 50) 
+                        ? `<span class="badge-pass">PASSED</span>` 
+                        : `<span class="badge-fail">FAILED</span>`;
 
                     return `
-                        <tr>
-                            <td class="fw-bold text-dark">${title}</td>
-                            <td class="text-muted small fw-bold">${formattedDate}</td>
-                            <td class="text-center fw-bold">${rawScore} / ${totalQs}</td>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td class="fw-bold" style="color: var(--text-color);">${title}</td>
+                            <td style="color: var(--text-muted); font-size: 0.85rem;">${formattedDate}</td>
+                            <td class="text-center fw-bold" style="color: var(--text-color);">${rawScore} / ${totalQs}</td>
                             <td class="text-center fw-bold text-primary">${percentage}%</td>
                             <td class="text-center">${statusBadge}</td>
                         </tr>
                     `;
                 }).join('');
 
-                // 4. Update the Top Summary Cards
                 document.getElementById('totalExams').innerText = results.length;
-                
                 const average = Math.round(totalPercentageSum / results.length);
                 document.getElementById('avgScore').innerText = `${average}%`;
 
@@ -204,14 +282,12 @@
 
             } catch (err) {
                 console.error("Error loading results:", err);
-                document.getElementById('resultsBody').innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Error loading results. Please try again.</td></tr>`;
+                document.getElementById('resultsBody').innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Error loading results.</td></tr>`;
                 document.getElementById('loadingOverlay').style.display = 'none';
             }
         }
 
         document.addEventListener('DOMContentLoaded', loadResults);
-
-        // Secure Logout
         document.getElementById('logoutBtn').addEventListener('click', async (e) => {
             e.preventDefault();
             await supabase.auth.signOut();

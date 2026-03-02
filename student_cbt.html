@@ -7,41 +7,84 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
+        /* GLOBAL DARK MODE ENGINE */
+        :root { 
+            --bg-color: #f4f7fa; 
+            --card-bg: #ffffff; 
+            --text-color: #333333; 
+            --text-muted: #6c757d; 
+            --border-color: #e9ecef; 
+            --input-bg: #f8f9fa; 
+        }
+        body.dark-mode { 
+            --bg-color: #121212; 
+            --card-bg: #1e1e1e; 
+            --text-color: #e0e0e0; 
+            --text-muted: #a0a0a0; 
+            --border-color: #333333; 
+            --input-bg: #2c2c2c; 
+        }
+
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
         
-        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1000; }
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1050; transition: transform 0.3s ease; }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center; }
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
 
-        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
         
+        /* Top Navbar */
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d; transition: all 0.3s; }
+        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .dark-toggle-btn:hover { transform: scale(1.1); }
+
         /* Table Card */
-        .edu-card { background: white; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-top: 20px;}
+        .edu-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-top: 20px; transition: all 0.3s;}
         .edu-header { background-color: #007a4d; color: white; padding: 12px 20px; border-radius: 4px 4px 0 0; font-weight: bold; }
         
-        .table th { border-top: none; color: #495057; font-weight: bold; text-transform: capitalize; font-size: 0.85rem; background-color: #f8f9fa; text-align: center;}
+        .table { color: var(--text-color); border-color: var(--border-color); }
+        .table th { border-top: none; color: var(--text-muted); font-weight: bold; text-transform: capitalize; font-size: 0.85rem; background-color: var(--input-bg); text-align: center;}
         .table td { vertical-align: middle; font-size: 0.9rem; text-align: center; }
         .table td.text-start { text-align: left; }
+        .table-hover tbody tr:hover { background-color: var(--input-bg); color: var(--text-color); }
 
-        .btn-attempt { background-color: #347ab7; color: white; font-weight: bold; font-size: 0.8rem; padding: 6px 15px; border-radius: 4px; border: none; }
-        .btn-attempt:hover { background-color: #286090; color: white; }
-        .btn-completed { background-color: #2ecc71; color: white; font-weight: bold; font-size: 0.8rem; padding: 6px 15px; border-radius: 4px; border: none; }
+        .btn-attempt { background-color: #347ab7; color: white; font-weight: bold; font-size: 0.8rem; padding: 6px 15px; border-radius: 4px; border: none; transition: 0.3s; }
+        .btn-attempt:hover { background-color: #286090; transform: translateY(-1px); }
+        .btn-completed { background-color: #2ecc71; color: white; font-weight: bold; font-size: 0.8rem; padding: 6px 15px; border-radius: 4px; border: none; opacity: 0.8; }
 
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .modal-content { background-color: var(--card-bg); color: var(--text-color); }
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+
+        /* MOBILE OPTIMIZATION */
+        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
+        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
+        
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); box-shadow: 2px 0 15px rgba(0,0,0,0.3); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .mobile-menu-toggle { display: inline-block; }
+            .top-navbar { padding: 15px; flex-direction: column; gap: 15px; align-items: stretch; }
+            .header-profile-section { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        }
     </style>
 </head>
 <body>
 
     <div id="loadingOverlay">
         <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
-        <h4>Loading Available Tests...</h4>
+        <h4 style="color: var(--text-muted);">Loading Available Tests...</h4>
     </div>
 
-    <div class="sidebar">
-        <div class="sidebar-brand">
-            <h5 class="text-white fw-bold"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
+            <h5 class="text-white fw-bold m-0"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
+            <button class="btn btn-sm btn-link text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
         </div>
         <nav class="nav flex-column mt-3">
             <a href="student_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
@@ -53,28 +96,46 @@
     </div>
 
     <div class="main-content">
-        <h5 class="fw-bold mb-0 text-dark">Home / Cbt / Test Manager</h5>
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="fw-bold d-none d-lg-block" style="color: var(--text-muted);"><i class="fas fa-laptop-code me-2"></i> CBT Examination Hub</div>
+            </div>
+
+            <div class="header-profile-section mt-3 mt-lg-0">
+                <div class="d-flex align-items-center ms-auto">
+                    <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
+                    <div class="fw-bold d-flex align-items-center" style="color: var(--text-color);">
+                        <span id="studentNameDisplay">Student</span><i class="fas fa-user-circle ms-3 fs-4 text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h5 class="fw-bold mb-0" style="color: var(--text-muted);">Home / CBT / Test Manager</h5>
 
         <div class="edu-card">
             <div class="edu-header">
-                Test List
+                Available Examinations
             </div>
             <div class="table-responsive p-0">
                 <table class="table table-hover table-bordered mb-0">
-                    <thead>
+                    <thead style="background-color: var(--input-bg);">
                         <tr>
                             <th width="5%">#</th>
                             <th width="25%" class="text-start">Title</th>
-                            <th width="15%">Subject(s)</th>
+                            <th width="15%">Subject</th>
                             <th width="15%">Type</th>
                             <th width="10%">Duration (Min)</th>
-                            <th width="10%">Total Questions</th>
+                            <th width="10%">Questions</th>
                             <th width="10%">Total Marks</th>
                             <th width="10%">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="testListBody">
-                        <tr><td colspan="8" class="text-center py-5">Loading...</td></tr>
+                        <tr><td colspan="8" class="text-center py-5" style="color: var(--text-muted);">Loading...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -85,7 +146,9 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content text-center border-0 shadow-lg">
                 <div class="modal-body p-5">
-                    <h3 class="fw-bold text-secondary fst-italic mb-4">You Are About To Start The Test</h3>
+                    <i class="fas fa-exclamation-circle fa-4x text-warning mb-4"></i>
+                    <h3 class="fw-bold fst-italic mb-4">You Are About To Start The Test</h3>
+                    <p class="text-muted mb-4">Ensure you have a stable internet connection. The timer will start immediately.</p>
                     <div class="d-flex justify-content-center gap-3">
                         <button type="button" class="btn btn-primary px-4 py-2 fw-bold" id="confirmStartBtn">PROCEED</button>
                         <button type="button" class="btn btn-secondary px-4 py-2 fw-bold" data-bs-dismiss="modal">CANCEL</button>
@@ -102,18 +165,50 @@
         let selectedTestIdToStart = null;
         let startModal = null;
 
+        // === UI TOGGLES ===
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+            const overlay = document.getElementById('sidebarOverlay');
+            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+        };
+
+        window.toggleTheme = () => {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
+        }
+
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'SPRINGDRILL_THEME') {
+                const isDark = event.newValue === 'dark';
+                isDark ? document.body.classList.add('dark-mode') : document.body.classList.remove('dark-mode');
+                document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+            }
+        });
+
         async function initializeManager() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
                 const userId = session.user.id;
 
+                // Fetch student name for UI
+                const { data: profile } = await supabase.from('users').select('name').eq('id', userId).single();
+                if(profile) document.getElementById('studentNameDisplay').innerText = profile.name;
+
                 startModal = new bootstrap.Modal(document.getElementById('startTestModal'));
 
                 // 1. Get Student Class
                 const { data: student } = await supabase.from('students').select('class_id').eq('user_id', userId).single();
                 if (!student || !student.class_id) {
-                    document.getElementById('testListBody').innerHTML = `<tr><td colspan="8" class="text-center py-4 text-warning fw-bold">You are not assigned to a class.</td></tr>`;
+                    document.getElementById('testListBody').innerHTML = `<tr><td colspan="8" class="text-center py-4 text-warning fw-bold">You are not assigned to a class. Contact Admin.</td></tr>`;
                     document.getElementById('loadingOverlay').style.display = 'none';
                     return;
                 }
@@ -140,7 +235,6 @@
                             stats[tq.test_id].marks += (tq.questions?.marks || 1);
                         });
                     }
-                    // Only keep tests that have a count > 0 in stats
                     validTests = rawTests.filter(t => stats[t.id] && stats[t.id].count > 0);
                 }
 
@@ -151,28 +245,25 @@
                 // 5. Render Table
                 const tbody = document.getElementById('testListBody');
                 if (validTests.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-muted">No exams available for your class at this time.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5" style="color: var(--text-muted);">No exams available for your class at this time.</td></tr>`;
                 } else {
                     tbody.innerHTML = validTests.map((test, index) => {
                         const hasTaken = takenTestIds.includes(test.id);
                         const tStats = stats[test.id] || { count: 0, marks: 0 };
                         
-                        let actionBtn = '';
-                        if (hasTaken) {
-                            actionBtn = `<button class="btn-completed" disabled><i class="fas fa-check"></i> COMPLETED</button>`;
-                        } else {
-                            actionBtn = `<button class="btn-attempt" onclick="window.triggerStartModal(${test.id})">ATTEMPT</button>`;
-                        }
+                        let actionBtn = hasTaken 
+                            ? `<button class="btn-completed" disabled><i class="fas fa-check"></i> COMPLETED</button>`
+                            : `<button class="btn-attempt" onclick="window.triggerStartModal(${test.id})">ATTEMPT</button>`;
 
                         return `
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td class="text-start fw-bold text-warning" style="color: #d98a00 !important;">${test.title}</td>
-                                <td>${test.subjects?.name || 'General'}</td>
-                                <td>Test/Assessment</td>
-                                <td>${test.duration_minutes || test.duration || 30}</td>
-                                <td>${tStats.count}</td>
-                                <td>${tStats.marks}</td>
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td class="fw-bold" style="color: var(--text-muted);">${index + 1}</td>
+                                <td class="text-start fw-bold" style="color: #d98a00 !important;">${test.title}</td>
+                                <td style="color: var(--text-color);">${test.subjects?.name || 'General'}</td>
+                                <td style="color: var(--text-muted);">CBT Assessment</td>
+                                <td style="color: var(--text-color);">${test.duration_minutes || test.duration || 30}</td>
+                                <td style="color: var(--text-color);">${tStats.count}</td>
+                                <td style="color: var(--text-color);">${tStats.marks}</td>
                                 <td>${actionBtn}</td>
                             </tr>
                         `;

@@ -7,39 +7,90 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
-        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1000; }
+        /* GLOBAL DARK MODE ENGINE */
+        :root { 
+            --bg-color: #f4f7fa; 
+            --card-bg: #ffffff; 
+            --text-color: #333333; 
+            --text-muted: #6c757d; 
+            --border-color: #e9ecef; 
+            --input-bg: #f8f9fa; 
+        }
+        body.dark-mode { 
+            --bg-color: #121212; 
+            --card-bg: #1e1e1e; 
+            --text-color: #e0e0e0; 
+            --text-muted: #a0a0a0; 
+            --border-color: #333333; 
+            --input-bg: #2c2c2c; 
+        }
+
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+        
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1050; transition: transform 0.3s ease; }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
         .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center;}
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
         
-        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
         
-        .nav-tabs { border-bottom: 2px solid #e9ecef; margin-bottom: 20px; margin-top: 20px; }
-        .nav-tabs .nav-link { color: #6c757d; font-weight: bold; border: none; border-bottom: 3px solid transparent; padding: 12px 25px;}
+        /* Top Navbar */
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #007a4d; transition: all 0.3s; }
+        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .dark-toggle-btn:hover { transform: scale(1.1); }
+
+        .nav-tabs { border-bottom: 2px solid var(--border-color); margin-bottom: 20px; margin-top: 20px; transition: border-color 0.3s;}
+        .nav-tabs .nav-link { color: var(--text-muted); font-weight: bold; border: none; border-bottom: 3px solid transparent; padding: 12px 25px;}
+        .nav-tabs .nav-link:hover { color: #007a4d; }
         .nav-tabs .nav-link.active { color: #007a4d; border-bottom: 3px solid #007a4d; background: transparent; }
         
-        .edu-card { background: white; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; }
+        .edu-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; transition: all 0.3s; }
         .edu-header { background-color: #007a4d; color: white; padding: 15px 20px; border-radius: 4px 4px 0 0; font-weight: bold;}
         
-        .table th { border-top: none; color: #495057; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; background-color: #f8f9fa;}
+        .table { color: var(--text-color); border-color: var(--border-color); }
+        .table th { border-top: none; color: var(--text-muted); font-weight: bold; text-transform: uppercase; font-size: 0.8rem; background-color: var(--input-bg);}
         .table td { vertical-align: middle; font-size: 0.95rem; }
+        .table-hover tbody tr:hover { background-color: var(--input-bg); color: var(--text-color); }
 
         /* Custom Modal Styling */
-        .modal-header.bg-success { background-color: #007a4d !important; }
+        .modal-content { background-color: var(--card-bg); color: var(--text-color); border-color: var(--border-color); }
+        .modal-header.bg-success { background-color: #007a4d !important; border-bottom: 1px solid var(--border-color); }
+        .modal-body { background-color: var(--card-bg) !important; }
         .profile-img-lg { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #007a4d; margin-bottom: 15px;}
-        .form-label { font-weight: 600; font-size: 0.85rem; color: #555; margin-bottom: 0.2rem;}
         
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .form-label { font-weight: 600; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.2rem;}
+        .form-control, .form-select { padding: 10px 15px; border-radius: 4px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); transition: all 0.3s; }
+        .form-control:focus, .form-select:focus { border-color: #007a4d; box-shadow: 0 0 0 0.25rem rgba(0, 122, 77, 0.25); background-color: var(--card-bg); color: var(--text-color); }
+        .form-control[readonly] { background-color: var(--input-bg); opacity: 0.8; }
+        
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+
+        /* MOBILE OPTIMIZATION */
+        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
+        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
+        
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); box-shadow: 2px 0 15px rgba(0,0,0,0.3); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .mobile-menu-toggle { display: inline-block; }
+            .top-navbar { padding: 15px; flex-direction: column; gap: 15px; align-items: stretch; text-align: center; }
+            .header-profile-section { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+            .nav-tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 5px; }
+            .nav-tabs .nav-link { white-space: nowrap; }
+        }
     </style>
 </head>
 <body>
-    <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i><h4 class="fw-bold text-muted">Loading Directory...</h4></div>
+    <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i><h4 class="fw-bold" style="color: var(--text-muted);">Loading Directory...</h4></div>
 
-    <div class="sidebar">
-        <div class="sidebar-brand">
-            <h5 class="text-white fw-bold"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
+            <h5 class="text-white fw-bold m-0"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
+            <button class="btn btn-sm btn-link text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
         </div>
         <nav class="nav flex-column mt-3">
             <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
@@ -51,13 +102,32 @@
                 <a href="manage_users.html" class="nav-link small py-2 active text-success fw-bold"><i class="fas fa-user-check me-2"></i> Approvals & Mgmt</a>
                 <a href="class_list.html" class="nav-link small py-2"><i class="fas fa-clipboard-list me-2"></i> Class Data</a>
             </div>
+            <a href="admin_messages.html" class="nav-link mt-2"><i class="fas fa-envelope me-2"></i> Internal Mail</a>
             <hr class="mx-3 my-4 border-secondary">
             <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </div>
 
     <div class="main-content">
-        <h5 class="text-muted fw-bold mb-4 mt-3">Home / Accounts / Approvals & Management</h5>
+        <h5 class="fw-bold mb-4 mt-3" style="color: var(--text-muted);">Home / Accounts / Approvals & Management</h5>
+
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="fw-bold d-none d-lg-block" style="color: var(--text-muted);"><i class="fas fa-shield-alt me-2"></i> User Administration</div>
+            </div>
+
+            <div class="header-profile-section mt-3 mt-lg-0">
+                <div class="d-flex align-items-center ms-auto">
+                    <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
+                    <div class="fw-bold d-flex align-items-center" style="color: var(--text-color);">
+                        Admin Panel<i class="fas fa-user-shield ms-3 fs-4 text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <ul class="nav nav-tabs" id="userTabs" role="tablist">
             <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#pending" type="button"><i class="fas fa-clock me-2"></i> Pending Approvals</button></li>
@@ -70,7 +140,14 @@
                     <div class="edu-header bg-warning text-dark"><i class="fas fa-user-clock me-2"></i> Waiting for Admin Approval</div>
                     <div class="table-responsive p-0">
                         <table class="table table-hover mb-0">
-                            <thead class="table-light"><tr><th width="30%">Full Name</th><th width="25%">Email</th><th width="15%" class="text-center">Role</th><th width="30%" class="text-center">Action</th></tr></thead>
+                            <thead style="background-color: var(--input-bg);">
+                                <tr>
+                                    <th width="30%">Full Name</th>
+                                    <th width="25%">Email</th>
+                                    <th width="15%" class="text-center">Role</th>
+                                    <th width="30%" class="text-center">Action</th>
+                                </tr>
+                            </thead>
                             <tbody id="pendingListBody"><tr><td colspan="4" class="text-center py-5">Loading...</td></tr></tbody>
                         </table>
                     </div>
@@ -82,7 +159,15 @@
                     <div class="edu-header"><i class="fas fa-users me-2"></i> Official School Directory</div>
                     <div class="table-responsive p-0">
                         <table class="table table-hover mb-0">
-                            <thead class="table-light"><tr><th width="5%" class="text-center">S/N</th><th width="30%">Full Name</th><th width="25%">Email / Username</th><th width="15%" class="text-center">Role</th><th width="25%" class="text-end pe-4">System Actions</th></tr></thead>
+                            <thead style="background-color: var(--input-bg);">
+                                <tr>
+                                    <th width="5%" class="text-center">S/N</th>
+                                    <th width="30%">Full Name</th>
+                                    <th width="25%">Email / Username</th>
+                                    <th width="15%" class="text-center">Role</th>
+                                    <th width="25%" class="text-end pe-4">System Actions</th>
+                                </tr>
+                            </thead>
                             <tbody id="activeListBody"><tr><td colspan="5" class="text-center py-5">Loading...</td></tr></tbody>
                         </table>
                     </div>
@@ -98,11 +183,11 @@
                     <h5 class="modal-title fw-bold"><i class="fas fa-user-edit me-2"></i> User Profile & Settings</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-4 bg-light">
+                <div class="modal-body p-4">
                     
-                    <div class="text-center mb-4 border-bottom pb-3">
+                    <div class="text-center mb-4 border-bottom pb-3" style="border-color: var(--border-color) !important;">
                         <img src="" id="modalProfileImg" class="profile-img-lg d-none">
-                        <h4 class="fw-bold text-dark mb-0" id="modalNameDisplay">Loading...</h4>
+                        <h4 class="fw-bold mb-0" id="modalNameDisplay" style="color: var(--text-color);">Loading...</h4>
                         <span class="badge bg-secondary text-uppercase mt-2" id="modalRoleBadge">Role</span>
                     </div>
 
@@ -111,13 +196,13 @@
                         <input type="hidden" id="editUserRole">
 
                         <div class="mb-3">
-                            <label class="form-label text-muted">Email / Username (Cannot be changed)</label>
-                            <input type="text" class="form-control fw-bold bg-white" id="modalEmail" readonly disabled>
+                            <label class="form-label">Email / Username (Cannot be changed)</label>
+                            <input type="text" class="form-control fw-bold" id="modalEmail" readonly disabled>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Full Name</label>
-                            <input type="text" class="form-control border-success" id="modalName" required>
+                            <input type="text" class="form-control" style="border-left: 4px solid #007a4d;" id="modalName" required>
                         </div>
 
                         <div id="studentExtraFields" style="display: none;">
@@ -141,8 +226,8 @@
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-between mt-4">
-                            <button type="button" class="btn btn-warning fw-bold shadow-sm" onclick="sendPasswordReset()"><i class="fas fa-key me-1"></i> Send Password Reset</button>
+                        <div class="d-flex justify-content-between mt-4 flex-wrap gap-2">
+                            <button type="button" class="btn btn-warning text-dark fw-bold shadow-sm" onclick="sendPasswordReset()"><i class="fas fa-key me-1"></i> Send Password Reset</button>
                             <button type="submit" class="btn btn-success fw-bold shadow-sm" id="saveProfileBtn"><i class="fas fa-save me-1"></i> Update Details</button>
                         </div>
                     </form>
@@ -158,9 +243,39 @@
         let currentAdminId = null;
         let profileModal = null;
 
+        // === UI TOGGLES ===
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+            const overlay = document.getElementById('sidebarOverlay');
+            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+        };
+
+        window.toggleTheme = () => {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
+        }
+
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'SPRINGDRILL_THEME') {
+                const isDark = event.newValue === 'dark';
+                isDark ? document.body.classList.add('dark-mode') : document.body.classList.remove('dark-mode');
+                document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+            }
+        });
+
+        // === LOGIC ===
         async function loadUsers() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = 'login.html';
                 currentAdminId = session.user.id;
                 
                 // Initialize Bootstrap Modal
@@ -181,20 +296,19 @@
                     if (u.role === 'teacher' && tMap[u.id] === false) approved = false;
 
                     if (!approved) {
-                        pHtml += `<tr>
+                        pHtml += `<tr style="border-bottom: 1px solid var(--border-color);">
                             <td class="fw-bold">${u.name}</td>
-                            <td>${u.email}</td>
-                            <td class="text-center text-uppercase fw-bold text-muted">${u.role}</td>
+                            <td style="color: var(--text-muted);">${u.email}</td>
+                            <td class="text-center text-uppercase fw-bold" style="color: var(--text-muted);">${u.role}</td>
                             <td class="text-center">
-                                <button class="btn btn-sm btn-success fw-bold me-2 px-3 shadow-sm" onclick="window.approveUser('${u.id}', '${u.role}')">Approve</button>
+                                <button class="btn btn-sm btn-success fw-bold px-4 shadow-sm" onclick="window.approveUser('${u.id}', '${u.role}')">Approve</button>
                             </td>
                         </tr>`;
                     } else {
                         let actionBtns = '';
                         if (u.id === currentAdminId) {
-                            actionBtns = `<span class="text-muted small fw-bold"><i class="fas fa-shield-alt"></i> Active Admin</span>`;
+                            actionBtns = `<span class="small fw-bold text-success"><i class="fas fa-shield-alt"></i> Active Admin</span>`;
                         } else {
-                            // NEW: Adding Profile/Edit button next to Delete
                             actionBtns = `
                                 <button class="btn btn-sm btn-primary fw-bold shadow-sm me-2" onclick="window.openProfileModal('${u.id}', '${u.role}', '${u.email}', '${u.name}')">
                                     <i class="fas fa-user-edit"></i> Profile
@@ -205,23 +319,22 @@
                             `;
                         }
                         
-                        aHtml += `<tr>
-                            <td class="text-center fw-bold text-muted">${aCount++}</td>
-                            <td class="fw-bold text-dark text-uppercase">${u.name}</td>
-                            <td class="text-muted">${u.email}</td>
+                        aHtml += `<tr style="border-bottom: 1px solid var(--border-color);">
+                            <td class="text-center fw-bold" style="color: var(--text-muted);">${aCount++}</td>
+                            <td class="fw-bold text-uppercase">${u.name}</td>
+                            <td style="color: var(--text-muted);">${u.email}</td>
                             <td class="text-center text-uppercase fw-bold text-secondary">${u.role}</td>
                             <td class="text-end pe-4">${actionBtns}</td>
                         </tr>`;
                     }
                 });
 
-                document.getElementById('pendingListBody').innerHTML = pHtml || `<tr><td colspan="4" class="text-center py-5 text-muted"><i class="fas fa-check-circle fa-2x mb-2 text-success opacity-50"></i><br>No pending approvals.</td></tr>`;
+                document.getElementById('pendingListBody').innerHTML = pHtml || `<tr><td colspan="4" class="text-center py-5" style="color: var(--text-muted);"><i class="fas fa-check-circle fa-2x mb-2 text-success opacity-50"></i><br>No pending approvals.</td></tr>`;
                 document.getElementById('activeListBody').innerHTML = aHtml;
                 document.getElementById('loadingOverlay').style.display = 'none';
             } catch (err) { console.error(err); }
         }
 
-        // --- NEW: MODAL LOGIC ---
         window.openProfileModal = async function(userId, role, email, name) {
             document.getElementById('editUserId').value = userId;
             document.getElementById('editUserRole').value = role;
@@ -236,14 +349,12 @@
             const studentFields = document.getElementById('studentExtraFields');
             const imgBox = document.getElementById('modalProfileImg');
 
-            // Reset specific fields
             document.getElementById('modalPhone').value = '';
             document.getElementById('modalAddress').value = '';
             imgBox.classList.add('d-none');
 
             if (role === 'student') {
                 studentFields.style.display = 'block';
-                // Fetch extra student data from DB
                 const { data: stu } = await supabase.from('students').select('*, classes(name)').eq('user_id', userId).single();
                 if (stu) {
                     document.getElementById('modalRegNum').value = stu.reg_number || 'N/A';
@@ -255,7 +366,7 @@
                         imgBox.src = stu.passport_url;
                         imgBox.classList.remove('d-none');
                     } else {
-                        imgBox.src = `https://ui-avatars.com/api/?name=${name.replace(' ', '+')}&background=007a4d&color=fff`;
+                        imgBox.src = `https://ui-avatars.com/api/?name=${name.replace(/ /g, '+')}&background=007a4d&color=fff`;
                         imgBox.classList.remove('d-none');
                     }
                 }
@@ -266,7 +377,6 @@
             profileModal.show();
         };
 
-        // Update Profile Details logic
         document.getElementById('editUserForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('saveProfileBtn');
@@ -278,12 +388,9 @@
             const newName = document.getElementById('modalName').value.trim();
 
             try {
-                // Update Main Users Table
                 await supabase.from('users').update({ name: newName }).eq('id', userId);
 
-                // If Student, update students table details
                 if (role === 'student') {
-                    // Update student table. Splitting name roughly for first/last.
                     const nameParts = newName.split(' ');
                     const first = nameParts[0];
                     const sur = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
@@ -297,7 +404,7 @@
                 }
 
                 profileModal.hide();
-                await loadUsers(); // Refresh the table behind the modal
+                await loadUsers(); 
                 alert("Profile successfully updated!");
 
             } catch (err) {
@@ -308,7 +415,6 @@
             }
         });
 
-        // Trigger Password Reset Email via Supabase
         window.sendPasswordReset = async function() {
             const email = document.getElementById('modalEmail').value;
             if (!confirm(`Are you sure you want to send a password reset link to ${email}?`)) return;
@@ -318,7 +424,7 @@
                 if (error) throw error;
                 alert("Success! A password recovery email has been sent to " + email);
             } catch (err) {
-                alert("Failed to send reset link. Ensure the user has a valid, real email address setup in Supabase. Error: " + err.message);
+                alert("Failed to send reset link. Ensure the user has a valid email address setup in Supabase. Error: " + err.message);
             }
         };
 

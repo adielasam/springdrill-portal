@@ -8,13 +8,27 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body { background-color: #525659; font-family: 'Times New Roman', Times, serif; }
-        .action-bar { background: #1a3c34; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);}
-        .action-bar button { font-family: sans-serif; font-weight: bold; padding: 10px 25px; font-size: 1.1rem;}
+        /* GLOBAL DARK MODE ENGINE */
+        :root { 
+            --bg-color: #525659; 
+            --action-bar-bg: #1a3c34;
+        }
+        body.dark-mode { 
+            --bg-color: #121212; 
+            --action-bar-bg: #111111;
+        }
+
+        body { background-color: var(--bg-color); font-family: 'Times New Roman', Times, serif; transition: background-color 0.3s; }
         
-        /* A4 Report Card Container */
-        .report-wrapper { display: flex; justify-content: center; padding: 40px 0; }
-        .report-card { background: white; width: 210mm; min-height: 297mm; padding: 40px 50px; box-shadow: 0 0 20px rgba(0,0,0,0.5); position: relative; }
+        .action-bar { background: var(--action-bar-bg); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: background-color 0.3s;}
+        .action-bar button, .action-bar a { font-family: sans-serif; font-weight: bold; }
+        
+        .dark-toggle-btn { background: transparent; border: 1px solid rgba(255,255,255,0.5); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .dark-toggle-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.1); }
+
+        /* A4 Report Card Container - STRICTLY WHITE FOR PDF PRINTING */
+        .report-wrapper { display: flex; justify-content: center; padding: 40px 15px; }
+        .report-card { background: white !important; color: black !important; width: 210mm; min-height: 297mm; padding: 40px 50px; box-shadow: 0 0 20px rgba(0,0,0,0.5); position: relative; transition: none; }
         
         .school-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 20px;}
         .school-title-section { text-align: center; flex-grow: 1; }
@@ -32,29 +46,41 @@
         .attendance-area span { color: #000; }
         
         table.report-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 2px solid #000; }
-        table.report-table th, table.report-table td { border: 1px solid #000; padding: 6px; text-align: center; font-size: 13px; font-weight: bold; }
+        table.report-table th, table.report-table td { border: 1px solid #000; padding: 6px; text-align: center; font-size: 13px; font-weight: bold; color: #000; }
         table.report-table td.subj-name { text-align: left; text-transform: uppercase; }
         
         .footer-section { border: 2px solid #000; padding: 10px; font-size: 14px; font-weight: bold; text-transform: uppercase; line-height: 1.8;}
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .report-card { width: 100%; min-height: auto; padding: 20px; }
+            .school-header { flex-direction: column; text-align: center; gap: 15px; }
+            .school-name { font-size: 24px; }
+            .details-row { flex-direction: column; text-align: center; gap: 5px; }
+            .action-bar { flex-direction: column; gap: 10px; }
+        }
     </style>
 </head>
 <body>
     <div class="action-bar" id="actionBar">
-        <a href="class_list.html" class="btn btn-outline-light me-3"><i class="fas fa-arrow-left"></i> Back to Directory</a>
-        <button class="btn btn-success shadow" onclick="window.downloadPDF()"><i class="fas fa-file-pdf me-2"></i> Download Official Report Card</button>
+        <a href="class_list.html" class="btn btn-outline-light btn-sm"><i class="fas fa-arrow-left me-1"></i> Directory</a>
+        <button class="btn btn-success shadow px-4 py-2" onclick="window.downloadPDF()"><i class="fas fa-file-pdf me-2"></i> Download Official Report</button>
+        <button class="dark-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
+            <i class="fas fa-moon" id="themeIcon"></i>
+        </button>
     </div>
 
     <div class="report-wrapper">
         <div class="report-card" id="printableReport">
             <div class="school-header">
-                <img src="" id="photoBox" class="student-photo">
+                <img src="" id="photoBox" class="student-photo" alt="Student">
                 <div class="school-title-section">
                     <div class="school-name">SPRINGDRILL ACADEMY</div>
                     <div class="school-address">123 SPRINGDRILL AVENUE, EDUCATION DISTRICT</div>
                     <div class="school-contact">Email : admin@springdrill.edu<br>Website: www.springdrill.edu</div>
                     <div class="report-title">PROGRESS REPORT</div>
                 </div>
-                <img src="https://cdn-icons-png.flaticon.com/512/3233/3233483.png" class="logo-placeholder">
+                <img src="https://cdn-icons-png.flaticon.com/512/3233/3233483.png" class="logo-placeholder" alt="Logo">
             </div>
 
             <div class="details-row"><div>NAME: <span id="rName">LOADING...</span></div><div>CLASS: <span id="rClass">LOADING...</span></div></div>
@@ -78,15 +104,43 @@
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
+        // === GLOBAL DARK MODE ENGINE ===
+        window.toggleTheme = () => {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
+        }
+
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'SPRINGDRILL_THEME') {
+                const isDark = event.newValue === 'dark';
+                isDark ? document.body.classList.add('dark-mode') : document.body.classList.remove('dark-mode');
+                document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+            }
+        });
+
+        // === REPORT GENERATION LOGIC ===
         async function generateReport() {
             try {
                 const targetStudentId = new URLSearchParams(window.location.search).get('student_id');
                 if (!targetStudentId) return window.location.href = 'class_list.html';
 
                 const { data: student } = await supabase.from('students').select('*, classes(name)').eq('user_id', targetStudentId).single();
+                
                 document.getElementById('rName').innerText = `${student.surname || ''} ${student.first_name || ''}`;
                 document.getElementById('rClass').innerText = student.classes?.name || 'UNASSIGNED';
                 document.getElementById('rId').innerText = student.reg_number || 'N/A';
+
+                // Handle Student Photo
+                const photoUrl = student.passport_url || `https://ui-avatars.com/api/?name=${student.first_name}+${student.surname}&background=ffffff&color=000&size=256`;
+                document.getElementById('photoBox').src = photoUrl;
 
                 const { data: rawResults } = await supabase.from('test_results').select('score, total_questions, tests(subjects(name))').eq('student_id', targetStudentId);
                 
@@ -106,14 +160,20 @@
                 
                 document.getElementById('reportTbody').innerHTML = htmlRows;
                 document.getElementById('rAverage').innerText = count > 0 ? (sum/count).toFixed(1) : '0';
-            } catch (err) { alert("Error loading report."); }
+            } catch (err) { console.error("Error loading report:", err); }
         }
 
         document.addEventListener('DOMContentLoaded', generateReport);
+        
         window.downloadPDF = function() {
             document.getElementById('actionBar').style.display = 'none';
-            html2pdf().set({ margin: 0, filename: `Report_Card.pdf`, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }})
-            .from(document.getElementById('printableReport')).save().then(() => { document.getElementById('actionBar').style.display = 'block'; });
+            html2pdf().set({ 
+                margin: 0, 
+                filename: `Report_Card_${document.getElementById('rName').innerText}.pdf`, 
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            }).from(document.getElementById('printableReport')).save().then(() => { 
+                document.getElementById('actionBar').style.display = 'flex'; 
+            });
         };
     </script>
 </body>

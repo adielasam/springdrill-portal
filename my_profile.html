@@ -7,11 +7,31 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f7fa; overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        /* GLOBAL DARK MODE ENGINE */
+        :root { 
+            --bg-color: #f4f7fa; 
+            --card-bg: #ffffff; 
+            --text-color: #333333; 
+            --text-muted: #6c757d; 
+            --border-color: #e9ecef; 
+            --input-bg: #f8f9fa; 
+            --passport-bg: #f8f9fa;
+        }
+        body.dark-mode { 
+            --bg-color: #121212; 
+            --card-bg: #1e1e1e; 
+            --text-color: #e0e0e0; 
+            --text-muted: #a0a0a0; 
+            --border-color: #333333; 
+            --input-bg: #2c2c2c; 
+            --passport-bg: #222222;
+        }
+
+        body { background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; transition: background-color 0.3s, color 0.3s; }
         
         /* Sidebar Styling */
-        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding-top: 30px; z-index: 1000; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
-        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding-top: 30px; z-index: 1050; box-shadow: 4px 0 15px rgba(0,0,0,0.1); transition: transform 0.3s ease; }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; position: relative; }
         .sidebar-brand i { color: #2ecc71; font-size: 2.5rem; margin-bottom: 10px; }
         .nav-link { color: rgba(255,255,255,0.8); padding: 15px 25px; margin: 4px 15px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; text-decoration: none; }
         .nav-link i { width: 25px; font-size: 1.1rem; }
@@ -19,24 +39,28 @@
         .nav-link.text-danger:hover { background: rgba(220, 53, 69, 0.2); color: #ff6b6b !important; }
 
         /* Main Content */
-        .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
-        .top-header { background: white; padding: 20px 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #2ecc71; }
+        .main-content { margin-left: 280px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #2ecc71; transition: all 0.3s; }
+        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .dark-toggle-btn:hover { transform: scale(1.1); }
 
         /* Profile Card & Upload */
-        .content-card { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: none; }
+        .content-card { background: var(--card-bg); border-radius: 15px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border-color); transition: all 0.3s; }
         
         .passport-container {
             width: 150px;
             height: 150px;
             border-radius: 15px;
-            border: 3px dashed #cbd3da;
+            border: 3px dashed var(--border-color);
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            background: #f8f9fa;
+            background: var(--passport-bg);
             position: relative;
             margin-bottom: 15px;
+            transition: all 0.3s;
         }
         .passport-container img {
             width: 100%;
@@ -46,7 +70,8 @@
         }
         .passport-container i {
             font-size: 4rem;
-            color: #cbd3da;
+            color: var(--text-muted);
+            opacity: 0.5;
         }
         .upload-btn-wrapper {
             position: relative;
@@ -61,21 +86,41 @@
             opacity: 0;
             cursor: pointer;
         }
-        .form-label { font-weight: bold; color: #495057; }
+        
+        .form-label { font-weight: bold; color: var(--text-color); }
+        .form-control { padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); transition: all 0.3s; }
+        .form-control:focus { border-color: #2ecc71; box-shadow: 0 0 0 0.25rem rgba(46, 204, 113, 0.25); background-color: var(--card-bg); color: var(--text-color); }
+        .form-control[readonly] { background-color: var(--input-bg); opacity: 0.8; color: var(--text-muted); }
 
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+
+        /* MOBILE OPTIMIZATION */
+        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
+        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
+        
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .mobile-menu-toggle { display: inline-block; }
+            .top-navbar { padding: 15px; flex-direction: column; gap: 15px; align-items: stretch; text-align: center; }
+            .top-navbar .d-flex { justify-content: center; }
+        }
     </style>
 </head>
 <body>
 
     <div id="loadingOverlay">
         <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
-        <h4>Loading Profile...</h4>
+        <h4 style="color: var(--text-muted);">Loading Profile...</h4>
     </div>
 
-    <div class="sidebar">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <i class="fas fa-user-graduate"></i>
+            <button class="btn btn-sm btn-link text-white position-absolute top-0 end-0 d-lg-none mt-2 me-2" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+            <i class="fas fa-user-graduate mt-3"></i>
             <h4 class="text-white fw-bold mb-0">STUDENT PORTAL</h4>
         </div>
         
@@ -90,10 +135,19 @@
     </div>
 
     <div class="main-content">
-        <div class="top-header">
-            <div>
-                <h3 class="fw-bold mb-0 text-dark"><i class="fas fa-user-edit text-success me-2"></i> My Profile</h3>
-                <p class="text-muted mb-0 mt-1">Manage your personal information and official passport photograph.</p>
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="text-start d-none d-md-block">
+                    <h4 class="fw-bold mb-0" style="color: var(--text-color);"><i class="fas fa-user-edit text-success me-2"></i> My Profile</h4>
+                    <p class="mb-0 mt-1" style="color: var(--text-muted);">Manage your personal information and official passport photograph.</p>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center mt-3 mt-md-0 ms-auto">
+                <button class="dark-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
             </div>
         </div>
 
@@ -101,8 +155,8 @@
 
         <div class="row">
             <div class="col-md-4 mb-4">
-                <div class="content-card text-center">
-                    <h5 class="fw-bold mb-4 border-bottom pb-2">Official Passport</h5>
+                <div class="content-card text-center h-100">
+                    <h5 class="fw-bold mb-4 border-bottom pb-2" style="border-color: var(--border-color) !important; color: var(--text-color);">Official Passport</h5>
                     
                     <div class="d-flex justify-content-center">
                         <div class="passport-container" id="passportContainer">
@@ -111,7 +165,7 @@
                         </div>
                     </div>
                     
-                    <p class="small text-muted mb-3">Upload a clear, recent passport photograph. This will appear on your final Report Card.</p>
+                    <p class="small mb-3" style="color: var(--text-muted);">Upload a clear, recent passport photograph. This will appear on your final Report Card.</p>
 
                     <div class="upload-btn-wrapper w-100">
                         <button class="btn btn-outline-success w-100 fw-bold" id="uploadBtnUI">
@@ -120,37 +174,37 @@
                         <input type="file" id="passportUpload" accept="image/png, image/jpeg, image/jpg" />
                     </div>
                     
-                    <button class="btn btn-success w-100 fw-bold mt-2 d-none" id="savePhotoBtn">
+                    <button class="btn btn-success w-100 fw-bold mt-2 d-none shadow-sm" id="savePhotoBtn">
                         <i class="fas fa-cloud-upload-alt me-2"></i> Save Photo
                     </button>
                 </div>
             </div>
 
-            <div class="col-md-8">
-                <div class="content-card">
-                    <h5 class="fw-bold mb-4 border-bottom pb-2">Personal Details</h5>
+            <div class="col-md-8 mb-4">
+                <div class="content-card h-100">
+                    <h5 class="fw-bold mb-4 border-bottom pb-2" style="border-color: var(--border-color) !important; color: var(--text-color);">Personal Details</h5>
                     
                     <form>
-                        <div class="row g-3">
+                        <div class="row g-4">
                             <div class="col-md-6">
                                 <label class="form-label">Full Name</label>
-                                <input type="text" id="fullName" class="form-control bg-light" readonly>
+                                <input type="text" id="fullName" class="form-control" readonly>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Email Address</label>
-                                <input type="email" id="emailAdd" class="form-control bg-light" readonly>
+                                <input type="email" id="emailAdd" class="form-control" readonly>
                             </div>
-                            <div class="col-md-6 mt-4">
+                            <div class="col-md-6">
                                 <label class="form-label">Assigned Class</label>
-                                <input type="text" id="className" class="form-control bg-light" readonly>
+                                <input type="text" id="className" class="form-control" readonly>
                             </div>
-                            <div class="col-md-6 mt-4">
+                            <div class="col-md-6">
                                 <label class="form-label">Account Status</label>
-                                <input type="text" id="accStatus" class="form-control bg-light text-success fw-bold" readonly value="Active & Approved">
+                                <input type="text" id="accStatus" class="form-control text-success fw-bold border-success" readonly value="Active & Approved" style="background-color: rgba(46, 204, 113, 0.05);">
                             </div>
                         </div>
-                        <div class="mt-4 pt-3 border-top">
-                            <p class="small text-muted"><i class="fas fa-info-circle me-1"></i> To change your assigned class or name, please contact the school Administrator.</p>
+                        <div class="mt-4 pt-3 border-top" style="border-color: var(--border-color) !important;">
+                            <p class="small" style="color: var(--text-muted);"><i class="fas fa-info-circle me-1"></i> To change your assigned class or name, please contact the school Administrator.</p>
                         </div>
                     </form>
                 </div>
@@ -158,13 +212,42 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
         let currentUserId = null;
         let selectedFile = null;
 
-        // 1. Initialize Page and Load Data
+        // === UI TOGGLES ===
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+            const overlay = document.getElementById('sidebarOverlay');
+            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+        };
+
+        window.toggleTheme = () => {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
+        }
+
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'SPRINGDRILL_THEME') {
+                const isDark = event.newValue === 'dark';
+                isDark ? document.body.classList.add('dark-mode') : document.body.classList.remove('dark-mode');
+                document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+            }
+        });
+
+        // === LOGIC ===
         async function initializePage() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
@@ -202,7 +285,7 @@
 
         document.addEventListener('DOMContentLoaded', initializePage);
 
-        // 2. Handle File Selection (Preview Image)
+        // Handle File Selection (Preview Image)
         document.getElementById('passportUpload').addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -229,7 +312,7 @@
             document.getElementById('uploadBtnUI').classList.add('d-none');
         });
 
-        // 3. Upload Image to Supabase Storage
+        // Upload Image to Supabase Storage
         document.getElementById('savePhotoBtn').addEventListener('click', async () => {
             if (!selectedFile) return;
 
@@ -267,7 +350,8 @@
                 if (updateError) throw updateError;
 
                 // Success
-                alertBox.className = 'alert alert-success mt-3';
+                alertBox.className = 'alert alert-success mt-3 shadow-sm';
+                alertBox.classList.remove('d-none');
                 alertBox.innerHTML = '<i class="fas fa-check-circle me-2"></i> Passport uploaded successfully!';
                 
                 // Reset UI
@@ -275,10 +359,12 @@
                 document.getElementById('uploadBtnUI').classList.remove('d-none');
                 btn.innerHTML = '<i class="fas fa-cloud-upload-alt me-2"></i> Save Photo';
                 btn.disabled = false;
+                setTimeout(() => alertBox.classList.add('d-none'), 3000);
 
             } catch (err) {
                 console.error("Upload failed:", err);
-                alertBox.className = 'alert alert-danger mt-3';
+                alertBox.className = 'alert alert-danger mt-3 shadow-sm';
+                alertBox.classList.remove('d-none');
                 alertBox.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i> Upload failed: ' + err.message;
                 
                 btn.innerHTML = '<i class="fas fa-cloud-upload-alt me-2"></i> Try Again';

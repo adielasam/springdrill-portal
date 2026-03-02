@@ -7,89 +7,126 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
+        /* GLOBAL DARK MODE ENGINE */
+        :root { 
+            --bg-color: #f4f7fa; 
+            --card-bg: #ffffff; 
+            --text-color: #333333; 
+            --text-muted: #6c757d; 
+            --border-color: #e9ecef; 
+            --input-bg: #f8f9fa; 
+            --grid-btn: #34495e;
+        }
+        body.dark-mode { 
+            --bg-color: #121212; 
+            --card-bg: #1e1e1e; 
+            --text-color: #e0e0e0; 
+            --text-muted: #a0a0a0; 
+            --border-color: #333333; 
+            --input-bg: #2c2c2c; 
+            --grid-btn: #2c2c2c;
+        }
+
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
         
-        /* Top Header */
-        .exam-header { background: white; padding: 15px 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #007a4d;}
+        /* Focus Mode Header (No Sidebar) */
+        .exam-header { background: var(--card-bg); padding: 15px 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #007a4d; transition: all 0.3s;}
         .school-logo { display: flex; align-items: center; font-weight: bold; font-size: 1.2rem; color: #007a4d;}
-        .exam-info { text-align: right; font-size: 0.85rem; font-weight: bold; color: #495057; line-height: 1.6;}
+        .exam-info { text-align: right; font-size: 0.85rem; font-weight: bold; color: var(--text-muted); line-height: 1.6;}
         .exam-info span { color: #d9534f; }
 
-        .main-container { max-width: 900px; margin: 30px auto; background: white; padding: 30px; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .main-container { max-width: 900px; margin: 30px auto; background: var(--card-bg); padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid var(--border-color); transition: all 0.3s; }
         
+        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; margin-left: 20px; }
+
         /* Navigation Grid */
-        .subject-badge { background: #5bc0de; color: white; padding: 5px 15px; border-radius: 4px; font-weight: bold; display: inline-block; margin-bottom: 15px; }
-        .q-grid { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 20px; }
-        .q-btn { width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; background: #34495e; color: white; font-weight: bold; font-size: 0.8rem; border-radius: 2px; cursor: pointer; border: none; transition: 0.2s;}
-        .q-btn.answered { background: #2ecc71; }
-        .q-btn.active { outline: 2px solid #f39c12; outline-offset: 2px; }
+        .subject-badge { background: #3498db; color: white; padding: 5px 15px; border-radius: 4px; font-weight: bold; display: inline-block; margin-bottom: 15px; font-size: 0.8rem; }
+        .q-grid { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+        .q-btn { width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; background: var(--grid-btn); color: white; font-weight: bold; font-size: 0.8rem; border-radius: 4px; cursor: pointer; border: 1px solid var(--border-color); transition: 0.2s;}
+        .q-btn.answered { background: #2ecc71; border-color: #27ae60; }
+        .q-btn.active { background: #f39c12; border-color: #e67e22; transform: scale(1.1); box-shadow: 0 0 10px rgba(243, 156, 18, 0.4); }
 
         /* Timer */
-        .timer-display { background: black; color: red; font-family: monospace; font-size: 1.5rem; font-weight: bold; padding: 5px 15px; border-radius: 4px; display: inline-block; float: right; }
+        .timer-display { background: #000; color: #ff0000; font-family: 'Courier New', Courier, monospace; font-size: 1.8rem; font-weight: bold; padding: 8px 20px; border-radius: 6px; display: inline-block; border: 2px solid #333; }
 
         /* Question Area */
-        .question-meta { font-size: 0.85rem; color: #6c757d; text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;}
-        .question-text { font-size: 1.2rem; font-weight: 500; color: #333; margin-bottom: 25px; }
+        .question-meta { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; font-weight: bold; letter-spacing: 1px;}
+        .question-text { font-size: 1.3rem; font-weight: 500; color: var(--text-color); margin-bottom: 30px; line-height: 1.5; }
         
         /* Options */
-        .option-row { display: flex; align-items: center; margin-bottom: 12px; cursor: pointer; }
-        .option-letter { font-weight: bold; margin-right: 15px; font-size: 1.1rem; color: #555;}
-        .option-radio { transform: scale(1.2); margin-right: 15px; cursor: pointer; }
-        .option-text { font-size: 1.1rem; color: #444; }
+        .option-row { display: flex; align-items: center; margin-bottom: 15px; padding: 12px 20px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); cursor: pointer; transition: 0.2s; }
+        .option-row:hover { border-color: #007a4d; background: rgba(0, 122, 77, 0.05); }
+        .option-row.selected { border-color: #007a4d; background: rgba(0, 122, 77, 0.1); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        
+        .option-letter { font-weight: 900; margin-right: 15px; font-size: 1.1rem; color: #007a4d;}
+        .option-radio { transform: scale(1.3); margin-right: 15px; cursor: pointer; accent-color: #007a4d; }
+        .option-text { font-size: 1.1rem; color: var(--text-color); }
 
         /* Bottom Controls */
-        .controls { border-top: 1px solid #eee; padding-top: 20px; margin-top: 40px; display: flex; justify-content: space-between; }
-        .btn-nav { background: #f8f9fa; border: 1px solid #ddd; font-weight: bold; color: #555; padding: 8px 20px;}
-        .btn-nav:hover { background: #e2e6ea; }
-        .btn-submit { background: #3498db; color: white; font-weight: bold; padding: 8px 30px; border: none;}
+        .controls { border-top: 1px solid var(--border-color); padding-top: 25px; margin-top: 40px; display: flex; justify-content: space-between; }
+        .btn-nav { background: var(--input-bg); border: 1px solid var(--border-color); font-weight: bold; color: var(--text-color); padding: 10px 25px; border-radius: 6px; transition: 0.3s; }
+        .btn-nav:hover:not(:disabled) { background: var(--border-color); }
+        .btn-submit { background: #3498db; color: white; font-weight: bold; padding: 10px 35px; border: none; border-radius: 6px; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3); transition: 0.3s; }
+        .btn-submit:hover { background: #2980b9; transform: translateY(-2px); }
         
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f4f7fa; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+
+        @media (max-width: 768px) {
+            .exam-header { flex-direction: column; text-align: center; gap: 15px; }
+            .exam-info { text-align: center; }
+            .main-container { margin: 15px; padding: 20px; }
+            .timer-display { font-size: 1.4rem; margin-top: 10px; }
+        }
     </style>
 </head>
 <body>
 
     <div id="loadingOverlay">
         <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
-        <h4 class="text-dark fw-bold">Authenticating & Loading Exam Data...</h4>
+        <h4 class="fw-bold" style="color: var(--text-color);">Preparing Exam Environment...</h4>
     </div>
 
     <div class="exam-header" style="display: none;" id="mainHeader">
         <div class="school-logo">
             <i class="fas fa-graduation-cap fa-2x text-warning me-2"></i> SPRINGDRILL
         </div>
-        <div class="exam-info">
-            Welcome <span id="hdrName">Student</span><br>
-            Test Title: <span id="hdrTitle">Loading...</span><br>
-            Test Duration: <span id="hdrDuration">0</span> minutes<br>
+        <div class="d-flex align-items-center">
+            <div class="exam-info">
+                Welcome <span id="hdrName">Student</span><br>
+                Exam: <span id="hdrTitle" class="text-success">Loading...</span><br>
+                Time: <span id="hdrDuration">0</span> mins
+            </div>
+            <button class="dark-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </button>
         </div>
     </div>
 
     <div class="main-container" style="display: none;" id="mainContainer">
         
-        <div class="d-flex justify-content-between align-items-start mb-3">
-            <div>
+        <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap">
+            <div class="flex-grow-1">
                 <div class="subject-badge" id="subjectBadge">General</div>
-                <div class="q-grid" id="questionGrid">
-                    </div>
+                <div class="q-grid" id="questionGrid"></div>
             </div>
-            <div class="timer-display" id="timerBox">00:00:00</div>
+            <div class="timer-display shadow-sm" id="timerBox">00:00:00</div>
         </div>
 
         <div id="questionArea">
             <div class="question-meta" id="qMeta">QUESTION 1 OF --</div>
             <div class="question-text" id="qText">Loading question...</div>
             
-            <div id="optionsArea">
-                </div>
+            <div id="optionsArea"></div>
         </div>
 
         <div class="controls">
             <button class="btn btn-nav" id="btnPrev" onclick="navigate(-1)"><i class="fas fa-arrow-left me-2"></i> Previous</button>
-            <button class="btn btn-submit" id="btnSubmitFinal" onclick="submitExam()" style="display: none;">Submit Final</button>
+            <button class="btn btn-submit" id="btnSubmitFinal" onclick="submitExam()" style="display: none;">Submit Final Exam</button>
             <button class="btn btn-success fw-bold px-4" id="btnNext" onclick="navigate(1)">Next <i class="fas fa-arrow-right ms-2"></i></button>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
@@ -101,9 +138,23 @@
         let timeRemaining = 0;
         let timerInterval;
 
+        // === UI TOGGLES ===
+        window.toggleTheme = () => {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
+        }
+
+        // === LOGIC ===
         async function initializeExam() {
             try {
-                // 1. Auth & Profile
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
                 studentSession = session;
@@ -112,23 +163,22 @@
                 const studentName = stuData ? (stuData.first_name ? `${stuData.first_name} ${stuData.surname}` : stuData.users.name) : 'Student';
                 document.getElementById('hdrName').innerText = studentName;
 
-                // 2. Validate Test ID
                 const urlParams = new URLSearchParams(window.location.search);
                 testId = urlParams.get('test_id') || urlParams.get('id');
 
                 if (!testId) {
-                    alert("No Exam Selected. Returning to dashboard.");
+                    alert("No Exam Selected.");
                     return window.location.href = 'student_cbt.html';
                 }
 
-                // Prevent Retakes
+                // Security Check: Prevent Retakes
                 const { data: pastAttempt } = await supabase.from('test_results').select('id').eq('student_id', session.user.id).eq('test_id', testId).single();
                 if (pastAttempt) {
                     alert("You have already completed this exam.");
                     return window.location.href = 'student_cbt.html';
                 }
 
-                // 3. Fetch Test Config
+                // Fetch Test Config
                 const { data: testData, error: tErr } = await supabase.from('tests').select('*, subjects(name)').eq('id', testId).single();
                 if (tErr) throw new Error("Test details not found.");
 
@@ -137,28 +187,20 @@
                 const duration = testData.duration_minutes || testData.duration || 30;
                 document.getElementById('hdrDuration').innerText = duration;
 
-                // 4. THE BULLETPROOF TWO-STEP QUESTION FETCH
-                
-                // Step A: Get exactly which question IDs belong to this test
+                // Load Questions
                 const { data: mappingData, error: mapErr } = await supabase.from('test_questions').select('question_id').eq('test_id', testId);
                 if (mapErr || !mappingData || mappingData.length === 0) throw new Error("No questions available for this exam.");
                 
                 const questionIdsToFetch = mappingData.map(row => row.question_id);
-
-                // Step B: Grab the physical questions matching those IDs
                 const { data: finalQs, error: qErr } = await supabase.from('questions').select('*').in('id', questionIdsToFetch);
-                if (qErr || !finalQs || finalQs.length === 0) throw new Error("Failed to load question text from database.");
+                if (qErr || !finalQs || finalQs.length === 0) throw new Error("Failed to load question text.");
 
                 questions = finalQs;
 
-                // Build the Grid
                 buildNavigationGrid();
-
-                // Start Timer
                 timeRemaining = duration * 60;
                 startTimer();
 
-                // Reveal UI
                 document.getElementById('loadingOverlay').style.display = 'none';
                 document.getElementById('mainHeader').style.display = 'flex';
                 document.getElementById('mainContainer').style.display = 'block';
@@ -182,14 +224,9 @@
         function updateGridColors() {
             questions.forEach((q, idx) => {
                 const btn = document.getElementById(`navBtn_${idx}`);
-                if (userAnswers[q.id]) {
-                    btn.classList.add('answered');
-                }
-                if (idx === currentIdx) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
+                if (userAnswers[q.id]) btn.classList.add('answered');
+                if (idx === currentIdx) btn.classList.add('active');
+                else btn.classList.remove('active');
             });
         }
 
@@ -203,21 +240,18 @@
             const optionsHtml = ['A', 'B', 'C', 'D'].map(letter => {
                 const optValue = q[`option_${letter.toLowerCase()}`]; 
                 if (!optValue) return ''; 
-                
-                const isChecked = savedAns === letter ? 'checked' : '';
+                const isSelected = savedAns === letter;
                 
                 return `
-                    <label class="option-row">
-                        <input type="radio" name="currentQ" class="option-radio" value="${letter}" ${isChecked} onchange="saveAnswer('${q.id}', this.value)">
+                    <div class="option-row ${isSelected ? 'selected' : ''}" onclick="saveAnswer('${q.id}', '${letter}')">
+                        <input type="radio" name="currentQ" class="option-radio" value="${letter}" ${isSelected ? 'checked' : ''}>
                         <span class="option-letter">${letter}</span>
                         <span class="option-text">${optValue}</span>
-                    </label>
+                    </div>
                 `;
             }).join('');
 
             document.getElementById('optionsArea').innerHTML = optionsHtml;
-
-            // Handle Buttons
             document.getElementById('btnPrev').disabled = currentIdx === 0;
             
             if (currentIdx === questions.length - 1) {
@@ -233,7 +267,7 @@
 
         window.saveAnswer = (qId, val) => {
             userAnswers[qId] = val;
-            updateGridColors();
+            renderQuestion(); // Re-render to show selection highlight
         };
 
         window.navigate = (dir) => {
@@ -253,25 +287,30 @@
                     clearInterval(timerInterval);
                     display.innerText = "00:00:00";
                     alert("Time is up! Submitting automatically.");
-                    submitExam();
+                    autoSubmit();
                     return;
                 }
                 timeRemaining--;
-                
                 const h = Math.floor(timeRemaining / 3600).toString().padStart(2, '0');
                 const m = Math.floor((timeRemaining % 3600) / 60).toString().padStart(2, '0');
                 const s = (timeRemaining % 60).toString().padStart(2, '0');
                 display.innerText = `${h}:${m}:${s}`;
+                
+                if (timeRemaining < 300) display.style.color = "#ffeb3b"; // Yellow at 5 mins
+                if (timeRemaining < 60) display.style.color = "#f44336"; // Red at 1 min
             }, 1000);
         }
 
-        window.submitExam = async () => {
-            if (!confirm("Are you sure you want to submit your final answers?")) return;
+        async function autoSubmit() {
+            submitExam(true);
+        }
+
+        window.submitExam = async (isAuto = false) => {
+            if (!isAuto && !confirm("Are you sure you want to submit your final answers?")) return;
             
             clearInterval(timerInterval);
-            const btn = document.getElementById('btnSubmitFinal');
-            btn.innerText = 'Submitting...';
-            btn.disabled = true;
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.querySelector('#loadingOverlay h4').innerText = "Calculating Scores & Submitting...";
 
             try {
                 let score = 0;
@@ -288,15 +327,13 @@
 
                 if (error) throw error;
 
-                alert(`Exam Submitted! You scored ${score} out of ${questions.length}.`);
+                alert(`Exam Submitted Successfully! You scored ${score} out of ${questions.length}.`);
                 window.location.href = 'student_cbt.html';
 
             } catch (err) {
-                console.error(err);
-                alert("Error submitting: " + err.message);
-                btn.innerText = 'Submit Final';
-                btn.disabled = false;
-                startTimer(); // Resume if failed
+                alert("Submission Error: " + err.message);
+                document.getElementById('loadingOverlay').style.display = 'none';
+                startTimer();
             }
         };
 

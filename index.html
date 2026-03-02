@@ -7,8 +7,25 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        /* LANDING PAGE DARK MODE ENGINE */
+        :root {
+            --overlay-start: rgba(26, 60, 52, 0.85);
+            --overlay-end: rgba(26, 60, 52, 0.85);
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --card-border: rgba(255, 255, 255, 0.2);
+            --text-color: #ffffff;
+        }
+
+        body.dark-mode {
+            --overlay-start: rgba(15, 15, 15, 0.92);
+            --overlay-end: rgba(10, 10, 10, 0.95);
+            --card-bg: rgba(0, 0, 0, 0.4);
+            --card-border: rgba(255, 255, 255, 0.05);
+            --text-color: #e0e0e0;
+        }
+
         body {
-            background: linear-gradient(rgba(26, 60, 52, 0.85), rgba(26, 60, 52, 0.85)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop');
+            background: linear-gradient(var(--overlay-start), var(--overlay-end)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -16,20 +33,48 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: var(--text-color);
             margin: 0;
+            transition: color 0.3s;
         }
+        
+        /* Floating Dark Mode Toggle */
+        .floating-theme-btn {
+            position: absolute;
+            top: 25px;
+            right: 30px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: #f1c40f;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            font-size: 1.2rem;
+        }
+        .floating-theme-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
         .hero-card {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--card-bg);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             padding: 4rem 3rem;
             border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--card-border);
             text-align: center;
             max-width: 800px;
             width: 90%;
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            transition: background 0.3s, border 0.3s;
         }
         .logo-icon {
             font-size: 4rem;
@@ -67,11 +112,17 @@
         .auth-links {
             margin-top: 40px;
             padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.2);
+            border-top: 1px solid var(--card-border);
+            transition: border 0.3s;
         }
     </style>
 </head>
 <body>
+
+    <button class="floating-theme-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
+        <i class="fas fa-moon" id="themeIcon"></i>
+    </button>
+
     <div class="hero-card">
         <i class="fas fa-graduation-cap logo-icon"></i>
         <h1 class="display-3 fw-bold mb-3">SPRINGDRILL</h1>
@@ -87,14 +138,36 @@
         </div>
         
         <div class="auth-links">
-            <p class="mb-0 text-light">New to the platform? <a href="signup.html" class="text-warning fw-bold text-decoration-none ms-2">Create an Account</a></p>
+            <p class="mb-0" style="color: var(--text-color);">New to the platform? <a href="signup.html" class="text-warning fw-bold text-decoration-none ms-2">Create an Account</a></p>
         </div>
     </div>
 
     <script type="module">
         import { supabase } from './supabaseClient.js';
         
-        // Auto-redirect if user is already logged in
+        // === GLOBAL DARK MODE ENGINE ===
+        window.toggleTheme = () => {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
+        }
+
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'SPRINGDRILL_THEME') {
+                const isDark = event.newValue === 'dark';
+                isDark ? document.body.classList.add('dark-mode') : document.body.classList.remove('dark-mode');
+                document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+            }
+        });
+
+        // === AUTO-REDIRECT LOGIC ===
         async function checkSession() {
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
