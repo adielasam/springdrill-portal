@@ -154,7 +154,7 @@
                                     </div>
                                     <div class="mb-4">
                                         <label class="fw-bold text-muted small text-uppercase">Extra Instructions (Optional)</label>
-                                        <textarea id="aiExtra" class="form-control" rows="2" placeholder="e.g. Include 3 fun quiz questions at the end"></textarea>
+                                        <textarea id="aiExtra" class="form-control" rows="2" placeholder="e.g. Expand extensively on each sub-topic with facts, descriptions, and examples"></textarea>
                                     </div>
                                     <button type="submit" class="btn ai-generate-btn w-100 fw-bold py-2 shadow-sm" id="btnGenerateAI">
                                         <i class="fas fa-magic me-2"></i> Generate Lesson Note
@@ -288,14 +288,33 @@
             }
         });
 
+        // === UPGRADED RICH-TEXT COPY FEATURE ===
         window.copyAIText = () => {
-            const content = document.getElementById('aiOutputContent').innerText;
-            navigator.clipboard.writeText(content).then(() => {
+            const outputBox = document.getElementById('aiOutputContent');
+            
+            // Create a selection range to highlight the HTML content
+            const range = document.createRange();
+            range.selectNodeContents(outputBox);
+            
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            
+            try {
+                // Execute the browser's copy command to preserve MS Word formatting
+                document.execCommand('copy');
+                
                 const btn = document.getElementById('btnCopyAI');
                 const original = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check text-success me-1"></i> Copied!';
-                setTimeout(() => { btn.innerHTML = original; }, 2000);
-            });
+                btn.innerHTML = '<i class="fas fa-check text-success me-1"></i> Copied with Formatting!';
+                
+                setTimeout(() => { btn.innerHTML = original; }, 2500);
+            } catch (err) {
+                alert("Failed to copy. Please manually highlight the text and press Ctrl+C.");
+            }
+            
+            // Deselect the text so it looks clean
+            selection.removeAllRanges();
         };
 
         document.addEventListener('DOMContentLoaded', initializeDashboard);
