@@ -182,7 +182,7 @@
                                 <div id="aiLoadingState" class="text-center py-5" style="display: none;">
                                     <i class="fas fa-circle-notch fa-spin fa-3x mb-3" style="color: #8e44ad;"></i>
                                     <h5 class="fw-bold text-dark">AI is thinking...</h5>
-                                    <p class="text-muted">Drafting your lesson objectives and activities.</p>
+                                    <p class="text-muted">Drafting your NERDC lesson plan.</p>
                                 </div>
 
                                 <div id="aiOutputBox" class="ai-output-box">
@@ -234,61 +234,55 @@
             } catch (err) { console.error(err); document.getElementById('loadingOverlay').style.display = 'none'; }
         }
 
-        // --- SUPABASE EDGE FUNCTION AI LOGIC ---
+        // === FIXED AI LESSON PLANNER (Supabase Edge Function + NERDC) ===
         document.getElementById('aiPlannerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const targetClass = document.getElementById('aiClass').value;
-            const subject = document.getElementById('aiSubject').value;
-            const topic = document.getElementById('aiTopic').value;
-            const extra = document.getElementById('aiExtra').value;
+            const targetClass = document.getElementById('aiClass').value.trim();
+            const subject = document.getElementById('aiSubject').value.trim();
+            const topic = document.getElementById('aiTopic').value.trim();
+            const extra = document.getElementById('aiExtra').value.trim();
 
-            document.getElementById('btnGenerateAI').innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Generating...';
-            document.getElementById('btnGenerateAI').disabled = true;
-            document.getElementById('aiEmptyState').style.display = 'none';
-            document.getElementById('aiOutputBox').style.display = 'none';
-            document.getElementById('btnCopyAI').style.display = 'none';
-            document.getElementById('aiLoadingState').style.display = 'block';
+            if (!targetClass || !subject || !topic) {
+                alert("Please fill Target Class, Subject, and Specific Topic");
+                return;
+            }
 
-            const promptText = `Act as an expert, professional school teacher. Generate a highly structured, comprehensive lesson plan for a ${targetClass} class. 
-            Subject: ${subject}. 
-            Topic: ${topic}. 
-            Additional instructions: ${extra}. 
-            Format the response nicely in Markdown. Please explicitly include the following headings:
-            - Lesson Objectives
-            - Introduction (Opening)
-            - Main Activities / Explanations
-            - Student Assessment / Quiz
-            - Conclusion & Homework`;
+            const generateBtn = document.getElementById('btnGenerateAI');
+            const loadingState = document.getElementById('aiLoadingState');
+            const emptyState = document.getElementById('aiEmptyState');
+            const outputBox = document.getElementById('aiOutputBox');
+            const copyBtn = document.getElementById('btnCopyAI');
+
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Generating NERDC Lesson Plan...';
+            generateBtn.disabled = true;
+            emptyState.style.display = 'none';
+            outputBox.style.display = 'none';
+            copyBtn.style.display = 'none';
+            loadingState.style.display = 'block';
 
             try {
-                // Securely invoke the Supabase Edge Function!
                 const { data, error } = await supabase.functions.invoke('generate-lesson', {
-                    body: { prompt: promptText }
+                    body: { targetClass, subject, topic, extra }
                 });
 
-                if (error) {
-                    throw new Error(error.message || "Failed to connect to Supabase Edge Function.");
-                }
+                if (error) throw error;
+                if (!data.success) throw new Error(data.error || "AI service error");
 
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-
-                // Render Markdown to HTML
                 document.getElementById('aiOutputContent').innerHTML = marked.parse(data.text);
 
-                document.getElementById('aiLoadingState').style.display = 'none';
-                document.getElementById('aiOutputBox').style.display = 'block';
-                document.getElementById('btnCopyAI').style.display = 'inline-block';
+                loadingState.style.display = 'none';
+                outputBox.style.display = 'block';
+                copyBtn.style.display = 'inline-block';
 
-            } catch (error) {
-                alert("AI Server Error: " + error.message);
-                document.getElementById('aiLoadingState').style.display = 'none';
-                document.getElementById('aiEmptyState').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                alert("AI Error: " + err.message);
+                loadingState.style.display = 'none';
+                emptyState.style.display = 'block';
             } finally {
-                document.getElementById('btnGenerateAI').innerHTML = '<i class="fas fa-magic me-2"></i> Generate Lesson Note';
-                document.getElementById('btnGenerateAI').disabled = false;
+                generateBtn.innerHTML = '<i class="fas fa-magic me-2"></i> Generate Lesson Note';
+                generateBtn.disabled = false;
             }
         });
 
@@ -296,13 +290,18 @@
             const content = document.getElementById('aiOutputContent').innerText;
             navigator.clipboard.writeText(content).then(() => {
                 const btn = document.getElementById('btnCopyAI');
+                const original = btn.innerHTML;
                 btn.innerHTML = '<i class="fas fa-check text-success me-1"></i> Copied!';
-                setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy me-1"></i> Copy Text'; }, 2000);
+                setTimeout(() => { btn.innerHTML = original; }, 2000);
             });
         };
 
         document.addEventListener('DOMContentLoaded', initializeDashboard);
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { 
+            e.preventDefault(); 
+            await supabase.auth.signOut(); 
+            window.location.href = 'login.html'; 
+        });
     </script>
 </body>
 </html>
