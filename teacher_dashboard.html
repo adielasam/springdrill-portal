@@ -160,9 +160,6 @@
                                         <i class="fas fa-magic me-2"></i> Generate Lesson Note
                                     </button>
                                 </form>
-                                <button type="button" class="btn btn-sm btn-outline-danger w-100 mt-3" onclick="resetAIKey()">
-                                    <i class="fas fa-key me-1"></i> Reset API Key
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -237,20 +234,9 @@
             } catch (err) { console.error(err); document.getElementById('loadingOverlay').style.display = 'none'; }
         }
 
-        // --- BULLETPROOF AI LOGIC WITH SMART FALLBACK ---
+        // --- SUPABASE EDGE FUNCTION AI LOGIC ---
         document.getElementById('aiPlannerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-
-            let apiKey = localStorage.getItem('SPRINGDRILL_GEMINI_KEY');
-            
-            if (!apiKey) {
-                apiKey = prompt("To activate the AI Planner securely, please paste your Google Gemini API Key here.\n\n(It will be saved only in your browser, keeping it 100% safe from GitHub!)");
-                if (!apiKey) {
-                    alert("API Key is required to use the AI Planner.");
-                    return; 
-                }
-                localStorage.setItem('SPRINGDRILL_GEMINI_KEY', apiKey.trim());
-            }
 
             const targetClass = document.getElementById('aiClass').value;
             const subject = document.getElementById('aiSubject').value;
@@ -276,42 +262,28 @@
             - Conclusion & Homework`;
 
             try {
-                // 1. FIRST ATTEMPT: Try the newest 2.5 Flash model
-                let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
+                // Securely invoke the Supabase Edge Function!
+                const { data, error } = await supabase.functions.invoke('generate-lesson', {
+                    body: { prompt: promptText }
                 });
 
-                // 2. SMART FALLBACK: If 2.5 is not found (404 error), silently switch to the rock-solid 1.5-flash
-                if (response.status === 404) {
-                    console.log("Model 2.5 not found in your region. Activating smart fallback to 1.5-flash...");
-                    response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
-                    });
+                if (error) {
+                    throw new Error(error.message || "Failed to connect to Supabase Edge Function.");
                 }
 
-                const data = await response.json();
-
-                if (!response.ok) {
-                    if (data.error?.message?.includes("API key not valid") || data.error?.code === 400) {
-                        localStorage.removeItem('SPRINGDRILL_GEMINI_KEY');
-                        throw new Error("Your API Key was invalid. It has been erased from memory. Please click Generate to try entering it again.");
-                    }
-                    throw new Error(data.error?.message || "Google API Error");
+                if (data.error) {
+                    throw new Error(data.error);
                 }
 
-                const aiResponseText = data.candidates[0].content.parts[0].text;
-                document.getElementById('aiOutputContent').innerHTML = marked.parse(aiResponseText);
+                // Render Markdown to HTML
+                document.getElementById('aiOutputContent').innerHTML = marked.parse(data.text);
 
                 document.getElementById('aiLoadingState').style.display = 'none';
                 document.getElementById('aiOutputBox').style.display = 'block';
                 document.getElementById('btnCopyAI').style.display = 'inline-block';
 
             } catch (error) {
-                alert("AI Error: " + error.message);
+                alert("AI Server Error: " + error.message);
                 document.getElementById('aiLoadingState').style.display = 'none';
                 document.getElementById('aiEmptyState').style.display = 'block';
             } finally {
@@ -327,13 +299,6 @@
                 btn.innerHTML = '<i class="fas fa-check text-success me-1"></i> Copied!';
                 setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy me-1"></i> Copy Text'; }, 2000);
             });
-        };
-
-        window.resetAIKey = () => {
-            if(confirm("Are you sure you want to clear your saved API key? You will need to paste it again next time you use the AI Planner.")) {
-                localStorage.removeItem('SPRINGDRILL_GEMINI_KEY');
-                alert("Key erased successfully.");
-            }
         };
 
         document.addEventListener('DOMContentLoaded', initializeDashboard);
