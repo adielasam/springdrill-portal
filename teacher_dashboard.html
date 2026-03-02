@@ -234,7 +234,7 @@
             } catch (err) { console.error(err); document.getElementById('loadingOverlay').style.display = 'none'; }
         }
 
-        // === FIXED AI LESSON PLANNER (Supabase Edge Function + NERDC) ===
+        // === SUPABASE AI LESSON PLANNER ===
         document.getElementById('aiPlannerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -244,7 +244,7 @@
             const extra = document.getElementById('aiExtra').value.trim();
 
             if (!targetClass || !subject || !topic) {
-                alert("Please fill Target Class, Subject, and Specific Topic");
+                alert("Please fill out Target Class, Subject, and Specific Topic");
                 return;
             }
 
@@ -262,13 +262,15 @@
             loadingState.style.display = 'block';
 
             try {
+                // Securely call the Edge Function
                 const { data, error } = await supabase.functions.invoke('generate-lesson', {
                     body: { targetClass, subject, topic, extra }
                 });
 
                 if (error) throw error;
-                if (!data.success) throw new Error(data.error || "AI service error");
+                if (!data.success) throw new Error(data.error || "Edge Function failed to process request.");
 
+                // Parse the markdown string returned by our Edge Function
                 document.getElementById('aiOutputContent').innerHTML = marked.parse(data.text);
 
                 loadingState.style.display = 'none';
@@ -276,7 +278,7 @@
                 copyBtn.style.display = 'inline-block';
 
             } catch (err) {
-                console.error(err);
+                console.error("Function Error Details:", err);
                 alert("AI Error: " + err.message);
                 loadingState.style.display = 'none';
                 emptyState.style.display = 'block';
