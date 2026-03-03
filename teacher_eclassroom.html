@@ -7,118 +7,145 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
-        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1000; }
-        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center; }
+        /* GLOBAL DARK MODE ENGINE */
+        :root { 
+            --bg-color: #f4f7fa; 
+            --card-bg: #ffffff; 
+            --text-color: #333333; 
+            --text-muted: #6c757d; 
+            --border-color: #e9ecef; 
+            --input-bg: #f8f9fa; 
+        }
+        body.dark-mode { 
+            --bg-color: #121212; 
+            --card-bg: #1e1e1e; 
+            --text-color: #e0e0e0; 
+            --text-muted: #a0a0a0; 
+            --border-color: #333333; 
+            --input-bg: #2c2c2c; 
+        }
+
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+        
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center; text-decoration: none;}
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
         
-        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
-        .top-navbar { background: white; padding: 15px 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #e74c3c;}
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
         
-        .nav-tabs { border-bottom: 2px solid #e9ecef; margin-bottom: 25px; }
-        .nav-tabs .nav-link { color: #6c757d; font-weight: bold; border: none; border-bottom: 3px solid transparent; padding: 12px 25px; font-size: 1.05rem;}
-        .nav-tabs .nav-link.active.text-danger { border-bottom: 3px solid #dc3545; color: #dc3545 !important; background: transparent; }
-        .nav-tabs .nav-link.active.text-success { border-bottom: 3px solid #198754; color: #198754 !important; background: transparent; }
-
-        .setup-card { background: white; border: 1px solid #dee2e6; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 30px; }
-        .form-label { font-weight: bold; font-size: 0.85rem; text-transform: uppercase; color: #555;}
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #e74c3c; transition: all 0.3s; }
+        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
         
-        .live-controls { display: none; justify-content: space-between; align-items: center; background: white; padding: 25px 30px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 5px solid #2ecc71;}
-        .room-code-badge { background: #f8f9fa; border: 1px dashed #ced4da; padding: 8px 15px; border-radius: 6px; font-family: monospace; font-size: 1.1rem; font-weight: bold; color: #333; letter-spacing: 1px;}
+        .setup-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); padding: 30px; transition: all 0.3s;}
+        .form-label { font-weight: bold; font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted);}
+        .form-control, .form-select { padding: 10px 15px; border-radius: 6px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); transition: all 0.3s; }
+        .form-control:focus, .form-select:focus { border-color: #e74c3c; box-shadow: 0 0 0 0.25rem rgba(231, 76, 60, 0.25); background-color: var(--card-bg); color: var(--text-color); }
+        
+        .live-controls { display: none; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 25px 30px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 5px solid #2ecc71; border: 1px solid var(--border-color); transition: all 0.3s;}
+        .room-code-badge { background: var(--input-bg); border: 1px dashed var(--border-color); padding: 8px 15px; border-radius: 6px; font-family: monospace; font-size: 1.1rem; font-weight: bold; color: var(--text-color); letter-spacing: 1px;}
+        
         .pulse { animation: pulse-animation 2s infinite; }
         @keyframes pulse-animation { 0% { box-shadow: 0 0 0 0px rgba(220, 53, 69, 0.7); } 100% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); } }
 
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .top-navbar { padding: 15px; flex-direction: column; gap: 10px; }
+            .live-controls { flex-direction: column; text-align: center; gap: 20px; }
+            .mobile-menu-toggle { display: inline-block !important; }
+        }
+        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
+        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
     </style>
 </head>
 <body>
 
-    <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-danger mb-3"></i><h4 class="fw-bold text-muted">Loading eClassroom...</h4></div>
+    <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-danger mb-3"></i><h4 class="fw-bold" style="color: var(--text-muted);">Loading eClassroom...</h4></div>
+    
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-    <div class="sidebar">
-        <div class="sidebar-brand"><h5 class="text-white fw-bold"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
+            <h5 class="text-white fw-bold m-0"><i class="fas fa-graduation-cap text-warning me-2"></i> STAFF PORTAL</h5>
+            <button class="btn btn-sm btn-link text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        </div>
         <nav class="nav flex-column mt-3">
             <a href="teacher_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="teacher_messages.html" class="nav-link"><i class="fas fa-envelope"></i> Communications</a>
+            <a href="teacher_class_list.html" class="nav-link"><i class="fas fa-users"></i> Class Roster & 360°</a>
             <a href="teacher_eclassroom.html" class="nav-link active"><i class="fas fa-video text-danger"></i> eClassroom</a>
+            <a href="teacher_subjects.html" class="nav-link"><i class="fas fa-book"></i> Materials & AI Planner</a>
+            <a href="teacher_messages.html" class="nav-link"><i class="fas fa-envelope"></i> Communications</a>
             <hr class="mx-3 my-4 border-secondary">
-            <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-power-off"></i> Logout</a>
         </nav>
     </div>
 
     <div class="main-content">
         <div class="top-navbar">
-            <div class="fw-bold text-muted"><i class="fas fa-broadcast-tower me-3 text-danger"></i> eClassroom Hub</div>
-            <div class="fw-bold text-dark"><i class="fas fa-chalkboard-teacher text-primary me-2"></i> <span id="teacherName">Teacher</span></div>
-        </div>
-
-        <ul class="nav nav-tabs" id="classroomTabs">
-            <li class="nav-item"><button class="nav-link active text-danger" data-bs-toggle="tab" data-bs-target="#liveTab" type="button"><i class="fas fa-video me-2"></i> Broadcast Live Class</button></li>
-            <li class="nav-item"><button class="nav-link text-success" data-bs-toggle="tab" data-bs-target="#notesTab" type="button"><i class="fas fa-file-upload me-2"></i> Share Lesson Notes</button></li>
-        </ul>
-
-        <div class="tab-content">
-            <div class="tab-pane fade show active" id="liveTab">
-                
-                <div class="live-controls" id="liveControls">
-                    <div>
-                        <span class="badge bg-danger pulse me-2">LIVE NOW</span>
-                        <span class="fw-bold text-dark fs-4 d-block mt-2" id="displaySubject">Subject</span>
-                        <div class="text-primary small mt-1 fw-bold"><i class="fas fa-info-circle me-1"></i> Tip: If a student cannot unmute, ask them to check their browser settings and allow Microphone access!</div>
-                    </div>
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="text-end me-2"><small class="text-muted d-block fw-bold">JOIN CODE</small><div class="room-code-badge" id="displayRoomCode">XXXX</div></div>
-                        <button class="btn btn-primary btn-lg fw-bold shadow" onclick="launchVideoRoom()"><i class="fas fa-external-link-alt me-2"></i> Enter Video Room</button>
-                        <button class="btn btn-danger btn-lg fw-bold shadow" onclick="endLiveClass()"><i class="fas fa-power-off me-2"></i> End Class</button>
-                    </div>
-                </div>
-
-                <div class="setup-card" id="setupFormArea" style="max-width: 600px; margin: 0 auto;">
-                    <div class="text-center mb-4"><i class="fas fa-video fa-3x text-danger mb-3"></i><h3 class="fw-bold">Start Virtual Class</h3></div>
-                    <form id="startClassForm">
-                        <div class="mb-3"><label class="form-label text-primary">Target Class</label><select id="liveClassSelect" class="form-select fw-bold" required><option value="">Loading...</option></select></div>
-                        <div class="mb-4"><label class="form-label">Subject</label><select id="liveSubjectSelect" class="form-select fw-bold" required><option value="">Loading...</option></select></div>
-                        <button type="submit" class="btn btn-danger w-100 fw-bold py-3 fs-5" id="startBtn"><i class="fas fa-satellite-dish me-2"></i> CREATE LIVE ROOM</button>
-                    </form>
-                </div>
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="fw-bold d-none d-md-block" style="color: var(--text-muted);"><i class="fas fa-broadcast-tower me-2 text-danger"></i> Virtual eClassroom Studio</div>
             </div>
-
-            <div class="tab-pane fade" id="notesTab">
-                <div class="row">
-                    <div class="col-lg-5">
-                        <div class="setup-card border-success">
-                            <h5 class="fw-bold text-success mb-4"><i class="fas fa-upload me-2"></i> Share Lesson Note</h5>
-                            <form id="uploadNotesForm">
-                                <div class="mb-3"><label class="form-label">Note Title / Topic <span class="text-danger">*</span></label><input type="text" id="noteTitle" class="form-control" placeholder="e.g. Week 1: Intro to Algebra" required></div>
-                                <div class="mb-3"><label class="form-label text-primary">Target Class <span class="text-danger">*</span></label><select id="noteClassSelect" class="form-select fw-bold" required></select></div>
-                                <div class="mb-3"><label class="form-label">Subject <span class="text-danger">*</span></label><select id="noteSubjectSelect" class="form-select fw-bold" required></select></div>
-                                <div class="mb-4"><label class="form-label">Attach Document (PDF/DOCX) <span class="text-danger">*</span></label><input type="file" id="noteFile" class="form-control" required></div>
-                                <button type="submit" class="btn btn-dark w-100 fw-bold py-2" id="uploadBtn"><i class="fas fa-cloud-upload-alt me-2"></i> Upload to eClassroom</button>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="col-lg-7">
-                        <div class="setup-card p-0">
-                            <div class="bg-success text-white p-3 fw-bold rounded-top"><i class="fas fa-history me-2"></i> My Upload History</div>
-                            <div class="table-responsive p-3" style="max-height: 400px; overflow-y: auto;">
-                                <table class="table table-hover">
-                                    <thead class="table-light"><tr><th>Topic / Title</th><th>Class</th><th>Subject</th></tr></thead>
-                                    <tbody id="historyBody"><tr><td colspan="3" class="text-center py-4">Loading history...</td></tr></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+            <div class="d-flex align-items-center ms-auto">
+                <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
+                <div class="fw-bold d-flex align-items-center" style="color: var(--text-color);">
+                    <span id="teacherName">Teacher</span><i class="fas fa-user-circle ms-3 fs-4 text-success"></i>
                 </div>
             </div>
         </div>
+
+        <div class="live-controls" id="liveControls">
+            <div>
+                <span class="badge bg-danger pulse me-2">LIVE NOW</span>
+                <span class="fw-bold fs-4 d-block mt-2" id="displaySubject" style="color: var(--text-color);">Subject</span>
+                <div class="text-primary small mt-1 fw-bold"><i class="fas fa-info-circle me-1"></i> Tip: If a student cannot unmute, ask them to check their browser settings and allow Microphone access!</div>
+            </div>
+            <div class="d-flex align-items-center gap-3 flex-wrap justify-content-center">
+                <div class="text-center text-md-end me-2"><small class="d-block fw-bold" style="color: var(--text-muted);">JOIN CODE</small><div class="room-code-badge" id="displayRoomCode">XXXX</div></div>
+                <button class="btn btn-primary btn-lg fw-bold shadow" onclick="launchVideoRoom()"><i class="fas fa-external-link-alt me-2"></i> Enter Room</button>
+                <button class="btn btn-danger btn-lg fw-bold shadow" onclick="endLiveClass()"><i class="fas fa-power-off me-2"></i> End Class</button>
+            </div>
+        </div>
+
+        <div class="setup-card" id="setupFormArea" style="max-width: 600px; margin: 0 auto;">
+            <div class="text-center mb-4">
+                <i class="fas fa-video fa-3x text-danger mb-3"></i>
+                <h3 class="fw-bold" style="color: var(--text-color);">Start Virtual Class</h3>
+            </div>
+            <form id="startClassForm">
+                <div class="mb-3">
+                    <label class="form-label text-primary">Target Class</label>
+                    <select id="liveClassSelect" class="form-select fw-bold border-primary" required><option value="">Loading...</option></select>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Subject</label>
+                    <select id="liveSubjectSelect" class="form-select fw-bold" required><option value="">Loading...</option></select>
+                </div>
+                <button type="submit" class="btn btn-danger w-100 fw-bold py-3 fs-5 shadow" id="startBtn"><i class="fas fa-satellite-dish me-2"></i> GO LIVE NOW</button>
+            </form>
+        </div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
-        let currentUserId = null; let currentUserName = "Teacher"; let activeRoomId = null; let activeRoomUrl = ""; let classesMap = {};
+        let currentUserId = null; let currentUserName = "Teacher"; let activeRoomId = null; let activeRoomUrl = "";
+
+        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('mobile-open'); document.getElementById('sidebarOverlay').style.display = document.getElementById('sidebarOverlay').style.display === 'block' ? 'none' : 'block'; };
+        
+        window.toggleTheme = () => {
+            const body = document.body; body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { document.body.classList.add('dark-mode'); document.getElementById('themeIcon').className = 'fas fa-sun text-warning'; }
 
         async function initSetup() {
             try {
@@ -131,27 +158,21 @@
 
                 const { data: classes } = await supabase.from('classes').select('*').order('id');
                 if (classes) {
-                    classes.forEach(c => classesMap[c.id] = c.name);
-                    const classOpts = `<option value="">-- Select Class --</option>` + classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-                    document.getElementById('liveClassSelect').innerHTML = classOpts;
-                    document.getElementById('noteClassSelect').innerHTML = classOpts;
+                    document.getElementById('liveClassSelect').innerHTML = `<option value="">-- Select Class --</option>` + classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
                 }
 
                 const { data: subjects } = await supabase.from('subjects').select('*').order('name');
                 if (subjects) {
-                    const subOpts = `<option value="">-- Select Subject --</option>` + subjects.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
-                    document.getElementById('liveSubjectSelect').innerHTML = subOpts;
-                    document.getElementById('noteSubjectSelect').innerHTML = subOpts;
+                    document.getElementById('liveSubjectSelect').innerHTML = `<option value="">-- Select Subject --</option>` + subjects.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
                 }
 
-                await fetchUploadHistory();
                 document.getElementById('loadingOverlay').style.display = 'none';
             } catch (err) { console.error(err); alert("Error loading module."); }
         }
 
         document.getElementById('startClassForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('startBtn'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...'; btn.disabled = true;
+            const btn = document.getElementById('startBtn'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Initializing...'; btn.disabled = true;
 
             try {
                 const classId = document.getElementById('liveClassSelect').value;
@@ -163,8 +184,6 @@
                 if (error) throw error;
                 
                 activeRoomId = liveData.id;
-                
-                // AUTO INJECT TEACHER NAME INTO URL
                 const safeName = encodeURIComponent(`Teacher: ${currentUserName}`);
                 activeRoomUrl = `https://meet.jit.si/${jitsiRoomName}#userInfo.displayName=${safeName}`;
 
@@ -175,7 +194,7 @@
 
                 launchVideoRoom();
 
-            } catch (err) { alert(err.message); btn.innerHTML = '<i class="fas fa-satellite-dish me-2"></i> CREATE LIVE ROOM'; btn.disabled = false; }
+            } catch (err) { alert(err.message); btn.innerHTML = '<i class="fas fa-satellite-dish me-2"></i> GO LIVE NOW'; btn.disabled = false; }
         });
 
         window.launchVideoRoom = () => { if (activeRoomUrl) window.open(activeRoomUrl, '_blank'); };
@@ -185,34 +204,6 @@
             if (activeRoomId) await supabase.from('live_classes').update({ is_active: false }).eq('id', activeRoomId);
             window.location.reload();
         };
-
-        // --- TAB 2: UPLOAD LOGIC ---
-        async function fetchUploadHistory() {
-            const { data: notes } = await supabase.from('lesson_notes').select('*').eq('teacher_id', currentUserId).order('created_at', { ascending: false });
-            document.getElementById('historyBody').innerHTML = (notes && notes.length) ? notes.map(n => `<tr><td class="fw-bold text-primary"><i class="fas fa-file-pdf me-2"></i>${n.title}</td><td>${classesMap[n.class_id]}</td><td>${n.subject_name}</td></tr>`).join('') : `<tr><td colspan="3" class="text-center text-muted py-3">No files uploaded yet.</td></tr>`;
-        }
-
-        document.getElementById('uploadNotesForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('uploadBtn'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...'; btn.disabled = true;
-            try {
-                const title = document.getElementById('noteTitle').value;
-                const classId = document.getElementById('noteClassSelect').value;
-                const subjectName = document.getElementById('noteSubjectSelect').value;
-                const file = document.getElementById('noteFile').files[0];
-
-                const safeName = `note_${Date.now()}_${Math.random().toString(36).substring(7)}.${file.name.split('.').pop()}`;
-                const { error: uploadErr } = await supabase.storage.from('lesson_notes').upload(safeName, file);
-                if (uploadErr) throw uploadErr;
-
-                const { data: pubData } = supabase.storage.from('lesson_notes').getPublicUrl(safeName);
-                await supabase.from('lesson_notes').insert([{ teacher_id: currentUserId, class_id: classId, subject_name: subjectName, title: title, file_url: pubData.publicUrl }]);
-                
-                document.getElementById('uploadNotesForm').reset();
-                await fetchUploadHistory();
-                alert("Notes uploaded successfully!");
-            } catch (err) { alert(err.message); } finally { btn.innerHTML = '<i class="fas fa-cloud-upload-alt me-2"></i> Upload to eClassroom'; btn.disabled = false; }
-        });
 
         window.addEventListener('beforeunload', async () => { if (activeRoomId) await supabase.from('live_classes').update({ is_active: false }).eq('id', activeRoomId); });
         document.addEventListener('DOMContentLoaded', initSetup);

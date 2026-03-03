@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - My Subjects & AI Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        /* GLOBAL DARK MODE ENGINE */
+        :root { 
+            --bg-color: #f4f7fa; 
+            --card-bg: #ffffff; 
+            --text-color: #333333; 
+            --text-muted: #6c757d; 
+            --border-color: #e9ecef; 
+            --input-bg: #f8f9fa; 
+            --ai-bg: #f1f8ff;
+        }
+        body.dark-mode { 
+            --bg-color: #121212; 
+            --card-bg: #1e1e1e; 
+            --text-color: #e0e0e0; 
+            --text-muted: #a0a0a0; 
+            --border-color: #333333; 
+            --input-bg: #2c2c2c; 
+            --ai-bg: #1a222b;
+        }
+
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+        
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.1);}
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; display: flex; align-items: center; font-size: 0.95rem; text-decoration: none;}
+        .nav-link i { width: 25px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
+
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #007a4d; transition: all 0.3s; }
+        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+
+        /* TABS */
+        .nav-tabs { border-bottom: 2px solid var(--border-color); margin-bottom: 20px; }
+        .nav-tabs .nav-link { color: var(--text-muted); font-weight: bold; border: none; border-bottom: 3px solid transparent; padding: 12px 25px;}
+        .nav-tabs .nav-link:hover { color: #007a4d; }
+        .nav-tabs .nav-link.active { color: #007a4d; border-bottom: 3px solid #007a4d; background: transparent; }
+
+        /* CARDS & FORMS */
+        .edu-card { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.02); margin-bottom: 30px; transition: all 0.3s;}
+        .edu-header { padding: 15px 25px; border-bottom: 1px solid var(--border-color); font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0;}
+        .edu-body { padding: 25px; color: var(--text-color); }
+        
+        .form-label { font-weight: 600; color: var(--text-color); }
+        .form-control, .form-select { padding: 10px 15px; border-radius: 6px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); transition: all 0.3s; }
+        .form-control:focus, .form-select:focus { border-color: #007a4d; box-shadow: 0 0 0 0.25rem rgba(0, 122, 77, 0.25); background-color: var(--card-bg); color: var(--text-color); }
+
+        /* AI PLANNER BOX */
+        .ai-result-box { background-color: var(--ai-bg); border: 1px solid #b6d4fe; border-radius: 8px; padding: 30px; min-height: 200px; display: none; margin-top: 20px; font-family: 'Georgia', serif; line-height: 1.8; color: var(--text-color);}
+        body.dark-mode .ai-result-box { border-color: #0d6efd; }
+        
+        /* TABLES */
+        .table { color: var(--text-color); border-color: var(--border-color); }
+        .table th { background-color: var(--input-bg); color: var(--text-muted); border-bottom: none; font-size: 0.85rem; text-transform: uppercase; }
+        .table td { vertical-align: middle; }
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .mobile-menu-toggle { display: inline-block !important; }
+            .top-navbar { padding: 15px; flex-direction: column; gap: 10px; }
+            .nav-tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 5px; }
+            .nav-tabs .nav-link { white-space: nowrap; }
+        }
+        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
+        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay">
+        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
+        <h4 class="fw-bold" style="color: var(--text-muted);">Loading Subjects Workspace...</h4>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
+            <h5 class="text-white fw-bold m-0"><i class="fas fa-chalkboard-teacher text-warning me-2"></i> STAFF PORTAL</h5>
+            <button class="btn btn-sm btn-link text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <nav class="nav flex-column mt-3">
+            <a href="teacher_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+            
+            <a href="teacher_class_list.html" class="nav-link"><i class="fas fa-users"></i> Class Roster & 360°</a>
+
+            <a href="teacher_subjects.html" class="nav-link active text-success fw-bold"><i class="fas fa-book"></i> Materials & AI Planner</a>
+
+            <a href="#cbtMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
+                <span><i class="fas fa-laptop-code me-2"></i> CBT Console</span>
+                <i class="fas fa-caret-down"></i>
+            </a>
+            <div class="collapse bg-dark mx-2 mt-1 rounded" id="cbtMenu">
+                <a href="create_test.html" class="nav-link small py-2"><i class="fas fa-plus-circle me-2"></i> Create Exam</a>
+                <a href="question_bank.html" class="nav-link small py-2"><i class="fas fa-database me-2"></i> Question Bank</a>
+                <a href="manage_cbt.html" class="nav-link small py-2"><i class="fas fa-list me-2"></i> Manage Exams</a>
+                <a href="test_results.html" class="nav-link small py-2"><i class="fas fa-chart-bar me-2"></i> Result Manager</a>
+            </div>
+
+            <hr class="mx-3 my-4 border-secondary">
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Secure Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="fw-bold d-none d-md-block" style="color: var(--text-muted);"><i class="fas fa-book-open me-2"></i> Subject Resource Center</div>
+            </div>
+
+            <div class="d-flex align-items-center ms-auto">
+                <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                <div class="fw-bold d-flex align-items-center" style="color: var(--text-color);">
+                    <span id="navTeacherName">Teacher</span><i class="fas fa-user-circle ms-3 fs-4 text-success"></i>
+                </div>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs flex-nowrap" id="subjectTabs">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#uploadTab"><i class="fas fa-cloud-upload-alt me-2"></i> Upload Materials</button></li>
+            <li class="nav-item"><button class="nav-link text-primary" data-bs-toggle="tab" data-bs-target="#aiTab"><i class="fas fa-robot me-2"></i> AI Lesson Planner</button></li>
+            <li class="nav-item"><button class="nav-link text-warning" data-bs-toggle="tab" data-bs-target="#manageTab"><i class="fas fa-folder-open me-2"></i> My Repository</button></li>
+        </ul>
+
+        <div id="alertBox" class="alert d-none shadow-sm" role="alert"></div>
+
+        <div class="tab-content">
+            
+            <div class="tab-pane fade show active" id="uploadTab">
+                <div class="edu-card border-success">
+                    <div class="edu-header bg-success text-white">Share Materials with Students</div>
+                    <div class="edu-body">
+                        <form id="uploadForm">
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">Material Type</label>
+                                    <select id="materialType" class="form-select border-success fw-bold" required>
+                                        <option value="note">Lesson Note</option>
+                                        <option value="scheme">Scheme of Work</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Document Title</label>
+                                    <input type="text" id="materialTitle" class="form-control" placeholder="e.g. Week 1: Introduction to Algebra" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Target Class</label>
+                                    <select id="classSelect" class="form-select" required><option value="">Loading...</option></select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Subject</label>
+                                    <select id="subjectSelect" class="form-select" required><option value="">Loading...</option></select>
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <label class="form-label fw-bold text-success"><i class="fas fa-file-pdf me-2"></i> Select File (PDF or Word)</label>
+                                    <input type="file" id="materialFile" class="form-control py-2" accept=".pdf,.doc,.docx" required>
+                                </div>
+                            </div>
+                            <button type="submit" id="btnUpload" class="btn btn-success fw-bold w-100 py-2 shadow-sm"><i class="fas fa-upload me-2"></i> Upload to Portal</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="aiTab">
+                <div class="edu-card border-primary">
+                    <div class="edu-header bg-primary text-white"><i class="fas fa-magic me-2"></i> Generate Smart Lesson Plans</div>
+                    <div class="edu-body">
+                        <form id="aiForm">
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">Class Level</label>
+                                    <select id="aiClass" class="form-select" required></select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Subject</label>
+                                    <select id="aiSubject" class="form-select" required></select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-bold text-primary">Lesson Topic</label>
+                                    <input type="text" id="aiTopic" class="form-control form-control-lg border-primary" placeholder="What are you teaching today? (e.g. Photosynthesis)" required>
+                                </div>
+                            </div>
+                            <button type="submit" id="btnGenerate" class="btn btn-primary fw-bold w-100 py-3 shadow-sm" style="font-size: 1.1rem;">
+                                <i class="fas fa-robot me-2"></i> Generate AI Lesson Plan
+                            </button>
+                        </form>
+
+                        <div id="aiResultArea" class="ai-result-box shadow-inner mt-4">
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3" style="border-color: #b6d4fe !important;">
+                                <h4 class="fw-bold m-0 text-primary"><i class="fas fa-file-alt me-2"></i> Official Lesson Plan</h4>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-primary fw-bold me-2" onclick="copyAiText()"><i class="fas fa-copy me-1"></i> Copy</button>
+                                    <button class="btn btn-sm btn-primary fw-bold" onclick="downloadAiPdf()"><i class="fas fa-file-pdf me-1"></i> Save PDF</button>
+                                </div>
+                            </div>
+                            <div id="aiTextContent"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="manageTab">
+                <div class="edu-card border-warning">
+                    <div class="edu-header bg-warning text-dark"><i class="fas fa-folder-open me-2"></i> My Uploaded Repository</div>
+                    <div class="table-responsive p-0">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th width="35%" class="ps-4">Title</th>
+                                    <th width="15%">Type</th>
+                                    <th width="20%">Subject</th>
+                                    <th width="15%">Class</th>
+                                    <th width="15%" class="text-center pe-4">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="repoBody">
+                                <tr><td colspan="5" class="text-center py-5 text-muted">Loading repository...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+        let currentTeacherId = null;
+
+        // === UI TOGGLES ===
+        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('mobile-open'); document.getElementById('sidebarOverlay').style.display = document.getElementById('sidebarOverlay').style.display === 'block' ? 'none' : 'block'; };
+        window.toggleTheme = () => {
+            const body = document.body; body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { document.body.classList.add('dark-mode'); document.getElementById('themeIcon').className = 'fas fa-sun text-warning'; }
+
+        function showAlert(msg, isSuccess = true) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.className = `alert ${isSuccess ? 'alert-success' : 'alert-danger'} d-block shadow-sm mb-4`;
+            alertBox.innerHTML = `<i class="fas ${isSuccess ? 'fa-check-circle' : 'fa-exclamation-triangle'} me-2"></i> ${msg}`;
+            setTimeout(() => { alertBox.classList.add('d-none'); }, 5000);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // === INIT ===
+        async function initialize() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = 'login.html';
+                currentTeacherId = session.user.id;
+
+                const { data: profile } = await supabase.from('users').select('name').eq('id', currentTeacherId).single();
+                if(profile) document.getElementById('navTeacherName').innerText = profile.name;
+
+                // Load Dropdowns
+                const [classesRes, subjectsRes] = await Promise.all([
+                    supabase.from('classes').select('*').order('name'),
+                    supabase.from('subjects').select('*').order('name')
+                ]);
+
+                const pop = (data) => '<option value="" disabled selected>-- Select --</option>' + data.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+                
+                if (classesRes.data) {
+                    document.getElementById('classSelect').innerHTML = pop(classesRes.data);
+                    document.getElementById('aiClass').innerHTML = pop(classesRes.data);
+                }
+                if (subjectsRes.data) {
+                    document.getElementById('subjectSelect').innerHTML = pop(subjectsRes.data);
+                    document.getElementById('aiSubject').innerHTML = pop(subjectsRes.data);
+                }
+
+                await loadRepository();
+                document.getElementById('loadingOverlay').style.display = 'none';
+            } catch (err) { console.error(err); }
+        }
+
+        // === MATERIAL UPLOADER ===
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnUpload');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Uploading...';
+            btn.disabled = true;
+
+            const type = document.getElementById('materialType').value;
+            const title = document.getElementById('materialTitle').value;
+            const classId = document.getElementById('classSelect').value;
+            const subjectId = document.getElementById('subjectSelect').value;
+            const file = document.getElementById('materialFile').files[0];
+
+            try {
+                // 1. Upload to Storage Bucket 'materials'
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${type}_${currentTeacherId}_${Date.now()}.${fileExt}`;
+                const { error: uploadError } = await supabase.storage.from('materials').upload(fileName, file);
+                if (uploadError) throw new Error("Ensure 'materials' storage bucket exists and is public.");
+
+                // 2. Get Public URL
+                const { data: publicUrlData } = supabase.storage.from('materials').getPublicUrl(fileName);
+                const fileUrl = publicUrlData.publicUrl;
+
+                // 3. Fetch Subject Name (Needed for Lesson Notes table)
+                const { data: subj } = await supabase.from('subjects').select('name').eq('id', subjectId).single();
+                const subjectName = subj ? subj.name : 'General';
+
+                // 4. Insert into correct table based on type
+                if (type === 'scheme') {
+                    await supabase.from('schemes_of_work').insert([{ class_id: classId, subject_id: subjectId, title: title, file_url: fileUrl, teacher_id: currentTeacherId }]);
+                } else {
+                    await supabase.from('lesson_notes').insert([{ class_id: classId, subject_name: subjectName, title: title, file_url: fileUrl, teacher_id: currentTeacherId }]);
+                }
+
+                showAlert("Material successfully uploaded and shared with students!");
+                document.getElementById('uploadForm').reset();
+                await loadRepository();
+
+            } catch (err) {
+                showAlert(err.message, false);
+            } finally {
+                btn.innerHTML = '<i class="fas fa-upload me-2"></i> Upload to Portal';
+                btn.disabled = false;
+            }
+        });
+
+        // === REPOSITORY LOADER ===
+        async function loadRepository() {
+            try {
+                // Fetch from both tables
+                const { data: schemes } = await supabase.from('schemes_of_work').select('id, title, file_url, classes(name), subjects(name)').eq('teacher_id', currentTeacherId);
+                const { data: notes } = await supabase.from('lesson_notes').select('id, title, file_url, classes(name), subject_name').eq('teacher_id', currentTeacherId);
+
+                let allMats = [];
+                if (schemes) schemes.forEach(s => allMats.push({ id: s.id, title: s.title, type: 'Scheme of Work', url: s.file_url, class_name: s.classes?.name, subject_name: s.subjects?.name, table: 'schemes_of_work' }));
+                if (notes) notes.forEach(n => allMats.push({ id: n.id, title: n.title, type: 'Lesson Note', url: n.file_url, class_name: n.classes?.name, subject_name: n.subject_name, table: 'lesson_notes' }));
+
+                const tbody = document.getElementById('repoBody');
+                if (allMats.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5 text-muted">You haven't uploaded any materials yet.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = allMats.map(m => `
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td class="ps-4 fw-bold" style="color: var(--text-color);"><a href="${m.url}" target="_blank" class="text-decoration-none">${m.title}</a></td>
+                        <td><span class="badge ${m.type === 'Scheme of Work' ? 'bg-primary' : 'bg-success'}">${m.type}</span></td>
+                        <td style="color: var(--text-muted);">${m.subject_name}</td>
+                        <td style="color: var(--text-muted);">${m.class_name}</td>
+                        <td class="text-center pe-4">
+                            <button onclick="deleteMaterial('${m.id}', '${m.table}')" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (err) { console.error(err); }
+        }
+
+        window.deleteMaterial = async (id, table) => {
+            if (!confirm("Delete this material permanently?")) return;
+            await supabase.from(table).delete().eq('id', id);
+            await loadRepository();
+        };
+
+        // === AI LESSON PLANNER (Simulated streaming for realistic UX) ===
+        document.getElementById('aiForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnGenerate');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Analyzing Curriculum...';
+            btn.disabled = true;
+
+            const topic = document.getElementById('aiTopic').value;
+            const cls = document.getElementById('aiClass').options[document.getElementById('aiClass').selectedIndex].text;
+            const sub = document.getElementById('aiSubject').options[document.getElementById('aiSubject').selectedIndex].text;
+
+            // Show box, clear old text
+            const resBox = document.getElementById('aiResultArea');
+            const txtBox = document.getElementById('aiTextContent');
+            resBox.style.display = 'block';
+            txtBox.innerHTML = '';
+
+            // Simulate Network Delay & Stream Generation
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-robot me-2"></i> Generate AI Lesson Plan';
+                btn.disabled = false;
+                
+                const template = `
+<strong>LESSON PLAN OVERVIEW</strong><br>
+<strong>Subject:</strong> ${sub}<br>
+<strong>Class:</strong> ${cls}<br>
+<strong>Topic:</strong> ${topic}<br>
+<strong>Duration:</strong> 40 Minutes<br><br>
+
+<strong>1. BEHAVIORAL OBJECTIVES</strong><br>
+By the end of this lesson, students should be able to:<br>
+- Define ${topic} clearly.<br>
+- Identify the key components and real-world applications of ${topic}.<br>
+- Solve basic problems or answer structural questions related to the topic.<br><br>
+
+<strong>2. PREVIOUS KNOWLEDGE</strong><br>
+Students have a foundational understanding of the basic concepts leading up to ${topic}.<br><br>
+
+<strong>3. INSTRUCTIONAL MATERIALS</strong><br>
+- Interactive Whiteboard / Smart Screen<br>
+- Downloadable PDF Notes<br>
+- Visual diagrams and charts related to ${topic}<br><br>
+
+<strong>4. LESSON PRESENTATION (STEP-BY-STEP)</strong><br>
+<em>Step 1: Introduction (5 mins)</em><br>
+Hook the students' attention by asking a thought-provoking question about ${topic}. Connect it to their everyday lives.<br><br>
+
+<em>Step 2: Core Explanation (15 mins)</em><br>
+Break down the definition and characteristics of ${topic}. Use the instructional materials to provide visual context.<br><br>
+
+<em>Step 3: Interactive Session & Examples (10 mins)</em><br>
+Provide live examples. Call on random students to answer prompt questions to ensure active engagement.<br><br>
+
+<em>Step 4: Evaluation & Conclusion (10 mins)</em><br>
+Summarize the key points. Administer a quick 3-question oral quiz. Assign homework based on ${topic} to reinforce learning.<br>
+                `;
+
+                // Typewriter effect
+                let i = 0;
+                function typeWriter() {
+                    if (i < template.length) {
+                        // Allow HTML tags to render instantly without breaking
+                        if(template.charAt(i) === '<') {
+                            let tag = '';
+                            while(template.charAt(i) !== '>' && i < template.length) { tag += template.charAt(i); i++; }
+                            tag += '>';
+                            txtBox.innerHTML += tag;
+                            i++;
+                        } else {
+                            txtBox.innerHTML += template.charAt(i);
+                            i++;
+                        }
+                        setTimeout(typeWriter, 5);
+                    }
+                }
+                typeWriter();
+
+            }, 1500);
+        });
+
+        window.copyAiText = () => {
+            const text = document.getElementById('aiTextContent').innerText;
+            navigator.clipboard.writeText(text);
+            alert("Lesson Plan copied to clipboard!");
+        };
+
+        window.downloadAiPdf = () => {
+            const element = document.getElementById('aiTextContent');
+            const topic = document.getElementById('aiTopic').value || 'Lesson_Plan';
+            html2pdf().set({ margin: 15, filename: `${topic}_Plan.pdf` }).from(element).save();
+        };
+
+        document.addEventListener('DOMContentLoaded', initialize);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
+    </script>
+</body>
+</html>
