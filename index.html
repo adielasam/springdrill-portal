@@ -3,149 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRINGDRILL - Educational Portal</title>
+    <title>SPRINGDRILL - Secure Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* LANDING PAGE DARK MODE ENGINE */
-        :root {
-            --overlay-start: rgba(26, 60, 52, 0.85);
-            --overlay-end: rgba(26, 60, 52, 0.85);
-            --card-bg: rgba(255, 255, 255, 0.1);
-            --card-border: rgba(255, 255, 255, 0.2);
-            --text-color: #ffffff;
+        /* GLOBAL DARK MODE ENGINE */
+        :root { 
+            --bg-color: #f4f7fa; 
+            --card-bg: #ffffff; 
+            --text-color: #333333; 
+            --text-muted: #6c757d; 
+            --border-color: #e9ecef; 
+            --input-bg: #ffffff; 
+            --demo-bg: #e8f5e9;
+            --demo-border: #2ecc71;
+        }
+        body.dark-mode { 
+            --bg-color: #121212; 
+            --card-bg: #1e1e1e; 
+            --text-color: #e0e0e0; 
+            --text-muted: #a0a0a0; 
+            --border-color: #333333; 
+            --input-bg: #2c2c2c; 
+            --demo-bg: rgba(46, 204, 113, 0.05);
+            --demo-border: #007a4d;
         }
 
-        body.dark-mode {
-            --overlay-start: rgba(15, 15, 15, 0.92);
-            --overlay-end: rgba(10, 10, 10, 0.95);
-            --card-bg: rgba(0, 0, 0, 0.4);
-            --card-border: rgba(255, 255, 255, 0.05);
-            --text-color: #e0e0e0;
-        }
-
-        body {
-            background: linear-gradient(var(--overlay-start), var(--overlay-end)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-color);
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
             margin: 0;
-            transition: color 0.3s;
-        }
-        
-        /* Floating Dark Mode Toggle */
-        .floating-theme-btn {
-            position: absolute;
-            top: 25px;
-            right: 30px;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            color: #f1c40f;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-            z-index: 100;
-            font-size: 1.2rem;
-        }
-        .floating-theme-btn:hover {
-            transform: scale(1.1);
-            background: rgba(255, 255, 255, 0.2);
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        .hero-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            padding: 4rem 3rem;
-            border-radius: 24px;
-            border: 1px solid var(--card-border);
-            text-align: center;
-            max-width: 800px;
-            width: 90%;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-            transition: background 0.3s, border 0.3s;
-        }
-        .logo-icon {
-            font-size: 4rem;
-            color: #f1c40f;
-            margin-bottom: 20px;
-        }
-        .btn-portal {
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            border-radius: 50px;
-            transition: all 0.3s ease;
-            margin: 10px;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-student {
-            background: #2ecc71;
-            color: white;
-            border: 2px solid #2ecc71;
-        }
-        .btn-teacher {
-            background: transparent;
-            color: white;
-            border: 2px solid #3498db;
-        }
-        .btn-portal:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            color: white;
-        }
-        .btn-teacher:hover {
-            background: #3498db;
-        }
-        .auth-links {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid var(--card-border);
-            transition: border 0.3s;
+        /* Dark Mode Toggle */
+        .dark-toggle-btn { position: absolute; top: 20px; right: 30px; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.05); z-index: 100; }
+        .dark-toggle-btn:hover { transform: scale(1.1); }
+
+        /* Login Container */
+        .login-wrapper { display: flex; max-width: 950px; width: 95%; background: var(--card-bg); border-radius: 12px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.08); border: 1px solid var(--border-color); transition: all 0.3s;}
+        
+        /* Left Panel */
+        .login-left { background: linear-gradient(145deg, #007a4d 0%, #004d34 100%); color: white; padding: 50px 40px; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .login-left i { font-size: 4rem; color: #f1c40f; margin-bottom: 20px; }
+        .login-left h2 { font-weight: 900; letter-spacing: 1px; margin-bottom: 15px; }
+        .login-left p { font-size: 1.05rem; opacity: 0.9; line-height: 1.6; }
+
+        /* Right Panel */
+        .login-right { padding: 40px 50px; flex: 1.3; display: flex; flex-direction: column; justify-content: center; }
+        
+        /* Demo Box */
+        .demo-box { background-color: var(--demo-bg); border: 1px solid var(--demo-border); border-radius: 8px; padding: 20px; margin-bottom: 30px; transition: all 0.3s; }
+        .demo-creds { border: 1px dashed var(--demo-border); background-color: var(--card-bg); padding: 12px; border-radius: 6px; font-family: monospace; font-size: 0.85rem; height: 100%; transition: all 0.3s;}
+        .demo-title { color: #007a4d; font-weight: 800; margin-bottom: 5px; font-family: sans-serif;}
+        body.dark-mode .demo-title { color: #2ecc71; }
+
+        .partnership-btn { background-color: #007a4d; color: white; text-align: center; padding: 10px; border-radius: 6px; font-weight: bold; margin-top: 15px; font-size: 0.9rem; }
+
+        /* Form Elements */
+        .login-right h3 { font-weight: 800; color: var(--text-color); margin-bottom: 25px; }
+        .form-label { font-size: 0.75rem; font-weight: bold; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .input-group-text { background-color: var(--input-bg); border-color: var(--border-color); color: var(--text-muted); border-right: none; transition: all 0.3s;}
+        .form-control { background-color: var(--input-bg); border-color: var(--border-color); color: var(--text-color); border-left: none; padding: 12px 15px; transition: all 0.3s; }
+        .form-control:focus { box-shadow: none; border-color: #007a4d; background-color: var(--card-bg); color: var(--text-color);}
+        .form-control:focus + .input-group-text, .input-group:focus-within .input-group-text { border-color: #007a4d; color: #007a4d; }
+        
+        .btn-submit { background-color: #007a4d; color: white; font-weight: bold; padding: 12px; border-radius: 6px; border: none; width: 100%; transition: 0.3s; font-size: 1.05rem; margin-top: 15px;}
+        .btn-submit:hover { background-color: #005a38; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 122, 77, 0.3); }
+
+        @media (max-width: 992px) {
+            .login-wrapper { flex-direction: column; margin-top: 80px; margin-bottom: 30px; }
+            .login-left { padding: 40px 20px; }
+            .login-right { padding: 30px 20px; }
         }
     </style>
 </head>
 <body>
 
-    <button class="floating-theme-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
+    <button class="dark-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
         <i class="fas fa-moon" id="themeIcon"></i>
     </button>
 
-    <div class="hero-card">
-        <i class="fas fa-graduation-cap logo-icon"></i>
-        <h1 class="display-3 fw-bold mb-3">SPRINGDRILL</h1>
-        <p class="lead mb-5">Access your exams, results, and interactive learning resources in one secure, centralized portal.</p>
-        
-        <div class="d-flex flex-wrap justify-content-center">
-            <a href="login.html" class="btn btn-portal btn-student shadow">
-                <i class="fas fa-user-graduate me-2"></i> Student Portal
-            </a>
-            <a href="login.html" class="btn btn-portal btn-teacher shadow">
-                <i class="fas fa-chalkboard-teacher me-2"></i> Staff Portal
-            </a>
+    <div class="login-wrapper">
+        <div class="login-left">
+            <i class="fas fa-graduation-cap"></i>
+            <h2>SPRINGDRILL</h2>
+            <p>The ultimate digital infrastructure for modern schools. Manage CBT, Results, eClassrooms, and Administration all in one secure place.</p>
         </div>
-        
-        <div class="auth-links">
-            <p class="mb-0" style="color: var(--text-color);">New to the platform? <a href="signup.html" class="text-warning fw-bold text-decoration-none ms-2">Create an Account</a></p>
+
+        <div class="login-right">
+            
+            <div class="demo-box">
+                <h6 class="fw-bold mb-2" style="color: #007a4d;"><i class="fas fa-rocket text-warning me-2"></i>Test Drive the Portal!</h6>
+                <p class="small mb-3" style="color: var(--text-color);">Want to see how this system works? Try it using the demo credentials below:</p>
+
+                <div class="row g-2">
+                    <div class="col-sm-6">
+                        <div class="demo-creds shadow-sm">
+                            <div class="demo-title"><i class="fas fa-user-graduate me-1"></i> Student Login</div>
+                            <span class="text-muted">Email:</span> <span class="fw-bold text-primary" style="word-break: break-all;">sam.john4331@springdrill.edu</span><br>
+                            <span class="text-muted">Pass:</span> <span class="fw-bold text-dark">Spring7067!</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="demo-creds shadow-sm">
+                            <div class="demo-title"><i class="fas fa-chalkboard-teacher me-1"></i> Teacher Login</div>
+                            <span class="text-muted">Email:</span> <span class="fw-bold text-primary" style="word-break: break-all;">chukwuemaka.john1560@springdrill.edu</span><br>
+                            <span class="text-muted">Pass:</span> <span class="fw-bold text-dark">Spring1187!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="partnership-btn shadow-sm">
+                    <i class="fas fa-handshake me-2"></i> For Partnership & Purchase: 08162337303
+                </div>
+            </div>
+
+            <h3>Account Login</h3>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label"><i class="fas fa-envelope me-1"></i> USERNAME OR EMAIL</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="email" id="email" class="form-control" placeholder="Enter your registered email" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label"><i class="fas fa-lock me-1"></i> PASSWORD</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                        <input type="password" id="password" class="form-control" placeholder="Enter your secure password" required>
+                    </div>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="rememberMe" style="accent-color: #007a4d;">
+                    <label class="form-check-label small fw-bold" for="rememberMe" style="color: var(--text-muted);">
+                        Remember me
+                    </label>
+                </div>
+
+                <button type="submit" id="loginBtn" class="btn-submit">
+                    Secure Sign In <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+            </form>
+
         </div>
     </div>
 
     <script type="module">
         import { supabase } from './supabaseClient.js';
-        
-        // === GLOBAL DARK MODE ENGINE ===
+
+        // === DARK MODE ENGINE ===
         window.toggleTheme = () => {
             const body = document.body;
             body.classList.toggle('dark-mode');
@@ -159,32 +174,51 @@
             document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
         }
 
-        window.addEventListener('storage', (event) => {
-            if (event.key === 'SPRINGDRILL_THEME') {
-                const isDark = event.newValue === 'dark';
-                isDark ? document.body.classList.add('dark-mode') : document.body.classList.remove('dark-mode');
-                document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
-            }
-        });
+        // === AUTHENTICATION LOGIC ===
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
 
-        // === AUTO-REDIRECT LOGIC ===
-        async function checkSession() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                const { data: profile } = await supabase
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Authenticating...';
+            btn.disabled = true;
+
+            try {
+                // 1. Sign In via Supabase Auth
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                });
+
+                if (error) throw error;
+
+                // 2. Fetch User Profile to determine role
+                const { data: profile, error: profileErr } = await supabase
                     .from('users')
                     .select('role')
-                    .eq('id', session.user.id)
+                    .eq('id', data.user.id)
                     .single();
-                
-                if (profile) {
-                    if (profile.role === 'admin') window.location.href = 'admin_dashboard.html';
-                    else if (profile.role === 'teacher') window.location.href = 'teacher_dashboard.html';
-                    else window.location.href = 'student_dashboard.html';
+
+                if (profileErr || !profile) throw new Error("Could not verify account role.");
+
+                // 3. Route to Correct Dashboard
+                if (profile.role === 'admin') {
+                    window.location.href = 'admin_dashboard.html';
+                } else if (profile.role === 'teacher') {
+                    window.location.href = 'teacher_dashboard.html';
+                } else if (profile.role === 'student') {
+                    window.location.href = 'student_dashboard.html';
+                } else {
+                    throw new Error("Invalid role assigned to this account.");
                 }
+
+            } catch (err) {
+                alert("Login Failed: " + err.message);
+                btn.innerHTML = 'Secure Sign In <i class="fas fa-arrow-right ms-2"></i>';
+                btn.disabled = false;
             }
-        }
-        document.addEventListener('DOMContentLoaded', checkSession);
+        });
     </script>
 </body>
 </html>

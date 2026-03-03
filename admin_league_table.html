@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - Academic League Table</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* GLOBAL DARK MODE ENGINE */
+        :root { 
+            --bg-color: #f4f7fa; 
+            --card-bg: #ffffff; 
+            --text-color: #333333; 
+            --text-muted: #6c757d; 
+            --border-color: #e9ecef; 
+            --input-bg: #f8f9fa; 
+            --podium-bg: #ffffff;
+        }
+        body.dark-mode { 
+            --bg-color: #121212; 
+            --card-bg: #1e1e1e; 
+            --text-color: #e0e0e0; 
+            --text-muted: #a0a0a0; 
+            --border-color: #333333; 
+            --input-bg: #2c2c2c; 
+            --podium-bg: #1a1a1a;
+        }
+
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+        
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1050; transition: transform 0.3s ease; }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center;}
+        .nav-link i { width: 25px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
+        
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #f1c40f; transition: all 0.3s; }
+        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+
+        /* PODIUM STYLES */
+        .podium-container { display: flex; justify-content: center; align-items: flex-end; gap: 20px; margin-bottom: 40px; padding: 20px 0; }
+        .podium-card { background: var(--podium-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; width: 220px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); position: relative; transition: all 0.3s; }
+        .podium-card img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 4px solid var(--input-bg); margin-bottom: 15px; background: white;}
+        .podium-card h5 { font-weight: 800; font-size: 1.1rem; margin-bottom: 5px; color: var(--text-color);}
+        .podium-card p { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 10px; font-weight: bold;}
+        .podium-points { font-size: 1.5rem; font-weight: 900; }
+        
+        .rank-1 { transform: translateY(-30px); border-top: 5px solid #f1c40f; } /* Gold */
+        .rank-1 .crown { color: #f1c40f; font-size: 2.5rem; position: absolute; top: -35px; left: 50%; transform: translateX(-50%); text-shadow: 0 4px 10px rgba(241, 196, 15, 0.4);}
+        .rank-1 .podium-points { color: #f1c40f; }
+
+        .rank-2 { border-top: 5px solid #bdc3c7; } /* Silver */
+        .rank-2 .crown { color: #bdc3c7; font-size: 2rem; position: absolute; top: -25px; left: 50%; transform: translateX(-50%);}
+        .rank-2 .podium-points { color: #bdc3c7; }
+
+        .rank-3 { border-top: 5px solid #cd7f32; } /* Bronze */
+        .rank-3 .crown { color: #cd7f32; font-size: 2rem; position: absolute; top: -25px; left: 50%; transform: translateX(-50%);}
+        .rank-3 .podium-points { color: #cd7f32; }
+
+        /* Table */
+        .edu-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: all 0.3s; }
+        .edu-header { background-color: #007a4d; color: white; padding: 15px 20px; border-radius: 8px 8px 0 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center;}
+        
+        .table { color: var(--text-color); border-color: var(--border-color); margin-bottom: 0;}
+        .table th { border-top: none; color: var(--text-muted); font-weight: 800; text-transform: uppercase; font-size: 0.8rem; background-color: var(--input-bg); padding: 15px;}
+        .table td { vertical-align: middle; font-size: 0.95rem; padding: 15px; font-weight: 500;}
+        .table-hover tbody tr:hover { background-color: var(--input-bg); color: var(--text-color); }
+        
+        .form-select { background-color: var(--input-bg); color: var(--text-color); border-color: var(--border-color); font-weight: bold;}
+        .form-select:focus { background-color: var(--card-bg); color: var(--text-color); border-color: #f1c40f; box-shadow: none;}
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .top-navbar { padding: 15px; flex-direction: column; gap: 15px; align-items: stretch; }
+            .podium-container { flex-direction: column; align-items: center; gap: 40px; margin-top: 40px;}
+            .rank-1 { transform: translateY(0); order: -1; } /* Gold on top for mobile */
+        }
+        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
+        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
+        @media (max-width: 992px) { .mobile-menu-toggle { display: inline-block; } }
+    </style>
+</head>
+<body>
+    <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-warning mb-3"></i><h4 class="fw-bold" style="color: var(--text-muted);">Calculating Rankings...</h4></div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
+            <h5 class="text-white fw-bold m-0"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
+            <button class="btn btn-sm btn-link text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        </div>
+        <nav class="nav flex-column mt-3">
+            <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
+            
+            <a href="#usersMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
+                <span><i class="fas fa-users me-2"></i> Accounts</span><i class="fas fa-caret-down"></i>
+            </a>
+            <div class="collapse bg-dark mx-2 mt-1 rounded" id="usersMenu">
+                <a href="admin_create_user.html" class="nav-link small py-2"><i class="fas fa-user-plus me-2"></i> Generate Account</a>
+                <a href="manage_users.html" class="nav-link small py-2"><i class="fas fa-user-check me-2"></i> Approvals</a>
+                <a href="class_list.html" class="nav-link small py-2"><i class="fas fa-clipboard-list me-2"></i> Class Data</a>
+            </div>
+
+            <a href="admin_league_table.html" class="nav-link active mt-2"><i class="fas fa-trophy text-warning me-2"></i> League Table</a>
+            
+            <a href="admin_messages.html" class="nav-link mt-2"><i class="fas fa-envelope me-2"></i> Internal Mail</a>
+            <hr class="mx-3 my-4 border-secondary">
+            <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="fw-bold d-none d-lg-block" style="color: var(--text-muted);"><i class="fas fa-trophy text-warning me-2"></i> Academic League Table</div>
+            </div>
+            <div class="d-flex align-items-center ms-auto">
+                <select class="form-select me-4 shadow-sm" id="classFilter" style="max-width: 200px;">
+                    <option value="ALL">All Classes (Global)</option>
+                </select>
+                <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode"><i class="fas fa-moon" id="themeIcon"></i></button>
+                <div class="fw-bold d-flex align-items-center" style="color: var(--text-color);">
+                    <span id="adminName">Admin Panel</span><i class="fas fa-user-shield ms-3 fs-4 text-primary"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="podium-container" id="podiumArea">
+            </div>
+
+        <div class="edu-card">
+            <div class="edu-header bg-dark border-bottom border-warning">
+                <span><i class="fas fa-list-ol me-2 text-warning"></i> Full Ranking Directory</span>
+            </div>
+            <div class="table-responsive p-0">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th width="10%" class="text-center">Rank</th>
+                            <th width="35%">Student Name</th>
+                            <th width="20%">Class</th>
+                            <th width="15%" class="text-center">Exams Taken</th>
+                            <th width="20%" class="text-center">Total Points</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leagueTableBody">
+                        <tr><td colspan="5" class="text-center py-5" style="color: var(--text-muted);">Compiling statistics...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        let allRankings = []; // Stores the calculated leaderboard
+
+        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('mobile-open'); document.getElementById('sidebarOverlay').style.display = document.getElementById('sidebarOverlay').style.display === 'block' ? 'none' : 'block'; };
+        
+        window.toggleTheme = () => {
+            const body = document.body; body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { document.body.classList.add('dark-mode'); document.getElementById('themeIcon').className = 'fas fa-sun text-warning'; }
+
+        async function initLeagueTable() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = 'login.html';
+                
+                const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
+                if(profile) document.getElementById('adminName').innerText = profile.name;
+
+                // Load Classes for Filter
+                const { data: classes } = await supabase.from('classes').select('id, name').order('name');
+                if (classes) {
+                    const filter = document.getElementById('classFilter');
+                    classes.forEach(c => filter.innerHTML += `<option value="${c.id}">${c.name}</option>`);
+                }
+
+                await calculateRankings();
+                document.getElementById('loadingOverlay').style.display = 'none';
+
+                // Listen for class filter change
+                document.getElementById('classFilter').addEventListener('change', renderLeague);
+
+            } catch (err) { console.error(err); }
+        }
+
+        async function calculateRankings() {
+            // 1. Fetch Students
+            const { data: students } = await supabase.from('students').select('user_id, first_name, surname, passport_url, class_id, classes(name)').eq('approved', true);
+            if (!students) return;
+
+            // 2. Fetch ALL Test Results
+            const { data: results } = await supabase.from('test_results').select('student_id, score');
+            
+            // 3. Aggregate Points
+            const pointsMap = {};
+            if(results) {
+                results.forEach(r => {
+                    if (!pointsMap[r.student_id]) pointsMap[r.student_id] = { total_score: 0, exams_taken: 0 };
+                    pointsMap[r.student_id].total_score += r.score;
+                    pointsMap[r.student_id].exams_taken += 1;
+                });
+            }
+
+            // 4. Combine & Sort
+            allRankings = students.map(s => {
+                const stats = pointsMap[s.user_id] || { total_score: 0, exams_taken: 0 };
+                return {
+                    id: s.user_id,
+                    name: `${s.first_name} ${s.surname || ''}`,
+                    class_id: s.class_id,
+                    class_name: s.classes?.name || 'Unassigned',
+                    points: stats.total_score,
+                    exams: stats.exams_taken,
+                    photo: s.passport_url || `https://ui-avatars.com/api/?name=${s.first_name}+${s.surname}&background=f1c40f&color=000`
+                };
+            }).filter(s => s.exams > 0); // Only show students who have actually taken tests
+
+            renderLeague();
+        }
+
+        function renderLeague() {
+            const filterId = document.getElementById('classFilter').value;
+            
+            // Filter by class if selected
+            let displayList = [...allRankings];
+            if (filterId !== 'ALL') {
+                displayList = displayList.filter(s => s.class_id == filterId);
+            }
+
+            // Sort by points highest to lowest
+            displayList.sort((a, b) => b.points - a.points);
+
+            renderPodium(displayList.slice(0, 3));
+            renderTable(displayList);
+        }
+
+        function renderPodium(top3) {
+            const podiumArea = document.getElementById('podiumArea');
+            if (top3.length === 0) {
+                podiumArea.innerHTML = `<div class="text-muted fw-bold">No data available to generate podium.</div>`;
+                return;
+            }
+
+            // Ensure we have 3 slots even if null
+            const first = top3[0];
+            const second = top3[1];
+            const third = top3[2];
+
+            let html = '';
+
+            // Silver (2nd) - placed first in HTML for flexbox layout order
+            if (second) {
+                html += `
+                <div class="podium-card rank-2">
+                    <i class="fas fa-crown crown"></i>
+                    <img src="${second.photo}" alt="2nd">
+                    <h5>${second.name}</h5>
+                    <p>${second.class_name}</p>
+                    <div class="podium-points">${second.points} PTS</div>
+                </div>`;
+            }
+
+            // Gold (1st) - placed middle
+            if (first) {
+                html += `
+                <div class="podium-card rank-1">
+                    <i class="fas fa-crown crown"></i>
+                    <img src="${first.photo}" alt="1st">
+                    <h5>${first.name}</h5>
+                    <p>${first.class_name}</p>
+                    <div class="podium-points">${first.points} PTS</div>
+                </div>`;
+            }
+
+            // Bronze (3rd) - placed last
+            if (third) {
+                html += `
+                <div class="podium-card rank-3">
+                    <i class="fas fa-crown crown"></i>
+                    <img src="${third.photo}" alt="3rd">
+                    <h5>${third.name}</h5>
+                    <p>${third.class_name}</p>
+                    <div class="podium-points">${third.points} PTS</div>
+                </div>`;
+            }
+
+            podiumArea.innerHTML = html;
+        }
+
+        function renderTable(list) {
+            const tbody = document.getElementById('leagueTableBody');
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5" style="color: var(--text-muted);">No student rankings found for this selection.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map((s, index) => {
+                const rank = index + 1;
+                let rankDisplay = rank;
+                let rowStyle = '';
+
+                if (rank === 1) { rankDisplay = '<i class="fas fa-medal text-warning fa-lg"></i>'; rowStyle='background: rgba(241, 196, 15, 0.05);';}
+                else if (rank === 2) { rankDisplay = '<i class="fas fa-medal fa-lg" style="color: #bdc3c7;"></i>'; }
+                else if (rank === 3) { rankDisplay = '<i class="fas fa-medal fa-lg" style="color: #cd7f32;"></i>'; }
+
+                return `
+                    <tr style="border-bottom: 1px solid var(--border-color); ${rowStyle}">
+                        <td class="text-center fw-bold fs-5">${rankDisplay}</td>
+                        <td class="fw-bold" style="color: var(--text-color);">
+                            <img src="${s.photo}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; margin-right: 10px;">
+                            ${s.name}
+                        </td>
+                        <td style="color: var(--text-muted);">${s.class_name}</td>
+                        <td class="text-center fw-bold" style="color: var(--text-muted);">${s.exams}</td>
+                        <td class="text-center fw-bold text-success fs-6">${s.points} Pts</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', initLeagueTable);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
+    </script>
+</body>
+</html>

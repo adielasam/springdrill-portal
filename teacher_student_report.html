@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - Student Report Card</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        /* GLOBAL DARK MODE ENGINE */
+        :root { --bg-color: #525659; --action-bar-bg: #1a3c34; }
+        body.dark-mode { --bg-color: #121212; --action-bar-bg: #111111; }
+        body { background-color: var(--bg-color); font-family: 'Times New Roman', Times, serif; transition: background-color 0.3s; }
+        
+        .action-bar { background: var(--action-bar-bg); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: background-color 0.3s;}
+        .action-bar button, .action-bar a { font-family: sans-serif; font-weight: bold; }
+        .dark-toggle-btn { background: transparent; border: 1px solid rgba(255,255,255,0.5); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        
+        /* A4 Report Card Container - STRICTLY WHITE FOR PDF PRINTING */
+        .report-wrapper { display: flex; justify-content: center; padding: 40px 15px; }
+        .report-card { background: white !important; color: black !important; width: 210mm; min-height: 297mm; padding: 40px 50px; box-shadow: 0 0 20px rgba(0,0,0,0.5); position: relative; transition: none; }
+        
+        .school-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 20px;}
+        .school-title-section { text-align: center; flex-grow: 1; }
+        .school-name { font-size: 36px; font-weight: 900; color: #007a4d; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000; letter-spacing: 1px; margin-bottom: 5px; font-family: 'Arial Black', sans-serif;}
+        .school-address { font-size: 14px; font-weight: bold; text-transform: uppercase; margin-bottom: 5px;}
+        .school-contact { font-size: 14px; margin-bottom: 15px; }
+        .report-title { font-size: 18px; font-weight: bold; color: #007a4d; text-decoration: underline; text-transform: uppercase;}
+        
+        .student-photo { width: 120px; height: 140px; border: 2px solid #000; object-fit: cover; }
+        .logo-placeholder { width: 100px; height: 100px; object-fit: contain;}
+        
+        .details-row { display: flex; justify-content: space-between; font-size: 15px; font-weight: bold; color: #d9534f; text-transform: uppercase; margin-bottom: 15px;}
+        .details-row span { color: #000; }
+        
+        table.report-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 2px solid #000; }
+        table.report-table th, table.report-table td { border: 1px solid #000; padding: 6px; text-align: center; font-size: 13px; font-weight: bold; color: #000; }
+        table.report-table td.subj-name { text-align: left; text-transform: uppercase; }
+        
+        .footer-section { border: 2px solid #000; padding: 10px; font-size: 14px; font-weight: bold; text-transform: uppercase; line-height: 1.8;}
+
+        @media (max-width: 768px) {
+            .report-card { width: 100%; min-height: auto; padding: 20px; }
+            .school-header { flex-direction: column; text-align: center; gap: 15px; }
+            .school-name { font-size: 24px; }
+            .details-row { flex-direction: column; text-align: center; gap: 5px; }
+            .action-bar { flex-direction: column; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="action-bar" id="actionBar">
+        <a href="teacher_class_list.html" class="btn btn-outline-light btn-sm"><i class="fas fa-arrow-left me-1"></i> Back to Roster</a>
+        <button class="btn btn-success shadow px-4 py-2" onclick="window.downloadPDF()"><i class="fas fa-file-pdf me-2"></i> Download Official Report</button>
+        <button class="dark-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
+            <i class="fas fa-moon" id="themeIcon"></i>
+        </button>
+    </div>
+
+    <div class="report-wrapper">
+        <div class="report-card" id="printableReport">
+            <div class="school-header">
+                <img src="" id="photoBox" class="student-photo" alt="Student">
+                <div class="school-title-section">
+                    <div class="school-name">SPRINGDRILL ACADEMY</div>
+                    <div class="school-address">123 SPRINGDRILL AVENUE, EDUCATION DISTRICT</div>
+                    <div class="school-contact">Email : admin@springdrill.edu<br>Website: www.springdrill.edu</div>
+                    <div class="report-title">PROGRESS REPORT</div>
+                </div>
+                <img src="https://cdn-icons-png.flaticon.com/512/3233/3233483.png" class="logo-placeholder" alt="Logo">
+            </div>
+
+            <div class="details-row"><div>NAME: <span id="rName">LOADING...</span></div><div>CLASS: <span id="rClass">LOADING...</span></div></div>
+            <div class="details-row"><div>STUDENT ID: <span id="rId">--</span></div><div>TERM: <span>FIRST TERM</span></div></div>
+            <div class="details-row text-danger"><div>SCHOOL RE-OPENS: <span>TBA</span></div><div>SESSION: <span>2025/2026</span></div></div>
+
+            <table class="report-table">
+                <thead>
+                    <tr><th width="5%">S/N</th><th width="35%">SUBJECT</th><th width="15%">EXAM (100%)</th><th width="15%">GRADE</th><th width="30%">REMARK</th></tr>
+                </thead>
+                <tbody id="reportTbody"><tr><td colspan="5">Compiling records...</td></tr></tbody>
+            </table>
+
+            <div class="footer-section">
+                <div>AVERAGE: <span id="rAverage">--</span></div>
+                <div style="border-top: 1px solid #000; margin-top: 5px; padding-top: 5px;">SUPERVISOR'S REMARK: <span style="font-weight: normal;">Participates well. Keep up the good work.</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        window.toggleTheme = () => {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
+        }
+
+        async function generateReport() {
+            try {
+                const targetStudentId = new URLSearchParams(window.location.search).get('student_id');
+                if (!targetStudentId) return window.location.href = 'teacher_class_list.html';
+
+                const { data: student } = await supabase.from('students').select('*, classes(name)').eq('user_id', targetStudentId).single();
+                
+                document.getElementById('rName').innerText = `${student.surname || ''} ${student.first_name || ''}`;
+                document.getElementById('rClass').innerText = student.classes?.name || 'UNASSIGNED';
+                document.getElementById('rId').innerText = student.reg_number || 'N/A';
+
+                const photoUrl = student.passport_url || `https://ui-avatars.com/api/?name=${student.first_name}+${student.surname}&background=ffffff&color=000&size=256`;
+                document.getElementById('photoBox').src = photoUrl;
+
+                const { data: rawResults } = await supabase.from('test_results').select('score, total_questions, tests(subjects(name))').eq('student_id', targetStudentId);
+                
+                let htmlRows = '', sn = 1, sum = 0, count = 0;
+                
+                if (rawResults) {
+                    rawResults.forEach(r => {
+                        const subj = r.tests?.subjects?.name || 'TEST';
+                        const score = Math.round((r.score / (r.total_questions || 1)) * 100);
+                        sum += score; count++;
+                        let grade = score >= 70 ? 'A' : score >= 60 ? 'B' : score >= 50 ? 'C' : score >= 40 ? 'P' : 'F';
+                        let remark = score >= 70 ? 'EXCELLENT' : score >= 50 ? 'CREDIT' : score >= 40 ? 'PASS' : 'FAIL';
+                        htmlRows += `<tr><td>${sn++}</td><td class="subj-name">${subj}</td><td>${score}</td><td>${grade}</td><td>${remark}</td></tr>`;
+                    });
+                }
+                while (sn <= 10) htmlRows += `<tr><td>${sn++}</td><td></td><td></td><td></td><td></td></tr>`;
+                
+                document.getElementById('reportTbody').innerHTML = htmlRows;
+                document.getElementById('rAverage').innerText = count > 0 ? (sum/count).toFixed(1) : '0';
+            } catch (err) { console.error("Error loading report:", err); }
+        }
+
+        document.addEventListener('DOMContentLoaded', generateReport);
+        
+        window.downloadPDF = function() {
+            document.getElementById('actionBar').style.display = 'none';
+            html2pdf().set({ 
+                margin: 0, 
+                filename: `Report_Card_${document.getElementById('rName').innerText}.pdf`, 
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            }).from(document.getElementById('printableReport')).save().then(() => { 
+                document.getElementById('actionBar').style.display = 'flex'; 
+            });
+        };
+    </script>
+</body>
+</html>

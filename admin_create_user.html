@@ -7,38 +7,104 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --bg-color: #f4f7fa; --card-bg: #ffffff; --text-color: #333333; --border-color: #e9ecef; --input-bg: #f8f9fa; }
-        body.dark-mode { --bg-color: #121212; --card-bg: #1e1e1e; --text-color: #e0e0e0; --border-color: #333333; --input-bg: #2c2c2c; }
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', sans-serif; }
-        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1050; }
+        /* GLOBAL DARK MODE ENGINE */
+        :root { 
+            --bg-color: #f4f7fa; 
+            --card-bg: #ffffff; 
+            --text-color: #333333; 
+            --text-muted: #6c757d; 
+            --border-color: #e9ecef; 
+            --input-bg: #f8f9fa; 
+        }
+        body.dark-mode { 
+            --bg-color: #121212; 
+            --card-bg: #1e1e1e; 
+            --text-color: #e0e0e0; 
+            --text-muted: #a0a0a0; 
+            --border-color: #333333; 
+            --input-bg: #2c2c2c; 
+        }
+
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+        
+        /* Sidebar Styling */
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1050; transition: transform 0.3s ease; }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; font-size: 0.95rem; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center;}
+        .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
-        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
-        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d;}
-        .edu-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        
+        /* Top Navbar */
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d; transition: all 0.3s; }
+        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .dark-toggle-btn:hover { transform: scale(1.1); }
+
+        .edu-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: all 0.3s; }
         .edu-header { background-color: #007a4d; color: white; padding: 12px 20px; border-radius: 4px 4px 0 0; font-weight: bold; }
-        .form-control, .form-select { background-color: var(--input-bg); color: var(--text-color); border-color: var(--border-color); }
-        .form-control:focus, .form-select:focus { background-color: var(--card-bg); color: var(--text-color); }
-        #classAssignmentSection { display: none; background: rgba(0, 122, 77, 0.05); padding: 20px; border-radius: 8px; border: 1px dashed #007a4d; }
+        
+        .form-control, .form-select { padding: 10px 15px; border-radius: 4px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); transition: all 0.3s; }
+        .form-control:focus, .form-select:focus { border-color: #007a4d; box-shadow: 0 0 0 0.25rem rgba(0, 122, 77, 0.25); background-color: var(--card-bg); color: var(--text-color); }
+        
+        #classAssignmentSection { display: none; background: var(--input-bg); padding: 20px; border-radius: 8px; border: 1px dashed #007a4d; transition: all 0.3s; }
+        #studentDOBSection { display: none; background: rgba(241, 196, 15, 0.05); padding: 20px; border-radius: 8px; border: 1px dashed #f1c40f; transition: all 0.3s; }
+
+        /* MOBILE OPTIMIZATION */
+        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
+        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
+        
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); box-shadow: 2px 0 15px rgba(0,0,0,0.3); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .mobile-menu-toggle { display: inline-block; }
+            .top-navbar { padding: 15px; flex-direction: column; gap: 15px; align-items: stretch; }
+            .header-profile-section { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="sidebar-brand"><h5 class="text-white fw-bold"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5></div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
+            <h5 class="text-white fw-bold m-0"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
+            <button class="btn btn-sm btn-link text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        </div>
         <nav class="nav flex-column mt-3">
-            <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
-            <a href="admin_create_user.html" class="nav-link active"><i class="fas fa-user-plus me-2"></i> Generate Account</a>
-            <a href="manage_users.html" class="nav-link"><i class="fas fa-user-check me-2"></i> Approvals</a>
+            <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="#usersMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
+                <span><i class="fas fa-users me-2"></i> Accounts</span><i class="fas fa-caret-down"></i>
+            </a>
+            <div class="collapse show bg-dark mx-2 mt-1 rounded" id="usersMenu">
+                <a href="admin_create_user.html" class="nav-link small py-2 active text-success fw-bold"><i class="fas fa-user-plus me-2"></i> Generate Account</a>
+                <a href="manage_users.html" class="nav-link small py-2"><i class="fas fa-user-check me-2"></i> Approvals</a>
+                <a href="class_list.html" class="nav-link small py-2"><i class="fas fa-clipboard-list me-2"></i> Class Data</a>
+            </div>
+            <a href="admin_messages.html" class="nav-link mt-2"><i class="fas fa-envelope me-2"></i> Internal Mail</a>
             <hr class="mx-3 my-4 border-secondary">
-            <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+            <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </div>
 
     <div class="main-content">
         <div class="top-navbar">
-            <div class="fw-bold text-muted"><i class="fas fa-shield-alt me-2"></i> System Administration</div>
-            <div class="fw-bold text-dark"><span id="adminName">Loading...</span><i class="fas fa-user-shield ms-3 text-primary"></i></div>
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="fw-bold d-none d-lg-block" style="color: var(--text-muted);"><i class="fas fa-shield-alt me-2"></i> System Administration</div>
+            </div>
+
+            <div class="header-profile-section mt-3 mt-lg-0">
+                <div class="d-flex align-items-center ms-auto">
+                    <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
+                    <div class="fw-bold d-flex align-items-center" style="color: var(--text-color);">
+                        <span id="adminName">Loading...</span><i class="fas fa-user-shield ms-3 fs-4 text-primary"></i>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="row justify-content-center">
@@ -49,20 +115,20 @@
                         <form id="createUserForm">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Full Name</label>
+                                    <label class="form-label fw-bold" style="color: var(--text-muted);">Full Name</label>
                                     <input type="text" id="userName" class="form-control" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Email Address</label>
+                                    <label class="form-label fw-bold" style="color: var(--text-muted);">Email Address</label>
                                     <input type="email" id="userEmail" class="form-control" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Password</label>
+                                    <label class="form-label fw-bold" style="color: var(--text-muted);">Password</label>
                                     <input type="password" id="userPassword" class="form-control" required minlength="6">
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Account Role</label>
-                                    <select id="roleSelect" class="form-select" required>
+                                <div class="col-md-6 mb-4">
+                                    <label class="form-label fw-bold" style="color: var(--text-muted);">Account Role</label>
+                                    <select id="roleSelect" class="form-select border-primary" required>
                                         <option value="" disabled selected>Select Role...</option>
                                         <option value="student">Student</option>
                                         <option value="teacher">Teacher</option>
@@ -73,14 +139,25 @@
 
                             <div id="classAssignmentSection" class="mb-4 mt-2">
                                 <h6 class="fw-bold text-success mb-3"><i class="fas fa-chalkboard-teacher me-2"></i> Assign Classes to this Teacher</h6>
-                                <p class="small text-muted mb-3">Tick all the classes this teacher is responsible for. They will only see students from these classes in their dashboard.</p>
+                                <p class="small mb-3" style="color: var(--text-muted);">Tick all the classes this teacher is responsible for. They will only see students from these classes in their dashboard.</p>
                                 <div id="classCheckboxes" class="d-flex flex-wrap gap-3">
                                     <div class="text-muted"><i class="fas fa-spinner fa-spin me-1"></i> Loading classes...</div>
                                 </div>
                             </div>
 
-                            <button type="submit" id="btnSubmit" class="btn btn-success w-100 fw-bold py-2 mt-3">
-                                <i class="fas fa-save me-2"></i> Create Account
+                            <div id="studentDOBSection" class="mb-4 mt-2">
+                                <h6 class="fw-bold text-warning mb-3" style="color: #d35400 !important;"><i class="fas fa-birthday-cake me-2"></i> Student Details</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold" style="color: var(--text-muted);">Date of Birth (Optional)</label>
+                                        <input type="date" id="studentDOB" class="form-control">
+                                        <div class="small mt-1" style="color: var(--text-muted);">Used for dashboard birthday alerts.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" id="btnSubmit" class="btn btn-success w-100 fw-bold py-3 mt-3 shadow-sm" style="font-size: 1.1rem;">
+                                <i class="fas fa-save me-2"></i> Generate Account
                             </button>
                         </form>
                     </div>
@@ -89,37 +166,76 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
-        // Initialize Dark Mode based on Admin Preference
-        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') document.body.classList.add('dark-mode');
+        // === UI TOGGLES ===
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+            const overlay = document.getElementById('sidebarOverlay');
+            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+        };
 
-        async function loadClasses() {
-            const { data: classes, error } = await supabase.from('classes').select('id, name').order('name');
-            const container = document.getElementById('classCheckboxes');
-            
-            if (error || !classes.length) {
-                container.innerHTML = '<span class="text-danger small">No classes found in the database.</span>';
-                return;
-            }
+        window.toggleTheme = () => {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
 
-            container.innerHTML = classes.map(c => `
-                <div class="form-check form-check-inline bg-white px-3 py-2 border rounded shadow-sm" style="border-color: var(--border-color) !important;">
-                    <input class="form-check-input class-cb" type="checkbox" id="class_${c.id}" value="${c.id}">
-                    <label class="form-check-label fw-bold ms-1" for="class_${c.id}" style="cursor:pointer;">${c.name}</label>
-                </div>
-            `).join('');
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
         }
 
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'SPRINGDRILL_THEME') {
+                const isDark = event.newValue === 'dark';
+                isDark ? document.body.classList.add('dark-mode') : document.body.classList.remove('dark-mode');
+                document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+            }
+        });
+
+        // === LOGIC ===
+        async function loadInitialData() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = 'login.html';
+                
+                const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
+                if(profile) document.getElementById('adminName').innerText = profile.name;
+
+                // Load Classes for Teacher assignment
+                const { data: classes, error } = await supabase.from('classes').select('id, name').order('name');
+                const container = document.getElementById('classCheckboxes');
+                
+                if (error || !classes.length) {
+                    container.innerHTML = '<span class="text-danger small">No classes found in the database.</span>';
+                    return;
+                }
+
+                container.innerHTML = classes.map(c => `
+                    <div class="form-check form-check-inline px-3 py-2 border rounded shadow-sm" style="background-color: var(--input-bg); border-color: var(--border-color) !important;">
+                        <input class="form-check-input class-cb" type="checkbox" id="class_${c.id}" value="${c.id}" style="cursor:pointer; border-color: var(--border-color);">
+                        <label class="form-check-label fw-bold ms-1" for="class_${c.id}" style="cursor:pointer; color: var(--text-color);">${c.name}</label>
+                    </div>
+                `).join('');
+            } catch (err) { console.error(err); }
+        }
+
+        // Logic to show/hide dynamic fields based on Role selection
         document.getElementById('roleSelect').addEventListener('change', (e) => {
-            document.getElementById('classAssignmentSection').style.display = e.target.value === 'teacher' ? 'block' : 'none';
+            const role = e.target.value;
+            document.getElementById('classAssignmentSection').style.display = role === 'teacher' ? 'block' : 'none';
+            document.getElementById('studentDOBSection').style.display = role === 'student' ? 'block' : 'none';
         });
 
         document.getElementById('createUserForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnSubmit');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Creating...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Generating...';
             btn.disabled = true;
 
             const name = document.getElementById('userName').value;
@@ -127,10 +243,17 @@
             const password = document.getElementById('userPassword').value;
             const role = document.getElementById('roleSelect').value;
 
-            // Gather selected classes if role is teacher
+            // Gather teacher classes
             let assigned_classes = [];
             if (role === 'teacher') {
                 assigned_classes = Array.from(document.querySelectorAll('.class-cb:checked')).map(cb => cb.value);
+            }
+
+            // Gather student DOB
+            let dobValue = null;
+            if (role === 'student') {
+                const rawDob = document.getElementById('studentDOB').value;
+                if(rawDob) dobValue = rawDob; 
             }
 
             try {
@@ -142,27 +265,37 @@
                 });
 
                 if (authErr) throw authErr;
+                const newUserId = authData.user.id;
 
-                // Update the user's profile with their assigned classes
+                // Update the main users table (triggers auto-handle role sync)
                 const { error: dbErr } = await supabase.from('users').update({
                     assigned_classes: assigned_classes
-                }).eq('id', authData.user.id);
-
+                }).eq('id', newUserId);
                 if (dbErr) throw dbErr;
 
-                alert("Account created successfully!");
+                // If Student, ensure DOB is saved to the students table
+                if (role === 'student' && dobValue) {
+                    const { error: stuErr } = await supabase.from('students').update({
+                        dob: dobValue
+                    }).eq('user_id', newUserId);
+                    if (stuErr) console.warn("Failed to update DOB, but account was created.", stuErr);
+                }
+
+                alert("Account generated successfully!");
+                
                 document.getElementById('createUserForm').reset();
                 document.getElementById('classAssignmentSection').style.display = 'none';
+                document.getElementById('studentDOBSection').style.display = 'none';
 
             } catch (err) {
                 alert("Error: " + err.message);
             } finally {
-                btn.innerHTML = '<i class="fas fa-save me-2"></i> Create Account';
+                btn.innerHTML = '<i class="fas fa-save me-2"></i> Generate Account';
                 btn.disabled = false;
             }
         });
 
-        document.addEventListener('DOMContentLoaded', loadClasses);
+        document.addEventListener('DOMContentLoaded', loadInitialData);
         document.getElementById('logoutBtn').addEventListener('click', async (e) => {
             e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html';
         });
