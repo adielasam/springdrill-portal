@@ -6,6 +6,9 @@
     <title>SPRINGDRILL - Question Bank</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
     <style>
         /* GLOBAL DARK MODE ENGINE */
         :root { 
@@ -30,9 +33,9 @@
         body { background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; transition: background-color 0.3s, color 0.3s; }
         
         /* Sidebar Styling */
-        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #1a3c34; color: white; padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #1a3c34; color: white; padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; display: flex; align-items: center; text-decoration: none; font-size: 0.95rem; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; display: flex; align-items: center; font-size: 0.95rem; text-decoration: none; }
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; }
         .nav-link.text-danger:hover { background: rgba(220, 53, 69, 0.2); color: #ff6b6b !important; }
@@ -41,19 +44,23 @@
         .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
         
         /* Top Navbar */
-        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #007a4d; transition: all 0.3s; }
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #007a4d; transition: all 0.3s; }
         .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
         .dark-toggle-btn:hover { transform: scale(1.1); }
-
-        /* Cards */
-        .edu-card { background: var(--card-bg); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border-color); margin-bottom: 30px; transition: all 0.3s; }
-        .edu-header { background-color: #007a4d; color: white; padding: 15px 20px; border-radius: 8px 8px 0 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
-        .edu-body { padding: 25px; color: var(--text-color); }
         
+        /* Cards */
+        .edu-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; transition: all 0.3s; }
+        .edu-header { background-color: #007a4d; color: white; padding: 15px 20px; border-radius: 4px 4px 0 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .edu-body { padding: 25px; color: var(--text-color); }
+
         /* Form Elements */
         .form-label { font-weight: 600; color: var(--text-color); }
-        .form-control, .form-select { padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); transition: all 0.3s; }
-        .form-control:focus, .form-select:focus { border-color: #3498db; box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25); background-color: var(--card-bg); color: var(--text-color); }
+        .form-control, .form-select { padding: 10px 15px; border-radius: 4px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); transition: all 0.3s; }
+        .form-control:focus, .form-select:focus { border-color: #007a4d; box-shadow: 0 0 0 0.25rem rgba(0, 122, 77, 0.25); background-color: var(--card-bg); color: var(--text-color); }
+        
+        /* File Upload Box */
+        .upload-box { background-color: var(--input-bg); border: 2px dashed var(--border-color); border-radius: 8px; padding: 20px; text-align: center; transition: all 0.3s; }
+        .upload-box:hover { border-color: #007a4d; background-color: rgba(0, 122, 77, 0.05); }
         
         /* Tables */
         .table { color: var(--text-color); border-color: var(--border-color); margin-bottom: 0; }
@@ -85,7 +92,7 @@
 
     <div id="loadingOverlay">
         <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
-        <h4 style="color: var(--text-muted);">Loading Repository...</h4>
+        <h4 style="color: var(--text-muted);">Verifying Access...</h4>
     </div>
 
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -98,14 +105,16 @@
         
         <nav class="nav flex-column mt-3">
             <a href="teacher_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard Home</a>
+            <a href="teacher_class_list.html" class="nav-link"><i class="fas fa-users"></i> Class Roster & 360°</a>
             
             <a href="#cbtMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
-                <span><i class="fas fa-laptop-code me-2"></i> CBT</span>
+                <span><i class="fas fa-laptop-code me-2"></i> CBT Console</span>
                 <i class="fas fa-caret-down"></i>
             </a>
             <div class="collapse show bg-dark mx-2 mt-1 rounded" id="cbtMenu">
+                <a href="create_test.html" class="nav-link small py-2"><i class="fas fa-plus-circle me-2"></i> Create Exam</a>
                 <a href="question_bank.html" class="nav-link small py-2 active text-success fw-bold"><i class="fas fa-database me-2"></i> Question Bank</a>
-                <a href="manage_cbt.html" class="nav-link small py-2"><i class="fas fa-list me-2"></i> Manage CBT</a>
+                <a href="manage_cbt.html" class="nav-link small py-2"><i class="fas fa-list me-2"></i> Manage Exams</a>
                 <a href="test_results.html" class="nav-link small py-2"><i class="fas fa-chart-bar me-2"></i> Result Manager</a>
             </div>
 
@@ -130,7 +139,7 @@
                     <i class="fas fa-moon" id="themeIcon"></i>
                 </button>
                 <button class="btn btn-outline-success fw-bold shadow-sm" onclick="window.toggleSection('importSection')">
-                    <i class="fas fa-file-import me-1"></i> Bulk Import
+                    <i class="fas fa-file-upload me-1"></i> Upload / Import
                 </button>
                 <button class="btn btn-outline-secondary fw-bold shadow-sm" style="color: var(--text-color); border-color: var(--border-color);" onclick="window.history.back()">
                     <i class="fas fa-arrow-left me-1"></i> Back
@@ -142,26 +151,40 @@
 
         <div id="importSection" class="edu-card border-success">
             <div class="edu-header bg-success">
-                <span><i class="fas fa-file-import me-2"></i> Import Questions Manually</span>
+                <span><i class="fas fa-file-import me-2"></i> Add Questions to Bank</span>
             </div>
             <div class="edu-body">
                 <form id="importForm">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Class</label>
+                            <label class="form-label">Assign to Class</label>
                             <select class="form-select class-dropdown" id="importClassId" required><option value="">Loading...</option></select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Subject</label>
+                            <label class="form-label">Assign to Subject</label>
                             <select class="form-select subject-dropdown" id="importSubjectId" required><option value="">Loading...</option></select>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Enter Questions (Format: Question|Option A|Option B|Option C|Option D|Correct Option)</label>
-                        <textarea class="form-control" id="manualQuestions" rows="5" placeholder="What is 2 + 2?|3|4|5|6|B" required></textarea>
+
+                    <div class="upload-box mt-2 mb-4">
+                        <h5 class="fw-bold text-success mb-3"><i class="fas fa-file-word fa-lg me-2"></i>Upload a .docx File (Word Document)</h5>
+                        <input type="file" id="docxFile" class="form-control mb-2" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="max-width: 400px; margin: 0 auto;">
+                        <small style="color: var(--text-muted);">
+                            Format inside Word document (one question per line):<br>
+                            <strong>Question | Option A | Option B | Option C | Option D | Answer</strong><br>
+                            <em>Example: What is 2+2? | 3 | 4 | 5 | 6 | B</em>
+                        </small>
                     </div>
-                    <button type="submit" class="btn btn-success fw-bold px-4" id="btnImport">
-                        <i class="fas fa-check me-2"></i> Import Questions
+
+                    <div class="text-center fw-bold mb-3" style="color: var(--text-muted);">OR PASTE MANUALLY</div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Type or Paste Questions</label>
+                        <textarea class="form-control" id="manualQuestions" rows="4" placeholder="If not uploading a file, you can paste your questions here using the same format as above..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success fw-bold px-4 w-100 py-2 shadow-sm" id="btnImport" style="font-size: 1.1rem;">
+                        <i class="fas fa-check-circle me-2"></i> Process and Import Questions
                     </button>
                 </form>
             </div>
@@ -207,7 +230,7 @@
         </div>
 
         <div class="edu-card">
-            <div class="edu-header bg-dark border-bottom border-secondary">
+            <div class="edu-header">
                 <span><i class="fas fa-archive me-2"></i> Your Repository</span>
                 <button id="btnAddToTest" class="btn btn-sm btn-light text-success fw-bold px-3 d-none shadow-sm" onclick="window.addSelectedToTest()">
                     <i class="fas fa-plus-circle me-1"></i> Add Selected to Exam
@@ -264,20 +287,12 @@
             document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
         }
 
-        window.addEventListener('storage', (event) => {
-            if (event.key === 'SPRINGDRILL_THEME') {
-                const isDark = event.newValue === 'dark';
-                isDark ? document.body.classList.add('dark-mode') : document.body.classList.remove('dark-mode');
-                document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
-            }
-        });
-
         // UI Helpers
         const alertBox = document.getElementById('alertBox');
         function showAlert(msg, isSuccess = true) {
             alertBox.className = `alert ${isSuccess ? 'alert-success' : 'alert-danger'} d-block shadow-sm`;
             alertBox.innerHTML = `<i class="fas ${isSuccess ? 'fa-check-circle' : 'fa-exclamation-triangle'} me-2"></i> ${msg}`;
-            setTimeout(() => { alertBox.classList.add('d-none'); }, 4000);
+            setTimeout(() => { alertBox.classList.add('d-none'); }, 5000);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -363,50 +378,82 @@
             }).join('');
         }
 
-        // 1. Bulk Import Logic
+        // 1. BULK IMPORT LOGIC (Handles both DOCX File and Manual Text)
         document.getElementById('importForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnImport');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Importing...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Processing...';
 
             const classId = document.getElementById('importClassId').value;
             const subjectId = document.getElementById('importSubjectId').value;
-            const rawText = document.getElementById('manualQuestions').value;
+            const fileInput = document.getElementById('docxFile');
+            let rawText = document.getElementById('manualQuestions').value;
 
-            const lines = rawText.split('\n');
-            const insertPayload = [];
-
-            lines.forEach(line => {
-                if (!line.trim()) return;
-                const parts = line.split('|').map(p => p.trim());
-                if (parts.length >= 6) {
-                    insertPayload.push({
-                        teacher_id: currentUserId, class_id: classId, subject_id: subjectId,
-                        question_text: parts[0], option_a: parts[1], option_b: parts[2], 
-                        option_c: parts[3], option_d: parts[4], correct_option: parts[5].toUpperCase()
-                    });
+            try {
+                // If a DOCX file was uploaded, use Mammoth to extract text
+                if (fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    const arrayBuffer = await file.arrayBuffer();
+                    
+                    // Extract raw text (ignoring bold/italics/tables, just pulling the strings)
+                    const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+                    rawText = result.value; 
                 }
-            });
 
-            if (insertPayload.length === 0) {
-                showAlert('No valid questions parsed. Check format.', false);
-                btn.innerHTML = '<i class="fas fa-check me-2"></i> Import Questions';
-                btn.disabled = false;
-                return;
-            }
+                if (!rawText || !rawText.trim()) {
+                    showAlert('Please upload a .docx file or paste questions into the text box.', false);
+                    btn.innerHTML = '<i class="fas fa-check-circle me-2"></i> Process and Import Questions';
+                    btn.disabled = false;
+                    return;
+                }
 
-            const { error } = await supabase.from('questions').insert(insertPayload);
-            
-            if (error) showAlert(error.message, false);
-            else {
-                showAlert(`${insertPayload.length} questions imported successfully!`);
+                const lines = rawText.split('\n');
+                const insertPayload = [];
+
+                lines.forEach(line => {
+                    if (!line.trim()) return;
+                    const parts = line.split('|').map(p => p.trim());
+                    
+                    // Only process lines that have exactly 6 parts separated by |
+                    if (parts.length >= 6) {
+                        insertPayload.push({
+                            teacher_id: currentUserId, 
+                            class_id: classId, 
+                            subject_id: subjectId,
+                            question_text: parts[0], 
+                            option_a: parts[1], 
+                            option_b: parts[2], 
+                            option_c: parts[3], 
+                            option_d: parts[4], 
+                            correct_option: parts[5].toUpperCase()
+                        });
+                    }
+                });
+
+                if (insertPayload.length === 0) {
+                    showAlert('Failed. Please ensure your text or Word document matches the exact format: Question|Option A|Option B|Option C|Option D|Answer', false);
+                    btn.innerHTML = '<i class="fas fa-check-circle me-2"></i> Process and Import Questions';
+                    btn.disabled = false;
+                    return;
+                }
+
+                // Insert into Database
+                const { error } = await supabase.from('questions').insert(insertPayload);
+                
+                if (error) throw error;
+
+                showAlert(`Success! ${insertPayload.length} questions were imported into your bank.`);
                 document.getElementById('importForm').reset();
                 window.toggleSection('importSection');
                 loadQuestions();
+
+            } catch (err) {
+                showAlert('Error processing import: ' + err.message, false);
+            } finally {
+                btn.innerHTML = '<i class="fas fa-check-circle me-2"></i> Process and Import Questions';
+                btn.disabled = false;
             }
-            btn.innerHTML = '<i class="fas fa-check me-2"></i> Import Questions';
-            btn.disabled = false;
         });
 
         // 2. Edit Logic
