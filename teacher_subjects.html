@@ -218,7 +218,7 @@
                                     <button class="btn btn-sm btn-primary fw-bold shadow-sm" onclick="downloadAiPdf()"><i class="fas fa-file-pdf me-1"></i> Save PDF</button>
                                 </div>
                             </div>
-                            <div id="aiTextContent"></div>
+                            <div id="aiTextContent" class="fs-5" style="white-space: pre-wrap;"></div>
                         </div>
                     </div>
                 </div>
@@ -385,7 +385,7 @@
             await loadRepository();
         };
 
-        // === REAL SUPABASE EDGE FUNCTION AI CALL ===
+        // === BULLETPROOF AI EDGE FUNCTION CALL ===
         document.getElementById('aiForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnGenerate');
@@ -400,51 +400,47 @@
             const txtBox = document.getElementById('aiTextContent');
             resBox.style.display = 'block';
             
-            // Professional White-labeled Loading Message
             txtBox.innerHTML = '<div class="text-center py-5"><i class="fas fa-cogs fa-spin fa-3x text-primary mb-3"></i><br><span class="fw-bold text-muted" style="font-size: 1.1rem;">Analyzing curriculum and drafting comprehensive lesson note...</span></div>';
 
             try {
-                // FIXED PAYLOAD: Using 'targetClass' and 'extra' to exactly match your index.ts file!
+                // IMPORTANT: Make sure 'generate-lesson' is exactly what your edge function is named in Supabase
                 const { data, error } = await supabase.functions.invoke('generate-lesson', {
                     body: { 
-                        topic: topic, 
                         targetClass: cls, 
                         subject: sub,
-                        extra: "Ensure you generate the 5 standard NERDC sections. Ensure the Comprehensive Lesson Note section is extremely detailed with thorough explanations, definitions, and real-world examples."
+                        topic: topic, 
+                        extra: "Generate the 5 standard NERDC sections clearly."
                     }
                 });
 
                 if (error) throw error;
                 
-                txtBox.innerHTML = ''; // Clear loading spinner
+                txtBox.innerHTML = ''; 
                 
-                const aiContent = data.reply || data.content || data.choices?.[0]?.message?.content || data;
+                // BULLETPROOF DATA EXTRACTION: Try every possible way the Edge function might return data
+                let aiContent = "";
+                if (typeof data === 'string') {
+                    aiContent = data;
+                } else if (typeof data === 'object' && data !== null) {
+                    aiContent = data.reply || data.content || data.text || data.message || data.response || data.output || (data.choices && data.choices[0]?.message?.content);
+                    
+                    // FALLBACK: If we still didn't find the string, print the raw JSON so you can see it and fix it without crashing!
+                    if (!aiContent || typeof aiContent !== 'string') {
+                        aiContent = "### Raw Backend Response Received\n```json\n" + JSON.stringify(data, null, 2) + "\n```";
+                    }
+                } else {
+                    aiContent = "Error: Did not receive valid data from Edge Function.";
+                }
 
-                // Safely convert the Markdown response to HTML using marked.js
+                // Convert Markdown to HTML
                 const htmlContent = marked.parse(aiContent);
 
-                // Typewriter effect handling HTML tags smoothly
-                let i = 0;
-                function typeWriterReal() {
-                    if (i < htmlContent.length) {
-                        if(htmlContent.charAt(i) === '<') {
-                            let tag = '';
-                            while(htmlContent.charAt(i) !== '>' && i < htmlContent.length) { tag += htmlContent.charAt(i); i++; }
-                            tag += '>';
-                            txtBox.innerHTML += tag;
-                            i++;
-                        } else {
-                            txtBox.innerHTML += htmlContent.charAt(i);
-                            i++;
-                        }
-                        setTimeout(typeWriterReal, 1); // Very fast typing
-                    }
-                }
-                typeWriterReal();
+                // Quick display
+                txtBox.innerHTML = htmlContent;
 
             } catch (err) {
                 console.error("AI Error:", err);
-                txtBox.innerHTML = `<div class="alert alert-danger fw-bold"><i class="fas fa-exclamation-triangle me-2"></i> Error generating content: ${err.message}. Please check your connection or try again.</div>`;
+                txtBox.innerHTML = `<div class="alert alert-danger fw-bold"><i class="fas fa-exclamation-triangle me-2"></i> Error generating content: ${err.message}. Please check your connection or Edge Function logs.</div>`;
             } finally {
                 btn.innerHTML = '<i class="fas fa-robot me-2"></i> Generate Complete NERDC Plan & Content';
                 btn.disabled = false;
