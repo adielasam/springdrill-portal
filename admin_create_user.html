@@ -242,7 +242,6 @@
             const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1].toLowerCase().replace(/[^a-z]/g, '') : '';
             
             const rand = Math.floor(1000 + Math.random() * 9000); // 4 digit number
-            
             const emailField = document.getElementById('userEmail');
 
             // Format: firstname.lastnameXXXX@springdrill.edu
@@ -332,7 +331,7 @@
             const gender = document.getElementById('userGender').value;
 
             try {
-                // Register user in Auth
+                // 1. Register user in Auth
                 const { data: authData, error: authErr } = await supabase.auth.signUp({
                     email: email,
                     password: password,
@@ -340,15 +339,25 @@
                 });
 
                 if (authErr) throw authErr;
+                if (!authData || !authData.user) throw new Error("Failed to generate authentication data.");
+                
                 const newUserId = authData.user.id;
 
-                // Update Users table for Admins and Teachers
-                if (role === 'teacher' || role === 'admin') {
-                    let updatePayload = { gender: gender };
-                    if (role === 'teacher') {
-                        updatePayload.assigned_classes = Array.from(document.querySelectorAll('.class-cb:checked')).map(cb => cb.value);
-                    }
-                    await supabase.from('users').update(updatePayload).eq('id', newUserId);
+                // 2. EXPLICITLY CREATE THE USER IN PUBLIC.USERS (Fixes the Foreign Key Crash!)
+                const { error: syncErr } = await supabase.from('users').upsert({
+                    id: newUserId,
+                    name: name,
+                    email: email,
+                    role: role,
+                    gender: gender
+                }, { onConflict: 'id' });
+                
+                if (syncErr) console.warn("User sync warning:", syncErr);
+
+                // 3. Update Specific Data based on Role
+                if (role === 'teacher') {
+                    const assigned_classes = Array.from(document.querySelectorAll('.class-cb:checked')).map(cb => cb.value);
+                    await supabase.from('users').update({ assigned_classes: assigned_classes }).eq('id', newUserId);
                 } 
                 else if (role === 'student') {
                     const nameParts = name.split(' ');
@@ -376,7 +385,7 @@
                         }
                     }
 
-                    // Write Student Data
+                    // Write Student Data (This will now succeed because the user exists in 'users'!)
                     const { error: stuErr } = await supabase.from('students').insert([{
                         user_id: newUserId,
                         first_name: firstName,
