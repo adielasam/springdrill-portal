@@ -28,7 +28,7 @@
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
         
         /* Sidebar Styling */
-        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1050; transition: transform 0.3s ease; }
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1050; transition: transform 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
         .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center;}
         .nav-link i { width: 25px; }
@@ -41,10 +41,10 @@
         .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
         .dark-toggle-btn:hover { transform: scale(1.1); }
 
-        .edu-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: all 0.3s; }
+        .edu-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: all 0.3s; }
         .edu-header { background-color: #007a4d; color: white; padding: 15px 20px; border-radius: 4px 4px 0 0; font-weight: bold; font-size: 1.1rem; }
         
-        .form-control, .form-select { padding: 10px 15px; border-radius: 4px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); transition: all 0.3s; }
+        .form-control, .form-select { padding: 10px 15px; border-radius: 4px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); transition: all 0.3s; font-weight: 500;}
         .form-control:focus, .form-select:focus { border-color: #007a4d; box-shadow: 0 0 0 0.25rem rgba(0, 122, 77, 0.25); background-color: var(--card-bg); color: var(--text-color); }
         
         /* Dynamic Sections */
@@ -111,9 +111,12 @@
         </div>
 
         <div class="row justify-content-center">
-            <div class="col-lg-9">
+            <div class="col-lg-10">
                 <div class="edu-card">
-                    <div class="edu-header"><i class="fas fa-user-plus me-2 text-warning"></i> Generate New Account</div>
+                    <div class="edu-header d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-user-plus me-2 text-warning"></i> Generate New Account</span>
+                        <button type="button" class="btn btn-sm btn-light text-success fw-bold d-none d-md-block" onclick="autoGenerateCredentials()"><i class="fas fa-magic me-1"></i> Auto-Fill Credentials</button>
+                    </div>
                     <div class="p-4 p-md-5">
                         <form id="createUserForm">
                             
@@ -121,22 +124,32 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold" style="color: var(--text-muted);">Full Name (First Last)</label>
                                     <input type="text" id="userName" class="form-control" placeholder="e.g. John Doe" required>
+                                    <small class="text-success fw-bold mt-1 d-block"><i class="fas fa-info-circle"></i> Email & Password will auto-generate when you type a name!</small>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold" style="color: var(--text-muted);">Email Address</label>
-                                    <input type="email" id="userEmail" class="form-control" placeholder="name@springdrill.edu" required>
+                                    <input type="email" id="userEmail" class="form-control text-primary fw-bold" placeholder="Auto-generated email" required>
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label fw-bold" style="color: var(--text-muted);">Password</label>
-                                    <input type="password" id="userPassword" class="form-control" placeholder="Min 6 characters" required minlength="6">
+                                    <input type="text" id="userPassword" class="form-control fw-bold" placeholder="Auto-generated password" required minlength="6">
                                 </div>
-                                <div class="col-md-6 mb-4">
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label fw-bold" style="color: var(--text-muted);">Account Role</label>
                                     <select id="roleSelect" class="form-select border-primary fw-bold" required>
                                         <option value="" disabled selected>Select Role...</option>
                                         <option value="student">Student</option>
                                         <option value="teacher">Teacher</option>
                                         <option value="admin">Administrator</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-4">
+                                    <label class="form-label fw-bold" style="color: var(--text-muted);">Gender</label>
+                                    <select id="userGender" class="form-select fw-bold" required>
+                                        <option value="" disabled selected>Select Gender...</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
                                     </select>
                                 </div>
                             </div>
@@ -160,7 +173,7 @@
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label fw-bold" style="color: var(--text-muted);">Assign Class <span class="text-danger">*</span></label>
-                                        <select id="studentClassSelect" class="form-select">
+                                        <select id="studentClassSelect" class="form-select fw-bold">
                                             <option value="" disabled selected>Select...</option>
                                         </select>
                                     </div>
@@ -217,15 +230,35 @@
             document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
         }
 
-        window.addEventListener('storage', (event) => {
-            if (event.key === 'SPRINGDRILL_THEME') {
-                const isDark = event.newValue === 'dark';
-                isDark ? document.body.classList.add('dark-mode') : document.body.classList.remove('dark-mode');
-                document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
-            }
-        });
+        // === AUTO GENERATE CREDENTIALS MAGIC ===
+        window.autoGenerateCredentials = () => {
+            const nameVal = document.getElementById('userName').value.trim();
+            if (!nameVal) return;
 
-        // Generate Random Reg Number
+            const nameParts = nameVal.split(' ');
+            const firstName = nameParts[0].toLowerCase().replace(/[^a-z]/g, '');
+            const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1].toLowerCase().replace(/[^a-z]/g, '') : '';
+            
+            const rand = Math.floor(1000 + Math.random() * 9000); // 4 digit number
+            
+            const emailField = document.getElementById('userEmail');
+            const passField = document.getElementById('userPassword');
+
+            // Format: firstname.lastnameXXXX@springdrill.edu
+            if (!emailField.value || emailField.value.includes('@springdrill.edu')) {
+                emailField.value = `${firstName}${lastName ? '.' + lastName : ''}${rand}@springdrill.edu`;
+            }
+            
+            // Format: SpringXXXX!
+            if (!passField.value || passField.value.startsWith('Spring')) {
+                passField.value = `Spring${rand}!`;
+            }
+        };
+
+        // Trigger Auto-Gen when Admin leaves the Name field
+        document.getElementById('userName').addEventListener('blur', window.autoGenerateCredentials);
+
+        // Generate Random Reg Number for Students
         function generateRegNum() {
             const year = new Date().getFullYear().toString().slice(-2);
             const rand = Math.floor(1000 + Math.random() * 9000);
@@ -286,7 +319,6 @@
                 classSelect.required = true;
                 regInput.value = generateRegNum(); // Auto-generate Reg Number
             } else {
-                // Admin
                 teacherSec.style.display = 'none';
                 studentSec.style.display = 'none';
                 classSelect.required = false;
@@ -303,24 +335,28 @@
             const email = document.getElementById('userEmail').value.trim();
             const password = document.getElementById('userPassword').value;
             const role = document.getElementById('roleSelect').value;
+            const gender = document.getElementById('userGender').value;
 
             try {
                 // Register user in Auth
                 const { data: authData, error: authErr } = await supabase.auth.signUp({
                     email: email,
                     password: password,
-                    options: { data: { name: name, role: role } }
+                    options: { data: { name: name, role: role, gender: gender } }
                 });
 
                 if (authErr) throw authErr;
                 const newUserId = authData.user.id;
 
-                if (role === 'teacher') {
-                    const assigned_classes = Array.from(document.querySelectorAll('.class-cb:checked')).map(cb => cb.value);
-                    await supabase.from('users').update({ assigned_classes: assigned_classes }).eq('id', newUserId);
+                // Update Users table for Admins and Teachers
+                if (role === 'teacher' || role === 'admin') {
+                    let updatePayload = { gender: gender };
+                    if (role === 'teacher') {
+                        updatePayload.assigned_classes = Array.from(document.querySelectorAll('.class-cb:checked')).map(cb => cb.value);
+                    }
+                    await supabase.from('users').update(updatePayload).eq('id', newUserId);
                 } 
                 else if (role === 'student') {
-                    // Split Full Name into First and Last Name
                     const nameParts = name.split(' ');
                     const firstName = nameParts[0];
                     const surname = nameParts.slice(1).join(' ');
@@ -334,7 +370,7 @@
 
                     let passportUrl = null;
 
-                    // Upload Passport if selected
+                    // Upload Passport
                     if (passportFile) {
                         const fileExt = passportFile.name.split('.').pop();
                         const fileName = `passport_${Date.now()}.${fileExt}`;
@@ -346,12 +382,12 @@
                         }
                     }
 
-                    // Ensure Student Data is correctly written into `students` table
-                    // By default, since Admin creates them, we set approved = true
+                    // Write Student Data
                     const { error: stuErr } = await supabase.from('students').insert([{
                         user_id: newUserId,
                         first_name: firstName,
                         surname: surname,
+                        gender: gender,
                         reg_number: regNum,
                         class_id: classId,
                         dob: dobValue || null,
@@ -364,7 +400,7 @@
                     if (stuErr) throw stuErr;
                 }
 
-                alert("Account generated successfully!");
+                alert(`Account generated successfully!\n\nEmail: ${email}\nPassword: ${password}\n\nPlease copy these credentials for the user.`);
                 
                 document.getElementById('createUserForm').reset();
                 document.getElementById('teacherDetailsSection').style.display = 'none';
