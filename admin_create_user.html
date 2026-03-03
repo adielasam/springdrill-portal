@@ -241,17 +241,14 @@
             const firstName = nameParts[0].toLowerCase().replace(/[^a-z]/g, '');
             const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1].toLowerCase().replace(/[^a-z]/g, '') : '';
             
-            const rand = Math.floor(1000 + Math.random() * 9000); // 4 digit number
+            const rand = Math.floor(1000 + Math.random() * 9000);
             const emailField = document.getElementById('userEmail');
 
-            // Format: firstname.lastnameXXXX@springdrill.edu
             emailField.value = `${firstName}${lastName ? '.' + lastName : ''}${rand}@springdrill.edu`;
         };
 
-        // Trigger Auto-Gen Email when Admin leaves the Name field
         document.getElementById('userName').addEventListener('blur', window.autoGenerateEmail);
 
-        // Generate Random Reg Number for Students
         function generateRegNum() {
             const year = new Date().getFullYear().toString().slice(-2);
             const rand = Math.floor(1000 + Math.random() * 9000);
@@ -267,7 +264,6 @@
                 const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
                 if(profile) document.getElementById('adminName').innerText = profile.name;
 
-                // Load Classes
                 const { data: classes, error } = await supabase.from('classes').select('id, name').order('name');
                 const cbContainer = document.getElementById('classCheckboxes');
                 const dropdown = document.getElementById('studentClassSelect');
@@ -277,7 +273,6 @@
                     return;
                 }
 
-                // Populate Teacher Checkboxes
                 cbContainer.innerHTML = classes.map(c => `
                     <div class="form-check form-check-inline px-3 py-2 border rounded shadow-sm" style="background-color: var(--card-bg); border-color: var(--border-color) !important;">
                         <input class="form-check-input class-cb" type="checkbox" id="class_${c.id}" value="${c.id}" style="cursor:pointer; border-color: var(--border-color);">
@@ -285,7 +280,6 @@
                     </div>
                 `).join('');
 
-                // Populate Student Dropdown
                 let options = '<option value="" disabled selected>Select Class...</option>';
                 classes.forEach(c => { options += `<option value="${c.id}">${c.name}</option>`; });
                 dropdown.innerHTML = options;
@@ -293,10 +287,8 @@
             } catch (err) { console.error(err); }
         }
 
-        // Logic to show/hide dynamic fields based on Role selection
         document.getElementById('roleSelect').addEventListener('change', (e) => {
             const role = e.target.value;
-            
             const teacherSec = document.getElementById('teacherDetailsSection');
             const studentSec = document.getElementById('studentDetailsSection');
             const classSelect = document.getElementById('studentClassSelect');
@@ -310,7 +302,7 @@
                 teacherSec.style.display = 'none';
                 studentSec.style.display = 'block';
                 classSelect.required = true;
-                regInput.value = generateRegNum(); // Auto-generate Reg Number
+                regInput.value = generateRegNum(); 
             } else {
                 teacherSec.style.display = 'none';
                 studentSec.style.display = 'none';
@@ -331,7 +323,7 @@
             const gender = document.getElementById('userGender').value;
 
             try {
-                // 1. Register user in Auth
+                // 1. Create User in Auth
                 const { data: authData, error: authErr } = await supabase.auth.signUp({
                     email: email,
                     password: password,
@@ -343,6 +335,9 @@
                 
                 const newUserId = authData.user.id;
 
+                // FIX: Add a brief 1.5-second delay to allow Database triggers to settle!
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
                 // 2. EXPLICITLY CREATE THE USER IN PUBLIC.USERS (Fixes the Foreign Key Crash!)
                 const { error: syncErr } = await supabase.from('users').upsert({
                     id: newUserId,
@@ -352,7 +347,7 @@
                     gender: gender
                 }, { onConflict: 'id' });
                 
-                if (syncErr) console.warn("User sync warning:", syncErr);
+                if (syncErr) throw new Error("Database blocked user sync. Did you run the SQL script to disable RLS? " + syncErr.message);
 
                 // 3. Update Specific Data based on Role
                 if (role === 'teacher') {
@@ -385,7 +380,7 @@
                         }
                     }
 
-                    // Write Student Data (This will now succeed because the user exists in 'users'!)
+                    // Write Student Data
                     const { error: stuErr } = await supabase.from('students').insert([{
                         user_id: newUserId,
                         first_name: firstName,
