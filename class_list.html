@@ -136,11 +136,11 @@
                     <thead class="table-light border-bottom">
                         <tr>
                             <th width="5%" class="text-center">S/N</th>
-                            <th width="30%">Student Name</th>
-                            <th width="20%">Reg Number</th>
+                            <th width="25%">Student Name</th>
+                            <th width="15%">Reg Number</th>
                             <th width="15%" class="text-center">CBTs Taken</th>
                             <th width="15%" class="text-center">Overall Average</th>
-                            <th width="15%" class="text-center">Action</th>
+                            <th width="25%" class="text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody id="studentListBody">
@@ -231,6 +231,7 @@
                             <td class="text-center fw-bold" style="color: var(--text-color);">${stats.count}</td>
                             <td class="text-center fw-bold" style="color: var(--text-color);">${avgDisplay}</td>
                             <td class="text-center">
+                                <a href="teacher_student_profile.html?student_id=${s.user_id}" class="btn btn-sm btn-primary fw-bold me-1 mb-1 mb-md-0"><i class="fas fa-eye me-1"></i> 360° Profile</a>
                                 <a href="admin_student_report.html?student_id=${s.user_id}" class="btn btn-sm btn-dark fw-bold"><i class="fas fa-file-invoice me-1"></i> Report</a>
                             </td>
                         </tr>

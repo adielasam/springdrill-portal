@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - Student 360 Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* GLOBAL DARK MODE ENGINE */
+        :root { 
+            --bg-color: #f4f7fa; 
+            --card-bg: #ffffff; 
+            --text-color: #333333; 
+            --text-muted: #6c757d; 
+            --border-color: #e9ecef; 
+            --input-bg: #f8f9fa; 
+            --risk-bg: #fff3cd;
+        }
+        body.dark-mode { 
+            --bg-color: #121212; 
+            --card-bg: #1e1e1e; 
+            --text-color: #e0e0e0; 
+            --text-muted: #a0a0a0; 
+            --border-color: #333333; 
+            --input-bg: #2c2c2c; 
+            --risk-bg: rgba(255, 193, 7, 0.1);
+        }
+
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+        
+        /* Sidebar Styling */
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; display: flex; align-items: center; font-size: 0.95rem; text-decoration: none;}
+        .nav-link i { width: 25px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; }
+
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        
+        /* Top Navbar */
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #007a4d; transition: all 0.3s; }
+        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .dark-toggle-btn:hover { transform: scale(1.1); }
+
+        /* Profile Header */
+        .profile-header { background: var(--card-bg); border-radius: 8px; padding: 25px; border: 1px solid var(--border-color); display: flex; gap: 25px; align-items: center; margin-bottom: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); transition: all 0.3s;}
+        .profile-img { width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--input-bg); object-fit: cover; }
+        
+        /* Risk Alert */
+        .risk-alert { background: var(--risk-bg); border-left: 4px solid #f39c12; padding: 15px 20px; border-radius: 4px; margin-bottom: 30px; display: none; align-items: center; gap: 15px; }
+        .risk-alert i { font-size: 2rem; color: #f39c12; }
+
+        /* Dashboard Cards */
+        .dash-card { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border-color); padding: 20px; margin-bottom: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.01); height: 100%; transition: all 0.3s;}
+        .dash-title { font-weight: 800; font-size: 1.1rem; color: var(--text-color); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;}
+        
+        /* Tables & Lists */
+        .table { color: var(--text-color); border-color: var(--border-color); }
+        .table th { background-color: var(--input-bg); color: var(--text-muted); border-bottom: none; font-size: 0.85rem; text-transform: uppercase; }
+        .table td { vertical-align: middle; }
+        
+        .note-item { background: var(--input-bg); padding: 15px; border-radius: 6px; border-left: 3px solid #3498db; margin-bottom: 15px; }
+        .note-meta { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px; font-weight: bold; }
+        
+        .form-control { background-color: var(--input-bg); border-color: var(--border-color); color: var(--text-color); }
+        .form-control:focus { background-color: var(--card-bg); color: var(--text-color); border-color: #3498db; box-shadow: none; }
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); box-shadow: 2px 0 15px rgba(0,0,0,0.3); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .profile-header { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay">
+        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
+        <h4 style="color: var(--text-muted);">Compiling Student Data...</h4>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <h5 class="text-white fw-bold mb-0"><i class="fas fa-chalkboard-teacher text-warning me-2"></i> STAFF PORTAL</h5>
+        </div>
+        <nav class="nav flex-column mt-3">
+            <a href="teacher_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="manage_cbt.html" class="nav-link"><i class="fas fa-laptop-code"></i> Manage CBT</a>
+            <a href="test_results.html" class="nav-link"><i class="fas fa-chart-bar"></i> Result Manager</a>
+            <a href="class_list.html" class="nav-link active text-success fw-bold"><i class="fas fa-users"></i> Class Roster</a>
+            <hr class="mx-3 my-4 border-secondary">
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-link text-muted d-lg-none p-0 me-3" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')"><i class="fas fa-bars fa-lg"></i></button>
+                <div class="fw-bold" style="color: var(--text-muted);"><i class="fas fa-id-badge me-2"></i> Student 360° View</div>
+            </div>
+            <div class="d-flex align-items-center">
+                <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
+                <button class="btn btn-outline-secondary btn-sm fw-bold shadow-sm" onclick="window.history.back()"><i class="fas fa-arrow-left me-1"></i> Back to List</button>
+            </div>
+        </div>
+
+        <div class="risk-alert shadow-sm" id="riskAlertBox">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <h5 class="fw-bold text-warning mb-1" style="color: #d35400 !important;">Academic Risk Alert</h5>
+                <p class="mb-0 text-muted" id="riskAlertText">This student's average performance has dropped below the 50% threshold. Intervention recommended.</p>
+            </div>
+        </div>
+
+        <div class="profile-header">
+            <img src="" id="profileImg" class="profile-img shadow-sm" alt="Student">
+            <div class="flex-grow-1">
+                <h3 class="fw-bold mb-1" id="studentName">Loading Name...</h3>
+                <div class="d-flex flex-wrap gap-3 mt-2" style="color: var(--text-muted);">
+                    <span><i class="fas fa-id-card me-1 text-primary"></i> <strong id="regNumber">---</strong></span>
+                    <span><i class="fas fa-chalkboard me-1 text-success"></i> <strong id="className">---</strong></span>
+                    <span><i class="fas fa-chart-pie me-1 text-warning"></i> Overall Avg: <strong id="overallAvg">0%</strong></span>
+                </div>
+            </div>
+            <div>
+                <a href="#" id="downloadReportBtn" class="btn btn-success fw-bold shadow-sm"><i class="fas fa-file-invoice me-2"></i> Generate Report Card</a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="dash-card">
+                    <div class="dash-title">
+                        <span><i class="fas fa-chart-line text-primary me-2"></i> Performance Trend (CBT & Assignments)</span>
+                    </div>
+                    <canvas id="performanceChart" height="100"></canvas>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="dash-card">
+                    <div class="dash-title">
+                        <span><i class="fas fa-calendar-check text-success me-2"></i> Recent Attendance</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <tbody id="attendanceBody">
+                                <tr><td class="text-center text-muted py-3">No attendance records found.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="dash-card">
+                    <div class="dash-title">
+                        <span><i class="fas fa-tasks text-warning me-2"></i> Assessment Scores</span>
+                    </div>
+                    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                        <table class="table table-hover">
+                            <thead class="sticky-top">
+                                <tr>
+                                    <th>Assessment Title</th>
+                                    <th class="text-center">Score</th>
+                                    <th class="text-center">Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scoresBody">
+                                <tr><td colspan="3" class="text-center py-4 text-muted">No exams taken yet.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="dash-card">
+                    <div class="dash-title">
+                        <span><i class="fas fa-comment-dots text-info me-2"></i> Behavior & Notes</span>
+                    </div>
+                    
+                    <form id="addNoteForm" class="mb-4">
+                        <div class="input-group">
+                            <input type="text" id="newNoteInput" class="form-control" placeholder="Add an observation..." required>
+                            <button class="btn btn-primary fw-bold" type="submit" id="saveNoteBtn">Save</button>
+                        </div>
+                    </form>
+
+                    <div id="notesContainer" style="max-height: 250px; overflow-y: auto; padding-right: 10px;">
+                        <div class="text-center text-muted py-4 small">No behavior notes recorded.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        let targetStudentId = null;
+        let currentTeacherId = null;
+        let performanceChartInstance = null;
+
+        // === UI TOGGLES ===
+        window.toggleTheme = () => {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+            
+            // Update Chart Colors if it exists
+            if (performanceChartInstance) {
+                const gridColor = isDark ? '#333333' : '#e9ecef';
+                const textColor = isDark ? '#a0a0a0' : '#6c757d';
+                performanceChartInstance.options.scales.x.grid.color = gridColor;
+                performanceChartInstance.options.scales.y.grid.color = gridColor;
+                performanceChartInstance.options.scales.x.ticks.color = textColor;
+                performanceChartInstance.options.scales.y.ticks.color = textColor;
+                performanceChartInstance.update();
+            }
+        };
+
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
+        }
+
+        // === INITIALIZATION ===
+        async function loadStudent360() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = 'login.html';
+                currentTeacherId = session.user.id;
+
+                const urlParams = new URLSearchParams(window.location.search);
+                targetStudentId = urlParams.get('student_id');
+
+                if (!targetStudentId) {
+                    alert("No student selected.");
+                    return window.history.back();
+                }
+
+                // 1. Load Profile
+                const { data: student } = await supabase.from('students').select('*, classes(name)').eq('user_id', targetStudentId).single();
+                
+                document.getElementById('studentName').innerText = `${student.surname || ''} ${student.first_name || ''}`;
+                document.getElementById('regNumber').innerText = student.reg_number || 'N/A';
+                document.getElementById('className').innerText = student.classes?.name || 'Unassigned';
+                document.getElementById('profileImg').src = student.passport_url || `https://ui-avatars.com/api/?name=${student.first_name}+${student.surname}&background=007a4d&color=fff`;
+                
+                // Set Report Card Link
+                document.getElementById('downloadReportBtn').href = `admin_student_report.html?student_id=${targetStudentId}`;
+
+                // 2. Load Assessment Scores & Calculate Average
+                const { data: results } = await supabase.from('test_results').select('score, total_questions, created_at, tests(title)').eq('student_id', targetStudentId).order('created_at', { ascending: true });
+                
+                let labels = [];
+                let dataPoints = [];
+                let totalPercentage = 0;
+
+                if (results && results.length > 0) {
+                    let scoresHtml = '';
+                    results.forEach(r => {
+                        const title = r.tests?.title || 'Assessment';
+                        const percent = Math.round((r.score / r.total_questions) * 100);
+                        totalPercentage += percent;
+                        
+                        // For Chart
+                        labels.push(title.substring(0, 10) + '...');
+                        dataPoints.push(percent);
+
+                        // For Table
+                        scoresHtml += `
+                            <tr>
+                                <td class="fw-bold">${title}</td>
+                                <td class="text-center">${r.score}/${r.total_questions}</td>
+                                <td class="text-center fw-bold ${percent >= 50 ? 'text-success' : 'text-danger'}">${percent}%</td>
+                            </tr>
+                        `;
+                    });
+
+                    document.getElementById('scoresBody').innerHTML = scoresHtml;
+                    
+                    const avg = Math.round(totalPercentage / results.length);
+                    document.getElementById('overallAvg').innerText = `${avg}%`;
+
+                    // Trigger Risk Alert if average is below 50%
+                    if (avg < 50) {
+                        document.getElementById('riskAlertBox').style.display = 'flex';
+                    }
+
+                    renderChart(labels, dataPoints);
+                } else {
+                    renderChart(['No Data'], [0]);
+                }
+
+                // 3. Load Attendance (Graceful fail if table missing)
+                try {
+                    const { data: attendance } = await supabase.from('attendance').select('*').eq('student_id', targetStudentId).order('date', { ascending: false }).limit(5);
+                    if (attendance && attendance.length > 0) {
+                        document.getElementById('attendanceBody').innerHTML = attendance.map(a => `
+                            <tr>
+                                <td>${new Date(a.date).toLocaleDateString()}</td>
+                                <td class="text-end fw-bold ${a.status === 'Present' ? 'text-success' : 'text-danger'}">${a.status}</td>
+                            </tr>
+                        `).join('');
+                    }
+                } catch(e) { console.log("Attendance table not configured yet."); }
+
+                // 4. Load Behavior Notes (Graceful fail if table missing)
+                await fetchNotes();
+
+                document.getElementById('loadingOverlay').style.display = 'none';
+
+            } catch (err) {
+                console.error(err);
+                alert("Failed to load student data.");
+                window.history.back();
+            }
+        }
+
+        // Behavior Notes Logic
+        async function fetchNotes() {
+            try {
+                const { data: notes } = await supabase.from('behavior_notes').select('*, users(name)').eq('student_id', targetStudentId).order('created_at', { ascending: false });
+                if (notes && notes.length > 0) {
+                    document.getElementById('notesContainer').innerHTML = notes.map(n => `
+                        <div class="note-item">
+                            <div class="note-meta">${n.users?.name || 'Staff'} • ${new Date(n.created_at).toLocaleDateString()}</div>
+                            <div>${n.note}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch(e) { console.log("Behavior table not configured yet."); }
+        }
+
+        document.getElementById('addNoteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('newNoteInput');
+            const btn = document.getElementById('saveNoteBtn');
+            btn.disabled = true;
+
+            try {
+                await supabase.from('behavior_notes').insert([{
+                    student_id: targetStudentId,
+                    teacher_id: currentTeacherId,
+                    note: input.value
+                }]);
+                input.value = '';
+                await fetchNotes();
+            } catch(err) {
+                alert("Database table 'behavior_notes' needs to be created in Supabase first!");
+            }
+            btn.disabled = false;
+        });
+
+        // Chart.js Rendering
+        function renderChart(labels, data) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            const isDark = document.body.classList.contains('dark-mode');
+            const gridColor = isDark ? '#333333' : '#e9ecef';
+            const textColor = isDark ? '#a0a0a0' : '#6c757d';
+
+            performanceChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Score Percentage',
+                        data: data,
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#3498db',
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            max: 100,
+                            grid: { color: gridColor },
+                            ticks: { color: textColor }
+                        },
+                        x: {
+                            grid: { color: gridColor },
+                            ticks: { color: textColor }
+                        }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadStudent360);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
+    </script>
+</body>
+</html>
