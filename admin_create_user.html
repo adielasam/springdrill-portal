@@ -334,20 +334,25 @@
                 if (!authData || !authData.user) throw new Error("Failed to generate authentication data.");
                 
                 const newUserId = authData.user.id;
+                
+                // Extract a username from the auto-generated email (e.g. davidsabbath8309)
+                const generatedUsername = email.split('@')[0];
 
                 // FIX: Add a brief 1.5-second delay to allow Database triggers to settle!
                 await new Promise(resolve => setTimeout(resolve, 1500));
 
-                // 2. EXPLICITLY CREATE THE USER IN PUBLIC.USERS (Fixes the Foreign Key Crash!)
+                // 2. EXPLICITLY CREATE THE USER IN PUBLIC.USERS
+                // ADDED THE REQUIRED "USERNAME" FIELD TO FIX THE NOT-NULL CONSTRAINT ERROR!
                 const { error: syncErr } = await supabase.from('users').upsert({
                     id: newUserId,
                     name: name,
                     email: email,
+                    username: generatedUsername, 
                     role: role,
                     gender: gender
                 }, { onConflict: 'id' });
                 
-                if (syncErr) throw new Error("Database blocked user sync. Did you run the SQL script to disable RLS? " + syncErr.message);
+                if (syncErr) throw new Error("Database blocked user sync. " + syncErr.message);
 
                 // 3. Update Specific Data based on Role
                 if (role === 'teacher') {
