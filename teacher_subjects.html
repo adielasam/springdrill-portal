@@ -17,7 +17,8 @@
             --text-muted: #6c757d; 
             --border-color: #e9ecef; 
             --input-bg: #f8f9fa; 
-            --ai-bg: #f1f8ff;
+            --ai-bg: #ffffff;
+            --ai-content-bg: #f8f9fa;
         }
         body.dark-mode { 
             --bg-color: #121212; 
@@ -26,7 +27,8 @@
             --text-muted: #a0a0a0; 
             --border-color: #333333; 
             --input-bg: #2c2c2c; 
-            --ai-bg: #1a222b;
+            --ai-bg: #1e1e1e;
+            --ai-content-bg: #2c2c2c;
         }
 
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
@@ -58,8 +60,8 @@
         .form-control:focus, .form-select:focus { border-color: #007a4d; box-shadow: 0 0 0 0.25rem rgba(0, 122, 77, 0.25); background-color: var(--card-bg); color: var(--text-color); }
 
         /* AI PLANNER BOX */
-        .ai-result-box { background-color: var(--ai-bg); border: 1px solid #b6d4fe; border-radius: 8px; padding: 30px; min-height: 200px; display: none; margin-top: 20px; font-family: 'Georgia', serif; line-height: 1.8; color: var(--text-color);}
-        body.dark-mode .ai-result-box { border-color: #0d6efd; }
+        .ai-result-box { background-color: var(--ai-bg); border: 1px solid #b6d4fe; border-radius: 8px; padding: 40px; min-height: 200px; display: none; margin-top: 20px; font-family: 'Georgia', serif; line-height: 1.8; color: var(--text-color); box-shadow: 0 10px 30px rgba(0,0,0,0.05);}
+        body.dark-mode .ai-result-box { border-color: #0d6efd; color: #e0e0e0; }
         
         /* TABLES */
         .table { color: var(--text-color); border-color: var(--border-color); }
@@ -98,9 +100,8 @@
         
         <nav class="nav flex-column mt-3">
             <a href="teacher_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
-            
             <a href="teacher_class_list.html" class="nav-link"><i class="fas fa-users"></i> Class Roster & 360°</a>
-
+            <a href="teacher_eclassroom.html" class="nav-link"><i class="fas fa-video text-danger"></i> eClassroom</a>
             <a href="teacher_subjects.html" class="nav-link active text-success fw-bold"><i class="fas fa-book"></i> Materials & AI Planner</a>
 
             <a href="#cbtMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
@@ -113,7 +114,8 @@
                 <a href="manage_cbt.html" class="nav-link small py-2"><i class="fas fa-list me-2"></i> Manage Exams</a>
                 <a href="test_results.html" class="nav-link small py-2"><i class="fas fa-chart-bar me-2"></i> Result Manager</a>
             </div>
-
+            
+            <a href="teacher_messages.html" class="nav-link mt-2"><i class="fas fa-envelope"></i> Communications</a>
             <hr class="mx-3 my-4 border-secondary">
             <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Secure Logout</a>
         </nav>
@@ -184,7 +186,7 @@
 
             <div class="tab-pane fade" id="aiTab">
                 <div class="edu-card border-primary">
-                    <div class="edu-header bg-primary text-white"><i class="fas fa-magic me-2"></i> Generate Smart Lesson Plans</div>
+                    <div class="edu-header bg-primary text-white"><i class="fas fa-magic me-2"></i> Generate Smart NERDC Lesson Plans & Content</div>
                     <div class="edu-body">
                         <form id="aiForm">
                             <div class="row g-3 mb-4">
@@ -202,16 +204,16 @@
                                 </div>
                             </div>
                             <button type="submit" id="btnGenerate" class="btn btn-primary fw-bold w-100 py-3 shadow-sm" style="font-size: 1.1rem;">
-                                <i class="fas fa-robot me-2"></i> Generate AI Lesson Plan
+                                <i class="fas fa-robot me-2"></i> Generate Complete NERDC Plan & Content
                             </button>
                         </form>
 
-                        <div id="aiResultArea" class="ai-result-box shadow-inner mt-4">
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3" style="border-color: #b6d4fe !important;">
-                                <h4 class="fw-bold m-0 text-primary"><i class="fas fa-file-alt me-2"></i> Official Lesson Plan</h4>
+                        <div id="aiResultArea" class="ai-result-box shadow mt-4">
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4" style="border-color: #b6d4fe !important;">
+                                <h4 class="fw-bold m-0 text-primary"><i class="fas fa-file-alt me-2"></i> Document Generated</h4>
                                 <div>
-                                    <button class="btn btn-sm btn-outline-primary fw-bold me-2" onclick="copyAiText()"><i class="fas fa-copy me-1"></i> Copy</button>
-                                    <button class="btn btn-sm btn-primary fw-bold" onclick="downloadAiPdf()"><i class="fas fa-file-pdf me-1"></i> Save PDF</button>
+                                    <button class="btn btn-sm btn-outline-primary fw-bold me-2 shadow-sm" onclick="copyAiText()"><i class="fas fa-copy me-1"></i> Copy Text</button>
+                                    <button class="btn btn-sm btn-primary fw-bold shadow-sm" onclick="downloadAiPdf()"><i class="fas fa-file-pdf me-1"></i> Save PDF</button>
                                 </div>
                             </div>
                             <div id="aiTextContent"></div>
@@ -314,21 +316,18 @@
             const file = document.getElementById('materialFile').files[0];
 
             try {
-                // 1. Upload to Storage Bucket 'materials'
                 const fileExt = file.name.split('.').pop();
                 const fileName = `${type}_${currentTeacherId}_${Date.now()}.${fileExt}`;
-                const { error: uploadError } = await supabase.storage.from('materials').upload(fileName, file);
-                if (uploadError) throw new Error("Ensure 'materials' storage bucket exists and is public.");
+                const { error: uploadError } = await supabase.storage.from('lesson_notes').upload(fileName, file);
+                
+                if (uploadError) throw new Error(uploadError.message || "Upload failed. Please check storage permissions.");
 
-                // 2. Get Public URL
-                const { data: publicUrlData } = supabase.storage.from('materials').getPublicUrl(fileName);
+                const { data: publicUrlData } = supabase.storage.from('lesson_notes').getPublicUrl(fileName);
                 const fileUrl = publicUrlData.publicUrl;
 
-                // 3. Fetch Subject Name (Needed for Lesson Notes table)
                 const { data: subj } = await supabase.from('subjects').select('name').eq('id', subjectId).single();
                 const subjectName = subj ? subj.name : 'General';
 
-                // 4. Insert into correct table based on type
                 if (type === 'scheme') {
                     await supabase.from('schemes_of_work').insert([{ class_id: classId, subject_id: subjectId, title: title, file_url: fileUrl, teacher_id: currentTeacherId }]);
                 } else {
@@ -350,7 +349,6 @@
         // === REPOSITORY LOADER ===
         async function loadRepository() {
             try {
-                // Fetch from both tables
                 const { data: schemes } = await supabase.from('schemes_of_work').select('id, title, file_url, classes(name), subjects(name)').eq('teacher_id', currentTeacherId);
                 const { data: notes } = await supabase.from('lesson_notes').select('id, title, file_url, classes(name), subject_name').eq('teacher_id', currentTeacherId);
 
@@ -385,84 +383,67 @@
             await loadRepository();
         };
 
-        // === AI LESSON PLANNER (Simulated streaming for realistic UX) ===
+        // === REAL SUPABASE EDGE FUNCTION AI CALL ===
         document.getElementById('aiForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnGenerate');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Analyzing Curriculum...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Generating Curriculum...';
             btn.disabled = true;
 
             const topic = document.getElementById('aiTopic').value;
             const cls = document.getElementById('aiClass').options[document.getElementById('aiClass').selectedIndex].text;
             const sub = document.getElementById('aiSubject').options[document.getElementById('aiSubject').selectedIndex].text;
 
-            // Show box, clear old text
             const resBox = document.getElementById('aiResultArea');
             const txtBox = document.getElementById('aiTextContent');
             resBox.style.display = 'block';
-            txtBox.innerHTML = '';
+            txtBox.innerHTML = '<div class="text-center py-4"><i class="fas fa-circle-notch fa-spin fa-2x text-primary mb-3"></i><br>Connecting to OpenAI via Supabase Edge Function...</div>';
 
-            // Simulate Network Delay & Stream Generation
-            setTimeout(() => {
-                btn.innerHTML = '<i class="fas fa-robot me-2"></i> Generate AI Lesson Plan';
-                btn.disabled = false;
+            try {
+                // IMPORTANT: Replace 'generate-lesson' with the exact name of your Edge Function if it's different!
+                const { data, error } = await supabase.functions.invoke('generate-lesson', {
+                    body: { 
+                        topic: topic, 
+                        className: cls, 
+                        subject: sub,
+                        instruction: "Format the output perfectly using HTML tags (<h3>, <strong>, <ul>, <p>, etc.). Follow the exact NERDC National Curriculum for Nigeria. Include these exact sections: 1. PERFORMANCE OBJECTIVES 2. TEACHING & LEARNING MATERIALS 3. TEACHER & STUDENT ACTIVITIES 4. COMPREHENSIVE LESSON NOTE (Make this very detailed and wrapped in a nice div) 5. EVALUATION & ASSIGNMENT."
+                    }
+                });
+
+                if (error) throw error;
                 
-                const template = `
-<strong>LESSON PLAN OVERVIEW</strong><br>
-<strong>Subject:</strong> ${sub}<br>
-<strong>Class:</strong> ${cls}<br>
-<strong>Topic:</strong> ${topic}<br>
-<strong>Duration:</strong> 40 Minutes<br><br>
+                txtBox.innerHTML = ''; // Clear loading spinner
+                
+                // Adjust this line based on exactly how your Edge Function returns the data
+                // E.g., data.reply, data.choices[0].message.content, data.text
+                const aiContent = data.reply || data.content || data.choices?.[0]?.message?.content || data;
 
-<strong>1. BEHAVIORAL OBJECTIVES</strong><br>
-By the end of this lesson, students should be able to:<br>
-- Define ${topic} clearly.<br>
-- Identify the key components and real-world applications of ${topic}.<br>
-- Solve basic problems or answer structural questions related to the topic.<br><br>
-
-<strong>2. PREVIOUS KNOWLEDGE</strong><br>
-Students have a foundational understanding of the basic concepts leading up to ${topic}.<br><br>
-
-<strong>3. INSTRUCTIONAL MATERIALS</strong><br>
-- Interactive Whiteboard / Smart Screen<br>
-- Downloadable PDF Notes<br>
-- Visual diagrams and charts related to ${topic}<br><br>
-
-<strong>4. LESSON PRESENTATION (STEP-BY-STEP)</strong><br>
-<em>Step 1: Introduction (5 mins)</em><br>
-Hook the students' attention by asking a thought-provoking question about ${topic}. Connect it to their everyday lives.<br><br>
-
-<em>Step 2: Core Explanation (15 mins)</em><br>
-Break down the definition and characteristics of ${topic}. Use the instructional materials to provide visual context.<br><br>
-
-<em>Step 3: Interactive Session & Examples (10 mins)</em><br>
-Provide live examples. Call on random students to answer prompt questions to ensure active engagement.<br><br>
-
-<em>Step 4: Evaluation & Conclusion (10 mins)</em><br>
-Summarize the key points. Administer a quick 3-question oral quiz. Assign homework based on ${topic} to reinforce learning.<br>
-                `;
-
-                // Typewriter effect
+                // Typewriter effect to display the real AI content
                 let i = 0;
-                function typeWriter() {
-                    if (i < template.length) {
-                        // Allow HTML tags to render instantly without breaking
-                        if(template.charAt(i) === '<') {
+                function typeWriterReal() {
+                    if (i < aiContent.length) {
+                        if(aiContent.charAt(i) === '<') {
                             let tag = '';
-                            while(template.charAt(i) !== '>' && i < template.length) { tag += template.charAt(i); i++; }
+                            while(aiContent.charAt(i) !== '>' && i < aiContent.length) { tag += aiContent.charAt(i); i++; }
                             tag += '>';
                             txtBox.innerHTML += tag;
                             i++;
                         } else {
-                            txtBox.innerHTML += template.charAt(i);
+                            txtBox.innerHTML += aiContent.charAt(i);
                             i++;
                         }
-                        setTimeout(typeWriter, 5);
+                        setTimeout(typeWriterReal, 2);
                     }
                 }
-                typeWriter();
+                typeWriterReal();
 
-            }, 1500);
+            } catch (err) {
+                console.error("AI Error:", err);
+                txtBox.innerHTML = `<div class="alert alert-danger fw-bold"><i class="fas fa-exclamation-triangle me-2"></i> Error reaching the AI backend: ${err.message}. Make sure your Supabase Edge Function is deployed and active.</div>`;
+            } finally {
+                btn.innerHTML = '<i class="fas fa-robot me-2"></i> Generate Complete NERDC Plan & Content';
+                btn.disabled = false;
+            }
         });
 
         window.copyAiText = () => {
@@ -474,7 +455,14 @@ Summarize the key points. Administer a quick 3-question oral quiz. Assign homewo
         window.downloadAiPdf = () => {
             const element = document.getElementById('aiTextContent');
             const topic = document.getElementById('aiTopic').value || 'Lesson_Plan';
-            html2pdf().set({ margin: 15, filename: `${topic}_Plan.pdf` }).from(element).save();
+            
+            element.style.color = "black";
+            element.style.backgroundColor = "white";
+            
+            html2pdf().set({ margin: 15, filename: `${topic}_NERDC_Plan.pdf` }).from(element).save().then(() => {
+                element.style.color = "";
+                element.style.backgroundColor = "";
+            });
         };
 
         document.addEventListener('DOMContentLoaded', initialize);

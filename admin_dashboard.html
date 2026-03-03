@@ -3,92 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRINGDRILL - Admin Command Center</title>
+    <title>SPRINGDRILL - Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
-            --bg-color: #f4f7fa;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --text-muted: #6c757d;
-            --border-color: #e9ecef;
-            --input-bg: #f8f9fa;
+        /* GLOBAL DARK MODE ENGINE */
+        :root { 
+            --bg-color: #f4f7fa; 
+            --card-bg: #ffffff; 
+            --text-color: #333333; 
+            --text-muted: #6c757d; 
+            --border-color: #e9ecef; 
+            --input-bg: #f8f9fa; 
+            --stat-icon-bg: #e8f5e9;
         }
-
-        /* DARK MODE VARIABLES */
-        body.dark-mode {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --text-color: #e0e0e0;
-            --text-muted: #a0a0a0;
-            --border-color: #333333;
-            --input-bg: #2c2c2c;
+        body.dark-mode { 
+            --bg-color: #121212; 
+            --card-bg: #1e1e1e; 
+            --text-color: #e0e0e0; 
+            --text-muted: #a0a0a0; 
+            --border-color: #333333; 
+            --input-bg: #2c2c2c; 
+            --stat-icon-bg: #1a2e21;
         }
 
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
         
-        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1050; transition: transform 0.3s ease; }
-        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center;}
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.1);}
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; display: flex; align-items: center; font-size: 0.95rem; text-decoration: none;}
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
 
         .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
         
-        /* HEADER & WIDGETS */
-        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d; transition: all 0.3s;}
-        
-        .search-bar { max-width: 350px; width: 100%; }
-        .search-bar .form-control { background-color: var(--input-bg); color: var(--text-color); border-color: var(--border-color); }
-        .search-bar .form-control:focus { box-shadow: none; border-color: #007a4d; }
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #007a4d; transition: all 0.3s; }
         .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
         .dark-toggle-btn:hover { transform: scale(1.1); }
 
-        .welcome-banner { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;}
-        .welcome-banner h4 { font-weight: 800; color: var(--text-color); text-transform: uppercase; font-size: 1.2rem; margin: 0;}
+        /* Profile Banner */
+        .profile-banner { background: linear-gradient(135deg, #007a4d 0%, #004d34 100%); border-radius: 12px; padding: 30px; color: white; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 20px rgba(0, 122, 77, 0.2);}
+        .profile-banner h2 { font-weight: 800; margin-bottom: 5px; }
+        .profile-banner p { margin-bottom: 0; opacity: 0.9; font-size: 1.1rem; }
 
-        /* CARDS */
-        .stat-card { background: var(--card-bg); border-radius: 4px; padding: 20px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); transition: all 0.3s;}
-        .stat-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: white;}
-        .stat-info h6 { font-weight: bold; color: var(--text-muted); margin-bottom: 2px; font-size: 0.8rem; text-transform: uppercase;}
-        .stat-info h3 { font-weight: 900; color: var(--text-color); margin-bottom: 0; font-size: 1.8rem;}
+        /* Stat Cards */
+        .stat-card { background: var(--card-bg); border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 20px; transition: all 0.3s; height: 100%;}
+        .stat-card:hover { transform: translateY(-5px); border-color: #007a4d; }
+        .stat-icon { width: 65px; height: 65px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: var(--input-bg); color: #007a4d;}
+        .stat-info h6 { font-weight: bold; color: var(--text-muted); margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;}
+        .stat-info h2 { font-weight: 900; color: var(--text-color); margin-bottom: 0; }
 
-        .bg-stu { background-color: #3498db; } .bg-tch { background-color: #e74c3c; } .bg-cbt { background-color: #f39c12; } .bg-res { background-color: #2ecc71; }
+        /* League Table Widget */
+        .league-widget { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.02); overflow: hidden; transition: all 0.3s; height: 100%; display: flex; flex-direction: column;}
+        .league-header { background: #1a3c34; color: white; padding: 15px 25px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .league-table { width: 100%; color: var(--text-color); margin-bottom: 0; }
+        .league-table th { background: var(--input-bg); color: var(--text-muted); border-bottom: 1px solid var(--border-color); padding: 12px 20px; font-size: 0.85rem; text-transform: uppercase; }
+        .league-table td { padding: 15px 20px; vertical-align: middle; border-bottom: 1px solid var(--border-color); font-weight: 500; }
+        .league-table tr:last-child td { border-bottom: none; }
+        .league-table tbody tr:hover { background-color: var(--input-bg); }
+        .rank-badge { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; margin: 0 auto; }
+        .rank-1 { background: #f1c40f; box-shadow: 0 0 10px rgba(241, 196, 15, 0.5); }
+        .rank-2 { background: #bdc3c7; }
+        .rank-3 { background: #cd7f32; }
+        .rank-other { background: var(--border-color); color: var(--text-muted); }
 
-        .edu-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; transition: all 0.3s; }
-        .edu-header { background-color: #007a4d; color: white; padding: 12px 20px; border-radius: 4px 4px 0 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center;}
-        .edu-header.light-header { background-color: var(--input-bg); color: var(--text-color); border-bottom: 1px solid var(--border-color); }
-        .edu-body { padding: 25px; color: var(--text-color); }
+        /* Quick Links Grid */
+        .quick-links-header { font-weight: 800; color: var(--text-color); margin-bottom: 20px; margin-top: 10px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;}
+        .quick-link-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); padding: 25px; text-align: center; transition: all 0.3s; text-decoration: none; color: var(--text-color); display: block; box-shadow: 0 4px 15px rgba(0,0,0,0.02);}
+        .quick-link-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-color: #007a4d; color: var(--text-color); }
+        .quick-link-card i { font-size: 2.5rem; color: #3498db; margin-bottom: 15px; }
+        .quick-link-card h5 { font-weight: 700; margin-bottom: 10px; }
+        .quick-link-card p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0; }
 
-        .quick-search-input { background-color: var(--input-bg); color: var(--text-color); border: 2px solid #007a4d; padding: 15px 20px; font-size: 1.1rem; border-radius: 8px; font-weight: bold; width: 100%; transition: all 0.3s;}
-        .quick-search-input:focus { outline: none; box-shadow: 0 0 0 0.25rem rgba(0, 122, 77, 0.25); background-color: var(--card-bg); color: var(--text-color); }
-        
-        .list-group-item { background-color: transparent; color: var(--text-color); border-color: var(--border-color); }
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
 
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s;}
-
-        /* MOBILE OPTIMIZATION */
-        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
-        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
-        
         @media (max-width: 992px) {
             .sidebar { transform: translateX(-100%); }
-            .sidebar.mobile-open { transform: translateX(0); box-shadow: 2px 0 15px rgba(0,0,0,0.3); }
+            .sidebar.mobile-open { transform: translateX(0); }
             .main-content { margin-left: 0; padding: 15px; }
-            .mobile-menu-toggle { display: inline-block; }
-            .top-navbar { padding: 15px; flex-direction: column; gap: 15px; align-items: stretch; }
-            .search-bar { max-width: 100%; }
-            .header-profile-section { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+            .mobile-menu-toggle { display: inline-block !important; }
+            .top-navbar { padding: 15px; flex-direction: column; gap: 10px; }
+            .profile-banner { flex-direction: column; text-align: center; gap: 15px; }
         }
+        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
+        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
     </style>
 </head>
 <body>
 
     <div id="loadingOverlay">
         <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
-        <h4 class="fw-bold" style="color: var(--text-muted);">Authenticating Admin...</h4>
+        <h4 class="fw-bold" style="color: var(--text-muted);">Loading Dashboard...</h4>
     </div>
 
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -98,22 +103,25 @@
             <h5 class="text-white fw-bold m-0"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
             <button class="btn btn-sm btn-link text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
         </div>
+        
         <nav class="nav flex-column mt-3">
             <a href="admin_dashboard.html" class="nav-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             
-            <a href="#usersMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2">
+            <a href="#usersMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
                 <span><i class="fas fa-users me-2"></i> Accounts</span><i class="fas fa-caret-down"></i>
             </a>
-            <div class="collapse bg-dark mx-2 mt-1 rounded" id="usersMenu">
+            <div class="collapse show bg-dark mx-2 mt-1 rounded" id="usersMenu">
                 <a href="admin_create_user.html" class="nav-link small py-2"><i class="fas fa-user-plus me-2"></i> Generate Account</a>
                 <a href="manage_users.html" class="nav-link small py-2"><i class="fas fa-user-check me-2"></i> Approvals</a>
                 <a href="class_list.html" class="nav-link small py-2"><i class="fas fa-clipboard-list me-2"></i> Class Data</a>
             </div>
 
-            <a href="admin_messages.html" class="nav-link mt-2"><i class="fas fa-envelope me-2"></i> Internal Mail <span class="badge bg-danger ms-auto" id="navUnread" style="display:none;">0</span></a>
-            
+            <a href="admin_league_table.html" class="nav-link mt-2"><i class="fas fa-trophy text-warning me-2"></i> League Table</a>
+
+            <a href="admin_messages.html" class="nav-link mt-2"><i class="fas fa-envelope me-2"></i> Internal Mail</a>
+
             <hr class="mx-3 my-4 border-secondary">
-            <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Secure Logout</a>
         </nav>
     </div>
 
@@ -121,231 +129,224 @@
         <div class="top-navbar">
             <div class="d-flex align-items-center">
                 <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-                <div class="fw-bold d-none d-lg-block" style="color: var(--text-muted);"><i class="fas fa-shield-alt me-2"></i> System Administration</div>
+                <div class="fw-bold d-none d-md-block" style="color: var(--text-muted);"><i class="fas fa-shield-alt me-2"></i> Administrator Console</div>
             </div>
 
-            <div class="search-bar input-group">
-                <input type="text" class="form-control form-control-sm" placeholder="Quick Search (Students/Classes...)" oninput="window.searchStudent(this.value)">
-                <button class="btn btn-outline-secondary btn-sm" type="button"><i class="fas fa-search"></i></button>
-            </div>
-
-            <div class="header-profile-section mt-3 mt-lg-0">
-                <div class="d-flex align-items-center">
-                    <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
-                        <i class="fas fa-moon" id="themeIcon"></i>
-                    </button>
-
-                    <div class="fw-bold d-flex align-items-center" style="color: var(--text-color);">
-                        <span id="adminName">Loading...</span><i class="fas fa-user-shield ms-3 fs-4 text-primary"></i>
-                    </div>
+            <div class="d-flex align-items-center ms-auto">
+                <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                <div class="fw-bold d-flex align-items-center" style="color: var(--text-color);">
+                    <span id="navAdminName">Loading...</span><i class="fas fa-user-shield ms-3 fs-4 text-primary"></i>
                 </div>
             </div>
         </div>
 
-        <div class="welcome-banner">
-            <h4 id="welcomeText">ADMIN COMMAND CENTER</h4>
+        <div class="profile-banner">
+            <div>
+                <h2 id="welcomeText">Welcome back, Admin!</h2>
+                <p>Monitor school operations and track top performing students.</p>
+            </div>
+            <div class="d-none d-md-block">
+                <i class="fas fa-server fa-4x opacity-50"></i>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-users text-primary"></i></div>
+                    <div class="stat-info">
+                        <h6>Total Active Users</h6>
+                        <h2 id="totalUsers">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-user-clock text-warning"></i></div>
+                    <div class="stat-info">
+                        <h6>Pending Approvals</h6>
+                        <h2 id="pendingUsers">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-chalkboard text-success"></i></div>
+                    <div class="stat-info">
+                        <h6>Total Classes</h6>
+                        <h2 id="totalClasses">0</h2>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="row g-4 mb-5">
-            <div class="col-md-6 col-lg-3"><div class="stat-card"><div class="stat-icon bg-stu shadow-sm"><i class="fas fa-user-graduate"></i></div><div class="stat-info"><h6>Active Students</h6><h3 id="statStudents">--</h3></div></div></div>
-            <div class="col-md-6 col-lg-3"><div class="stat-card"><div class="stat-icon bg-tch shadow-sm"><i class="fas fa-chalkboard-teacher"></i></div><div class="stat-info"><h6>Active Staff</h6><h3 id="statTeachers">--</h3></div></div></div>
-            <div class="col-md-6 col-lg-3"><div class="stat-card"><div class="stat-icon bg-cbt shadow-sm"><i class="fas fa-laptop-code"></i></div><div class="stat-info"><h6>Exams Created</h6><h3 id="statExams">--</h3></div></div></div>
-            <div class="col-md-6 col-lg-3"><div class="stat-card"><div class="stat-icon bg-res shadow-sm"><i class="fas fa-medal"></i></div><div class="stat-info"><h6>Results Logged</h6><h3 id="statResults">--</h3></div></div></div>
-        </div>
-
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="edu-card">
-                    <div class="edu-header light-header"><i class="fas fa-history text-primary me-2"></i> Recent System Activity</div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between align-items-center py-3">
-                            <div><i class="fas fa-user-check text-success me-3"></i> <strong>New Teacher Account</strong> approved</div>
-                            <small style="color: var(--text-muted);">10 mins ago</small>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center py-3">
-                            <div><i class="fas fa-laptop-code text-warning me-3"></i> <strong>CBT Exam Generated</strong> for Year 8 Science</div>
-                            <small style="color: var(--text-muted);">2 hours ago</small>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center py-3">
-                            <div><i class="fas fa-file-export text-primary me-3"></i> <strong>Report Cards Extracted</strong> by Admin</div>
-                            <small style="color: var(--text-muted);">Yesterday</small>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
+            
             <div class="col-lg-7">
-                <div class="edu-card border-success">
-                    <div class="edu-header bg-success"><span><i class="fas fa-search me-2"></i> Global Student Lookup</span></div>
-                    <div class="edu-body text-center py-5">
-                        <i class="fas fa-id-card fa-3x mb-3 opacity-25" style="color: var(--text-muted);"></i>
-                        <h5 class="fw-bold mb-3">Find Student Results Instantly</h5>
-                        <input type="text" class="quick-search-input mb-3 text-center" placeholder="Search by Name or Reg Number..." oninput="window.searchStudent(this.value)">
-                        <div id="searchResults" class="text-start mt-4"></div>
+                <div class="league-widget">
+                    <div class="league-header">
+                        <span><i class="fas fa-trophy text-warning me-2"></i> Global Top Performers</span>
+                        <a href="admin_league_table.html" class="btn btn-sm btn-warning fw-bold text-dark">View Full Table</a>
+                    </div>
+                    <div class="table-responsive flex-grow-1">
+                        <table class="league-table">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" width="10%">Rank</th>
+                                    <th width="45%">Student Name</th>
+                                    <th width="25%">Class</th>
+                                    <th class="text-center" width="20%">Points</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leagueWidgetBody">
+                                <tr><td colspan="4" class="text-center py-4" style="color: var(--text-muted);">Calculating leaderboard...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+
             <div class="col-lg-5">
-                <div class="edu-card">
-                    <div class="edu-header bg-dark"><span><i class="fas fa-chart-bar me-2"></i> Student Distribution</span></div>
-                    <div class="edu-body"><div style="position: relative; height:300px; width:100%"><canvas id="studentChart"></canvas></div></div>
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <a href="admin_create_user.html" class="quick-link-card p-3">
+                            <i class="fas fa-user-plus text-success fs-3 mb-2"></i>
+                            <h6 class="fw-bold mb-1">Create Account</h6>
+                            <p class="small" style="font-size: 0.75rem;">Generate credentials.</p>
+                        </a>
+                    </div>
+                    <div class="col-sm-6">
+                        <a href="manage_users.html" class="quick-link-card p-3">
+                            <i class="fas fa-user-check text-primary fs-3 mb-2"></i>
+                            <h6 class="fw-bold mb-1">Approvals</h6>
+                            <p class="small" style="font-size: 0.75rem;">Verify new users.</p>
+                        </a>
+                    </div>
+                    <div class="col-sm-6">
+                        <a href="class_list.html" class="quick-link-card p-3">
+                            <i class="fas fa-clipboard-list text-info fs-3 mb-2"></i>
+                            <h6 class="fw-bold mb-1">Class Directory</h6>
+                            <p class="small" style="font-size: 0.75rem;">View rosters.</p>
+                        </a>
+                    </div>
+                    <div class="col-sm-6">
+                        <a href="admin_messages.html" class="quick-link-card p-3">
+                            <i class="fas fa-envelope text-danger fs-3 mb-2"></i>
+                            <h6 class="fw-bold mb-1">Internal Mail</h6>
+                            <p class="small" style="font-size: 0.75rem;">Check messages.</p>
+                        </a>
+                    </div>
                 </div>
             </div>
+
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
-        // UI Toggles
-        window.toggleSidebar = () => {
-            document.getElementById('sidebar').classList.toggle('mobile-open');
-            const overlay = document.getElementById('sidebarOverlay');
-            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
-        };
-
+        // === UI TOGGLES ===
+        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('mobile-open'); document.getElementById('sidebarOverlay').style.display = document.getElementById('sidebarOverlay').style.display === 'block' ? 'none' : 'block'; };
         window.toggleTheme = () => {
-            const body = document.body;
-            body.classList.toggle('dark-mode');
+            const body = document.body; body.classList.toggle('dark-mode');
             const isDark = body.classList.contains('dark-mode');
             localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
-            
-            const icon = document.getElementById('themeIcon');
-            icon.className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
         };
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { document.body.classList.add('dark-mode'); document.getElementById('themeIcon').className = 'fas fa-sun text-warning'; }
 
-        // Initialize Theme from storage
-        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') {
-            document.body.classList.add('dark-mode');
-            document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
-        }
-
-        async function initializeAdminDashboard() {
+        // === DASHBOARD LOGIC ===
+        async function initializeDashboard() {
             try {
+                // Auth Check
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
 
-                const { data: profile } = await supabase.from('users').select('name, role').eq('id', session.user.id).single();
-                if (!profile || profile.role !== 'admin') {
-                    alert("Unauthorized Access.");
-                    return window.location.href = 'login.html';
-                }
-                document.getElementById('adminName').innerText = profile.name;
-
-                // CHECK UNREAD MAIL
-                const { count: unreadCount, error: msgErr } = await supabase
-                    .from('messages')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('receiver_id', session.user.id)
-                    .eq('is_read', false);
-
-                if (!msgErr && unreadCount > 0) {
-                    document.getElementById('navUnread').innerText = unreadCount;
-                    document.getElementById('navUnread').style.display = 'inline-block';
+                // Load Name
+                const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
+                if(profile) {
+                    const name = profile.name.split(' ')[0];
+                    document.getElementById('navAdminName').innerText = profile.name;
+                    document.getElementById('welcomeText').innerText = `Welcome back, ${name}!`;
                 }
 
-                const { count: studentCount } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', true);
-                document.getElementById('statStudents').innerText = studentCount || 0;
+                // 1. Get Top Stat Cards
+                const { count: totalUserCount } = await supabase.from('users').select('*', { count: 'exact', head: true });
+                document.getElementById('totalUsers').innerText = totalUserCount || 0;
 
-                const { count: teacherCount } = await supabase.from('teachers').select('*', { count: 'exact', head: true }).eq('approved', true);
-                document.getElementById('statTeachers').innerText = teacherCount || 0;
+                const { count: pendingCount } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', false);
+                document.getElementById('pendingUsers').innerText = pendingCount || 0;
 
-                const { count: examCount } = await supabase.from('tests').select('*', { count: 'exact', head: true });
-                document.getElementById('statExams').innerText = examCount || 0;
+                const { count: classCount } = await supabase.from('classes').select('*', { count: 'exact', head: true });
+                document.getElementById('totalClasses').innerText = classCount || 0;
 
-                const { count: resultCount } = await supabase.from('test_results').select('*', { count: 'exact', head: true });
-                document.getElementById('statResults').innerText = resultCount || 0;
+                // 2. Build League Table Preview Widget
+                await populateLeagueWidget();
 
-                await renderClassChart();
                 document.getElementById('loadingOverlay').style.display = 'none';
 
             } catch (err) {
                 console.error(err);
-                alert("Error loading dashboard.");
+                alert("Error loading dashboard data.");
+                document.getElementById('loadingOverlay').style.display = 'none';
             }
         }
 
-        async function renderClassChart() {
+        async function populateLeagueWidget() {
             try {
-                const { data: classes } = await supabase.from('classes').select('id, name').order('id');
-                const { data: students } = await supabase.from('students').select('class_id').eq('approved', true);
-                if (!classes || !students) return;
+                const { data: students } = await supabase.from('students').select('user_id, first_name, surname, classes(name)').eq('approved', true);
+                const { data: results } = await supabase.from('test_results').select('student_id, score');
 
-                const classCounts = {};
-                classes.forEach(c => classCounts[c.id] = { name: c.name, count: 0 });
-                students.forEach(s => { if (classCounts[s.class_id]) classCounts[s.class_id].count++; });
+                const pointsMap = {};
+                if (results) {
+                    results.forEach(r => {
+                        if (!pointsMap[r.student_id]) pointsMap[r.student_id] = 0;
+                        pointsMap[r.student_id] += r.score;
+                    });
+                }
 
-                const labels = Object.values(classCounts).map(c => c.name);
-                const dataPoints = Object.values(classCounts).map(c => c.count);
+                let rankings = students.map(s => ({
+                    name: `${s.first_name} ${s.surname || ''}`,
+                    class_name: s.classes?.name || 'Unassigned',
+                    points: pointsMap[s.user_id] || 0
+                })).filter(s => s.points > 0).sort((a, b) => b.points - a.points).slice(0, 5); // Get Top 5
 
-                const isDark = document.body.classList.contains('dark-mode');
-                const textColor = isDark ? '#e0e0e0' : '#333333';
-
-                new Chart(document.getElementById('studentChart').getContext('2d'), {
-                    type: 'bar',
-                    data: { labels: labels, datasets: [{ label: 'Active Students', data: dataPoints, backgroundColor: '#3498db', borderRadius: 4 }] },
-                    options: { 
-                        responsive: true, 
-                        maintainAspectRatio: false,
-                        plugins: { legend: { labels: { color: textColor } } },
-                        scales: { 
-                            x: { ticks: { color: textColor } },
-                            y: { ticks: { color: textColor } }
-                        }
-                    }
-                });
-            } catch (e) { console.error("Chart error:", e); }
-        }
-
-        window.searchStudent = async function(query) {
-            const resultsDiv = document.getElementById('searchResults');
-            if (query.length < 2) { resultsDiv.innerHTML = ''; return; }
-            
-            resultsDiv.innerHTML = `<div class="text-center" style="color: var(--text-muted);"><i class="fas fa-spinner fa-spin me-2"></i> Searching...</div>`;
-            
-            try {
-                const { data, error } = await supabase
-                    .from('students')
-                    .select('user_id, first_name, surname, reg_number, classes(name), passport_url')
-                    .or(`first_name.ilike.%${query}%,surname.ilike.%${query}%,reg_number.ilike.%${query}%`)
-                    .limit(5);
-
-                if (error) throw error;
-
-                if (!data || data.length === 0) {
-                    resultsDiv.innerHTML = `<div class="alert alert-warning small"><i class="fas fa-info-circle me-1"></i> No student found matching "${query}".</div>`;
+                const tbody = document.getElementById('leagueWidgetBody');
+                
+                if (rankings.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4" style="color: var(--text-muted);">No exam points recorded yet.</td></tr>`;
                     return;
                 }
 
-                resultsDiv.innerHTML = data.map(s => `
-                    <div class="d-flex align-items-center p-3 mb-2 border rounded shadow-sm" style="background-color: var(--card-bg); border-color: var(--border-color) !important;">
-                        <img src="${s.passport_url || `https://ui-avatars.com/api/?name=${s.first_name}+${s.surname}&background=007a4d&color=fff`}" class="rounded-circle me-3" style="width: 45px; height: 45px; object-fit: cover; border: 2px solid #007a4d;">
-                        <div>
-                            <h6 class="fw-bold mb-0 text-success">${s.surname || ''} ${s.first_name || ''}</h6>
-                            <small class="fw-bold" style="color: var(--text-muted);">${s.reg_number || 'No ID'} • ${s.classes?.name || 'Unassigned'}</small>
-                        </div>
-                        <div class="ms-auto">
-                            <a href="admin_student_report.html?student_id=${s.user_id}" class="btn btn-sm btn-primary fw-bold">
-                                Get Report <i class="fas fa-arrow-right ms-1"></i>
-                            </a>
-                        </div>
-                    </div>
-                `).join('');
+                tbody.innerHTML = rankings.map((s, index) => {
+                    const rank = index + 1;
+                    let rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+                    let iconHtml = rank <= 3 ? `<i class="fas fa-medal"></i>` : rank;
 
-            } catch (err) {
-                console.error(err);
-                resultsDiv.innerHTML = `<div class="text-danger small">Search failed. Try again.</div>`;
+                    return `
+                        <tr>
+                            <td class="text-center"><div class="rank-badge ${rankClass}">${iconHtml}</div></td>
+                            <td class="fw-bold">${s.name}</td>
+                            <td style="color: var(--text-muted); font-size: 0.9rem;">${s.class_name}</td>
+                            <td class="text-center fw-bold text-success">${s.points} Pts</td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch(e) {
+                console.error("League Error:", e);
             }
-        };
+        }
 
-        document.addEventListener('DOMContentLoaded', initializeAdminDashboard);
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
 
         document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html';
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
         });
     </script>
 </body>

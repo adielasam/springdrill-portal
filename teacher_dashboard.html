@@ -57,11 +57,14 @@
 
         /* Quick Links Grid */
         .quick-links-header { font-weight: 800; color: var(--text-color); margin-bottom: 20px; margin-top: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;}
-        .quick-link-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); padding: 25px; text-align: center; transition: all 0.3s; text-decoration: none; color: var(--text-color); display: block; box-shadow: 0 4px 15px rgba(0,0,0,0.02);}
+        .quick-link-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); padding: 25px; text-align: center; transition: all 0.3s; text-decoration: none; color: var(--text-color); display: block; box-shadow: 0 4px 15px rgba(0,0,0,0.02); position: relative;}
         .quick-link-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-color: #007a4d; color: var(--text-color); }
         .quick-link-card i { font-size: 2.5rem; color: #3498db; margin-bottom: 15px; }
         .quick-link-card h5 { font-weight: 700; margin-bottom: 10px; }
         .quick-link-card p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0; }
+
+        /* Notification Badge for Inbox */
+        .notification-badge { position: absolute; top: 15px; right: 15px; background: #e74c3c; color: white; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 20px; display: none; border: 2px solid var(--card-bg); box-shadow: 0 2px 5px rgba(231, 76, 60, 0.4);}
 
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
 
@@ -112,7 +115,10 @@
                 <a href="test_results.html" class="nav-link small py-2"><i class="fas fa-chart-bar me-2"></i> Result Manager</a>
             </div>
 
-            <a href="teacher_messages.html" class="nav-link mt-2"><i class="fas fa-envelope"></i> Communications</a>
+            <a href="teacher_messages.html" class="nav-link mt-2">
+                <i class="fas fa-envelope"></i> Communications 
+                <span class="badge bg-danger ms-auto" id="sidebarBadge" style="display: none;">0</span>
+            </a>
 
             <hr class="mx-3 my-4 border-secondary">
             <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Secure Logout</a>
@@ -220,10 +226,27 @@
             </div>
 
             <div class="col-md-3 col-sm-6">
+                <a href="manage_cbt.html" class="quick-link-card">
+                    <i class="fas fa-tasks text-secondary"></i>
+                    <h5>Manage Exams</h5>
+                    <p>Edit, publish, or disable your active CBTs.</p>
+                </a>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
                 <a href="test_results.html" class="quick-link-card">
-                    <i class="fas fa-chart-bar text-danger" style="color: #9b59b6 !important;"></i>
+                    <i class="fas fa-chart-bar" style="color: #e67e22 !important;"></i>
                     <h5>Results</h5>
                     <p>Analyze student performance and grades.</p>
+                </a>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <a href="teacher_messages.html" class="quick-link-card">
+                    <div class="notification-badge" id="cardBadge">0 New</div>
+                    <i class="fas fa-envelope" style="color: #9b59b6 !important;"></i>
+                    <h5>Communications</h5>
+                    <p>Check your inbox and message students or admins.</p>
                 </a>
             </div>
 
@@ -292,6 +315,20 @@
                 // Get Total Banked Questions (By this teacher)
                 const { count: questionCount } = await supabase.from('questions').select('*', { count: 'exact', head: true }).eq('teacher_id', currentTeacherId);
                 document.getElementById('totalQuestions').innerText = questionCount || 0;
+
+                // Check for Unread Messages
+                const { count: unreadCount, error: msgErr } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('receiver_id', currentTeacherId).eq('is_read', false);
+                if (!msgErr && unreadCount > 0) {
+                    // Update Sidebar Badge
+                    const sidebarBadge = document.getElementById('sidebarBadge');
+                    sidebarBadge.innerText = unreadCount;
+                    sidebarBadge.style.display = 'inline-block';
+
+                    // Update Quick Card Badge
+                    const cardBadge = document.getElementById('cardBadge');
+                    cardBadge.innerText = `${unreadCount} New`;
+                    cardBadge.style.display = 'inline-block';
+                }
 
                 document.getElementById('loadingOverlay').style.display = 'none';
 

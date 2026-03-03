@@ -42,13 +42,14 @@
         .dark-toggle-btn:hover { transform: scale(1.1); }
 
         .edu-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: all 0.3s; }
-        .edu-header { background-color: #007a4d; color: white; padding: 12px 20px; border-radius: 4px 4px 0 0; font-weight: bold; }
+        .edu-header { background-color: #007a4d; color: white; padding: 15px 20px; border-radius: 4px 4px 0 0; font-weight: bold; font-size: 1.1rem; }
         
         .form-control, .form-select { padding: 10px 15px; border-radius: 4px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); transition: all 0.3s; }
         .form-control:focus, .form-select:focus { border-color: #007a4d; box-shadow: 0 0 0 0.25rem rgba(0, 122, 77, 0.25); background-color: var(--card-bg); color: var(--text-color); }
         
-        #classAssignmentSection { display: none; background: var(--input-bg); padding: 20px; border-radius: 8px; border: 1px dashed #007a4d; transition: all 0.3s; }
-        #studentDOBSection { display: none; background: rgba(241, 196, 15, 0.05); padding: 20px; border-radius: 8px; border: 1px dashed #f1c40f; transition: all 0.3s; }
+        /* Dynamic Sections */
+        #teacherDetailsSection { display: none; background: var(--input-bg); padding: 20px; border-radius: 8px; border: 1px dashed #007a4d; transition: all 0.3s; }
+        #studentDetailsSection { display: none; background: var(--input-bg); padding: 20px; border-radius: 8px; border: 1px dashed #3498db; transition: all 0.3s; }
 
         /* MOBILE OPTIMIZATION */
         .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
@@ -82,6 +83,8 @@
                 <a href="manage_users.html" class="nav-link small py-2"><i class="fas fa-user-check me-2"></i> Approvals</a>
                 <a href="class_list.html" class="nav-link small py-2"><i class="fas fa-clipboard-list me-2"></i> Class Data</a>
             </div>
+            
+            <a href="admin_league_table.html" class="nav-link mt-2"><i class="fas fa-trophy text-warning me-2"></i> League Table</a>
             <a href="admin_messages.html" class="nav-link mt-2"><i class="fas fa-envelope me-2"></i> Internal Mail</a>
             <hr class="mx-3 my-4 border-secondary">
             <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -108,27 +111,28 @@
         </div>
 
         <div class="row justify-content-center">
-            <div class="col-lg-8">
+            <div class="col-lg-9">
                 <div class="edu-card">
-                    <div class="edu-header"><i class="fas fa-user-plus me-2"></i> Generate New Account</div>
-                    <div class="p-4">
+                    <div class="edu-header"><i class="fas fa-user-plus me-2 text-warning"></i> Generate New Account</div>
+                    <div class="p-4 p-md-5">
                         <form id="createUserForm">
+                            
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold" style="color: var(--text-muted);">Full Name</label>
-                                    <input type="text" id="userName" class="form-control" required>
+                                    <label class="form-label fw-bold" style="color: var(--text-muted);">Full Name (First Last)</label>
+                                    <input type="text" id="userName" class="form-control" placeholder="e.g. John Doe" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold" style="color: var(--text-muted);">Email Address</label>
-                                    <input type="email" id="userEmail" class="form-control" required>
+                                    <input type="email" id="userEmail" class="form-control" placeholder="name@springdrill.edu" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold" style="color: var(--text-muted);">Password</label>
-                                    <input type="password" id="userPassword" class="form-control" required minlength="6">
+                                    <input type="password" id="userPassword" class="form-control" placeholder="Min 6 characters" required minlength="6">
                                 </div>
                                 <div class="col-md-6 mb-4">
                                     <label class="form-label fw-bold" style="color: var(--text-muted);">Account Role</label>
-                                    <select id="roleSelect" class="form-select border-primary" required>
+                                    <select id="roleSelect" class="form-select border-primary fw-bold" required>
                                         <option value="" disabled selected>Select Role...</option>
                                         <option value="student">Student</option>
                                         <option value="teacher">Teacher</option>
@@ -137,26 +141,49 @@
                                 </div>
                             </div>
 
-                            <div id="classAssignmentSection" class="mb-4 mt-2">
-                                <h6 class="fw-bold text-success mb-3"><i class="fas fa-chalkboard-teacher me-2"></i> Assign Classes to this Teacher</h6>
+                            <div id="teacherDetailsSection" class="mb-4 mt-2 shadow-sm">
+                                <h6 class="fw-bold text-success mb-3"><i class="fas fa-chalkboard-teacher me-2"></i> Teacher Profile: Assign Classes</h6>
                                 <p class="small mb-3" style="color: var(--text-muted);">Tick all the classes this teacher is responsible for. They will only see students from these classes in their dashboard.</p>
                                 <div id="classCheckboxes" class="d-flex flex-wrap gap-3">
                                     <div class="text-muted"><i class="fas fa-spinner fa-spin me-1"></i> Loading classes...</div>
                                 </div>
                             </div>
 
-                            <div id="studentDOBSection" class="mb-4 mt-2">
-                                <h6 class="fw-bold text-warning mb-3" style="color: #d35400 !important;"><i class="fas fa-birthday-cake me-2"></i> Student Details</h6>
+                            <div id="studentDetailsSection" class="mb-4 mt-2 shadow-sm">
+                                <h6 class="fw-bold text-primary mb-4" style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                                    <i class="fas fa-user-graduate me-2"></i> Student Profile Setup
+                                </h6>
                                 <div class="row">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold" style="color: var(--text-muted);">Date of Birth (Optional)</label>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold" style="color: var(--text-muted);">Registration No.</label>
+                                        <input type="text" id="regNumber" class="form-control fw-bold text-primary" readonly placeholder="Auto-generated">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold" style="color: var(--text-muted);">Assign Class <span class="text-danger">*</span></label>
+                                        <select id="studentClassSelect" class="form-select">
+                                            <option value="" disabled selected>Select...</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold" style="color: var(--text-muted);">Date of Birth</label>
                                         <input type="date" id="studentDOB" class="form-control">
-                                        <div class="small mt-1" style="color: var(--text-muted);">Used for dashboard birthday alerts.</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold" style="color: var(--text-muted);">Parent/Guardian Name</label>
+                                        <input type="text" id="parentName" class="form-control" placeholder="Full name">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold text-success" style="color: var(--text-muted);">Passport Photo (Optional)</label>
+                                        <input type="file" id="studentPassport" class="form-control" accept="image/*">
+                                    </div>
+                                    <div class="col-md-12 mb-2">
+                                        <label class="form-label fw-bold" style="color: var(--text-muted);">Home Address</label>
+                                        <input type="text" id="studentAddress" class="form-control" placeholder="Residential address">
                                     </div>
                                 </div>
                             </div>
 
-                            <button type="submit" id="btnSubmit" class="btn btn-success w-100 fw-bold py-3 mt-3 shadow-sm" style="font-size: 1.1rem;">
+                            <button type="submit" id="btnSubmit" class="btn btn-success w-100 fw-bold py-3 mt-3 shadow" style="font-size: 1.1rem; letter-spacing: 0.5px;">
                                 <i class="fas fa-save me-2"></i> Generate Account
                             </button>
                         </form>
@@ -198,6 +225,13 @@
             }
         });
 
+        // Generate Random Reg Number
+        function generateRegNum() {
+            const year = new Date().getFullYear().toString().slice(-2);
+            const rand = Math.floor(1000 + Math.random() * 9000);
+            return `SD/${year}/${rand}`;
+        }
+
         // === LOGIC ===
         async function loadInitialData() {
             try {
@@ -207,29 +241,56 @@
                 const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
                 if(profile) document.getElementById('adminName').innerText = profile.name;
 
-                // Load Classes for Teacher assignment
+                // Load Classes
                 const { data: classes, error } = await supabase.from('classes').select('id, name').order('name');
-                const container = document.getElementById('classCheckboxes');
+                const cbContainer = document.getElementById('classCheckboxes');
+                const dropdown = document.getElementById('studentClassSelect');
                 
                 if (error || !classes.length) {
-                    container.innerHTML = '<span class="text-danger small">No classes found in the database.</span>';
+                    cbContainer.innerHTML = '<span class="text-danger small">No classes found in the database.</span>';
                     return;
                 }
 
-                container.innerHTML = classes.map(c => `
-                    <div class="form-check form-check-inline px-3 py-2 border rounded shadow-sm" style="background-color: var(--input-bg); border-color: var(--border-color) !important;">
+                // Populate Teacher Checkboxes
+                cbContainer.innerHTML = classes.map(c => `
+                    <div class="form-check form-check-inline px-3 py-2 border rounded shadow-sm" style="background-color: var(--card-bg); border-color: var(--border-color) !important;">
                         <input class="form-check-input class-cb" type="checkbox" id="class_${c.id}" value="${c.id}" style="cursor:pointer; border-color: var(--border-color);">
                         <label class="form-check-label fw-bold ms-1" for="class_${c.id}" style="cursor:pointer; color: var(--text-color);">${c.name}</label>
                     </div>
                 `).join('');
+
+                // Populate Student Dropdown
+                let options = '<option value="" disabled selected>Select Class...</option>';
+                classes.forEach(c => { options += `<option value="${c.id}">${c.name}</option>`; });
+                dropdown.innerHTML = options;
+
             } catch (err) { console.error(err); }
         }
 
         // Logic to show/hide dynamic fields based on Role selection
         document.getElementById('roleSelect').addEventListener('change', (e) => {
             const role = e.target.value;
-            document.getElementById('classAssignmentSection').style.display = role === 'teacher' ? 'block' : 'none';
-            document.getElementById('studentDOBSection').style.display = role === 'student' ? 'block' : 'none';
+            
+            const teacherSec = document.getElementById('teacherDetailsSection');
+            const studentSec = document.getElementById('studentDetailsSection');
+            const classSelect = document.getElementById('studentClassSelect');
+            const regInput = document.getElementById('regNumber');
+
+            if (role === 'teacher') {
+                teacherSec.style.display = 'block';
+                studentSec.style.display = 'none';
+                classSelect.required = false;
+            } else if (role === 'student') {
+                teacherSec.style.display = 'none';
+                studentSec.style.display = 'block';
+                classSelect.required = true;
+                regInput.value = generateRegNum(); // Auto-generate Reg Number
+            } else {
+                // Admin
+                teacherSec.style.display = 'none';
+                studentSec.style.display = 'none';
+                classSelect.required = false;
+            }
         });
 
         document.getElementById('createUserForm').addEventListener('submit', async (e) => {
@@ -238,23 +299,10 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Generating...';
             btn.disabled = true;
 
-            const name = document.getElementById('userName').value;
-            const email = document.getElementById('userEmail').value;
+            const name = document.getElementById('userName').value.trim();
+            const email = document.getElementById('userEmail').value.trim();
             const password = document.getElementById('userPassword').value;
             const role = document.getElementById('roleSelect').value;
-
-            // Gather teacher classes
-            let assigned_classes = [];
-            if (role === 'teacher') {
-                assigned_classes = Array.from(document.querySelectorAll('.class-cb:checked')).map(cb => cb.value);
-            }
-
-            // Gather student DOB
-            let dobValue = null;
-            if (role === 'student') {
-                const rawDob = document.getElementById('studentDOB').value;
-                if(rawDob) dobValue = rawDob; 
-            }
 
             try {
                 // Register user in Auth
@@ -267,25 +315,60 @@
                 if (authErr) throw authErr;
                 const newUserId = authData.user.id;
 
-                // Update the main users table (triggers auto-handle role sync)
-                const { error: dbErr } = await supabase.from('users').update({
-                    assigned_classes: assigned_classes
-                }).eq('id', newUserId);
-                if (dbErr) throw dbErr;
+                if (role === 'teacher') {
+                    const assigned_classes = Array.from(document.querySelectorAll('.class-cb:checked')).map(cb => cb.value);
+                    await supabase.from('users').update({ assigned_classes: assigned_classes }).eq('id', newUserId);
+                } 
+                else if (role === 'student') {
+                    // Split Full Name into First and Last Name
+                    const nameParts = name.split(' ');
+                    const firstName = nameParts[0];
+                    const surname = nameParts.slice(1).join(' ');
 
-                // If Student, ensure DOB is saved to the students table
-                if (role === 'student' && dobValue) {
-                    const { error: stuErr } = await supabase.from('students').update({
-                        dob: dobValue
-                    }).eq('user_id', newUserId);
-                    if (stuErr) console.warn("Failed to update DOB, but account was created.", stuErr);
+                    const regNum = document.getElementById('regNumber').value;
+                    const classId = document.getElementById('studentClassSelect').value;
+                    const dobValue = document.getElementById('studentDOB').value;
+                    const parentName = document.getElementById('parentName').value;
+                    const address = document.getElementById('studentAddress').value;
+                    const passportFile = document.getElementById('studentPassport').files[0];
+
+                    let passportUrl = null;
+
+                    // Upload Passport if selected
+                    if (passportFile) {
+                        const fileExt = passportFile.name.split('.').pop();
+                        const fileName = `passport_${Date.now()}.${fileExt}`;
+                        const { error: uploadError } = await supabase.storage.from('passports').upload(fileName, passportFile);
+                        
+                        if (!uploadError) {
+                            const { data: pubData } = supabase.storage.from('passports').getPublicUrl(fileName);
+                            passportUrl = pubData.publicUrl;
+                        }
+                    }
+
+                    // Ensure Student Data is correctly written into `students` table
+                    // By default, since Admin creates them, we set approved = true
+                    const { error: stuErr } = await supabase.from('students').insert([{
+                        user_id: newUserId,
+                        first_name: firstName,
+                        surname: surname,
+                        reg_number: regNum,
+                        class_id: classId,
+                        dob: dobValue || null,
+                        parent_name: parentName,
+                        address: address,
+                        passport_url: passportUrl,
+                        approved: true 
+                    }]);
+
+                    if (stuErr) throw stuErr;
                 }
 
                 alert("Account generated successfully!");
                 
                 document.getElementById('createUserForm').reset();
-                document.getElementById('classAssignmentSection').style.display = 'none';
-                document.getElementById('studentDOBSection').style.display = 'none';
+                document.getElementById('teacherDetailsSection').style.display = 'none';
+                document.getElementById('studentDetailsSection').style.display = 'none';
 
             } catch (err) {
                 alert("Error: " + err.message);
