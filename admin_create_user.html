@@ -47,6 +47,9 @@
         .form-control, .form-select { padding: 10px 15px; border-radius: 4px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); transition: all 0.3s; font-weight: 500;}
         .form-control:focus, .form-select:focus { border-color: #007a4d; box-shadow: 0 0 0 0.25rem rgba(0, 122, 77, 0.25); background-color: var(--card-bg); color: var(--text-color); }
         
+        /* Readonly styles */
+        .form-control[readonly] { background-color: var(--border-color); opacity: 0.8; cursor: not-allowed; }
+
         /* Dynamic Sections */
         #teacherDetailsSection { display: none; background: var(--input-bg); padding: 20px; border-radius: 8px; border: 1px dashed #007a4d; transition: all 0.3s; }
         #studentDetailsSection { display: none; background: var(--input-bg); padding: 20px; border-radius: 8px; border: 1px dashed #3498db; transition: all 0.3s; }
@@ -115,7 +118,6 @@
                 <div class="edu-card">
                     <div class="edu-header d-flex justify-content-between align-items-center">
                         <span><i class="fas fa-user-plus me-2 text-warning"></i> Generate New Account</span>
-                        <button type="button" class="btn btn-sm btn-light text-success fw-bold d-none d-md-block" onclick="autoGenerateCredentials()"><i class="fas fa-magic me-1"></i> Auto-Fill Credentials</button>
                     </div>
                     <div class="p-4 p-md-5">
                         <form id="createUserForm">
@@ -124,16 +126,16 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold" style="color: var(--text-muted);">Full Name (First Last)</label>
                                     <input type="text" id="userName" class="form-control" placeholder="e.g. John Doe" required>
-                                    <small class="text-success fw-bold mt-1 d-block"><i class="fas fa-info-circle"></i> Email & Password will auto-generate when you type a name!</small>
+                                    <small class="text-success fw-bold mt-1 d-block"><i class="fas fa-magic"></i> Email will auto-generate based on this name.</small>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold" style="color: var(--text-muted);">Email Address</label>
-                                    <input type="email" id="userEmail" class="form-control text-primary fw-bold" placeholder="Auto-generated email" required>
+                                    <input type="email" id="userEmail" class="form-control text-primary fw-bold" placeholder="Auto-generated..." required readonly>
                                 </div>
                                 
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label fw-bold" style="color: var(--text-muted);">Password</label>
-                                    <input type="text" id="userPassword" class="form-control fw-bold" placeholder="Auto-generated password" required minlength="6">
+                                    <input type="password" id="userPassword" class="form-control fw-bold" placeholder="Enter secure password" required minlength="6">
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label fw-bold" style="color: var(--text-muted);">Account Role</label>
@@ -230,8 +232,8 @@
             document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
         }
 
-        // === AUTO GENERATE CREDENTIALS MAGIC ===
-        window.autoGenerateCredentials = () => {
+        // === AUTO GENERATE EMAIL ONLY ===
+        window.autoGenerateEmail = () => {
             const nameVal = document.getElementById('userName').value.trim();
             if (!nameVal) return;
 
@@ -242,21 +244,13 @@
             const rand = Math.floor(1000 + Math.random() * 9000); // 4 digit number
             
             const emailField = document.getElementById('userEmail');
-            const passField = document.getElementById('userPassword');
 
             // Format: firstname.lastnameXXXX@springdrill.edu
-            if (!emailField.value || emailField.value.includes('@springdrill.edu')) {
-                emailField.value = `${firstName}${lastName ? '.' + lastName : ''}${rand}@springdrill.edu`;
-            }
-            
-            // Format: SpringXXXX!
-            if (!passField.value || passField.value.startsWith('Spring')) {
-                passField.value = `Spring${rand}!`;
-            }
+            emailField.value = `${firstName}${lastName ? '.' + lastName : ''}${rand}@springdrill.edu`;
         };
 
-        // Trigger Auto-Gen when Admin leaves the Name field
-        document.getElementById('userName').addEventListener('blur', window.autoGenerateCredentials);
+        // Trigger Auto-Gen Email when Admin leaves the Name field
+        document.getElementById('userName').addEventListener('blur', window.autoGenerateEmail);
 
         // Generate Random Reg Number for Students
         function generateRegNum() {
@@ -400,7 +394,7 @@
                     if (stuErr) throw stuErr;
                 }
 
-                alert(`Account generated successfully!\n\nEmail: ${email}\nPassword: ${password}\n\nPlease copy these credentials for the user.`);
+                alert(`Account generated successfully!\n\nEmail: ${email}\nPassword: (As entered by you)\n\nPlease provide these credentials to the user.`);
                 
                 document.getElementById('createUserForm').reset();
                 document.getElementById('teacherDetailsSection').style.display = 'none';
