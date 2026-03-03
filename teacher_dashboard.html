@@ -100,6 +100,8 @@
             
             <a href="teacher_class_list.html" class="nav-link"><i class="fas fa-users"></i> Class Roster & 360°</a>
 
+            <a href="teacher_attendance.html" class="nav-link"><i class="fas fa-calendar-check"></i> Attendance Tracker</a>
+
             <a href="teacher_eclassroom.html" class="nav-link"><i class="fas fa-video text-danger"></i> eClassroom</a>
 
             <a href="teacher_subjects.html" class="nav-link"><i class="fas fa-book"></i> Materials & AI Planner</a>
@@ -280,51 +282,35 @@
             document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
         }
 
-        window.addEventListener('storage', (event) => {
-            if (event.key === 'SPRINGDRILL_THEME') {
-                const isDark = event.newValue === 'dark';
-                isDark ? document.body.classList.add('dark-mode') : document.body.classList.remove('dark-mode');
-                document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
-            }
-        });
-
         // === DASHBOARD LOGIC ===
         async function initializeDashboard() {
             try {
-                // Auth Check
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
                 currentTeacherId = session.user.id;
 
-                // Load Name
                 const { data: profile } = await supabase.from('users').select('name').eq('id', currentTeacherId).single();
                 if(profile) {
-                    const name = profile.name.split(' ')[0]; // Get first name
+                    const name = profile.name.split(' ')[0];
                     document.getElementById('navTeacherName').innerText = profile.name;
                     document.getElementById('welcomeText').innerText = `Welcome back, ${name}!`;
                 }
 
-                // Get Total Students
                 const { count: studentCount } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', true);
                 document.getElementById('totalStudents').innerText = studentCount || 0;
 
-                // Get Active Exams (Published by this teacher)
                 const { count: examCount } = await supabase.from('tests').select('*', { count: 'exact', head: true }).eq('teacher_id', currentTeacherId).eq('is_published', true);
                 document.getElementById('totalExams').innerText = examCount || 0;
 
-                // Get Total Banked Questions (By this teacher)
                 const { count: questionCount } = await supabase.from('questions').select('*', { count: 'exact', head: true }).eq('teacher_id', currentTeacherId);
                 document.getElementById('totalQuestions').innerText = questionCount || 0;
 
-                // Check for Unread Messages
                 const { count: unreadCount, error: msgErr } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('receiver_id', currentTeacherId).eq('is_read', false);
                 if (!msgErr && unreadCount > 0) {
-                    // Update Sidebar Badge
                     const sidebarBadge = document.getElementById('sidebarBadge');
                     sidebarBadge.innerText = unreadCount;
                     sidebarBadge.style.display = 'inline-block';
 
-                    // Update Quick Card Badge
                     const cardBadge = document.getElementById('cardBadge');
                     cardBadge.innerText = `${unreadCount} New`;
                     cardBadge.style.display = 'inline-block';
@@ -334,7 +320,6 @@
 
             } catch (err) {
                 console.error(err);
-                alert("Error loading dashboard data.");
                 document.getElementById('loadingOverlay').style.display = 'none';
             }
         }

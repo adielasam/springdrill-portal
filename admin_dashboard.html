@@ -6,6 +6,7 @@
     <title>SPRINGDRILL - Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* GLOBAL DARK MODE ENGINE */
         :root { 
@@ -15,7 +16,6 @@
             --text-muted: #6c757d; 
             --border-color: #e9ecef; 
             --input-bg: #f8f9fa; 
-            --stat-icon-bg: #e8f5e9;
         }
         body.dark-mode { 
             --bg-color: #121212; 
@@ -24,7 +24,6 @@
             --text-muted: #a0a0a0; 
             --border-color: #333333; 
             --input-bg: #2c2c2c; 
-            --stat-icon-bg: #1a2e21;
         }
 
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
@@ -41,40 +40,47 @@
         .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
         .dark-toggle-btn:hover { transform: scale(1.1); }
 
-        /* Profile Banner */
-        .profile-banner { background: linear-gradient(135deg, #007a4d 0%, #004d34 100%); border-radius: 12px; padding: 30px; color: white; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 20px rgba(0, 122, 77, 0.2);}
-        .profile-banner h2 { font-weight: 800; margin-bottom: 5px; }
-        .profile-banner p { margin-bottom: 0; opacity: 0.9; font-size: 1.1rem; }
+        /* COLORFUL STAT CARDS (Screenshot Match) */
+        .color-stat-card { border-radius: 8px; padding: 20px 15px; color: white; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); height: 100%; display: flex; flex-direction: column; justify-content: center; transition: transform 0.3s;}
+        .color-stat-card:hover { transform: translateY(-5px); }
+        .color-stat-card h2 { font-weight: 900; font-size: 2.5rem; margin-bottom: 5px; }
+        .color-stat-card p { margin: 0; font-size: 0.9rem; font-weight: bold; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;}
+        
+        .bg-c-blue { background: linear-gradient(45deg, #3498db, #2980b9); }
+        .bg-c-teal { background: linear-gradient(45deg, #1abc9c, #16a085); }
+        .bg-c-yellow { background: linear-gradient(45deg, #f1c40f, #f39c12); }
+        .bg-c-cyan { background: linear-gradient(45deg, #00bcd4, #0097a7); }
+        .bg-c-purple { background: linear-gradient(45deg, #9b59b6, #8e44ad); }
+        .bg-c-red { background: linear-gradient(45deg, #e74c3c, #c0392b); } /* For Pending */
 
-        /* Stat Cards */
-        .stat-card { background: var(--card-bg); border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 20px; transition: all 0.3s; height: 100%;}
-        .stat-card:hover { transform: translateY(-5px); border-color: #007a4d; }
-        .stat-icon { width: 65px; height: 65px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: var(--input-bg); color: #007a4d;}
-        .stat-info h6 { font-weight: bold; color: var(--text-muted); margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;}
-        .stat-info h2 { font-weight: 900; color: var(--text-color); margin-bottom: 0; }
+        /* DASHBOARD WIDGETS */
+        .dash-widget { background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.02); margin-bottom: 30px; overflow: hidden; transition: all 0.3s;}
+        .widget-header { padding: 15px 20px; font-weight: bold; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--input-bg); color: var(--text-color);}
+        .widget-body { padding: 20px; }
 
         /* League Table Widget */
-        .league-widget { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.02); overflow: hidden; transition: all 0.3s; height: 100%; display: flex; flex-direction: column;}
-        .league-header { background: #1a3c34; color: white; padding: 15px 25px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
         .league-table { width: 100%; color: var(--text-color); margin-bottom: 0; }
-        .league-table th { background: var(--input-bg); color: var(--text-muted); border-bottom: 1px solid var(--border-color); padding: 12px 20px; font-size: 0.85rem; text-transform: uppercase; }
-        .league-table td { padding: 15px 20px; vertical-align: middle; border-bottom: 1px solid var(--border-color); font-weight: 500; }
+        .league-table th { color: var(--text-muted); border-bottom: 1px solid var(--border-color); padding: 10px; font-size: 0.85rem; text-transform: uppercase; }
+        .league-table td { padding: 12px 10px; vertical-align: middle; border-bottom: 1px solid var(--border-color); font-weight: 500; }
         .league-table tr:last-child td { border-bottom: none; }
-        .league-table tbody tr:hover { background-color: var(--input-bg); }
-        .rank-badge { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; margin: 0 auto; }
+        .rank-badge { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; margin: 0 auto; font-size: 0.85rem;}
         .rank-1 { background: #f1c40f; box-shadow: 0 0 10px rgba(241, 196, 15, 0.5); }
         .rank-2 { background: #bdc3c7; }
         .rank-3 { background: #cd7f32; }
         .rank-other { background: var(--border-color); color: var(--text-muted); }
 
         /* Quick Links Grid */
-        .quick-links-header { font-weight: 800; color: var(--text-color); margin-bottom: 20px; margin-top: 10px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;}
-        .quick-link-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); padding: 25px; text-align: center; transition: all 0.3s; text-decoration: none; color: var(--text-color); display: block; box-shadow: 0 4px 15px rgba(0,0,0,0.02);}
-        .quick-link-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-color: #007a4d; color: var(--text-color); }
-        .quick-link-card i { font-size: 2.5rem; color: #3498db; margin-bottom: 15px; }
-        .quick-link-card h5 { font-weight: 700; margin-bottom: 10px; }
-        .quick-link-card p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0; }
+        .quick-link-card { background: var(--input-bg); border-radius: 8px; border: 1px solid var(--border-color); padding: 20px; text-align: center; transition: all 0.3s; text-decoration: none; color: var(--text-color); display: block; height: 100%;}
+        .quick-link-card:hover { transform: translateY(-3px); border-color: #007a4d; box-shadow: 0 5px 15px rgba(0,0,0,0.05); color: var(--text-color);}
+        .quick-link-card i { font-size: 2rem; margin-bottom: 10px; }
+        .quick-link-card h6 { font-weight: 700; margin-bottom: 5px; font-size: 0.95rem; }
 
+        /* Birthdays & Events */
+        .bday-item { display: flex; align-items: center; gap: 15px; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
+        .bday-item:last-child { border-bottom: none; }
+        .bday-date { background: rgba(241, 196, 15, 0.15); color: #d35400; font-weight: 900; padding: 8px; border-radius: 6px; text-align: center; min-width: 50px; font-size: 1rem;}
+        body.dark-mode .bday-date { color: #f1c40f; }
+        
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
 
         @media (max-width: 992px) {
@@ -83,7 +89,6 @@
             .main-content { margin-left: 0; padding: 15px; }
             .mobile-menu-toggle { display: inline-block !important; }
             .top-navbar { padding: 15px; flex-direction: column; gap: 10px; }
-            .profile-banner { flex-direction: column; text-align: center; gap: 15px; }
         }
         .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
         .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
@@ -142,100 +147,126 @@
             </div>
         </div>
 
-        <div class="profile-banner">
-            <div>
-                <h2 id="welcomeText">Welcome back, Admin!</h2>
-                <p>Monitor school operations and track top performing students.</p>
+        <div class="row g-3 mb-4 row-cols-2 row-cols-md-3 row-cols-lg-6">
+            <div class="col">
+                <div class="color-stat-card bg-c-blue">
+                    <h2 id="statActiveStudents">0</h2>
+                    <p>Active Students</p>
+                </div>
             </div>
-            <div class="d-none d-md-block">
-                <i class="fas fa-server fa-4x opacity-50"></i>
+            <div class="col">
+                <div class="color-stat-card bg-c-teal">
+                    <h2 id="statMale">0</h2>
+                    <p>Male Students</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="color-stat-card bg-c-yellow">
+                    <h2 id="statFemale">0</h2>
+                    <p>Female Students</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="color-stat-card bg-c-cyan">
+                    <h2 id="statClasses">0</h2>
+                    <p>Classes</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="color-stat-card bg-c-purple">
+                    <h2 id="statTeachers">0</h2>
+                    <p>Teachers</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="color-stat-card bg-c-red">
+                    <h2 id="statPending">0</h2>
+                    <p>Pending Approvals</p>
+                </div>
             </div>
         </div>
 
         <div class="row g-4 mb-4">
-            <div class="col-md-4">
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-users text-primary"></i></div>
-                    <div class="stat-info">
-                        <h6>Total Active Users</h6>
-                        <h2 id="totalUsers">0</h2>
+            <div class="col-lg-9">
+                <div class="dash-widget h-100">
+                    <div class="widget-header">
+                        <span><i class="fas fa-chart-bar text-primary me-2"></i> School Class Distribution</span>
+                        <span class="badge bg-secondary">2025/2026 Session</span>
+                    </div>
+                    <div class="widget-body">
+                        <canvas id="classDistributionChart" height="100"></canvas>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-user-clock text-warning"></i></div>
-                    <div class="stat-info">
-                        <h6>Pending Approvals</h6>
-                        <h2 id="pendingUsers">0</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-chalkboard text-success"></i></div>
-                    <div class="stat-info">
-                        <h6>Total Classes</h6>
-                        <h2 id="totalClasses">0</h2>
-                    </div>
+            <div class="col-lg-3">
+                <div class="dash-widget h-100 bg-c-teal text-white d-flex flex-column justify-content-center align-items-center p-4">
+                    <i class="fas fa-calendar-check fa-4x mb-3 opacity-75"></i>
+                    <h1 class="display-3 fw-bold mb-0" id="statAttendance">0</h1>
+                    <h5 class="fw-bold text-uppercase mt-2">Total Attendance</h5>
+                    <p class="small opacity-75 mb-0">Recorded Today</p>
                 </div>
             </div>
         </div>
 
         <div class="row g-4 mb-5">
             
-            <div class="col-lg-7">
-                <div class="league-widget">
-                    <div class="league-header">
-                        <span><i class="fas fa-trophy text-warning me-2"></i> Global Top Performers</span>
-                        <a href="admin_league_table.html" class="btn btn-sm btn-warning fw-bold text-dark">View Full Table</a>
+            <div class="col-lg-5">
+                <div class="dash-widget h-100">
+                    <div class="widget-header">
+                        <span class="text-warning"><i class="fas fa-trophy me-2"></i> Global Top Performers</span>
+                        <a href="admin_league_table.html" class="btn btn-sm btn-outline-warning" style="font-size: 0.75rem;">View Full</a>
                     </div>
                     <div class="table-responsive flex-grow-1">
                         <table class="league-table">
                             <thead>
                                 <tr>
-                                    <th class="text-center" width="10%">Rank</th>
-                                    <th width="45%">Student Name</th>
-                                    <th width="25%">Class</th>
-                                    <th class="text-center" width="20%">Points</th>
+                                    <th class="text-center" width="15%">Rank</th>
+                                    <th width="50%">Student Name</th>
+                                    <th class="text-center" width="35%">Points</th>
                                 </tr>
                             </thead>
                             <tbody id="leagueWidgetBody">
-                                <tr><td colspan="4" class="text-center py-4" style="color: var(--text-muted);">Calculating leaderboard...</td></tr>
+                                <tr><td colspan="3" class="text-center py-4" style="color: var(--text-muted);">Calculating leaderboard...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <div class="col-lg-5">
+            <div class="col-lg-4">
+                <div class="dash-widget mb-4">
+                    <div class="widget-header text-info"><i class="fas fa-calendar-alt me-2"></i> Upcoming Events</div>
+                    <div class="widget-body p-3">
+                        <div class="text-center text-muted py-3 small">No Recent Events Scheduled</div>
+                    </div>
+                </div>
+
+                <div class="dash-widget">
+                    <div class="widget-header text-danger"><i class="fas fa-birthday-cake me-2"></i> Upcoming Birthdays</div>
+                    <div class="widget-body p-3" id="birthdayWidgetBody">
+                        <div class="text-center text-muted py-3 small"><i class="fas fa-spinner fa-spin me-1"></i> Checking...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
                 <div class="row g-3">
-                    <div class="col-sm-6">
-                        <a href="admin_create_user.html" class="quick-link-card p-3">
-                            <i class="fas fa-user-plus text-success fs-3 mb-2"></i>
-                            <h6 class="fw-bold mb-1">Create Account</h6>
-                            <p class="small" style="font-size: 0.75rem;">Generate credentials.</p>
+                    <div class="col-12">
+                        <a href="admin_create_user.html" class="quick-link-card">
+                            <i class="fas fa-user-plus text-success"></i>
+                            <h6>Generate Account</h6>
                         </a>
                     </div>
-                    <div class="col-sm-6">
-                        <a href="manage_users.html" class="quick-link-card p-3">
-                            <i class="fas fa-user-check text-primary fs-3 mb-2"></i>
-                            <h6 class="fw-bold mb-1">Approvals</h6>
-                            <p class="small" style="font-size: 0.75rem;">Verify new users.</p>
+                    <div class="col-12">
+                        <a href="class_list.html" class="quick-link-card">
+                            <i class="fas fa-clipboard-list text-info"></i>
+                            <h6>Class Directory</h6>
                         </a>
                     </div>
-                    <div class="col-sm-6">
-                        <a href="class_list.html" class="quick-link-card p-3">
-                            <i class="fas fa-clipboard-list text-info fs-3 mb-2"></i>
-                            <h6 class="fw-bold mb-1">Class Directory</h6>
-                            <p class="small" style="font-size: 0.75rem;">View rosters.</p>
-                        </a>
-                    </div>
-                    <div class="col-sm-6">
-                        <a href="admin_messages.html" class="quick-link-card p-3">
-                            <i class="fas fa-envelope text-danger fs-3 mb-2"></i>
-                            <h6 class="fw-bold mb-1">Internal Mail</h6>
-                            <p class="small" style="font-size: 0.75rem;">Check messages.</p>
+                    <div class="col-12">
+                        <a href="admin_messages.html" class="quick-link-card">
+                            <i class="fas fa-envelope text-primary"></i>
+                            <h6>Internal Mail</h6>
                         </a>
                     </div>
                 </div>
@@ -255,46 +286,103 @@
             const isDark = body.classList.contains('dark-mode');
             localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
             document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+            if(window.classChartInstance) window.classChartInstance.update(); // Update chart colors
         };
         if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { document.body.classList.add('dark-mode'); document.getElementById('themeIcon').className = 'fas fa-sun text-warning'; }
 
         // === DASHBOARD LOGIC ===
         async function initializeDashboard() {
             try {
-                // Auth Check
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
 
-                // Load Name
                 const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
-                if(profile) {
-                    const name = profile.name.split(' ')[0];
-                    document.getElementById('navAdminName').innerText = profile.name;
-                    document.getElementById('welcomeText').innerText = `Welcome back, ${name}!`;
-                }
+                if(profile) document.getElementById('navAdminName').innerText = profile.name.split(' ')[0];
 
-                // 1. Get Top Stat Cards
-                const { count: totalUserCount } = await supabase.from('users').select('*', { count: 'exact', head: true });
-                document.getElementById('totalUsers').innerText = totalUserCount || 0;
+                // 1. Fetch Advanced Stats
+                const { count: activeStudents } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', true);
+                document.getElementById('statActiveStudents').innerText = activeStudents || 0;
 
                 const { count: pendingCount } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', false);
-                document.getElementById('pendingUsers').innerText = pendingCount || 0;
+                document.getElementById('statPending').innerText = pendingCount || 0;
+
+                const { count: maleCount } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('gender', 'Male').eq('approved', true);
+                document.getElementById('statMale').innerText = maleCount || 0;
+
+                const { count: femaleCount } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('gender', 'Female').eq('approved', true);
+                document.getElementById('statFemale').innerText = femaleCount || 0;
 
                 const { count: classCount } = await supabase.from('classes').select('*', { count: 'exact', head: true });
-                document.getElementById('totalClasses').innerText = classCount || 0;
+                document.getElementById('statClasses').innerText = classCount || 0;
 
-                // 2. Build League Table Preview Widget
+                const { count: teacherCount } = await supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'teacher');
+                document.getElementById('statTeachers').innerText = teacherCount || 0;
+
+                // Daily Attendance Fetch
+                const today = new Date().toISOString().split('T')[0];
+                try {
+                    const { count: attCount } = await supabase.from('attendance').select('*', { count: 'exact', head: true }).eq('date', today).eq('status', 'Present');
+                    document.getElementById('statAttendance').innerText = attCount || 0;
+                } catch(e) { console.log("Attendance table setup pending."); }
+
+                // 2. Render Chart
+                await renderClassChart();
+
+                // 3. Render Widgets
                 await populateLeagueWidget();
+                await fetchBirthdays();
 
                 document.getElementById('loadingOverlay').style.display = 'none';
-
             } catch (err) {
                 console.error(err);
-                alert("Error loading dashboard data.");
                 document.getElementById('loadingOverlay').style.display = 'none';
             }
         }
 
+        // === CLASS DISTRIBUTION CHART ===
+        async function renderClassChart() {
+            try {
+                const { data: students } = await supabase.from('students').select('classes(name)').eq('approved', true);
+                
+                const classCounts = {};
+                if (students) {
+                    students.forEach(s => {
+                        const cName = s.classes?.name || 'Unassigned';
+                        classCounts[cName] = (classCounts[cName] || 0) + 1;
+                    });
+                }
+
+                const labels = Object.keys(classCounts);
+                const data = Object.values(classCounts);
+                
+                // Colors matching screenshot vibe
+                const bgColors = ['#3498db', '#34495e', '#2ecc71', '#e67e22', '#9b59b6', '#e74c3c', '#f1c40f', '#1abc9c', '#00bcd4', '#795548', '#8bc34a', '#3f51b5'];
+
+                const ctx = document.getElementById('classDistributionChart').getContext('2d');
+                window.classChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Number of Students',
+                            data: data,
+                            backgroundColor: bgColors.slice(0, labels.length),
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { stepSize: 5 } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            } catch(e) { console.error("Chart Error:", e); }
+        }
+
+        // === LEAGUE TABLE WIDGET (PRESERVED) ===
         async function populateLeagueWidget() {
             try {
                 const { data: students } = await supabase.from('students').select('user_id, first_name, surname, classes(name)').eq('approved', true);
@@ -312,12 +400,11 @@
                     name: `${s.first_name} ${s.surname || ''}`,
                     class_name: s.classes?.name || 'Unassigned',
                     points: pointsMap[s.user_id] || 0
-                })).filter(s => s.points > 0).sort((a, b) => b.points - a.points).slice(0, 5); // Get Top 5
+                })).filter(s => s.points > 0).sort((a, b) => b.points - a.points).slice(0, 5);
 
                 const tbody = document.getElementById('leagueWidgetBody');
-                
                 if (rankings.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4" style="color: var(--text-muted);">No exam points recorded yet.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="3" class="text-center py-4" style="color: var(--text-muted);">No points recorded yet.</td></tr>`;
                     return;
                 }
 
@@ -325,29 +412,52 @@
                     const rank = index + 1;
                     let rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
                     let iconHtml = rank <= 3 ? `<i class="fas fa-medal"></i>` : rank;
-
                     return `
                         <tr>
                             <td class="text-center"><div class="rank-badge ${rankClass}">${iconHtml}</div></td>
-                            <td class="fw-bold">${s.name}</td>
-                            <td style="color: var(--text-muted); font-size: 0.9rem;">${s.class_name}</td>
+                            <td><div class="fw-bold">${s.name}</div><div class="small" style="color: var(--text-muted);">${s.class_name}</div></td>
                             <td class="text-center fw-bold text-success">${s.points} Pts</td>
                         </tr>
                     `;
                 }).join('');
+            } catch(e) { console.error("League Error:", e); }
+        }
 
-            } catch(e) {
-                console.error("League Error:", e);
-            }
+        // === BIRTHDAY WIDGET ===
+        async function fetchBirthdays() {
+            try {
+                const currentMonth = new Date().getMonth();
+                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                
+                const { data: students } = await supabase.from('students').select('first_name, surname, dob').not('dob', 'is', null);
+                const bdayContainer = document.getElementById('birthdayWidgetBody');
+
+                if (!students || students.length === 0) {
+                    bdayContainer.innerHTML = '<div class="text-center text-muted py-3 small">No birthdays recorded.</div>';
+                    return;
+                }
+
+                const birthdaysThisMonth = students.filter(s => new Date(s.dob).getMonth() === currentMonth)
+                                                  .sort((a, b) => new Date(a.dob).getDate() - new Date(b.dob).getDate());
+
+                if (birthdaysThisMonth.length === 0) {
+                    bdayContainer.innerHTML = '<div class="text-center text-muted py-3 small">No birthdays this month.</div>';
+                } else {
+                    bdayContainer.innerHTML = birthdaysThisMonth.map(s => {
+                        const bDate = new Date(s.dob);
+                        return `
+                            <div class="bday-item">
+                                <div class="bday-date">${bDate.getDate()} <span class="d-block" style="font-size:0.7rem;">${monthNames[bDate.getMonth()]}</span></div>
+                                <div><h6 class="mb-0 fw-bold" style="color: var(--text-color);">${s.first_name} ${s.surname || ''}</h6><small style="color: var(--text-muted);">Student</small></div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (err) { console.error(err); }
         }
 
         document.addEventListener('DOMContentLoaded', initializeDashboard);
-
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            await supabase.auth.signOut();
-            window.location.href = 'login.html';
-        });
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
     </script>
 </body>
 </html>
