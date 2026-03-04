@@ -8,111 +8,67 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         /* GLOBAL DARK MODE ENGINE */
-        :root { 
-            --bg-color: #f4f7fa; 
-            --card-bg: #ffffff; 
-            --text-color: #333333; 
-            --text-muted: #6c757d; 
-            --border-color: #e9ecef; 
-            --input-bg: #f8f9fa; 
-        }
-        body.dark-mode { 
-            --bg-color: #121212; 
-            --card-bg: #1e1e1e; 
-            --text-color: #e0e0e0; 
-            --text-muted: #a0a0a0; 
-            --border-color: #333333; 
-            --input-bg: #2c2c2c; 
-        }
-
+        :root { --bg-color: #f4f7fa; --card-bg: #ffffff; --text-color: #333333; --text-muted: #6c757d; --border-color: #e9ecef; --input-bg: #f8f9fa; }
+        body.dark-mode { --bg-color: #121212; --card-bg: #1e1e1e; --text-color: #e0e0e0; --text-muted: #a0a0a0; --border-color: #333333; --input-bg: #2c2c2c; }
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
         
-        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1050; transition: transform 0.3s ease; }
-        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center; text-decoration: none;}
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; display: flex; align-items: center; font-size: 0.95rem; text-decoration: none;}
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
-
+        
         .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
-        
-        /* Top Navbar */
-        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d; transition: all 0.3s; }
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #3498db; transition: all 0.3s; }
         .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
-        .dark-toggle-btn:hover { transform: scale(1.1); }
 
-        /* Student Profile Card */
-        .profile-section { display: flex; align-items: center; gap: 30px; padding: 25px; background: var(--card-bg); border-radius: 8px; border-top: 4px solid #007a4d; box-shadow: 0 2px 5px rgba(0,0,0,0.02); margin-bottom: 30px; transition: all 0.3s;}
-        .profile-img { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid var(--bg-color); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .profile-info h3 { font-weight: 800; color: var(--text-color); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;}
-        .profile-info p { color: var(--text-muted); font-size: 1.1rem; margin: 0; }
-
-        /* Icon Grid */
-        .icon-grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;}
-        .icon-card { background: var(--card-bg); width: 140px; padding: 25px 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03); cursor: pointer; transition: all 0.3s; text-decoration: none; color: var(--text-color); border: 1px solid var(--border-color); position: relative;}
-        .icon-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.08); border-color: #007a4d; }
-        .icon-circle { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; font-size: 2rem; color: white; }
+        .profile-banner { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); border-radius: 12px; padding: 30px; color: white; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 20px rgba(52, 152, 219, 0.2);}
         
-        .ic-subjects { background: #3498db; }
-        .ic-assignments { background: #f39c12; }
-        .ic-cbt { background: #e74c3c; }
-        .ic-eclassroom { background: #34495e; }
-        .ic-results { background: #2ecc71; }
-        .ic-mail { background: #9b59b6; }
+        .stat-card { background: var(--card-bg); border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 20px; transition: all 0.3s; height: 100%;}
+        .stat-icon { width: 65px; height: 65px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: var(--input-bg); }
 
-        .icon-card h6 { font-weight: 600; font-size: 0.9rem; color: inherit; margin: 0; }
-        .notification-badge { position: absolute; top: 15px; right: 15px; background: #e74c3c; color: white; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 50%; display: none; border: 2px solid var(--card-bg);}
+        .quick-links-header { font-weight: 800; color: var(--text-color); margin-bottom: 20px; margin-top: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;}
+        .quick-link-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); padding: 25px; text-align: center; transition: all 0.3s; text-decoration: none; color: var(--text-color); display: block; box-shadow: 0 4px 15px rgba(0,0,0,0.02);}
+        .quick-link-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-color: #3498db; color: var(--text-color); }
+        .quick-link-card i { font-size: 2.5rem; margin-bottom: 15px; }
 
-        /* Birthday Widget */
-        .birthday-section { background: var(--card-bg); border-radius: 8px; padding: 25px; border: 1px solid var(--border-color); margin-top: 40px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); transition: all 0.3s;}
-        .birthday-card { background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px 20px; display: flex; align-items: center; gap: 15px; min-width: 250px; transition: all 0.3s; flex-grow: 1; max-width: 350px;}
-        .birthday-card:hover { border-color: #f1c40f; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(241, 196, 15, 0.1); }
-        .birthday-date { background: rgba(241, 196, 15, 0.15); color: #d35400; font-weight: 900; padding: 10px; border-radius: 8px; text-align: center; min-width: 60px; font-size: 1.2rem;}
-        body.dark-mode .birthday-date { color: #f1c40f; }
-        .birthday-date span { display: block; font-size: 0.75rem; text-transform: uppercase; margin-top: 2px;}
-        .birthday-info h6 { margin: 0; font-weight: bold; color: var(--text-color); font-size: 1rem;}
-        .birthday-info p { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
+        .utme-card { border: 2px solid #27ae60; background: rgba(39, 174, 96, 0.05); }
+        .utme-card:hover { border-color: #2ecc71; background: rgba(39, 174, 96, 0.1); }
 
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
-
-        /* MOBILE OPTIMIZATION */
-        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
-        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         
         @media (max-width: 992px) {
             .sidebar { transform: translateX(-100%); }
-            .sidebar.mobile-open { transform: translateX(0); box-shadow: 2px 0 15px rgba(0,0,0,0.3); }
+            .sidebar.mobile-open { transform: translateX(0); }
             .main-content { margin-left: 0; padding: 15px; }
-            .mobile-menu-toggle { display: inline-block; }
+            .mobile-menu-toggle { display: inline-block !important; }
             .top-navbar { padding: 15px; flex-direction: column; gap: 10px; }
-            .profile-section { flex-direction: column; text-align: center; }
-            .icon-grid { gap: 15px; }
-            .icon-card { width: calc(50% - 10px); }
         }
+        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
     </style>
 </head>
 <body>
 
-    <div id="loadingOverlay">
-        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
-        <h4 class="fw-bold" style="color: var(--text-muted);">Loading Portal...</h4>
-    </div>
-
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-primary mb-3"></i><h4 class="fw-bold" style="color: var(--text-muted);">Loading Student Portal...</h4></div>
 
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
             <h5 class="text-white fw-bold m-0"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
             <button class="btn btn-sm btn-link text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
         </div>
+        
         <nav class="nav flex-column mt-3">
             <a href="student_dashboard.html" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
-            <a href="student_eclassroom.html" class="nav-link"><i class="fas fa-play"></i> eClassroom</a>
-            <a href="student_subjects.html" class="nav-link"><i class="fas fa-book"></i> My Subjects</a>
-            <a href="student_cbt.html" class="nav-link"><i class="fas fa-laptop-code"></i> CBT / Exams</a>
-            <a href="student_results.html" class="nav-link"><i class="fas fa-award"></i> Result Manager</a>
-            <a href="student_messages.html" class="nav-link mt-2"><i class="fas fa-envelope"></i> My Inbox <span class="badge bg-danger ms-auto" id="sidebarBadge" style="display: none;">0</span></a>
+            <a href="student_subjects.html" class="nav-link"><i class="fas fa-book"></i> My Subjects & Notes</a>
+            <a href="student_eclassroom.html" class="nav-link"><i class="fas fa-video text-danger"></i> Live eClassroom</a>
+            <a href="student_cbt.html" class="nav-link"><i class="fas fa-laptop-code text-info"></i> Take CBT Exam</a>
+            
+            <a href="student_utme.html" class="nav-link fw-bold" style="color: #2ecc71;"><i class="fas fa-university"></i> UTME Simulator</a>
+            
+            <a href="student_results.html" class="nav-link"><i class="fas fa-chart-bar text-warning"></i> My Results</a>
+            <a href="student_messages.html" class="nav-link mt-2"><i class="fas fa-envelope"></i> Messages</a>
             <hr class="mx-3 my-4 border-secondary">
-            <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Secure Logout</a>
         </nav>
     </div>
 
@@ -120,222 +76,105 @@
         <div class="top-navbar">
             <div class="d-flex align-items-center">
                 <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-                <div class="fw-bold d-none d-md-block" style="color: var(--text-muted);"><i class="fas fa-user-graduate me-2"></i> Student Portal</div>
+                <div class="fw-bold d-none d-md-block" style="color: var(--text-muted);"><i class="fas fa-user-graduate me-2"></i> Student Study Center</div>
             </div>
-
-            <div class="header-profile-section mt-lg-0">
-                <div class="d-flex align-items-center ms-auto">
-                    <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
-                        <i class="fas fa-moon" id="themeIcon"></i>
-                    </button>
-                    <div class="fw-bold d-flex align-items-center" style="color: var(--text-color);">
-                        <span id="headerName">Loading...</span><i class="fas fa-bell text-success ms-3"></i>
-                    </div>
+            <div class="d-flex align-items-center ms-auto">
+                <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
+                <div class="fw-bold d-flex align-items-center" style="color: var(--text-color);">
+                    <span id="navStudentName">Loading...</span><i class="fas fa-user-circle ms-3 fs-4 text-primary"></i>
                 </div>
             </div>
         </div>
 
-        <div class="profile-section">
-            <img src="https://ui-avatars.com/api/?name=Student&background=007a4d&color=fff" id="profileImage" class="profile-img">
-            <div class="profile-info">
-                <h3 id="studentName">LOADING...</h3>
-                <p id="studentClass">Class: Verifying...</p>
+        <div class="profile-banner">
+            <div>
+                <h2 id="welcomeText">Welcome back, Scholar!</h2>
+                <p>Keep up the great work and prepare for your upcoming exams.</p>
             </div>
+            <div class="d-none d-md-block"><i class="fas fa-book-reader fa-4x opacity-50"></i></div>
         </div>
 
-        <div class="icon-grid">
-            <a href="student_messages.html" class="icon-card">
-                <div class="notification-badge" id="cardBadge">0</div>
-                <div class="icon-circle ic-mail"><i class="fas fa-envelope"></i></div>
-                <h6>My Inbox</h6>
-            </a>
-
-            <a href="student_subjects.html" class="icon-card">
-                <div class="icon-circle ic-subjects"><i class="fas fa-book"></i></div>
-                <h6>Subjects</h6>
-            </a>
-
-            <a href="student_eclassroom.html" class="icon-card">
-                <div class="icon-circle ic-eclassroom"><i class="fas fa-video"></i></div>
-                <h6>eClassroom</h6>
-            </a>
-
-            <a href="student_cbt.html" class="icon-card">
-                <div class="icon-circle ic-cbt"><i class="fas fa-laptop-code"></i></div>
-                <h6>CBT / Exams</h6>
-            </a>
-
-            <a href="student_results.html" class="icon-card">
-                <div class="icon-circle ic-results"><i class="fas fa-award"></i></div>
-                <h6>Results</h6>
-            </a>
-
-            <a href="my_profile.html" class="icon-card">
-                <div class="icon-circle ic-assignments" style="background: #3498db;"><i class="fas fa-user-circle"></i></div>
-                <h6>My Profile</h6>
-            </a>
-        </div>
-
-        <div class="birthday-section">
-            <h5 class="fw-bold mb-4" style="color: var(--text-color);"><i class="fas fa-birthday-cake text-warning me-2"></i> Upcoming Birthdays This Month</h5>
-            <div id="birthdayList" class="d-flex flex-wrap gap-3">
-                <div class="w-100 text-center py-4" style="color: var(--text-muted);">
-                    <i class="fas fa-spinner fa-spin me-2"></i> Checking for birthdays...
-                </div>
+        <h4 class="quick-links-header">Learning Actions</h4>
+        <div class="row g-4">
+            
+            <div class="col-md-4 col-sm-6">
+                <a href="student_utme.html" class="quick-link-card utme-card">
+                    <i class="fas fa-university text-success"></i>
+                    <h5 class="text-success">JAMB / UTME Simulator</h5>
+                    <p>Practice past questions under real exam conditions.</p>
+                </a>
             </div>
-        </div>
 
+            <div class="col-md-4 col-sm-6">
+                <a href="student_cbt.html" class="quick-link-card">
+                    <i class="fas fa-laptop-code text-info"></i>
+                    <h5>School CBT Exams</h5>
+                    <p>Take your termly or continuous assessments.</p>
+                </a>
+            </div>
+
+            <div class="col-md-4 col-sm-6">
+                <a href="student_subjects.html" class="quick-link-card">
+                    <i class="fas fa-book text-primary"></i>
+                    <h5>Subject Notes</h5>
+                    <p>Download schemes of work and lesson materials.</p>
+                </a>
+            </div>
+
+            <div class="col-md-4 col-sm-6">
+                <a href="student_eclassroom.html" class="quick-link-card">
+                    <i class="fas fa-video text-danger"></i>
+                    <h5>Live eClassroom</h5>
+                    <p>Join virtual video classes with your teachers.</p>
+                </a>
+            </div>
+
+            <div class="col-md-4 col-sm-6">
+                <a href="student_results.html" class="quick-link-card">
+                    <i class="fas fa-chart-line text-warning"></i>
+                    <h5>Performance Results</h5>
+                    <p>Check your grades and track your academic growth.</p>
+                </a>
+            </div>
+
+            <div class="col-md-4 col-sm-6">
+                <a href="student_messages.html" class="quick-link-card">
+                    <i class="fas fa-envelope text-secondary"></i>
+                    <h5>Messages</h5>
+                    <p>Communicate securely with school administration.</p>
+                </a>
+            </div>
+
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
-        // === UI TOGGLES ===
-        window.toggleSidebar = () => {
-            document.getElementById('sidebar').classList.toggle('mobile-open');
-            const overlay = document.getElementById('sidebarOverlay');
-            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
-        };
-
+        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('mobile-open'); };
         window.toggleTheme = () => {
-            const body = document.body;
-            body.classList.toggle('dark-mode');
+            const body = document.body; body.classList.toggle('dark-mode');
             const isDark = body.classList.contains('dark-mode');
             localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
             document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
         };
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { document.body.classList.add('dark-mode'); document.getElementById('themeIcon').className = 'fas fa-sun text-warning'; }
 
-        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') {
-            document.body.classList.add('dark-mode');
-            document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
-        }
-
-        window.addEventListener('storage', (event) => {
-            if (event.key === 'SPRINGDRILL_THEME') {
-                const isDark = event.newValue === 'dark';
-                isDark ? document.body.classList.add('dark-mode') : document.body.classList.remove('dark-mode');
-                document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
-            }
-        });
-
-        // === LOGIC ===
-        async function initializeDashboard() {
+        async function init() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
-                const userId = session.user.id;
-
-                let displayName = "Student";
-                let className = "Unassigned";
-                let avatarUrl = `https://ui-avatars.com/api/?name=Student&background=007a4d&color=fff`;
-
-                // 1. Fetch Profile Data
-                const { data: studentRecords } = await supabase
-                    .from('students')
-                    .select('surname, first_name, passport_url, classes(name)')
-                    .eq('user_id', userId);
-
-                if (studentRecords && studentRecords.length > 0) {
-                    const student = studentRecords[0];
-                    if (student.first_name) {
-                        displayName = `${student.first_name} ${student.surname || ''}`;
-                        avatarUrl = student.passport_url || `https://ui-avatars.com/api/?name=${student.first_name}+${student.surname}&background=007a4d&color=fff`;
-                    }
-                    if (student.classes) className = student.classes.name;
+                const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
+                if(profile) {
+                    document.getElementById('navStudentName').innerText = profile.name;
+                    document.getElementById('welcomeText').innerText = `Welcome back, ${profile.name.split(' ')[0]}!`;
                 }
-
-                document.getElementById('headerName').innerText = displayName;
-                document.getElementById('studentName').innerText = displayName;
-                document.getElementById('studentClass').innerText = `Class: ${className}`;
-                document.getElementById('profileImage').src = avatarUrl;
-
-                // 2. Check for Unread Messages
-                const { count: unreadCount, error: msgErr } = await supabase
-                    .from('messages')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('receiver_id', userId)
-                    .eq('is_read', false);
-
-                if (!msgErr && unreadCount > 0) {
-                    const sidebarBadge = document.getElementById('sidebarBadge');
-                    sidebarBadge.innerText = unreadCount;
-                    sidebarBadge.style.display = 'inline-block';
-
-                    const cardBadge = document.getElementById('cardBadge');
-                    cardBadge.innerText = unreadCount;
-                    cardBadge.style.display = 'inline-block';
-                }
-
-                // 3. Fetch Upcoming Birthdays
-                await fetchBirthdays();
-
                 document.getElementById('loadingOverlay').style.display = 'none';
-            } catch (err) {
-                console.error(err);
-                document.getElementById('loadingOverlay').style.display = 'none';
-            }
+            } catch (err) { console.error(err); }
         }
-
-        async function fetchBirthdays() {
-            try {
-                const currentMonth = new Date().getMonth(); // 0 = Jan, 11 = Dec
-                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-                const { data: students, error } = await supabase
-                    .from('students')
-                    .select('first_name, surname, dob, classes(name)')
-                    .not('dob', 'is', null);
-
-                const bdayContainer = document.getElementById('birthdayList');
-
-                if (error || !students || students.length === 0) {
-                    bdayContainer.innerHTML = '<div class="w-100 text-center text-muted py-3">No birthdays recorded yet.</div>';
-                    return;
-                }
-
-                // Filter for current month
-                const birthdaysThisMonth = students.filter(s => {
-                    const dobDate = new Date(s.dob);
-                    return dobDate.getMonth() === currentMonth;
-                }).sort((a, b) => new Date(a.dob).getDate() - new Date(b.dob).getDate());
-
-                if (birthdaysThisMonth.length === 0) {
-                    bdayContainer.innerHTML = '<div class="w-100 text-center text-muted py-3">No student birthdays this month.</div>';
-                } else {
-                    bdayContainer.innerHTML = birthdaysThisMonth.map(s => {
-                        const bDate = new Date(s.dob);
-                        const day = bDate.getDate();
-                        const monthStr = monthNames[bDate.getMonth()];
-                        
-                        return `
-                            <div class="birthday-card shadow-sm">
-                                <div class="birthday-date">
-                                    ${day}
-                                    <span>${monthStr}</span>
-                                </div>
-                                <div class="birthday-info">
-                                    <h6>${s.first_name} ${s.surname || ''}</h6>
-                                    <p><i class="fas fa-chalkboard text-success me-1"></i> ${s.classes?.name || 'Student'}</p>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-                }
-
-            } catch (err) {
-                console.error("Birthday fetch error:", err);
-                document.getElementById('birthdayList').innerHTML = '<div class="w-100 text-center text-muted py-3">Failed to load birthdays.</div>';
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', initializeDashboard);
-
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            await supabase.auth.signOut();
-            window.location.href = 'login.html';
-        });
+        document.addEventListener('DOMContentLoaded', init);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
     </script>
 </body>
 </html>

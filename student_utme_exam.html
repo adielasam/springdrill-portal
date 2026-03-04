@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - UTME Live Exam</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* GLOBAL DARK MODE ENGINE */
+        :root { 
+            --bg-color: #e9ecef; 
+            --card-bg: #ffffff; 
+            --text-color: #333333; 
+            --text-muted: #6c757d; 
+            --border-color: #dee2e6; 
+            --input-bg: #f8f9fa; 
+            --utme-green: #27ae60;
+            --utme-green-dark: #1e8449;
+        }
+        body.dark-mode { 
+            --bg-color: #121212; 
+            --card-bg: #1e1e1e; 
+            --text-color: #e0e0e0; 
+            --text-muted: #a0a0a0; 
+            --border-color: #333333; 
+            --input-bg: #2c2c2c; 
+            --utme-green: #2ecc71;
+            --utme-green-dark: #27ae60;
+        }
+
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh;}
+        
+        /* Top Header Area */
+        .exam-header { background-color: var(--utme-green); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10;}
+        .student-info { display: flex; align-items: center; gap: 15px; }
+        .student-photo { width: 50px; height: 50px; background: white; border-radius: 5px; display: flex; justify-content: center; align-items: center; color: var(--utme-green); font-size: 1.5rem; border: 2px solid rgba(255,255,255,0.5);}
+        .timer-box { background: rgba(0,0,0,0.2); padding: 8px 20px; border-radius: 30px; font-family: monospace; font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; border: 1px solid rgba(255,255,255,0.3);}
+        
+        /* Subject Tabs */
+        .subject-tabs { background: var(--card-bg); border-bottom: 2px solid var(--border-color); display: flex; padding: 0 20px; overflow-x: auto;}
+        .sub-tab { padding: 15px 25px; font-weight: bold; color: var(--text-muted); cursor: pointer; border-bottom: 4px solid transparent; transition: 0.3s; white-space: nowrap;}
+        .sub-tab:hover { color: var(--utme-green); background: var(--input-bg); }
+        .sub-tab.active { color: var(--utme-green); border-bottom: 4px solid var(--utme-green); background: var(--input-bg); }
+
+        /* Main Content Layout */
+        .exam-body { flex: 1; display: flex; overflow: hidden; }
+        
+        /* Left: Question Area */
+        .question-area { flex: 3; padding: 30px; overflow-y: auto; display: flex; flex-direction: column;}
+        .question-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;}
+        .q-number { font-size: 1.2rem; font-weight: 800; color: var(--utme-green); }
+        .q-text { font-size: 1.2rem; line-height: 1.6; margin-bottom: 30px; font-weight: 500;}
+        
+        .options-container { display: flex; flex-direction: column; gap: 15px; margin-bottom: 40px;}
+        .option-label { display: flex; align-items: center; padding: 15px 20px; border: 2px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: 0.2s; background: var(--card-bg); font-size: 1.1rem; font-weight: 500;}
+        .option-label:hover { border-color: var(--utme-green); background: var(--input-bg); }
+        .option-input { width: 22px; height: 22px; margin-right: 15px; accent-color: var(--utme-green); cursor: pointer;}
+        .option-label.selected { border-color: var(--utme-green); background: rgba(39, 174, 96, 0.05); }
+
+        /* Navigation Buttons */
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color);}
+        .btn-nav { padding: 10px 30px; font-size: 1.1rem; font-weight: bold; border-radius: 30px; transition: 0.3s;}
+
+        /* Right: Question Palette Area */
+        .palette-area { flex: 1; min-width: 300px; max-width: 350px; background: var(--card-bg); border-left: 1px solid var(--border-color); display: flex; flex-direction: column;}
+        .palette-header { padding: 15px; background: var(--input-bg); border-bottom: 1px solid var(--border-color); font-weight: bold; text-align: center; color: var(--text-color);}
+        .palette-grid { padding: 15px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; overflow-y: auto; flex: 1; align-content: start;}
+        
+        .q-node { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; border: 1px solid var(--border-color); border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s; background: var(--input-bg); color: var(--text-muted);}
+        .q-node:hover { border-color: var(--utme-green); color: var(--text-color); }
+        .q-node.answered { background: var(--utme-green); color: white; border-color: var(--utme-green-dark); }
+        .q-node.active-node { outline: 3px solid #3498db; outline-offset: -2px; }
+
+        .palette-footer { padding: 20px; border-top: 1px solid var(--border-color); background: var(--input-bg);}
+        
+        /* Dark Mode Toggle */
+        .dark-toggle { background: transparent; border: 1px solid rgba(255,255,255,0.5); color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; margin-left: 15px;}
+        .dark-toggle:hover { background: rgba(255,255,255,0.2); }
+
+        #submitOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; color: white;}
+
+        @media (max-width: 992px) {
+            .exam-body { flex-direction: column; overflow: auto;}
+            .question-area { flex: none; overflow: visible; }
+            .palette-area { flex: none; max-width: 100%; border-left: none; border-top: 2px solid var(--border-color); }
+            .student-name-text { display: none; } /* Hide name on mobile to save space */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="submitOverlay">
+        <i class="fas fa-spinner fa-spin fa-4x text-success mb-3"></i>
+        <h2 class="fw-bold">Submitting Exam...</h2>
+        <p>Please wait while we compile your results.</p>
+    </div>
+
+    <header class="exam-header">
+        <div class="student-info">
+            <div class="student-photo"><i class="fas fa-user"></i></div>
+            <div>
+                <div class="fw-bold fs-5 student-name-text" id="studentNameDisplay">Loading Student...</div>
+                <div style="font-size: 0.8rem; opacity: 0.8;">UTME Mock Simulator</div>
+            </div>
+        </div>
+
+        <div class="timer-box" id="timerDisplay">02:00:00</div>
+
+        <div class="d-flex align-items-center">
+            <button class="btn btn-outline-light fw-bold me-3 d-none d-md-block" onclick="alert('Calculator function coming soon!')"><i class="fas fa-calculator me-2"></i>Calculator</button>
+            <button class="btn btn-danger fw-bold shadow" onclick="submitExam()"><i class="fas fa-paper-plane me-2"></i> Submit Exam</button>
+            <button class="dark-toggle" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
+        </div>
+    </header>
+
+    <div class="subject-tabs" id="subjectTabsContainer">
+        </div>
+
+    <div class="exam-body">
+        
+        <div class="question-area">
+            <div class="question-header">
+                <div class="q-number" id="questionNumberDisplay">Question 1</div>
+                <div class="badge bg-secondary" id="subjectBadgeDisplay">English</div>
+            </div>
+
+            <div class="q-text" id="questionTextDisplay">Loading question...</div>
+
+            <div class="options-container" id="optionsContainer">
+                </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-outline-secondary btn-nav" id="btnPrev" onclick="prevQuestion()"><i class="fas fa-arrow-left me-2"></i> Previous</button>
+                <button class="btn btn-primary btn-nav px-5 shadow" id="btnNext" onclick="nextQuestion()">Next <i class="fas fa-arrow-right ms-2"></i></button>
+            </div>
+        </div>
+
+        <div class="palette-area">
+            <div class="palette-header">
+                Question Navigator
+            </div>
+            <div class="palette-grid" id="paletteGrid">
+                </div>
+            <div class="palette-footer">
+                <div class="d-flex justify-content-between small fw-bold" style="color: var(--text-muted);">
+                    <div><span style="display:inline-block; width:12px; height:12px; background:var(--utme-green); margin-right:5px; border-radius:2px;"></span> Answered</div>
+                    <div><span style="display:inline-block; width:12px; height:12px; background:var(--input-bg); border: 1px solid var(--border-color); margin-right:5px; border-radius:2px;"></span> Unanswered</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        // === DARK MODE ===
+        window.toggleTheme = () => {
+            const body = document.body; body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { document.body.classList.add('dark-mode'); document.getElementById('themeIcon').className = 'fas fa-sun text-warning'; }
+
+        // === EXAM STATE ===
+        let subjects = [];
+        let currentSubjectIndex = 0;
+        let currentQuestionIndex = 0;
+        let examData = {}; // { "English": [{q: "", options: [], id: 1}], "Math": [...] }
+        let userAnswers = {}; // { "English": { 0: "A", 1: "C" }, "Math": {...} }
+        let totalSeconds = 7200; // 2 hours default
+        let timerInterval;
+
+        // === INITIALIZE EXAM ===
+        async function initExam() {
+            try {
+                // Verify User
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = 'login.html';
+                const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
+                if(profile) document.getElementById('studentNameDisplay').innerText = profile.name;
+
+                // Read selected subjects from LocalStorage (Set by the previous setup page)
+                const storedSubjects = JSON.parse(localStorage.getItem('UTME_SUBJECTS'));
+                subjects = storedSubjects && storedSubjects.length > 0 ? storedSubjects : ["English", "Mathematics", "Physics", "Chemistry"]; // Fallback to Science combo
+                
+                // Initialize Answer Tracker
+                subjects.forEach(sub => {
+                    examData[sub] = generateMockQuestions(sub, 40); // Generate 40 questions per subject
+                    userAnswers[sub] = {};
+                });
+
+                renderTabs();
+                loadSubject(0);
+                startTimer();
+
+            } catch (err) { console.error(err); }
+        }
+
+        // === MOCK QUESTION GENERATOR ===
+        // This acts as a placeholder until the DB has thousands of real questions
+        function generateMockQuestions(subject, count) {
+            let qs = [];
+            for(let i = 0; i < count; i++) {
+                qs.push({
+                    id: i,
+                    question_text: `This is a simulated ${subject} question for question number ${i + 1}. In a real exam, the actual UTME question from the database will appear here. What is the correct answer?`,
+                    options: {
+                        "A": `Option A for ${subject} Q${i+1}`,
+                        "B": `Option B for ${subject} Q${i+1}`,
+                        "C": `Option C for ${subject} Q${i+1}`,
+                        "D": `Option D for ${subject} Q${i+1}`
+                    }
+                });
+            }
+            return qs;
+        }
+
+        // === RENDER LOGIC ===
+        function renderTabs() {
+            const container = document.getElementById('subjectTabsContainer');
+            container.innerHTML = subjects.map((sub, index) => `
+                <div class="sub-tab ${index === currentSubjectIndex ? 'active' : ''}" onclick="window.loadSubject(${index})">
+                    ${sub}
+                </div>
+            `).join('');
+        }
+
+        window.loadSubject = (index) => {
+            currentSubjectIndex = index;
+            currentQuestionIndex = 0; // Reset to Q1 when switching subjects
+            renderTabs();
+            renderQuestion();
+            renderPalette();
+        };
+
+        function renderQuestion() {
+            const subjectName = subjects[currentSubjectIndex];
+            const currentQ = examData[subjectName][currentQuestionIndex];
+            
+            document.getElementById('subjectBadgeDisplay').innerText = subjectName;
+            document.getElementById('questionNumberDisplay').innerText = `Question ${currentQuestionIndex + 1}`;
+            document.getElementById('questionTextDisplay').innerText = currentQ.question_text;
+
+            const selectedAnswer = userAnswers[subjectName][currentQuestionIndex];
+
+            const optionsHtml = Object.entries(currentQ.options).map(([letter, text]) => {
+                const isChecked = selectedAnswer === letter;
+                return `
+                    <label class="option-label ${isChecked ? 'selected' : ''}" onclick="window.selectOption('${letter}')">
+                        <input type="radio" name="q_option" class="option-input" ${isChecked ? 'checked' : ''}>
+                        <span class="fw-bold me-3 text-primary">${letter}.</span> ${text}
+                    </label>
+                `;
+            }).join('');
+            
+            document.getElementById('optionsContainer').innerHTML = optionsHtml;
+
+            // Handle Nav Buttons
+            document.getElementById('btnPrev').style.visibility = currentQuestionIndex === 0 ? 'hidden' : 'visible';
+            const isLastQuestion = currentQuestionIndex === examData[subjectName].length - 1;
+            document.getElementById('btnNext').innerHTML = isLastQuestion ? `Next Subject <i class="fas fa-step-forward ms-2"></i>` : `Next <i class="fas fa-arrow-right ms-2"></i>`;
+            
+            // Update Palette highlight
+            renderPalette();
+        }
+
+        function renderPalette() {
+            const subjectName = subjects[currentSubjectIndex];
+            const totalQs = examData[subjectName].length;
+            const grid = document.getElementById('paletteGrid');
+
+            let html = '';
+            for(let i = 0; i < totalQs; i++) {
+                const isAnswered = userAnswers[subjectName][i] !== undefined;
+                const isActive = i === currentQuestionIndex;
+                html += `<div class="q-node ${isAnswered ? 'answered' : ''} ${isActive ? 'active-node' : ''}" onclick="window.jumpToQuestion(${i})">${i + 1}</div>`;
+            }
+            grid.innerHTML = html;
+        }
+
+        // === INTERACTIONS ===
+        window.selectOption = (letter) => {
+            const subjectName = subjects[currentSubjectIndex];
+            userAnswers[subjectName][currentQuestionIndex] = letter;
+            
+            // Re-render to show selection and update palette color
+            renderQuestion(); 
+        };
+
+        window.nextQuestion = () => {
+            const subjectName = subjects[currentSubjectIndex];
+            if (currentQuestionIndex < examData[subjectName].length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                // If it's the last question, jump to next subject tab if available
+                if (currentSubjectIndex < subjects.length - 1) {
+                    loadSubject(currentSubjectIndex + 1);
+                } else {
+                    alert("You have reached the end of the final subject.");
+                }
+            }
+        };
+
+        window.prevQuestion = () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        };
+
+        window.jumpToQuestion = (index) => {
+            currentQuestionIndex = index;
+            renderQuestion();
+        };
+
+        // === TIMER & SUBMISSION ===
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                totalSeconds--;
+                if (totalSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    autoSubmitExam();
+                } else {
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+            const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+            const s = Math.floor(totalSeconds % 60).toString().padStart(2, '0');
+            const display = document.getElementById('timerDisplay');
+            display.innerText = `${h}:${m}:${s}`;
+            
+            if(totalSeconds < 300) { // Less than 5 mins
+                display.style.color = '#e74c3c';
+                display.classList.add('pulse');
+            }
+        }
+
+        window.submitExam = () => {
+            if(confirm("Are you sure you want to submit your UTME Mock Exam? You cannot undo this action.")) {
+                autoSubmitExam();
+            }
+        };
+
+        function autoSubmitExam() {
+            clearInterval(timerInterval);
+            document.getElementById('submitOverlay').style.display = 'flex';
+            
+            // Calculate mock score
+            let totalAnswered = 0;
+            subjects.forEach(sub => { totalAnswered += Object.keys(userAnswers[sub]).length; });
+
+            setTimeout(() => {
+                alert(`Exam Submitted Successfully!\n\nYou answered ${totalAnswered} questions across all subjects.\nYour detailed UTME result will be available in the Results tab.`);
+                window.location.href = 'student_dashboard.html';
+            }, 2000);
+        }
+
+        document.addEventListener('DOMContentLoaded', initExam);
+    </script>
+</body>
+</html>
