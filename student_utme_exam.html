@@ -87,21 +87,31 @@
         const QUESTIONS_PER_SUBJECT = parseInt(localStorage.getItem('UTME_QUESTION_COUNT')) || 40; 
         let totalSeconds = parseInt(localStorage.getItem('UTME_EXAM_TIME')) || 7200; 
 
-        async function fetchExamQuestions(subject, count) {
-            try {
-                const { data, error } = await supabase.functions.invoke('generate-utme-questions', {
-                    body: { subject: subject, count: count }
-                });
-                if (error) throw error;
-                if (!data || !Array.isArray(data)) throw new Error("Invalid AI output format.");
-                return data;
-            } catch (error) {
-                console.error("Failed to fetch " + subject, error);
-                return [{
-                    question_text: `API Error. Could not load questions for ${subject}. Please check Supabase logs.`,
-                    options: { "A": "Opt A", "B": "Opt B", "C": "Opt C", "D": "Opt D" },
-                    correct_option: "A"
-                }];
+        // NEW: Auto-Retry System
+        async function fetchExamQuestions(subject, count, retries = 2) {
+            for (let attempt = 0; attempt <= retries; attempt++) {
+                try {
+                    const { data, error } = await supabase.functions.invoke('generate-utme-questions', {
+                        body: { subject: subject, count: count }
+                    });
+                    if (error) throw error;
+                    if (!data || !Array.isArray(data)) throw new Error("Invalid AI output format.");
+                    return data; // Success! Return the questions.
+                } catch (error) {
+                    console.error(`Attempt ${attempt + 1} failed for ${subject}:`, error.message);
+                    
+                    if (attempt === retries) {
+                        // If it fails 3 times in a row, THEN we show the error.
+                        return [{
+                            question_text: `Network Error. Could not load questions for ${subject} after multiple attempts.`,
+                            options: { "A": "Opt A", "B": "Opt B", "C": "Opt C", "D": "Opt D" },
+                            correct_option: "A"
+                        }];
+                    }
+                    
+                    // Wait 2.5 seconds before trying again to let the server breathe
+                    await new Promise(resolve => setTimeout(resolve, 2500));
+                }
             }
         }
 
@@ -126,11 +136,11 @@
             document.getElementById('loadingOverlay').style.display = 'none';
             renderTabs(); loadSubject(0); startTimer();
 
-            // 2. The Fix: Sequentially load the remaining subjects in the background to prevent Rate Limits!
+            // 2. Sequentially load the remaining subjects in the background to prevent Rate Limits!
             (async () => {
                 for (let i = 1; i < subjects.length; i++) {
                     const sub = subjects[i];
-                    // The 'await' here forces the browser to wait for Math to finish before asking for Physics
+                    // The 'await' here forces the browser to wait for the previous to finish
                     const data = await fetchExamQuestions(sub, QUESTIONS_PER_SUBJECT);
                     examData[sub] = data;
                     userAnswers[sub] = {};
