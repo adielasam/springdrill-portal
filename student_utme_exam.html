@@ -95,7 +95,7 @@
     <div id="loadingOverlay">
         <i class="fas fa-brain fa-spin fa-4x text-success mb-3"></i>
         <h3 class="fw-bold" style="color: var(--text-color);">AI is generating your exam...</h3>
-        <p id="aiStatusText" style="color: var(--text-muted);">Connecting to OpenRouter...</p>
+        <p id="aiStatusText" style="color: var(--text-muted);">Connecting to Secure Server...</p>
     </div>
 
     <div id="submitOverlay">
@@ -159,16 +159,6 @@
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
-        // ==========================================
-        // 🚨 OPENROUTER API CONFIGURATION 🚨
-        // ==========================================
-        // Replace this with your actual OpenRouter API Key
-        const OPENROUTER_API_KEY = "YOUR_OPENROUTER_API_KEY_HERE"; 
-        
-        // Number of questions to generate per subject (Keep at 10-15 initially to avoid long loading times)
-        const QUESTIONS_PER_SUBJECT = 10; 
-        // ==========================================
-
         // === DARK MODE ===
         window.toggleTheme = () => {
             const body = document.body; body.classList.toggle('dark-mode');
@@ -184,9 +174,52 @@
         let currentQuestionIndex = 0;
         let examData = {}; 
         let userAnswers = {}; 
-        let correctAnswers = {}; // We store the AI's answer key here!
+        let correctAnswers = {}; 
         let totalSeconds = 7200; 
         let timerInterval;
+
+        // Number of questions to generate per subject
+        const QUESTIONS_PER_SUBJECT = 10; 
+
+        // === OPENROUTER AI ENGINE (VIA SUPABASE EDGE FUNCTION) ===
+        async function generateAIQuestions(subject, count) {
+            try {
+                console.log(`Requesting ${subject} questions from Supabase Edge Function...`);
+                
+                // Securely call the Edge Function we built in the Dashboard
+                const { data, error } = await supabase.functions.invoke('generate-utme-questions', {
+                    body: { subject: subject, count: count }
+                });
+
+                if (error) {
+                    console.error("Supabase edge function error:", error);
+                    throw error;
+                }
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                return data; // Returns the clean JSON questions
+
+            } catch (error) {
+                console.error("AI Generation Failed for", subject, error);
+                alert(`AI failed to generate ${subject} questions. Falling back to backup database. Reason: ${error.message}`);
+                return fallbackMockQuestions(subject, count);
+            }
+        }
+
+        function fallbackMockQuestions(subject, count) {
+            let qs = [];
+            for(let i = 0; i < count; i++) {
+                qs.push({
+                    question_text: `This is a backup generated question for ${subject} Q${i + 1}. Please ensure your Supabase Edge Function is running properly.`,
+                    options: { "A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D" },
+                    correct_option: "A"
+                });
+            }
+            return qs;
+        }
 
         // === INITIALIZE EXAM ===
         async function initExam() {
@@ -225,72 +258,9 @@
 
             } catch (err) { 
                 console.error(err); 
-                alert("Failed to initialize exam. Please check your API key and internet connection.");
+                alert("Failed to initialize exam. Please check your connection.");
                 window.location.href = 'student_utme.html';
             }
-        }
-
-        // === OPENROUTER AI ENGINE ===
-        async function generateAIQuestions(subject, count) {
-            // If the user hasn't added their API key yet, fall back to dummy data so the app doesn't crash
-            if (OPENROUTER_API_KEY === "YOUR_OPENROUTER_API_KEY_HERE") {
-                console.warn("API Key missing. Falling back to dummy data.");
-                return fallbackMockQuestions(subject, count);
-            }
-
-            const prompt = `You are a strict Nigerian JAMB/UTME examiner. Generate exactly ${count} multiple-choice questions for the subject: ${subject}. 
-            Return ONLY a valid JSON array. Do not include markdown formatting like \`\`\`json. 
-            Each object must match this exact structure:
-            {
-              "question_text": "The actual question goes here?",
-              "options": {
-                "A": "First option",
-                "B": "Second option",
-                "C": "Third option",
-                "D": "Fourth option"
-              },
-              "correct_option": "A"
-            }`;
-
-            try {
-                const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        model: "google/gemini-2.5-flash", // Fast and excellent at JSON
-                        messages: [{ role: "user", content: prompt }]
-                    })
-                });
-
-                const data = await response.json();
-                let aiText = data.choices[0].message.content;
-
-                // Smart JSON Cleaner (Removes markdown blocks if the AI stubbornly adds them)
-                aiText = aiText.replace(/```json/g, '').replace(/```/g, '').trim();
-                
-                const parsedQuestions = JSON.parse(aiText);
-                return parsedQuestions;
-
-            } catch (error) {
-                console.error("AI Generation Failed for", subject, error);
-                alert(`AI failed to generate ${subject} questions. Falling back to backup database.`);
-                return fallbackMockQuestions(subject, count);
-            }
-        }
-
-        function fallbackMockQuestions(subject, count) {
-            let qs = [];
-            for(let i = 0; i < count; i++) {
-                qs.push({
-                    question_text: `This is a backup generated question for ${subject} Q${i + 1}. Please insert your OpenRouter API Key to get real AI questions!`,
-                    options: { "A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D" },
-                    correct_option: "A"
-                });
-            }
-            return qs;
         }
 
         // === RENDER LOGIC ===
@@ -430,15 +400,13 @@
             subjects.forEach(sub => { 
                 totalQuestions += examData[sub].length;
                 
-                // Compare user answer to the AI's correct answer
                 for (let i = 0; i < examData[sub].length; i++) {
                     if (userAnswers[sub][i] === correctAnswers[sub][i]) {
                         totalCorrect++;
                     }
                 }
-            }); 
+            });
 
-            // Convert to JAMB scale (Usually out of 400)
             const finalJambScore = Math.round((totalCorrect / totalQuestions) * 400);
 
             setTimeout(() => {
