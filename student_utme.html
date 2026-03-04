@@ -7,108 +7,59 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* GLOBAL DARK MODE ENGINE */
         :root { --bg-color: #f4f7fa; --card-bg: #ffffff; --text-color: #333333; --text-muted: #6c757d; --border-color: #e9ecef; --input-bg: #f8f9fa; }
         body.dark-mode { --bg-color: #121212; --card-bg: #1e1e1e; --text-color: #e0e0e0; --text-muted: #a0a0a0; --border-color: #333333; --input-bg: #2c2c2c; }
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
-        
-        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: 0.3s; }
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; transition: 0.3s; }
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; display: flex; align-items: center; font-size: 0.95rem; text-decoration: none;}
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: 0.3s; display: flex; align-items: center; }
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
-        
-        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
-        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #27ae60; transition: all 0.3s; }
-        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
-
-        /* UTME SIMULATOR SPECIFIC STYLES */
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: 0.3s; }
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #27ae60;}
+        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .utme-container { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
         .utme-header { background-color: #27ae60; color: white; padding: 15px 25px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; font-size: 1.2rem;}
-        
-        /* Subject Grid */
         .subject-grid { padding: 20px 25px; border-bottom: 2px solid var(--border-color); display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; background: var(--input-bg);}
-        .subject-item { display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--text-color); cursor: pointer;}
+        .subject-item { display: flex; align-items: center; gap: 10px; font-weight: 600; cursor: pointer;}
         .subject-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #27ae60;}
-
-        /* Config Section */
         .config-area { padding: 30px 25px; display: flex; gap: 30px; flex-wrap: wrap;}
-        
-        /* Left: Subject Settings */
-        .config-col-left { flex: 1; min-width: 250px; }
+        .config-col-left, .config-col-right { flex: 1; min-width: 250px; }
         .subject-accordion-header { background: #27ae60; color: white; padding: 10px 15px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; margin-bottom: 15px;}
         .form-label { font-weight: 600; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px; display: block;}
         .form-select, .form-control { border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); border-radius: 4px; padding: 8px 12px; width: 100%; transition: 0.3s;}
-        .form-select:focus, .form-control:focus { border-color: #27ae60; outline: none; box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.2);}
-        
-        /* Center: User Profile */
         .config-col-center { flex: 1; min-width: 250px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 1px dashed var(--border-color); border-right: 1px dashed var(--border-color); padding: 0 20px;}
-        .utme-avatar { width: 150px; height: 150px; border-radius: 50%; background-color: #27ae60; display: flex; justify-content: center; align-items: center; color: white; font-size: 5rem; margin-bottom: 20px; border: 5px solid rgba(39, 174, 96, 0.2);}
+        .utme-avatar { width: 150px; height: 150px; border-radius: 50%; background-color: #27ae60; display: flex; justify-content: center; align-items: center; color: white; font-size: 5rem; margin-bottom: 20px;}
         .btn-start { background-color: #1976d2; color: white; border: none; width: 100%; padding: 12px; font-size: 1.2rem; font-weight: bold; border-radius: 30px; transition: 0.3s; margin-top: 15px;}
-        .btn-start:hover { background-color: #1565c0; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(25, 118, 210, 0.4);}
-
-        /* Right: General Settings */
-        .config-col-right { flex: 1; min-width: 250px; }
         .fieldset-box { border: 1px solid var(--border-color); border-radius: 4px; padding: 15px; margin-bottom: 20px; position: relative;}
         .fieldset-legend { position: absolute; top: -10px; left: 10px; background: var(--card-bg); padding: 0 10px; font-size: 0.85rem; font-weight: bold; color: var(--text-muted);}
-        .info-text { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0;}
-        .btn-instructions { background-color: #27ae60; color: white; border: none; width: 100%; padding: 10px; font-weight: bold; border-radius: 30px;}
-
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        @media (max-width: 992px) {
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.mobile-open { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 15px; }
-            .mobile-menu-toggle { display: inline-block !important; }
-            .top-navbar { padding: 15px; flex-direction: column; gap: 10px; }
-            .config-col-center { border: none; padding: 30px 0; }
-        }
-        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
     </style>
 </head>
 <body>
-
     <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i><h4 class="fw-bold" style="color: var(--text-muted);">Initializing Simulator...</h4></div>
 
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
             <h5 class="text-white fw-bold m-0"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
-            <button class="btn btn-sm btn-link text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
         </div>
-        
         <nav class="nav flex-column mt-3">
             <a href="student_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
-            <a href="student_subjects.html" class="nav-link"><i class="fas fa-book"></i> My Subjects & Notes</a>
-            <a href="student_eclassroom.html" class="nav-link"><i class="fas fa-video text-danger"></i> Live eClassroom</a>
-            <a href="student_cbt.html" class="nav-link"><i class="fas fa-laptop-code text-info"></i> Take CBT Exam</a>
-            
             <a href="student_utme.html" class="nav-link active fw-bold" style="color: #2ecc71;"><i class="fas fa-university"></i> UTME Simulator</a>
-            
             <a href="student_results.html" class="nav-link"><i class="fas fa-chart-bar text-warning"></i> My Results</a>
-            <a href="student_messages.html" class="nav-link mt-2"><i class="fas fa-envelope"></i> Messages</a>
-            <hr class="mx-3 my-4 border-secondary">
-            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Secure Logout</a>
         </nav>
     </div>
 
     <div class="main-content">
         <div class="top-navbar">
-            <div class="d-flex align-items-center">
-                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-                <div class="fw-bold d-none d-md-block" style="color: var(--text-muted);"><i class="fas fa-university me-2 text-success"></i> Test Preparation Center</div>
-            </div>
-            <div class="d-flex align-items-center ms-auto">
-                <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
-            </div>
+            <div class="fw-bold d-none d-md-block" style="color: var(--text-muted);"><i class="fas fa-university me-2 text-success"></i> Test Preparation Center</div>
+            <button class="dark-toggle-btn" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
         </div>
 
         <div class="utme-container">
-            <div class="utme-header">
-                <span>Practice For UTME</span>
-                <a href="student_dashboard.html" class="text-white"><i class="fas fa-home"></i></a>
-            </div>
+            <div class="utme-header"><span>Practice For UTME</span></div>
 
-            <div class="p-2 text-center border-bottom fw-bold" style="background: var(--card-bg); color: var(--text-muted); font-size: 0.85rem;">
+            <div class="p-2 text-center border-bottom fw-bold" style="background: var(--card-bg); color: var(--text-muted);">
                 Select One or More Subjects (Max 4 for JAMB)
             </div>
             <div class="subject-grid">
@@ -118,48 +69,20 @@
                 <label class="subject-item"><input type="checkbox" value="Chemistry"> Chemistry</label>
                 <label class="subject-item"><input type="checkbox" value="Biology"> Biology</label>
                 <label class="subject-item"><input type="checkbox" value="Economics"> Economics</label>
-                <label class="subject-item"><input type="checkbox" value="Government"> Government</label>
-                <label class="subject-item"><input type="checkbox" value="Literature"> Literature</label>
-                <label class="subject-item"><input type="checkbox" value="CRK"> CRK / IRK</label>
-                <label class="subject-item"><input type="checkbox" value="Geography"> Geography</label>
-                <label class="subject-item"><input type="checkbox" value="Commerce"> Commerce</label>
-                <label class="subject-item"><input type="checkbox" value="Agric"> Agriculture</label>
             </div>
 
             <div class="config-area">
-                
                 <div class="config-col-left">
                     <div class="subject-accordion-header">
-                        <div>
-                            <i class="fas fa-chevron-down me-2"></i> English
-                            <div style="font-size: 0.75rem; font-weight: normal; margin-left: 20px;">2023 Model | 60 Questions</div>
-                        </div>
-                        <button class="btn btn-sm btn-light fw-bold" style="font-size: 0.75rem;">Hide</button>
+                        <div><i class="fas fa-chevron-down me-2"></i> Configuration</div>
                     </div>
-
                     <div class="mb-3">
-                        <label class="form-label">Year</label>
-                        <select class="form-select">
-                            <option>Random (All Years)</option>
-                            <option selected>2023 Model</option>
-                            <option>2022 Model</option>
-                            <option>2021 Model</option>
-                            <option>2020 Model</option>
+                        <label class="form-label">Number of questions per subject</label>
+                        <select class="form-select" id="questionCountSelect">
+                            <option value="10">10 Questions</option>
+                            <option value="20">20 Questions</option>
+                            <option value="40" selected>40 Questions</option>
                         </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Number of questions</label>
-                        <select class="form-select">
-                            <option>40</option>
-                            <option>50</option>
-                            <option selected>60</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Topic : All</label>
-                        <button class="btn btn-outline-secondary w-100 rounded-pill fw-bold" style="border-color: var(--border-color); color: var(--text-color);">Select Topics Of Interest</button>
                     </div>
                 </div>
 
@@ -170,97 +93,52 @@
                 </div>
 
                 <div class="config-col-right">
-                    
                     <div class="fieldset-box mt-3">
-                        <span class="fieldset-legend">Mode</span>
-                        <select class="form-select mb-2 border-0 bg-transparent fw-bold" style="padding: 0;">
-                            <option>Practice</option>
-                            <option>Mock Exam (Strict)</option>
-                        </select>
-                        <p class="info-text">Get timed, view result and get corrections.</p>
-                    </div>
-
-                    <div class="fieldset-box">
                         <span class="fieldset-legend">Total Time</span>
                         <select class="form-select border-0 bg-transparent fw-bold" style="padding: 0;">
-                            <option>01:00:00</option>
-                            <option>01:30:00</option>
-                            <option selected>02:00:00</option>
+                            <option>02:00:00</option>
                         </select>
                     </div>
-
-                    <div class="fieldset-box pb-2">
-                        <span class="fieldset-legend">Shuffle</span>
-                        <div class="d-flex justify-content-between px-2">
-                            <label style="color: var(--text-color); font-weight: 500;"><input type="checkbox" checked class="me-1"> Questions</label>
-                            <label style="color: var(--text-color); font-weight: 500;"><input type="checkbox" checked class="me-1"> Options</label>
-                        </div>
-                    </div>
-
-                    <div class="fieldset-box pb-2 border-0 px-0">
-                        <span class="fieldset-legend" style="left: 50%; transform: translateX(-50%);">Instructions</span>
-                        <button class="btn-instructions mt-2"><i class="fas fa-chalkboard-teacher me-2"></i> Click To View</button>
-                    </div>
-
                 </div>
-
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
-        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('mobile-open'); };
         window.toggleTheme = () => {
             const body = document.body; body.classList.toggle('dark-mode');
             const isDark = body.classList.contains('dark-mode');
             localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
             document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
         };
-        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { document.body.classList.add('dark-mode'); document.getElementById('themeIcon').className = 'fas fa-sun text-warning'; }
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { window.toggleTheme(); }
 
         async function init() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
-                
                 const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
-                if(profile) {
-                    const nameParts = profile.name.split(' ');
-                    document.getElementById('displayStudentName').value = nameParts[0].toUpperCase() + (nameParts[1] ? ' ' + nameParts[1] : '');
-                }
-                
+                if(profile) document.getElementById('displayStudentName').value = profile.name;
                 document.getElementById('loadingOverlay').style.display = 'none';
             } catch (err) { console.error(err); }
         }
 
-        // === THIS IS THE NEW REDIRECT LOGIC ===
         window.startSimulator = () => {
-            // 1. Gather all checked subjects from the grid
             const checkboxes = document.querySelectorAll('.subject-grid input[type="checkbox"]:checked');
             const selectedSubjects = Array.from(checkboxes).map(cb => cb.value);
+            const questionCount = document.getElementById('questionCountSelect').value;
 
-            // 2. Validate selection
-            if (selectedSubjects.length === 0) {
-                alert("Please select at least one subject to begin the simulator.");
-                return;
-            }
-            if (selectedSubjects.length > 4) {
-                alert("JAMB only allows a maximum of 4 subjects. Please uncheck some subjects.");
-                return;
-            }
+            if (selectedSubjects.length === 0) return alert("Select at least one subject.");
+            if (selectedSubjects.length > 4) return alert("JAMB allows a maximum of 4 subjects.");
 
-            // 3. Save selections to local storage so the exam page knows what to load
             localStorage.setItem('UTME_SUBJECTS', JSON.stringify(selectedSubjects));
-
-            // 4. Transport the student to the live exam window!
+            localStorage.setItem('UTME_QUESTION_COUNT', questionCount); // Saving the dynamic count!
             window.location.href = 'student_utme_exam.html';
         };
 
         document.addEventListener('DOMContentLoaded', init);
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
     </script>
 </body>
 </html>

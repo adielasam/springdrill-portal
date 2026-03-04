@@ -6,293 +6,171 @@
     <title>SPRINGDRILL - My Results</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
-        /* GLOBAL DARK MODE ENGINE */
-        :root { 
-            --bg-color: #f4f7fa; 
-            --card-bg: #ffffff; 
-            --text-color: #333333; 
-            --text-muted: #6c757d; 
-            --border-color: #e9ecef; 
-            --input-bg: #f8f9fa; 
-            --stat-icon-bg: #e8f5e9;
-        }
-        body.dark-mode { 
-            --bg-color: #121212; 
-            --card-bg: #1e1e1e; 
-            --text-color: #e0e0e0; 
-            --text-muted: #a0a0a0; 
-            --border-color: #333333; 
-            --input-bg: #2c2c2c; 
-            --stat-icon-bg: #1a2e21;
-        }
-
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+        :root { --bg-color: #f4f7fa; --card-bg: #ffffff; --text-color: #333333; --border-color: #e9ecef; --utme-green: #27ae60;}
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', sans-serif; }
         
-        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1050; transition: transform 0.3s ease; }
-        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center; }
-        .nav-link i { width: 25px; }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
-
-        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        /* Sidebar Styling */
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1000;}
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; display: flex; align-items: center; text-decoration: none; transition: 0.3s;}
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; border-left: 4px solid #f1c40f;}
         
-        /* Top Navbar */
-        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d; transition: all 0.3s; }
-        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
-        .dark-toggle-btn:hover { transform: scale(1.1); }
-
-        /* Page Header Card */
-        .page-header-card { background: var(--card-bg); border-radius: 8px; border-left: 5px solid #2ecc71; padding: 20px 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 30px; transition: all 0.3s; }
-        .page-header-card h4 { font-weight: 800; color: var(--text-color); margin-bottom: 5px; }
-        .page-header-card p { color: var(--text-muted); margin-bottom: 0; font-size: 0.9rem; }
-
-        /* Stat Cards */
-        .stat-card { background: var(--card-bg); border-radius: 8px; padding: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 20px; border: 1px solid var(--border-color); height: 100%; transition: all 0.3s; }
-        .stat-icon { width: 60px; height: 60px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
-        .stat-icon.bg-light-success { background-color: var(--stat-icon-bg); color: #2ecc71; }
-        .stat-icon.bg-light-primary { background-color: var(--input-bg); color: #3498db; }
+        /* Main Layout */
+        .main-content { margin-left: 260px; padding: 40px; }
+        .result-card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); padding: 25px; border: 1px solid var(--border-color); height: 100%;}
         
-        .stat-info h6 { font-weight: bold; color: var(--text-muted); margin-bottom: 5px; font-size: 0.85rem; letter-spacing: 0.5px;}
-        .stat-info h2 { font-weight: 900; color: var(--text-color); margin-bottom: 0; }
-
-        /* Table Card */
-        .table-card { background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border: 1px solid var(--border-color); margin-top: 30px; padding: 25px; transition: all 0.3s; }
-        .table-card h5 { font-weight: bold; color: var(--text-color); border-bottom: 2px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px; }
-        
-        .table { color: var(--text-color); border-color: var(--border-color); }
-        .table th { border-top: none; color: var(--text-muted); font-weight: bold; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; background-color: var(--input-bg);}
-        .table td { vertical-align: middle; font-size: 0.95rem; }
-        .table-hover tbody tr:hover { background-color: var(--input-bg); color: var(--text-color); }
-        
-        .badge-pass { background-color: rgba(46, 204, 113, 0.15); color: #2ecc71; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
-        .badge-fail { background-color: rgba(231, 76, 60, 0.15); color: #e74c3c; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
-
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
-
-        /* MOBILE OPTIMIZATION */
-        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
-        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
-        
-        @media (max-width: 992px) {
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.mobile-open { transform: translateX(0); box-shadow: 2px 0 15px rgba(0,0,0,0.3); }
-            .main-content { margin-left: 0; padding: 15px; }
-            .mobile-menu-toggle { display: inline-block; }
-            .top-navbar { padding: 15px; flex-direction: column; gap: 10px; }
-            .header-profile-section { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        }
+        .score-badge { font-size: 1.5rem; font-weight: 800; padding: 10px 15px; border-radius: 8px; background: rgba(39, 174, 96, 0.1); color: var(--utme-green); display: inline-block;}
     </style>
 </head>
 <body>
-
-    <div id="loadingOverlay">
-        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
-        <h4 class="fw-bold" style="color: var(--text-muted);">Fetching Your Records...</h4>
-    </div>
-
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
+    
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
-            <h5 class="text-white fw-bold m-0"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
-            <button class="btn btn-sm btn-link text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        <div class="text-center pb-3 border-bottom border-secondary mb-4">
+            <h5 class="fw-bold m-0"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
         </div>
-        <nav class="nav flex-column mt-3">
-            <a href="student_dashboard.html" class="nav-link"><i class="fas fa-home me-2"></i> My Dashboard</a>
-            <a href="student_cbt.html" class="nav-link"><i class="fas fa-laptop-code me-2"></i> Take a Test</a>
-            <a href="student_results.html" class="nav-link active"><i class="fas fa-award me-2"></i> My Results</a>
-            <hr class="mx-3 my-4 border-secondary">
-            <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        <nav class="nav flex-column">
+            <a href="student_dashboard.html" class="nav-link"><i class="fas fa-home me-2"></i> Dashboard</a>
+            <a href="student_utme.html" class="nav-link"><i class="fas fa-university me-2"></i> UTME Simulator</a>
+            <a href="student_results.html" class="nav-link active fw-bold text-white"><i class="fas fa-chart-line me-2"></i> My Results</a>
         </nav>
     </div>
 
     <div class="main-content">
-        <div class="top-navbar">
-            <div class="d-flex align-items-center">
-                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-                <div class="fw-bold d-none d-md-block" style="color: var(--text-muted);"><i class="fas fa-chart-line me-2"></i> Academic Performance Hub</div>
-            </div>
-
-            <div class="header-profile-section mt-lg-0">
-                <div class="d-flex align-items-center ms-auto">
-                    <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
-                        <i class="fas fa-moon" id="themeIcon"></i>
-                    </button>
-                    <div class="fw-bold d-flex align-items-center" style="color: var(--text-color);">
-                        <span id="studentNameDisplay">Student</span><i class="fas fa-user-circle ms-3 fs-4 text-primary"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="page-header-card">
-            <h4><i class="fas fa-medal text-success me-2"></i> My Examination Results</h4>
-            <p>Review your past scores and academic performance history.</p>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold m-0">Performance Analytics</h2>
+            <div class="score-badge" id="highestScoreBadge">Highest Score: -- / 400</div>
         </div>
 
         <div class="row g-4">
-            <div class="col-md-6">
-                <div class="stat-card">
-                    <div class="stat-icon bg-light-success"><i class="fas fa-clipboard-check"></i></div>
-                    <div class="stat-info">
-                        <h6>EXAMS COMPLETED</h6>
-                        <h2 id="totalExams">0</h2>
-                    </div>
+            <div class="col-lg-7">
+                <div class="result-card">
+                    <h5 class="fw-bold mb-4"><i class="fas fa-chart-area text-primary me-2"></i> Score Progression Trend</h5>
+                    <canvas id="progressChart" height="200"></canvas>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="stat-card">
-                    <div class="stat-icon bg-light-primary"><i class="fas fa-chart-line"></i></div>
-                    <div class="stat-info">
-                        <h6>AVERAGE SCORE</h6>
-                        <h2 id="avgScore">0%</h2>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="table-card">
-            <h5><i class="fas fa-history text-primary me-2"></i> Attempt History</h5>
-            
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead style="background-color: var(--input-bg);">
-                        <tr>
-                            <th width="35%">Exam Title</th>
-                            <th width="20%">Date Taken</th>
-                            <th width="15%" class="text-center">Raw Score</th>
-                            <th width="15%" class="text-center">Percentage</th>
-                            <th width="15%" class="text-center">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resultsBody">
-                        <tr>
-                            <td colspan="5" class="text-center py-5" style="color: var(--text-muted);">Loading records...</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="col-lg-5">
+                <div class="result-card" style="max-height: 500px; overflow-y: auto;">
+                    <h5 class="fw-bold mb-4 sticky-top bg-white pb-2 border-bottom"><i class="fas fa-history text-success me-2"></i> Recent Exams</h5>
+                    
+                    <div id="historyContainer">
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-spinner fa-spin fa-2x mb-2"></i><br>Loading your analytics...
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
-        // === UI TOGGLES ===
-        window.toggleSidebar = () => {
-            document.getElementById('sidebar').classList.toggle('mobile-open');
-            const overlay = document.getElementById('sidebarOverlay');
-            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
-        };
+        let progressChartInstance = null;
 
-        window.toggleTheme = () => {
-            const body = document.body;
-            body.classList.toggle('dark-mode');
-            const isDark = body.classList.contains('dark-mode');
-            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
-            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
-        };
-
-        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') {
-            document.body.classList.add('dark-mode');
-            document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
-        }
-
-        window.addEventListener('storage', (event) => {
-            if (event.key === 'SPRINGDRILL_THEME') {
-                const isDark = event.newValue === 'dark';
-                isDark ? document.body.classList.add('dark-mode') : document.body.classList.remove('dark-mode');
-                document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
-            }
-        });
-
-        // === LOGIC ===
         async function loadResults() {
             try {
+                // 1. Authenticate User
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
-                const userId = session.user.id;
 
-                // Fetch student name for UI
-                const { data: profile } = await supabase.from('users').select('name').eq('id', userId).single();
-                if(profile) document.getElementById('studentNameDisplay').innerText = profile.name;
-
-                const { data: results, error } = await supabase
+                // 2. Fetch past exams from Supabase
+                const { data: scores, error } = await supabase
                     .from('test_results')
-                    .select(`
-                        created_at, 
-                        score, 
-                        total_questions, 
-                        tests (title)
-                    `)
-                    .eq('student_id', userId)
-                    .order('created_at', { ascending: false });
+                    .select('score, created_at')
+                    .eq('student_id', session.user.id)
+                    .eq('test_id', 999) 
+                    .order('created_at', { ascending: false })
+                    .limit(10); // Fetch the last 10 exams
 
                 if (error) throw error;
 
-                const tbody = document.getElementById('resultsBody');
+                const container = document.getElementById('historyContainer');
                 
-                if (!results || results.length === 0) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="5" class="text-center py-5" style="color: var(--text-muted);">
-                                <i class="fas fa-folder-open fa-3x mb-3" style="opacity: 0.3;"></i><br>
-                                You have not completed any exams yet.
-                            </td>
-                        </tr>
-                    `;
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                    return;
-                }
+                if (scores && scores.length > 0) {
+                    // --- RENDER HISTORY LIST ---
+                    container.innerHTML = scores.map(s => {
+                        const scoreColor = s.score >= 200 ? 'text-success' : (s.score >= 150 ? 'text-warning' : 'text-danger');
+                        return `
+                        <div class="d-flex justify-content-between align-items-center border-bottom py-3">
+                            <div>
+                                <div class="fw-bold">${new Date(s.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                                <small class="text-muted"><i class="far fa-clock me-1"></i> ${new Date(s.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="fs-4 fw-bold ${scoreColor}">${s.score} <span class="fs-6 text-muted fw-normal">/ 400</span></div>
+                            </div>
+                        </div>
+                        `;
+                    }).join('');
 
-                let totalPercentageSum = 0;
+                    // --- RENDER HIGHEST SCORE BADGE ---
+                    const highestScore = Math.max(...scores.map(s => s.score));
+                    document.getElementById('highestScoreBadge').innerText = `Highest Score: ${highestScore} / 400`;
 
-                tbody.innerHTML = results.map(row => {
-                    const title = row.tests?.title || 'Unknown Assessment';
-                    const dateObj = new Date(row.created_at);
-                    const formattedDate = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                    // --- RENDER CHART.JS GRAPH ---
+                    // We must reverse the array so the oldest date is on the left of the graph, and the newest is on the right
+                    const chronologicalScores = [...scores].reverse();
                     
-                    const rawScore = row.score || 0;
-                    const totalQs = row.total_questions || 1;
-                    const percentage = Math.round((rawScore / totalQs) * 100);
-                    totalPercentageSum += percentage;
+                    const labels = chronologicalScores.map(s => new Date(s.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }));
+                    const dataPoints = chronologicalScores.map(s => s.score);
 
-                    let statusBadge = (percentage >= 50) 
-                        ? `<span class="badge-pass">PASSED</span>` 
-                        : `<span class="badge-fail">FAILED</span>`;
+                    const ctx = document.getElementById('progressChart').getContext('2d');
+                    
+                    // Destroy previous chart instance if it exists to prevent glitching
+                    if (progressChartInstance) progressChartInstance.destroy();
 
-                    return `
-                        <tr style="border-bottom: 1px solid var(--border-color);">
-                            <td class="fw-bold" style="color: var(--text-color);">${title}</td>
-                            <td style="color: var(--text-muted); font-size: 0.85rem;">${formattedDate}</td>
-                            <td class="text-center fw-bold" style="color: var(--text-color);">${rawScore} / ${totalQs}</td>
-                            <td class="text-center fw-bold text-primary">${percentage}%</td>
-                            <td class="text-center">${statusBadge}</td>
-                        </tr>
-                    `;
-                }).join('');
+                    progressChartInstance = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'JAMB Mock Score',
+                                data: dataPoints,
+                                borderColor: '#27ae60', // UTME Green
+                                backgroundColor: 'rgba(39, 174, 96, 0.15)',
+                                pointBackgroundColor: '#ffffff',
+                                pointBorderColor: '#27ae60',
+                                pointBorderWidth: 2,
+                                pointRadius: 5,
+                                fill: true,
+                                tension: 0.4 // Gives the line a smooth curve
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) { return `Score: ${context.parsed.y} / 400`; }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    min: 0,
+                                    max: 400,
+                                    grid: { color: '#e9ecef' }
+                                },
+                                x: {
+                                    grid: { display: false }
+                                }
+                            }
+                        }
+                    });
 
-                document.getElementById('totalExams').innerText = results.length;
-                const average = Math.round(totalPercentageSum / results.length);
-                document.getElementById('avgScore').innerText = `${average}%`;
-
-                document.getElementById('loadingOverlay').style.display = 'none';
-
+                } else {
+                    container.innerHTML = `<div class="alert alert-info text-center mt-3">No exam data found. Head to the UTME Simulator to take your first test!</div>`;
+                }
             } catch (err) {
-                console.error("Error loading results:", err);
-                document.getElementById('resultsBody').innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Error loading results.</td></tr>`;
-                document.getElementById('loadingOverlay').style.display = 'none';
+                console.error("Failed to load analytics", err);
             }
         }
 
         document.addEventListener('DOMContentLoaded', loadResults);
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            await supabase.auth.signOut();
-            window.location.href = 'login.html';
-        });
     </script>
 </body>
 </html>
