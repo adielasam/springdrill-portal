@@ -82,7 +82,7 @@
         let userAnswers = {}; 
         let correctAnswers = {}; 
         let timerInterval;
-        let isReviewMode = false; // Controls the Corrections View
+        let isReviewMode = false; 
 
         const QUESTIONS_PER_SUBJECT = parseInt(localStorage.getItem('UTME_QUESTION_COUNT')) || 40; 
         let totalSeconds = parseInt(localStorage.getItem('UTME_EXAM_TIME')) || 7200; 
@@ -93,11 +93,12 @@
                     body: { subject: subject, count: count }
                 });
                 if (error) throw error;
+                if (!data || !Array.isArray(data)) throw new Error("Invalid AI output format.");
                 return data;
             } catch (error) {
                 console.error("Failed to fetch " + subject, error);
                 return [{
-                    question_text: `Network error. Could not load questions for ${subject}.`,
+                    question_text: `API Error. Could not load questions for ${subject}. Please check Supabase logs.`,
                     options: { "A": "Opt A", "B": "Opt B", "C": "Opt C", "D": "Opt D" },
                     correct_option: "A"
                 }];
@@ -111,9 +112,9 @@
             if(profile) document.getElementById('studentNameDisplay').innerText = profile.name;
 
             updateTimerDisplay();
-            subjects = JSON.parse(localStorage.getItem('UTME_SUBJECTS')) || ["English"];
+            subjects = JSON.parse(localStorage.getItem('UTME_SUBJECTS')) || ["English Language"];
             
-            // 🚨 HIGH-SPEED LAZY LOADING: Fetch only the first subject immediately
+            // 1. Fetch the first subject so the student can start immediately
             const firstSub = subjects[0];
             const firstData = await fetchExamQuestions(firstSub, QUESTIONS_PER_SUBJECT);
             examData[firstSub] = firstData;
@@ -121,26 +122,28 @@
             correctAnswers[firstSub] = {};
             firstData.forEach((q, i) => correctAnswers[firstSub][i] = q.correct_option);
 
-            // Hide loading screen so student can start NOW
+            // Hide loading screen and start exam
             document.getElementById('loadingOverlay').style.display = 'none';
             renderTabs(); loadSubject(0); startTimer();
 
-            // 🚨 SECRETLY fetch the remaining subjects in the background
-            for (let i = 1; i < subjects.length; i++) {
-                const sub = subjects[i];
-                fetchExamQuestions(sub, QUESTIONS_PER_SUBJECT).then(data => {
+            // 2. The Fix: Sequentially load the remaining subjects in the background to prevent Rate Limits!
+            (async () => {
+                for (let i = 1; i < subjects.length; i++) {
+                    const sub = subjects[i];
+                    // The 'await' here forces the browser to wait for Math to finish before asking for Physics
+                    const data = await fetchExamQuestions(sub, QUESTIONS_PER_SUBJECT);
                     examData[sub] = data;
                     userAnswers[sub] = {};
                     correctAnswers[sub] = {};
                     data.forEach((q, idx) => correctAnswers[sub][idx] = q.correct_option);
-                    renderTabs(); // Updates tabs to remove loading spinner
-                });
-            }
+                    renderTabs(); // Remove the loading spinner for this subject
+                }
+            })();
         }
 
         function renderTabs() {
             document.getElementById('subjectTabsContainer').innerHTML = subjects.map((sub, i) => {
-                const isReady = !!examData[sub]; // Check if background load is done
+                const isReady = !!examData[sub]; 
                 const activeClass = i === currentSubjectIndex ? 'active' : '';
                 const spinner = isReady ? '' : '<i class="fas fa-spinner fa-spin ms-2" style="font-size:0.8rem;"></i>';
                 return `<div class="sub-tab ${activeClass}" style="opacity: ${isReady ? 1 : 0.6}; cursor: ${isReady ? 'pointer' : 'not-allowed'};" 
@@ -164,7 +167,6 @@
                 let style = '';
                 let icon = '';
 
-                // CORRECTIONS MODE LOGIC
                 if (isReviewMode) {
                     if (letter === correctAns) {
                         style = 'border-color: #27ae60; background: rgba(39, 174, 96, 0.15);';
@@ -196,8 +198,8 @@
                 if (isReviewMode) {
                     const picked = userAnswers[sub][i];
                     const correct = correctAnswers[sub][i];
-                    if (picked === correct) nodeClass = 'answered'; // Green
-                    else if (picked !== undefined) nodeClass = 'wrong-node'; // Red
+                    if (picked === correct) nodeClass = 'answered'; 
+                    else if (picked !== undefined) nodeClass = 'wrong-node'; 
                 } else {
                     if (userAnswers[sub][i] !== undefined) nodeClass = 'answered';
                 }
@@ -262,19 +264,17 @@
                     }]);
                     if (error) {
                         console.error("Database insert error:", error);
-                        alert("Score saving failed. Please ensure you ran the SQL security fix in your Supabase dashboard!");
+                        alert("Score saving failed. Ensure you ran the SQL security fix in your Supabase dashboard!");
                     }
                 }
             } catch (err) {
                 console.error("Failed to save to Supabase:", err.message);
             }
 
-            // ACTIVATE REVIEW MODE INSTEAD OF REDIRECTING
             setTimeout(() => {
                 document.getElementById('submitOverlay').style.display = 'none';
                 isReviewMode = true;
                 
-                // Change Header UI
                 document.getElementById('headerSubtitle').innerText = "CORRECTIONS & REVIEW MODE";
                 document.getElementById('timerDisplay').innerHTML = `<span class="text-warning">${finalJambScore} / 400</span>`;
                 document.getElementById('navigatorTitle').innerText = "Review Navigator";
@@ -286,7 +286,6 @@
 
                 alert(`Exam Submitted Successfully!\nYour JAMB Prediction Score: ${finalJambScore} / 400\n\nYou are now in Review Mode. You can navigate through the questions to see the correct answers.`);
                 
-                // Force UI to show corrections
                 currentSubjectIndex = 0; currentQuestionIndex = 0;
                 renderTabs(); renderQuestion();
             }, 2500);
