@@ -21,7 +21,6 @@
         .utme-container { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
         .utme-header { background-color: #27ae60; color: white; padding: 15px 25px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; font-size: 1.2rem;}
         
-        /* Updated Grid for Many Subjects */
         .subject-grid { padding: 20px 25px; border-bottom: 2px solid var(--border-color); display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; background: var(--input-bg); max-height: 300px; overflow-y: auto;}
         .subject-item { display: flex; align-items: center; gap: 10px; font-weight: 600; cursor: pointer; font-size: 0.95rem;}
         .subject-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #27ae60;}
@@ -116,8 +115,12 @@
                 <div class="config-col-right">
                     <div class="fieldset-box mt-3">
                         <span class="fieldset-legend">Total Time</span>
-                        <select class="form-select border-0 bg-transparent fw-bold" style="padding: 0;">
-                            <option>02:00:00</option>
+                        <select class="form-select border-0 bg-transparent fw-bold" id="examTimeSelect" style="padding: 0;">
+                            <option value="1800">00:30:00 (30 Mins)</option>
+                            <option value="3600">01:00:00 (1 Hour)</option>
+                            <option value="5400">01:30:00 (1.5 Hours)</option>
+                            <option value="7200" selected>02:00:00 (2 Hours)</option>
+                            <option value="10800">03:00:00 (3 Hours)</option>
                         </select>
                     </div>
                 </div>
@@ -150,12 +153,16 @@
             const checkboxes = document.querySelectorAll('.subject-grid input[type="checkbox"]:checked');
             const selectedSubjects = Array.from(checkboxes).map(cb => cb.value);
             const questionCount = document.getElementById('questionCountSelect').value;
+            const examTime = document.getElementById('examTimeSelect').value;
 
             if (selectedSubjects.length === 0) return alert("Select at least one subject.");
             if (selectedSubjects.length > 4) return alert("JAMB allows a maximum of 4 subjects.");
 
+            // Save everything to localStorage so the exam engine can read it!
             localStorage.setItem('UTME_SUBJECTS', JSON.stringify(selectedSubjects));
-            localStorage.setItem('UTME_QUESTION_COUNT', questionCount); // Saving the dynamic count
+            localStorage.setItem('UTME_QUESTION_COUNT', questionCount); 
+            localStorage.setItem('UTME_EXAM_TIME', examTime); // NEW: Save time!
+
             window.location.href = 'student_utme_exam.html';
         };
 
