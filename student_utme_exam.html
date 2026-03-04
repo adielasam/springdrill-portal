@@ -12,8 +12,8 @@
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh;}
         .exam-header { background-color: var(--utme-green); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10;}
         .timer-box { background: rgba(0,0,0,0.2); padding: 8px 20px; border-radius: 30px; font-family: monospace; font-size: 1.5rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.3);}
-        .subject-tabs { background: var(--card-bg); border-bottom: 2px solid var(--border-color); display: flex; padding: 0 20px;}
-        .sub-tab { padding: 15px 25px; font-weight: bold; color: var(--text-muted); cursor: pointer; border-bottom: 4px solid transparent;}
+        .subject-tabs { background: var(--card-bg); border-bottom: 2px solid var(--border-color); display: flex; padding: 0 20px; overflow-x: auto;}
+        .sub-tab { padding: 15px 25px; font-weight: bold; color: var(--text-muted); cursor: pointer; border-bottom: 4px solid transparent; white-space: nowrap;}
         .sub-tab.active { color: var(--utme-green); border-bottom: 4px solid var(--utme-green); background: var(--input-bg); }
         .exam-body { flex: 1; display: flex; overflow: hidden; }
         .question-area { flex: 3; padding: 30px; overflow-y: auto; display: flex; flex-direction: column;}
@@ -26,25 +26,30 @@
         .q-node { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; border: 1px solid var(--border-color); border-radius: 4px; font-weight: bold; cursor: pointer; background: var(--input-bg); color: var(--text-muted);}
         .q-node.answered { background: var(--utme-green); color: white; border-color: var(--utme-green-dark); }
         .q-node.active-node { outline: 3px solid #3498db; outline-offset: -2px; }
-        #loadingOverlay, #submitOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        #submitOverlay { background: rgba(0,0,0,0.8); color: white; display: none; }
+        #loadingOverlay, #submitOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 20px;}
+        #submitOverlay { background: rgba(0,0,0,0.9); color: white; display: none; }
     </style>
 </head>
 <body>
     <div id="loadingOverlay">
-        <i class="fas fa-brain fa-spin fa-4x text-success mb-3"></i>
-        <h3 class="fw-bold" style="color: var(--text-color);">AI is generating your exam...</h3>
+        <i class="fas fa-circle-notch fa-spin fa-4x text-success mb-4"></i>
+        <h3 class="fw-bold" style="color: var(--text-color);">Preparing your unique questions...</h3>
+        <p class="text-muted fs-5">Please wait a few seconds while we set up your exam environment.</p>
     </div>
 
     <div id="submitOverlay">
-        <i class="fas fa-spinner fa-spin fa-4x text-success mb-3"></i>
+        <i class="fas fa-spinner fa-spin fa-4x text-success mb-4"></i>
         <h2 class="fw-bold">Saving Scores to Database...</h2>
+        <p class="fs-5 text-light">Compiling your final results.</p>
     </div>
 
     <header class="exam-header">
-        <div class="fw-bold fs-5" id="studentNameDisplay">Loading...</div>
-        <div class="timer-box" id="timerDisplay">02:00:00</div>
-        <button class="btn btn-danger fw-bold" onclick="submitExam()"><i class="fas fa-paper-plane me-2"></i> Submit Exam</button>
+        <div>
+            <div class="fw-bold fs-5" id="studentNameDisplay">Loading...</div>
+            <div style="font-size: 0.8rem; opacity: 0.8;">UTME Practice Simulator</div>
+        </div>
+        <div class="timer-box" id="timerDisplay">--:--:--</div>
+        <button class="btn btn-danger fw-bold shadow-sm" onclick="submitExam()"><i class="fas fa-paper-plane me-2"></i> Submit Exam</button>
     </header>
 
     <div class="subject-tabs" id="subjectTabsContainer"></div>
@@ -77,13 +82,12 @@
         let examData = {}; 
         let userAnswers = {}; 
         let correctAnswers = {}; 
-        let totalSeconds = 7200; 
         let timerInterval;
 
-        // READ DYNAMIC COUNT FROM LOCAL STORAGE
         const QUESTIONS_PER_SUBJECT = parseInt(localStorage.getItem('UTME_QUESTION_COUNT')) || 40; 
+        let totalSeconds = parseInt(localStorage.getItem('UTME_EXAM_TIME')) || 7200; 
 
-        async function generateAIQuestions(subject, count) {
+        async function fetchExamQuestions(subject, count) {
             try {
                 const { data, error } = await supabase.functions.invoke('generate-utme-questions', {
                     body: { subject: subject, count: count }
@@ -91,9 +95,9 @@
                 if (error) throw error;
                 return data;
             } catch (error) {
-                console.error("AI Generation Failed", error);
+                console.error("Question Generation Failed for " + subject, error);
                 return [{
-                    question_text: `Dummy question for ${subject}. Error loading AI.`,
+                    question_text: `Could not load questions for ${subject}. Please check your connection.`,
                     options: { "A": "Opt A", "B": "Opt B", "C": "Opt C", "D": "Opt D" },
                     correct_option: "A"
                 }];
@@ -106,16 +110,22 @@
             const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
             if(profile) document.getElementById('studentNameDisplay').innerText = profile.name;
 
+            updateTimerDisplay();
+
             subjects = JSON.parse(localStorage.getItem('UTME_SUBJECTS')) || ["English"];
             
-            for (let i = 0; i < subjects.length; i++) {
-                const sub = subjects[i];
-                const aiQuestions = await generateAIQuestions(sub, QUESTIONS_PER_SUBJECT);
-                examData[sub] = aiQuestions;
+            // 🚨 HIGH-SPEED PARALLEL FETCHING 🚨
+            // This fetches all selected subjects simultaneously instead of one by one!
+            const fetchPromises = subjects.map(sub => fetchExamQuestions(sub, QUESTIONS_PER_SUBJECT));
+            const allResults = await Promise.all(fetchPromises);
+
+            subjects.forEach((sub, index) => {
+                const generatedQuestions = allResults[index];
+                examData[sub] = generatedQuestions;
                 userAnswers[sub] = {};
                 correctAnswers[sub] = {};
-                aiQuestions.forEach((q, index) => { correctAnswers[sub][index] = q.correct_option; });
-            }
+                generatedQuestions.forEach((q, i) => { correctAnswers[sub][i] = q.correct_option; });
+            });
 
             document.getElementById('loadingOverlay').style.display = 'none';
             renderTabs(); loadSubject(0); startTimer();
@@ -167,22 +177,26 @@
         };
         window.prevQuestion = () => { if (currentQuestionIndex > 0) { currentQuestionIndex--; renderQuestion(); } };
 
+        function updateTimerDisplay() {
+            const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+            const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+            const s = Math.floor(totalSeconds % 60).toString().padStart(2, '0');
+            document.getElementById('timerDisplay').innerText = `${h}:${m}:${s}`;
+        }
+
         function startTimer() {
             timerInterval = setInterval(() => {
                 totalSeconds--;
-                if (totalSeconds <= 0) autoSubmitExam();
-                else {
-                    const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
-                    const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
-                    const s = Math.floor(totalSeconds % 60).toString().padStart(2, '0');
-                    document.getElementById('timerDisplay').innerText = `${h}:${m}:${s}`;
+                if (totalSeconds <= 0) {
+                    autoSubmitExam();
+                } else {
+                    updateTimerDisplay();
                 }
             }, 1000);
         }
 
-        window.submitExam = () => { if(confirm("Are you sure you want to submit?")) autoSubmitExam(); };
+        window.submitExam = () => { if(confirm("Are you sure you want to submit your exam?")) autoSubmitExam(); };
 
-        // === THE DATABASE SAVING LOGIC ===
         async function autoSubmitExam() {
             clearInterval(timerInterval);
             document.getElementById('submitOverlay').style.display = 'flex';
@@ -195,11 +209,9 @@
                 for (let i = 0; i < subTotal; i++) {
                     if (userAnswers[sub][i] === correctAnswers[sub][i]) subCorrect++;
                 }
-                // Convert whatever count they chose to a 100-point scale for JAMB logic
                 scoresPerSubject[sub] = Math.round((subCorrect / subTotal) * 100);
             });
 
-            // Total out of 400
             const finalJambScore = Object.values(scoresPerSubject).reduce((a, b) => a + b, 0);
 
             try {
@@ -207,7 +219,7 @@
                 if (session) {
                     const { error } = await supabase.from('test_results').insert([{
                         student_id: session.user.id,
-                        test_id: 999, // 999 is our internal ID for the UTME Simulator
+                        test_id: 999,
                         score: finalJambScore,
                         total_score: 400,
                         created_at: new Date().toISOString()
@@ -220,7 +232,7 @@
 
             setTimeout(() => {
                 alert(`Exam Saved!\nYour JAMB Prediction Score: ${finalJambScore} / 400`);
-                window.location.href = 'student_results.html'; // Teleports them to see their history!
+                window.location.href = 'student_results.html'; 
             }, 2000);
         }
 
