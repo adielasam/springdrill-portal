@@ -229,7 +229,6 @@
                 const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
                 if(profile) {
                     const nameParts = profile.name.split(' ');
-                    // Format like screenshot (Surname usually uppercase)
                     document.getElementById('displayStudentName').value = nameParts[0].toUpperCase() + (nameParts[1] ? ' ' + nameParts[1] : '');
                 }
                 
@@ -237,8 +236,27 @@
             } catch (err) { console.error(err); }
         }
 
+        // === THIS IS THE NEW REDIRECT LOGIC ===
         window.startSimulator = () => {
-            alert("The UTME Simulator logic will be connected here! It will pull questions from the database and launch the exam window.");
+            // 1. Gather all checked subjects from the grid
+            const checkboxes = document.querySelectorAll('.subject-grid input[type="checkbox"]:checked');
+            const selectedSubjects = Array.from(checkboxes).map(cb => cb.value);
+
+            // 2. Validate selection
+            if (selectedSubjects.length === 0) {
+                alert("Please select at least one subject to begin the simulator.");
+                return;
+            }
+            if (selectedSubjects.length > 4) {
+                alert("JAMB only allows a maximum of 4 subjects. Please uncheck some subjects.");
+                return;
+            }
+
+            // 3. Save selections to local storage so the exam page knows what to load
+            localStorage.setItem('UTME_SUBJECTS', JSON.stringify(selectedSubjects));
+
+            // 4. Transport the student to the live exam window!
+            window.location.href = 'student_utme_exam.html';
         };
 
         document.addEventListener('DOMContentLoaded', init);
