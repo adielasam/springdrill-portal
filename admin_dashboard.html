@@ -40,7 +40,7 @@
         .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
         .dark-toggle-btn:hover { transform: scale(1.1); }
 
-        /* COLORFUL STAT CARDS (Screenshot Match) */
+        /* COLORFUL STAT CARDS */
         .color-stat-card { border-radius: 8px; padding: 20px 15px; color: white; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); height: 100%; display: flex; flex-direction: column; justify-content: center; transition: transform 0.3s;}
         .color-stat-card:hover { transform: translateY(-5px); }
         .color-stat-card h2 { font-weight: 900; font-size: 2.5rem; margin-bottom: 5px; }
@@ -51,14 +51,13 @@
         .bg-c-yellow { background: linear-gradient(45deg, #f1c40f, #f39c12); }
         .bg-c-cyan { background: linear-gradient(45deg, #00bcd4, #0097a7); }
         .bg-c-purple { background: linear-gradient(45deg, #9b59b6, #8e44ad); }
-        .bg-c-red { background: linear-gradient(45deg, #e74c3c, #c0392b); } /* For Pending */
+        .bg-c-red { background: linear-gradient(45deg, #e74c3c, #c0392b); } 
 
         /* DASHBOARD WIDGETS */
         .dash-widget { background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.02); margin-bottom: 30px; overflow: hidden; transition: all 0.3s;}
         .widget-header { padding: 15px 20px; font-weight: bold; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--input-bg); color: var(--text-color);}
         .widget-body { padding: 20px; }
 
-        /* League Table Widget */
         .league-table { width: 100%; color: var(--text-color); margin-bottom: 0; }
         .league-table th { color: var(--text-muted); border-bottom: 1px solid var(--border-color); padding: 10px; font-size: 0.85rem; text-transform: uppercase; }
         .league-table td { padding: 12px 10px; vertical-align: middle; border-bottom: 1px solid var(--border-color); font-weight: 500; }
@@ -69,13 +68,11 @@
         .rank-3 { background: #cd7f32; }
         .rank-other { background: var(--border-color); color: var(--text-muted); }
 
-        /* Quick Links Grid */
         .quick-link-card { background: var(--input-bg); border-radius: 8px; border: 1px solid var(--border-color); padding: 20px; text-align: center; transition: all 0.3s; text-decoration: none; color: var(--text-color); display: block; height: 100%;}
         .quick-link-card:hover { transform: translateY(-3px); border-color: #007a4d; box-shadow: 0 5px 15px rgba(0,0,0,0.05); color: var(--text-color);}
         .quick-link-card i { font-size: 2rem; margin-bottom: 10px; }
         .quick-link-card h6 { font-weight: 700; margin-bottom: 5px; font-size: 0.95rem; }
 
-        /* Birthdays & Events */
         .bday-item { display: flex; align-items: center; gap: 15px; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
         .bday-item:last-child { border-bottom: none; }
         .bday-date { background: rgba(241, 196, 15, 0.15); color: #d35400; font-weight: 900; padding: 8px; border-radius: 6px; text-align: center; min-width: 50px; font-size: 1rem;}
@@ -286,7 +283,7 @@
             const isDark = body.classList.contains('dark-mode');
             localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
             document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
-            if(window.classChartInstance) window.classChartInstance.update(); // Update chart colors
+            if(window.classChartInstance) window.classChartInstance.update(); 
         };
         if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { document.body.classList.add('dark-mode'); document.getElementById('themeIcon').className = 'fas fa-sun text-warning'; }
 
@@ -318,12 +315,26 @@
                 const { count: teacherCount } = await supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'teacher');
                 document.getElementById('statTeachers').innerText = teacherCount || 0;
 
-                // Daily Attendance Fetch
-                const today = new Date().toISOString().split('T')[0];
+                // 🚨 BULLETPROOF DAILY ATTENDANCE FETCH 🚨
+                // Instead of relying on how the teacher formatted the date column, this filters by the database's internal 'created_at' timestamp and is case-insensitive.
                 try {
-                    const { count: attCount } = await supabase.from('attendance').select('*', { count: 'exact', head: true }).eq('date', today).eq('status', 'Present');
-                    document.getElementById('statAttendance').innerText = attCount || 0;
-                } catch(e) { console.log("Attendance table setup pending."); }
+                    const { data: attData, error } = await supabase.from('attendance').select('status, created_at');
+                    
+                    if (attData && !error) {
+                        const todayLocal = new Date().toDateString(); // Gives standard local date string
+                        
+                        const presentCount = attData.filter(record => {
+                            const isCreatedToday = new Date(record.created_at).toDateString() === todayLocal;
+                            const isStatusPresent = String(record.status).toLowerCase().includes('present');
+                            return isCreatedToday && isStatusPresent;
+                        }).length;
+
+                        document.getElementById('statAttendance').innerText = presentCount;
+                    }
+                } catch(e) { 
+                    console.log("Attendance table setup pending or empty:", e); 
+                    document.getElementById('statAttendance').innerText = 0;
+                }
 
                 // 2. Render Chart
                 await renderClassChart();
@@ -355,7 +366,6 @@
                 const labels = Object.keys(classCounts);
                 const data = Object.values(classCounts);
                 
-                // Colors matching screenshot vibe
                 const bgColors = ['#3498db', '#34495e', '#2ecc71', '#e67e22', '#9b59b6', '#e74c3c', '#f1c40f', '#1abc9c', '#00bcd4', '#795548', '#8bc34a', '#3f51b5'];
 
                 const ctx = document.getElementById('classDistributionChart').getContext('2d');
@@ -382,7 +392,7 @@
             } catch(e) { console.error("Chart Error:", e); }
         }
 
-        // === LEAGUE TABLE WIDGET (PRESERVED) ===
+        // === LEAGUE TABLE WIDGET ===
         async function populateLeagueWidget() {
             try {
                 const { data: students } = await supabase.from('students').select('user_id, first_name, surname, classes(name)').eq('approved', true);
