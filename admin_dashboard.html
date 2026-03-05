@@ -58,6 +58,11 @@
         .widget-header { padding: 15px 20px; font-weight: bold; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--input-bg); color: var(--text-color);}
         .widget-body { padding: 20px; }
 
+        /* ATTENDANCE LIST STYLES */
+        .att-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border-color); transition: background-color 0.2s; }
+        .att-item:hover { background-color: var(--input-bg); cursor: pointer; }
+        .att-item:last-child { border-bottom: none; }
+
         .league-table { width: 100%; color: var(--text-color); margin-bottom: 0; }
         .league-table th { color: var(--text-muted); border-bottom: 1px solid var(--border-color); padding: 10px; font-size: 0.85rem; text-transform: uppercase; }
         .league-table td { padding: 12px 10px; vertical-align: middle; border-bottom: 1px solid var(--border-color); font-weight: 500; }
@@ -109,6 +114,8 @@
         <nav class="nav flex-column mt-3">
             <a href="admin_dashboard.html" class="nav-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             
+            <a href="admin_attendance.html" class="nav-link mt-2"><i class="fas fa-calendar-check text-info me-2"></i> Attendance Log</a>
+
             <a href="#usersMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
                 <span><i class="fas fa-users me-2"></i> Accounts</span><i class="fas fa-caret-down"></i>
             </a>
@@ -184,7 +191,7 @@
         </div>
 
         <div class="row g-4 mb-4">
-            <div class="col-lg-9">
+            <div class="col-lg-8">
                 <div class="dash-widget h-100">
                     <div class="widget-header">
                         <span><i class="fas fa-chart-bar text-primary me-2"></i> School Class Distribution</span>
@@ -195,18 +202,23 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3">
-                <div class="dash-widget h-100 bg-c-teal text-white d-flex flex-column justify-content-center align-items-center p-4">
-                    <i class="fas fa-calendar-check fa-4x mb-3 opacity-75"></i>
-                    <h1 class="display-3 fw-bold mb-0" id="statAttendance">0</h1>
-                    <h5 class="fw-bold text-uppercase mt-2">Total Attendance</h5>
-                    <p class="small opacity-75 mb-0">Recorded Today</p>
+            
+            <div class="col-lg-4">
+                <div class="dash-widget h-100 d-flex flex-column">
+                    <div class="widget-header">
+                        <span class="text-success"><i class="fas fa-clipboard-user me-2"></i> Today's Attendance</span>
+                        <a href="admin_attendance.html" class="small text-decoration-none">View All</a>
+                    </div>
+                    <div class="p-0 flex-grow-1" id="attendanceListWidget" style="max-height: 350px; overflow-y: auto;">
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-spinner fa-spin fa-2x mb-2"></i><br>Checking classes...
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="row g-4 mb-5">
-            
             <div class="col-lg-5">
                 <div class="dash-widget h-100">
                     <div class="widget-header">
@@ -296,7 +308,7 @@
                 const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
                 if(profile) document.getElementById('navAdminName').innerText = profile.name.split(' ')[0];
 
-                // 1. Fetch Advanced Stats
+                // Fetch Advanced Stats
                 const { count: activeStudents } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', true);
                 document.getElementById('statActiveStudents').innerText = activeStudents || 0;
 
@@ -315,31 +327,9 @@
                 const { count: teacherCount } = await supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'teacher');
                 document.getElementById('statTeachers').innerText = teacherCount || 0;
 
-                // 🚨 BULLETPROOF DAILY ATTENDANCE FETCH 🚨
-                // Instead of relying on how the teacher formatted the date column, this filters by the database's internal 'created_at' timestamp and is case-insensitive.
-                try {
-                    const { data: attData, error } = await supabase.from('attendance').select('status, created_at');
-                    
-                    if (attData && !error) {
-                        const todayLocal = new Date().toDateString(); // Gives standard local date string
-                        
-                        const presentCount = attData.filter(record => {
-                            const isCreatedToday = new Date(record.created_at).toDateString() === todayLocal;
-                            const isStatusPresent = String(record.status).toLowerCase().includes('present');
-                            return isCreatedToday && isStatusPresent;
-                        }).length;
-
-                        document.getElementById('statAttendance').innerText = presentCount;
-                    }
-                } catch(e) { 
-                    console.log("Attendance table setup pending or empty:", e); 
-                    document.getElementById('statAttendance').innerText = 0;
-                }
-
-                // 2. Render Chart
+                // Render Chart & Widgets
                 await renderClassChart();
-
-                // 3. Render Widgets
+                await fetchRecentAttendance();
                 await populateLeagueWidget();
                 await fetchBirthdays();
 
@@ -390,6 +380,65 @@
                     }
                 });
             } catch(e) { console.error("Chart Error:", e); }
+        }
+
+        // 🚨 RESTORED: THE MISSING ATTENDANCE WIDGET (Where the Red X was) 🚨
+        async function fetchRecentAttendance() {
+            try {
+                // Fetch attendance joined with the student's class name
+                const { data: attData, error } = await supabase
+                    .from('attendance')
+                    .select('status, created_at, students(classes(name))')
+                    .order('created_at', { ascending: false });
+
+                const attContainer = document.getElementById('attendanceListWidget');
+
+                if (error || !attData || attData.length === 0) {
+                    attContainer.innerHTML = '<div class="text-center text-muted py-5 small"><i class="fas fa-info-circle fs-2 mb-2 opacity-50"></i><br>No attendance submitted today.</div>';
+                    return;
+                }
+
+                const todayLocal = new Date().toDateString();
+                const todayAtt = attData.filter(r => new Date(r.created_at).toDateString() === todayLocal);
+
+                if (todayAtt.length === 0) {
+                    attContainer.innerHTML = '<div class="text-center text-muted py-5 small"><i class="fas fa-info-circle fs-2 mb-2 opacity-50"></i><br>No attendance submitted today.</div>';
+                    return;
+                }
+
+                // Group the data by Class Name
+                let classCounts = {};
+                todayAtt.forEach(r => {
+                    const cName = r.students?.classes?.name || 'General';
+                    if (!classCounts[cName]) classCounts[cName] = { present: 0, absent: 0 };
+                    
+                    if (String(r.status).toLowerCase().includes('present')) {
+                        classCounts[cName].present++;
+                    } else {
+                        classCounts[cName].absent++;
+                    }
+                });
+
+                // Render the list
+                if(Object.keys(classCounts).length > 0) {
+                    attContainer.innerHTML = Object.entries(classCounts).map(([className, counts]) => `
+                        <div class="att-item">
+                            <div>
+                                <h6 class="mb-1 fw-bold" style="color: var(--text-color);">${className}</h6>
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success me-1"><i class="fas fa-check me-1"></i>${counts.present} Present</span>
+                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger"><i class="fas fa-times me-1"></i>${counts.absent} Absent</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-muted" style="font-size: 0.8rem; opacity: 0.5;"></i>
+                        </div>
+                    `).join('');
+                } else {
+                    attContainer.innerHTML = '<div class="text-center text-muted py-4 small">No class data found.</div>';
+                }
+
+            } catch (err) {
+                console.error("Attendance Widget Error:", err);
+                document.getElementById('attendanceListWidget').innerHTML = '<div class="text-center text-danger py-4 small">Failed to load attendance data.</div>';
+            }
         }
 
         // === LEAGUE TABLE WIDGET ===
