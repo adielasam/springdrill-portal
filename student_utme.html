@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SPRINGDRILL - UTME Simulator</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -11,20 +11,21 @@
         body.dark-mode { --bg-color: #121212; --card-bg: #1e1e1e; --text-color: #e0e0e0; --text-muted: #a0a0a0; --border-color: #333333; --input-bg: #2c2c2c; }
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: 0.3s; }
         
-        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; box-shadow: 4px 0 15px rgba(0,0,0,0.1);}
+        /* Sidebar Styling - Mobile Optimized */
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; box-shadow: 4px 0 15px rgba(0,0,0,0.1); transition: left 0.3s ease;}
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
         .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; text-decoration: none; display: flex; align-items: center; font-size: 0.95rem;}
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
 
-        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease;}
         .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
         
         .setup-card { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow: hidden;}
         .setup-header { background: var(--utme-green); color: white; padding: 15px 20px; font-weight: bold; font-size: 1.1rem;}
         
         .subject-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin: 20px 0 40px 0; }
-        .form-check-label { font-weight: 600; cursor: pointer; color: var(--text-color);}
+        .form-check-label { font-weight: 600; cursor: pointer; color: var(--text-color); font-size: 0.95rem;}
         
         .config-box { border: 1px solid var(--utme-green); border-radius: 8px; overflow: hidden; height: 100%;}
         .config-header { background: var(--utme-green); color: white; padding: 10px 15px; font-weight: bold; font-size: 0.9rem;}
@@ -32,22 +33,35 @@
 
         .profile-circle { width: 120px; height: 120px; background: var(--utme-green); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 4rem; margin: 0 auto 20px auto; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);}
         .name-plate { background: var(--input-bg); border: 1px solid var(--border-color); padding: 10px; border-radius: 30px; font-weight: bold; text-align: center; margin-bottom: 20px;}
-        .btn-start { background: #1976d2; color: white; font-weight: bold; border-radius: 30px; padding: 12px 0; width: 100%; transition: 0.3s; border: none;}
-        .btn-start:hover { background: #1565c0; transform: translateY(-2px);}
+        .btn-start { background: #1976d2; color: white; font-weight: bold; border-radius: 30px; padding: 15px 0; width: 100%; transition: 0.3s; border: none; font-size: 1.1rem;}
+        
+        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--utme-green); font-size: 1.8rem; cursor: pointer;}
+        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
 
+        /* MOBILE FIXES */
+        @media (max-width: 992px) {
+            .sidebar { left: -260px; } /* Hide sidebar completely off screen */
+            .sidebar.mobile-open { left: 0; } /* Slide in when toggled */
+            .main-content { margin-left: 0; padding: 15px; } /* Reclaim the full screen width */
+            .mobile-menu-toggle { display: inline-block; }
+            .subject-row { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); } /* Tighter grid for phones */
+            .config-box { margin-bottom: 20px; }
+            .top-navbar { padding: 10px 15px; }
+        }
     </style>
 </head>
 <body>
 
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-brand">
+        <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
             <h5 class="text-white fw-bold m-0"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
+            <button class="btn btn-sm text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times fs-4"></i></button>
         </div>
         <nav class="nav flex-column mt-3">
             <a href="student_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
-            
             <a href="student_utme.html" class="nav-link active fw-bold text-success"><i class="fas fa-robot"></i> AI JAMB Simulator</a>
-            
             <a href="student_utme_hub.html" class="nav-link"><i class="fas fa-university text-warning"></i> Real UTME Hub</a>
             <a href="student_results.html" class="nav-link"><i class="fas fa-chart-line"></i> My Results</a>
             <a href="student_messages.html" class="nav-link"><i class="fas fa-envelope"></i> Messages</a>
@@ -58,13 +72,16 @@
 
     <div class="main-content">
         <div class="top-navbar border-start border-4 border-success">
-            <div class="fw-bold text-muted"><i class="fas fa-desktop me-2"></i> Test Preparation Center</div>
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle me-3" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="fw-bold text-muted"><i class="fas fa-desktop me-2"></i> Test Preparation Center</div>
+            </div>
         </div>
 
         <div class="setup-card">
             <div class="setup-header">Practice For UTME (AI Mode)</div>
             
-            <div class="p-4">
+            <div class="p-3 p-md-4">
                 <div class="text-center text-muted fw-bold mb-3 small">Select One or More Subjects (Max 4 for JAMB)</div>
                 
                 <div class="subject-row">
@@ -113,10 +130,10 @@
                         </div>
                     </div>
 
-                    <div class="col-md-4 text-center px-4">
+                    <div class="col-md-4 text-center px-2 px-md-4">
                         <div class="profile-circle"><i class="fas fa-user"></i></div>
                         <div class="name-plate text-uppercase" id="studentNameDisplay">Loading...</div>
-                        <button class="btn-start" onclick="startAIExam()"><i class="fas fa-play-circle me-2"></i> Get Started</button>
+                        <button class="btn-start shadow" onclick="startAIExam()"><i class="fas fa-play-circle me-2"></i> Get Started</button>
                     </div>
 
                     <div class="col-md-4">
@@ -134,6 +151,13 @@
 
     <script type="module">
         import { supabase } from './supabaseClient.js';
+
+        // Toggle Sidebar Logic for Mobile
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+            const overlay = document.getElementById('sidebarOverlay');
+            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+        };
 
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
