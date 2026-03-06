@@ -1,20 +1,3 @@
-<?php
-session_start();
-require_once 'db_connect.php';
-
-// Check if user is logged in and is a student
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] != 'student') {
-    header("Location: index.php");
-    exit();
-}
-
-// Fetch student name (assuming it's stored in the users table)
-$stmt = $pdo->prepare("SELECT username FROM users WHERE id = ?");
-$stmt->execute([$_SESSION['user_id']]);
-$student = $stmt->fetch(PDO::FETCH_ASSOC);
-$student_name = $student['username'] ?? 'Student';
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,123 +5,211 @@ $student_name = $student['username'] ?? 'Student';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPRINGDRILL - Student Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        .sidebar {
-            width: 250px;
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            background-color: #1a3c34;
-            padding-top: 20px;
-            color: white;
+        :root { --bg-color: #f4f7fa; --card-bg: #ffffff; --text-color: #333333; --text-muted: #6c757d; --border-color: #e9ecef; --input-bg: #f8f9fa; --utme-green: #007a4d;}
+        body.dark-mode { --bg-color: #121212; --card-bg: #1e1e1e; --text-color: #e0e0e0; --text-muted: #a0a0a0; --border-color: #333333; --input-bg: #2c2c2c; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+        
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.1);}
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; display: flex; align-items: center; font-size: 0.95rem; text-decoration: none;}
+        .nav-link i { width: 25px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
+
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; }
+        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+
+        .welcome-banner { background: #3498db; background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; border-radius: 10px; padding: 30px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);}
+        .welcome-banner h2 { font-weight: 800; margin-bottom: 5px;}
+        .welcome-banner p { margin: 0; opacity: 0.9;}
+        .welcome-icon { font-size: 4rem; opacity: 0.5; }
+
+        .section-title { font-weight: 800; font-size: 1.2rem; margin-bottom: 20px; color: var(--text-color); }
+
+        /* Actions Grid */
+        .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .action-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 25px; text-align: center; text-decoration: none; color: var(--text-color); transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 180px;}
+        .action-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); color: inherit; }
+        
+        .action-card i { font-size: 3rem; margin-bottom: 15px; }
+        .action-card h5 { font-weight: 700; margin-bottom: 10px; color: var(--text-color);}
+        .action-card p { font-size: 0.85rem; color: var(--text-muted); margin: 0;}
+
+        /* Specifically highlighting the Simulators */
+        .card-ai-sim { border: 2px solid #007a4d; }
+        .card-ai-sim i { color: #007a4d; }
+        .card-ai-sim h5 { color: #007a4d; }
+        
+        .card-real-hub { border: 2px solid #f39c12; background: rgba(241, 196, 15, 0.05) !important;}
+        .card-real-hub i { color: #f39c12; }
+        .card-real-hub h5 { color: #d35400; }
+
+        .card-cbt i { color: #3498db; }
+        .card-notes i { color: #2980b9; }
+        .card-class i { color: #e74c3c; }
+        .card-results i { color: #f1c40f; }
+        .card-msg i { color: #95a5a6; }
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .mobile-menu-toggle { display: inline-block !important; }
+            .welcome-icon { display: none; }
         }
-        .sidebar a {
-            color: white;
-            padding: 10px 15px;
-            text-decoration: none;
-            display: block;
-        }
-        .sidebar a:hover {
-            background-color: #2a5c54;
-        }
-        .sidebar .active {
-            background-color: #2ecc71;
-        }
-        .content {
-            margin-left: 250px;
-            padding: 20px;
-        }
-        .profile-img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            margin-bottom: 10px;
-        }
-        .nav-tabs .nav-link {
-            color: #007bff;
-        }
-        .nav-tabs .nav-link.active {
-            color: #000;
-            background-color: #fff;
-            border-color: #dee2e6 #dee2e6 #fff;
-        }
+        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
+        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <h5 class="text-center">SPRING DRILL</h5>
-        <input type="text" class="form-control mb-3" placeholder="Search...">
-        <a href="student_dashboard.php" class="active">Dashboard</a>
-        <a href="#">Pastoral</a>
-        <a href="#">Feedback</a>
-        <a href="#">eClassroom</a>
-        <a href="#">Assignments</a>
-        <a href="#">Subjects</a>
-        <a href="cbt_manager.php">CBT</a>
-        <a href="#">Lesson Planner</a>
+
+    <div id="loadingOverlay">
+        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
+        <h4 class="fw-bold" style="color: var(--text-muted);">Loading Dashboard...</h4>
     </div>
 
-    <div class="content">
-        <nav class="navbar navbar-light bg-light">
-            <div class="container-fluid">
-                <span class="navbar-brand mb-0 h1">Welcome, <?php echo htmlspecialchars($student_name); ?> CORALBELL</span>
-                <div>
-                    <img src="https://via.placeholder.com/40" alt="Profile" class="profile-img me-2">
-                    <a href="logout.php" class="btn btn-danger">Logout</a>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
+            <h5 class="text-white fw-bold m-0"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
+            <button class="btn btn-sm btn-link text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <nav class="nav flex-column mt-3">
+            <a href="student_dashboard.html" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
+            
+            <a href="student_subjects.html" class="nav-link"><i class="fas fa-book"></i> My Subjects & Notes</a>
+            <a href="student_eclassroom.html" class="nav-link"><i class="fas fa-video text-danger"></i> Live eClassroom</a>
+            
+            <a href="take_test.html" class="nav-link"><i class="fas fa-laptop-code text-info"></i> Take CBT Exam</a>
+            
+            <a href="jamb_simulator.html" class="nav-link"><i class="fas fa-robot"></i> AI JAMB Simulator</a>
+            <a href="student_utme_hub.html" class="nav-link text-warning fw-bold"><i class="fas fa-university"></i> Real UTME Hub</a>
+
+            <a href="student_results.html" class="nav-link"><i class="fas fa-chart-line"></i> My Results</a>
+            <a href="student_messages.html" class="nav-link"><i class="fas fa-envelope"></i> Messages</a>
+
+            <hr class="mx-3 my-4 border-secondary">
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Secure Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            </div>
+            <div class="d-flex align-items-center ms-auto">
+                <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                <div class="fw-bold d-flex align-items-center" style="color: var(--text-color);">
+                    <i class="fas fa-user-circle me-2 fs-4 text-primary"></i> <span id="navStudentName">Loading...</span>
                 </div>
             </div>
-        </nav>
+        </div>
 
-        <ul class="nav nav-tabs mt-3" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">Overview</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance" type="button" role="tab">Attendance</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="result-tab" data-bs-toggle="tab" data-bs-target="#result" type="button" role="tab">Result</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="medical-tab" data-bs-toggle="tab" data-bs-target="#medical" type="button" role="tab">Medical</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="remarks-tab" data-bs-toggle="tab" data-bs-target="#remarks" type="button" role="tab">Remarks</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="result-analysis-tab" data-bs-toggle="tab" data-bs-target="#result-analysis" type="button" role="tab">Result Analysis</button>
-            </li>
-        </ul>
+        <div class="welcome-banner">
+            <div>
+                <h2 id="welcomeText">Welcome back!</h2>
+                <p>Keep up the great work and prepare for your upcoming exams.</p>
+            </div>
+            <i class="fas fa-book-reader welcome-icon"></i>
+        </div>
 
-        <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
-                <h3>Overview</h3>
-                <p>Welcome to your dashboard. Click on CBT to view and attempt your tests.</p>
-            </div>
-            <div class="tab-pane fade" id="attendance" role="tabpanel" aria-labelledby="attendance-tab">
-                <h3>Attendance</h3>
-                <p>Attendance details will be displayed here.</p>
-            </div>
-            <div class="tab-pane fade" id="result" role="tabpanel" aria-labelledby="result-tab">
-                <h3>Result</h3>
-                <p>Result details will be displayed here.</p>
-            </div>
-            <div class="tab-pane fade" id="medical" role="tabpanel" aria-labelledby="medical-tab">
-                <h3>Medical</h3>
-                <p>Medical details will be displayed here.</p>
-            </div>
-            <div class="tab-pane fade" id="remarks" role="tabpanel" aria-labelledby="remarks-tab">
-                <h3>Remarks</h3>
-                <p>Remarks details will be displayed here.</p>
-            </div>
-            <div class="tab-pane fade" id="result-analysis" role="tabpanel" aria-labelledby="result-analysis-tab">
-                <h3>Result Analysis</h3>
-                <p>Result analysis details will be displayed here.</p>
-            </div>
+        <h4 class="section-title">Learning Actions</h4>
+        
+        <div class="action-grid">
+            
+            <a href="student_utme_hub.html" class="action-card card-real-hub">
+                <span class="badge bg-danger position-absolute top-0 end-0 m-3 shadow">NEW APP</span>
+                <i class="fas fa-university"></i>
+                <h5>Real UTME Hub Console</h5>
+                <p>Practice with 100% authentic past questions uploaded by teachers.</p>
+            </a>
+
+            <a href="jamb_simulator.html" class="action-card card-ai-sim">
+                <i class="fas fa-robot"></i>
+                <h5>AI JAMB Simulator</h5>
+                <p>Practice infinitely with AI-generated questions under exam conditions.</p>
+            </a>
+
+            <a href="take_test.html" class="action-card card-cbt">
+                <i class="fas fa-laptop-code"></i>
+                <h5>School CBT Exams</h5>
+                <p>Take your termly or continuous assessments.</p>
+            </a>
+
+            <a href="student_subjects.html" class="action-card card-notes">
+                <i class="fas fa-book"></i>
+                <h5>Subject Notes</h5>
+                <p>Download schemes of work and lesson materials.</p>
+            </a>
+
+            <a href="student_eclassroom.html" class="action-card card-class">
+                <i class="fas fa-video"></i>
+                <h5>Live eClassroom</h5>
+                <p>Join virtual video classes with your teachers.</p>
+            </a>
+
+            <a href="student_results.html" class="action-card card-results">
+                <i class="fas fa-chart-line"></i>
+                <h5>Performance Results</h5>
+                <p>Check your grades and track your academic growth.</p>
+            </a>
+
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('mobile-open'); document.getElementById('sidebarOverlay').style.display = document.getElementById('sidebarOverlay').style.display === 'block' ? 'none' : 'block'; };
+        
+        window.toggleTheme = () => {
+            const body = document.body; body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') window.toggleTheme();
+
+        async function initializeDashboard() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = 'login.html';
+
+                const { data: profile } = await supabase.from('users').select('name, approved').eq('id', session.user.id).single();
+                
+                if (profile) {
+                    if (!profile.approved) {
+                        alert("Your account is pending admin approval.");
+                        await supabase.auth.signOut();
+                        window.location.href = 'login.html';
+                        return;
+                    }
+                    const firstName = profile.name.split(' ')[0];
+                    document.getElementById('navStudentName').innerText = firstName;
+                    document.getElementById('welcomeText').innerText = `Welcome back, ${firstName}!`;
+                }
+
+                document.getElementById('loadingOverlay').style.display = 'none';
+                
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
+    </script>
 </body>
 </html>
