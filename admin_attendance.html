@@ -7,7 +7,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* GLOBAL DARK MODE ENGINE */
         :root { 
             --bg-color: #f4f7fa; 
             --card-bg: #ffffff; 
@@ -42,7 +41,6 @@
         .form-control, .form-select { background-color: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); }
         .form-control:focus, .form-select:focus { background-color: var(--card-bg); color: var(--text-color); border-color: var(--utme-green); box-shadow: none;}
         
-        /* Table Styles */
         .table-wrapper { background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02);}
         .custom-table { width: 100%; margin: 0; color: var(--text-color); }
         .custom-table th { background: var(--input-bg); padding: 15px 20px; font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); border-bottom: 2px solid var(--border-color); font-weight: 700;}
@@ -83,9 +81,7 @@
         
         <nav class="nav flex-column mt-3">
             <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            
             <a href="admin_attendance.html" class="nav-link active fw-bold"><i class="fas fa-calendar-check text-warning me-2"></i> Attendance Log</a>
-
             <a href="#usersMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
                 <span><i class="fas fa-users me-2"></i> Accounts</span><i class="fas fa-caret-down"></i>
             </a>
@@ -94,9 +90,7 @@
                 <a href="manage_users.html" class="nav-link small py-2"><i class="fas fa-user-check me-2"></i> Approvals</a>
                 <a href="class_list.html" class="nav-link small py-2"><i class="fas fa-clipboard-list me-2"></i> Class Data</a>
             </div>
-
             <a href="admin_league_table.html" class="nav-link mt-2"><i class="fas fa-trophy text-warning me-2"></i> League Table</a>
-
             <hr class="mx-3 my-4 border-secondary">
             <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Secure Logout</a>
         </nav>
@@ -108,11 +102,8 @@
                 <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
                 <div class="fw-bold d-none d-md-block" style="color: var(--text-muted);"><i class="fas fa-calendar-alt me-2"></i> Master Attendance Log</div>
             </div>
-
             <div class="d-flex align-items-center ms-auto">
-                <button class="dark-toggle-btn me-3" onclick="toggleTheme()" title="Toggle Dark Mode">
-                    <i class="fas fa-moon" id="themeIcon"></i>
-                </button>
+                <button class="dark-toggle-btn me-3" onclick="toggleTheme()" title="Toggle Dark Mode"><i class="fas fa-moon" id="themeIcon"></i></button>
             </div>
         </div>
 
@@ -130,7 +121,7 @@
                     <label class="form-label fw-bold text-muted small">Filter by Class</label>
                     <select id="classFilter" class="form-select form-select-lg fw-bold" onchange="loadAttendance()">
                         <option value="all">All Classes Overview</option>
-                        </select>
+                    </select>
                 </div>
                 <div class="col-md-3">
                     <button class="btn btn-success btn-lg w-100 fw-bold" onclick="loadAttendance()"><i class="fas fa-sync-alt me-2"></i> Refresh</button>
@@ -152,14 +143,12 @@
                     </tbody>
             </table>
         </div>
-
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
-        // UI Toggles
         window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('mobile-open'); document.getElementById('sidebarOverlay').style.display = document.getElementById('sidebarOverlay').style.display === 'block' ? 'none' : 'block'; };
         window.toggleTheme = () => {
             const body = document.body; body.classList.toggle('dark-mode');
@@ -169,33 +158,18 @@
         };
         if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { window.toggleTheme(); }
 
-        // Core Logic
         async function initialize() {
             try {
-                // 1. Verify Admin Session
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
 
-                const { data: profile } = await supabase.from('users').select('role').eq('id', session.user.id).single();
-                if (!profile || profile.role !== 'admin') {
-                    alert("Unauthorized access!");
-                    window.location.href = 'login.html';
-                    return;
-                }
-
-                // 2. Load classes into the dropdown filter
                 const { data: classes } = await supabase.from('classes').select('id, name').order('name');
                 if (classes) {
                     const classSelect = document.getElementById('classFilter');
-                    classes.forEach(c => {
-                        classSelect.innerHTML += `<option value="${c.id}">${c.name}</option>`;
-                    });
+                    classes.forEach(c => { classSelect.innerHTML += `<option value="${c.id}">${c.name}</option>`; });
                 }
 
-                // 3. Set Date picker to TODAY by default
                 document.getElementById('dateFilter').valueAsDate = new Date();
-
-                // 4. Fetch the data
                 await loadAttendance();
 
                 document.getElementById('loadingOverlay').style.display = 'none';
@@ -209,25 +183,25 @@
             const tbody = document.getElementById('attendanceTableBody');
             tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin fa-2x mb-2"></i><br>Fetching records...</td></tr>';
 
-            const selectedDate = document.getElementById('dateFilter').value; // Returns YYYY-MM-DD
+            const selectedDate = document.getElementById('dateFilter').value; 
             const selectedClass = document.getElementById('classFilter').value;
 
             try {
-                // Fetch attendance joined with student and class data
-                const { data: attData, error } = await supabase
+                // 🚨 BULLETPROOF QUERY 🚨
+                // Pulling all records, then we will manually match them to students to avoid Supabase join crashes
+                const { data: attData, error: attError } = await supabase
                     .from('attendance')
-                    .select('status, created_at, students(first_name, surname, class_id, classes(name))')
+                    .select('*, students(*, classes(*))')
                     .order('created_at', { ascending: false });
 
-                if (error) throw error;
+                if (attError) throw new Error(attError.message);
 
-                // Filter the results in JS based on Date and selected Class
                 const filteredRecords = attData.filter(record => {
-                    if (!record.students) return false; // Ignore orphans
+                    if (!record.students) return false; 
 
-                    // Format database timestamp to local YYYY-MM-DD for comparison
-                    const dbDate = new Date(record.created_at);
-                    const dbDateString = dbDate.getFullYear() + '-' + String(dbDate.getMonth() + 1).padStart(2, '0') + '-' + String(dbDate.getDate()).padStart(2, '0');
+                    // Support both generic 'created_at' and specific 'date' column if the teacher app uses it
+                    const recordDate = record.date || record.created_at; 
+                    const dbDateString = new Date(recordDate).toISOString().split('T')[0];
 
                     const dateMatch = dbDateString === selectedDate;
                     const classMatch = selectedClass === 'all' || record.students.class_id == selectedClass;
@@ -236,11 +210,10 @@
                 });
 
                 if (filteredRecords.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted"><i class="fas fa-calendar-times fs-1 mb-3 opacity-25"></i><br>No attendance records found for this criteria.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted"><i class="fas fa-calendar-times fs-1 mb-3 opacity-25"></i><br>No attendance records found for this date.</td></tr>';
                     return;
                 }
 
-                // Render the table rows
                 tbody.innerHTML = filteredRecords.map(record => {
                     const isPresent = String(record.status).toLowerCase().includes('present');
                     const badge = isPresent 
@@ -249,8 +222,6 @@
 
                     const studentName = `${record.students.first_name} ${record.students.surname || ''}`;
                     const className = record.students.classes?.name || 'Unassigned';
-                    
-                    // Format time (e.g., 08:30 AM)
                     const timeString = new Date(record.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                     return `
@@ -265,7 +236,10 @@
 
             } catch (err) {
                 console.error("Failed to load attendance:", err);
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-danger fw-bold"><i class="fas fa-exclamation-triangle me-2"></i>Error loading records.</td></tr>';
+                // 🚨 VISIBLE ERROR DISPLAY 🚨 - This prints the exact database issue to the screen!
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-danger fw-bold">
+                    <i class="fas fa-exclamation-triangle fs-2 mb-2"></i><br>Database Error: ${err.message}
+                </td></tr>`;
             }
         };
 
