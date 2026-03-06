@@ -10,7 +10,6 @@
         /* CBT ENGINE STRICT STYLING */
         body { background-color: #f4f7fa; color: #333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; user-select: none; }
         
-        /* Top Navigation Bar */
         .exam-header { background: #004d34; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000;}
         .student-info { display: flex; align-items: center; gap: 15px; }
         .student-photo { width: 50px; height: 50px; background: white; color: #004d34; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold;}
@@ -19,16 +18,13 @@
         .timer-text { font-family: 'Courier New', Courier, monospace; font-size: 1.8rem; font-weight: 900; color: #f1c40f; letter-spacing: 2px; margin: 0; line-height: 1;}
         .timer-warning { border-color: #e74c3c !important; color: #e74c3c !important; animation: pulse 1s infinite; }
 
-        /* Subject Tabs */
         .subject-tabs { background: #ffffff; border-bottom: 2px solid #007a4d; display: flex; overflow-x: auto; padding: 0 20px;}
         .sub-tab { padding: 12px 25px; font-weight: bold; color: #6c757d; cursor: pointer; border-bottom: 4px solid transparent; transition: 0.2s; white-space: nowrap;}
         .sub-tab:hover { color: #007a4d; background: #f8f9fa;}
         .sub-tab.active { color: #007a4d; border-bottom-color: #007a4d; background: #e8f5e9;}
 
-        /* Layout Grid */
         .exam-container { display: flex; height: calc(100vh - 120px); }
         
-        /* Left: Question Area */
         .question-area { flex: 1; padding: 30px; overflow-y: auto; background: white;}
         .question-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;}
         .q-number { font-size: 1.2rem; font-weight: 900; color: #007a4d; }
@@ -37,12 +33,9 @@
         .question-image { max-width: 100%; max-height: 300px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd; padding: 5px;}
         
         .options-list { display: flex; flex-direction: column; gap: 12px; }
-        .option-label { display: flex; align-items: center; padding: 15px; border: 2px solid #e9ecef; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 1.1rem; font-weight: 500;}
+        .option-label { display: flex; align-items: center; padding: 15px; border: 2px solid #e9ecef; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 1.1rem; font-weight: 500; background: #ffffff;}
         .option-label:hover { border-color: #007a4d; background: #f8f9fa; }
-        .option-input { margin-right: 15px; transform: scale(1.5); cursor: pointer; }
-        .option-label.selected { border-color: #007a4d; background: #e8f5e9; }
 
-        /* Right: Navigation Grid */
         .nav-sidebar { width: 320px; background: #f8f9fa; border-left: 1px solid #ddd; padding: 20px; display: flex; flex-direction: column; overflow-y: auto;}
         
         .nav-buttons { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px;}
@@ -56,11 +49,11 @@
         .grid-btn:hover { background: #e9ecef; }
         .grid-btn.answered { background: #2ecc71; color: white; border-color: #27ae60;}
         .grid-btn.current { border: 3px solid #3498db; transform: scale(1.1); }
+        .grid-btn.wrong-node { background: #e74c3c !important; color: white !important; border-color: #c0392b !important;}
 
         .submit-btn { background: #e74c3c; color: white; font-weight: 900; font-size: 1.1rem; padding: 15px; border-radius: 8px; border: none; width: 100%; transition: 0.3s; margin-top: 20px; box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);}
         .submit-btn:hover { background: #c0392b; transform: translateY(-2px);}
 
-        /* Loading Screen */
         #loadingScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
@@ -77,7 +70,7 @@
 
     <div id="loadingScreen">
         <i class="fas fa-satellite-dish fa-spin fa-4x text-success mb-3"></i>
-        <h2 class="fw-bold" style="color: #004d34;">Downloading Real UTME Data...</h2>
+        <h2 class="fw-bold" style="color: #004d34;" id="loadingTextTitle">Downloading Real UTME Data...</h2>
         <p class="text-muted" id="loadingText">Configuring subjects and fetching questions.</p>
     </div>
 
@@ -119,27 +112,9 @@
                 </div>
                 
                 <div class="question-text" id="qText">Loading question text...</div>
-                
                 <img id="qImage" class="question-image" src="" alt="Question Diagram" style="display: none;">
 
-                <div class="options-list">
-                    <label class="option-label" id="labelA" onclick="selectOption('A')">
-                        <input type="radio" name="jambOption" class="option-input" value="A" id="radioA">
-                        <span class="fw-bold me-2">A.</span> <span id="textA">Option A</span>
-                    </label>
-                    <label class="option-label" id="labelB" onclick="selectOption('B')">
-                        <input type="radio" name="jambOption" class="option-input" value="B" id="radioB">
-                        <span class="fw-bold me-2">B.</span> <span id="textB">Option B</span>
-                    </label>
-                    <label class="option-label" id="labelC" onclick="selectOption('C')">
-                        <input type="radio" name="jambOption" class="option-input" value="C" id="radioC">
-                        <span class="fw-bold me-2">C.</span> <span id="textC">Option C</span>
-                    </label>
-                    <label class="option-label" id="labelD" onclick="selectOption('D')">
-                        <input type="radio" name="jambOption" class="option-input" value="D" id="radioD">
-                        <span class="fw-bold me-2">D.</span> <span id="textD">Option D</span>
-                    </label>
-                </div>
+                <div class="options-list" id="optionsContainer"></div>
             </div>
         </div>
 
@@ -152,7 +127,7 @@
             <div class="grid-title" id="gridTitle">Navigation Grid</div>
             <div class="number-grid" id="navigationGrid"></div>
 
-            <button class="submit-btn" onclick="submitExamManually()"><i class="fas fa-check-circle me-2"></i> SUBMIT EXAM</button>
+            <button class="submit-btn" id="sideSubmitBtn" onclick="submitExamManually()"><i class="fas fa-check-circle me-2"></i> SUBMIT EXAM</button>
         </div>
 
     </div>
@@ -161,13 +136,13 @@
         import { supabase } from './supabaseClient.js';
 
         let testConfig = null;
-        let studentProfile = null;
         let questionsBySubject = {}; 
         let userAnswers = {}; 
         let currentSubject = "";
         let currentIndex = 0;
         let totalSeconds = 0;
         let timerInterval = null;
+        let isReviewMode = false; // The magic fix!
 
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
@@ -183,7 +158,6 @@
             try {
                 const { data: profile } = await supabase.from('users').select('name, reg_number').eq('id', session.user.id).single();
                 if(profile) {
-                    studentProfile = profile;
                     document.getElementById('headerName').innerText = profile.name.toUpperCase();
                     document.getElementById('headerReg').innerText = "REG: " + (profile.reg_number || 'N/A');
                 }
@@ -194,29 +168,20 @@
                 });
 
                 await fetchRealQuestions();
-
             } catch(e) {
                 console.error(e);
-                alert("Database Error: " + e.message);
             }
         }
 
         async function fetchRealQuestions() {
             let query = supabase.from('question_bank').select('*').in('subject', testConfig.subjects);
-            
-            if (testConfig.year && testConfig.year !== 'RANDOM') {
-                query = query.eq('exam_year', testConfig.year);
-            }
+            if (testConfig.year && testConfig.year !== 'RANDOM') query = query.eq('exam_year', testConfig.year);
 
             const { data: qData, error } = await query;
-            if (error) throw error;
-
-            if (qData) {
+            if (!error && qData) {
                 qData.forEach(q => {
                     const subKey = testConfig.subjects.find(s => s.toLowerCase() === q.subject.toLowerCase()) || q.subject;
-                    if(questionsBySubject[subKey]) {
-                        questionsBySubject[subKey].push(q);
-                    }
+                    if(questionsBySubject[subKey]) questionsBySubject[subKey].push(q);
                 });
             }
 
@@ -266,6 +231,8 @@
             document.getElementById('questionContent').style.display = 'block';
 
             const q = questions[currentIndex];
+            const correctAns = q.correct_option;
+            const selectedAns = userAnswers[currentSubject][currentIndex];
             
             document.getElementById('qNumberDisplay').innerText = currentIndex + 1;
             document.getElementById('qTotalDisplay').innerText = questions.length;
@@ -273,26 +240,36 @@
             document.getElementById('qText').innerHTML = q.question_text;
             
             const imgEl = document.getElementById('qImage');
-            if (q.image_url) {
-                imgEl.src = q.image_url;
-                imgEl.style.display = 'block';
-            } else {
-                imgEl.style.display = 'none';
-            }
+            if (q.image_url) { imgEl.src = q.image_url; imgEl.style.display = 'block'; } 
+            else { imgEl.style.display = 'none'; }
 
-            document.getElementById('textA').innerText = q.option_a;
-            document.getElementById('textB').innerText = q.option_b;
-            document.getElementById('textC').innerText = q.option_c;
-            document.getElementById('textD').innerText = q.option_d;
+            // Dynamic Options for Review Mode
+            const optionsHtml = ['A', 'B', 'C', 'D'].map(letter => {
+                const text = q[`option_${letter.toLowerCase()}`];
+                let style = '';
+                let icon = '';
 
-            document.querySelectorAll('.option-label').forEach(lbl => lbl.classList.remove('selected'));
-            document.querySelectorAll('.option-input').forEach(rad => rad.checked = false);
+                if (isReviewMode) {
+                    if (letter === correctAns) {
+                        style = 'border-color: #27ae60; background: rgba(39, 174, 96, 0.15);';
+                        icon = '<i class="fas fa-check-circle text-success ms-auto fs-5"></i>';
+                    } else if (letter === selectedAns && letter !== correctAns) {
+                        style = 'border-color: #e74c3c; background: rgba(231, 76, 60, 0.15); opacity: 0.8;';
+                        icon = '<i class="fas fa-times-circle text-danger ms-auto fs-5"></i>';
+                    }
+                } else {
+                    if (selectedAns === letter) style = 'border-color: #007a4d; background: #e8f5e9;';
+                }
 
-            const savedAns = userAnswers[currentSubject][currentIndex];
-            if (savedAns) {
-                document.getElementById(`radio${savedAns}`).checked = true;
-                document.getElementById(`label${savedAns}`).classList.add('selected');
-            }
+                return `
+                <label class="option-label" style="${style}" ${!isReviewMode ? `onclick="selectOption('${letter}')"` : ''}>
+                    <span class="fw-bold me-3 text-primary">${letter}.</span> 
+                    <span style="flex-grow: 1;">${text}</span> 
+                    ${icon}
+                </label>`;
+            }).join('');
+
+            document.getElementById('optionsContainer').innerHTML = optionsHtml;
 
             updateGridHighlights();
             document.getElementById('btnPrev').disabled = (currentIndex === 0);
@@ -316,9 +293,7 @@
 
         window.selectOption = (optionLetter) => {
             userAnswers[currentSubject][currentIndex] = optionLetter;
-            document.getElementById(`radio${optionLetter}`).checked = true;
-            document.querySelectorAll('.option-label').forEach(lbl => lbl.classList.remove('selected'));
-            document.getElementById(`label${optionLetter}`).classList.add('selected');
+            displayCurrentQuestion(); // Re-render to highlight selection
             const gridBtn = document.getElementById(`gridBtn_${currentIndex}`);
             if (gridBtn) gridBtn.classList.add('answered');
         };
@@ -327,10 +302,19 @@
             const questions = questionsBySubject[currentSubject];
             if (!questions) return;
             const grid = document.getElementById('navigationGrid');
-            grid.innerHTML = questions.map((_, idx) => {
-                const isAnswered = userAnswers[currentSubject][idx] ? 'answered' : '';
-                return `<div class="grid-btn ${isAnswered}" id="gridBtn_${idx}" onclick="jumpToQuestion(${idx})">${idx + 1}</div>`;
+            grid.innerHTML = questions.map((q, idx) => {
+                let nodeClass = '';
+                if (isReviewMode) {
+                    const picked = userAnswers[currentSubject][idx];
+                    const correct = q.correct_option;
+                    if (picked === correct) nodeClass = 'answered'; 
+                    else if (picked) nodeClass = 'wrong-node'; 
+                } else {
+                    if (userAnswers[currentSubject][idx]) nodeClass = 'answered';
+                }
+                return `<div class="grid-btn ${nodeClass}" id="gridBtn_${idx}" onclick="jumpToQuestion(${idx})">${idx + 1}</div>`;
             }).join('');
+            updateGridHighlights();
         }
 
         function updateGridHighlights() {
@@ -365,14 +349,9 @@
                     String(hrs).padStart(2, '0') + ':' + 
                     String(mins).padStart(2, '0') + ':' + 
                     String(secs).padStart(2, '0');
-                if (totalSeconds < 300) {
-                    document.getElementById('timerBox').classList.add('timer-warning');
-                    document.getElementById('timeDisplay').classList.add('text-danger');
-                }
             }, 1000);
         }
 
-        // --- NEW: CLOSE EXAM LOGIC ---
         window.closeExamManually = () => {
             if (confirm("Are you sure you want to close this exam? Your progress will NOT be saved.")) {
                 clearInterval(timerInterval);
@@ -391,14 +370,16 @@
             processSubmission();
         }
 
-        function processSubmission() {
+        // NO MORE REDIRECTS. Processes the score entirely on the current page!
+        async function processSubmission() {
             clearInterval(timerInterval);
+            
+            document.getElementById('loadingTextTitle').innerText = "Calculating Scores...";
+            document.getElementById('loadingText').innerText = "Please wait while we grade your performance.";
             document.getElementById('loadingScreen').style.display = 'flex';
-            document.getElementById('loadingScreen').innerHTML = `<i class="fas fa-spinner fa-spin fa-4x text-success mb-3"></i><h2 class="fw-bold" style="color: #004d34;">Calculating Results...</h2>`;
 
             let totalScore = 0;
             let totalPossible = 0;
-            let breakdown = {};
 
             for (let sub in questionsBySubject) {
                 let subScore = 0;
@@ -406,23 +387,50 @@
                 questions.forEach((q, index) => {
                     if (userAnswers[sub][index] === q.correct_option) subScore++;
                 });
-                breakdown[sub] = { score: subScore, total: questions.length };
                 totalScore += subScore;
                 totalPossible += questions.length;
             }
 
-            const finalResults = {
-                score: totalScore,
-                total: totalPossible,
-                percentage: totalPossible > 0 ? Math.round((totalScore / totalPossible) * 100) : 0,
-                breakdown: breakdown,
-                mode: testConfig.mode,
-                year: testConfig.year,
-                date_taken: new Date().toISOString()
-            };
+            let finalJambScore = 0;
+            if(totalPossible > 0) finalJambScore = Math.round((totalScore / totalPossible) * 400);
 
-            sessionStorage.setItem('UTME_FINAL_RESULTS', JSON.stringify(finalResults));
-            window.location.href = 'utme_test_results.html';
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                    await supabase.from('test_results').insert([{
+                        student_id: session.user.id,
+                        test_id: 998,
+                        score: finalJambScore,
+                        total_score: 400,
+                        created_at: new Date().toISOString()
+                    }]);
+                }
+            } catch(e) { console.error("DB Save failed silently", e); }
+
+            // Switch to Review Mode IN-PAGE
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.display = 'none';
+                isReviewMode = true;
+                
+                // Update Top Header
+                document.getElementById('timerBox').innerHTML = `<span class="text-warning" style="font-size:1.2rem;">SCORE: ${finalJambScore} / 400</span>`;
+                document.getElementById('gridTitle').innerText = "REVIEW NAVIGATOR";
+                
+                // Hide Close Button, Change Submit to Dashboard
+                document.getElementById('closeExamBtn').style.display = 'none';
+                const mainBtn = document.getElementById('submitTopBtn');
+                mainBtn.innerHTML = '<i class="fas fa-home me-2"></i> Dashboard';
+                mainBtn.onclick = () => window.location.href = 'student_results.html';
+                
+                const sideSubmitBtn = document.getElementById('sideSubmitBtn');
+                if(sideSubmitBtn) sideSubmitBtn.style.display = 'none';
+
+                alert(`Exam Submitted Successfully!\nYour Real JAMB Score: ${finalJambScore} / 400\n\nYou are now in Review Mode. Navigate through the questions to view the correct answers.`);
+                
+                currentIndex = 0;
+                renderNavigationGrid();
+                displayCurrentQuestion();
+            }, 1500);
         }
 
         document.addEventListener('DOMContentLoaded', init);
