@@ -85,7 +85,7 @@
             <a href="student_eclassroom.html" class="nav-link"><i class="fas fa-video text-danger"></i> Live eClassroom</a>
             <a href="take_test.html" class="nav-link"><i class="fas fa-laptop-code text-info"></i> Take CBT Exam</a>
             
-            <a href="utme_simulator.html" class="nav-link"><i class="fas fa-university text-success"></i> UTME Simulator</a>
+            <a href="student_utme.html" class="nav-link"><i class="fas fa-university text-success"></i> UTME Simulator</a>
             
             <a href="student_results.html" class="nav-link"><i class="fas fa-chart-line text-warning"></i> My Results</a>
             <a href="student_messages.html" class="nav-link"><i class="fas fa-envelope"></i> Messages</a>
@@ -125,7 +125,7 @@
         
         <div class="action-grid">
             
-            <a href="utme_simulator.html" class="action-card card-ai-sim">
+            <a href="student_utme.html" class="action-card card-ai-sim">
                 <i class="fas fa-university"></i>
                 <h5>JAMB / UTME Simulator</h5>
                 <p>Practice past questions under real exam conditions.</p>
@@ -190,7 +190,6 @@
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
 
-                // THE FIX: Removed the strict "approved" check that was logging you out!
                 const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
                 
                 if (profile) {

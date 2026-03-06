@@ -10,7 +10,6 @@
         :root { --bg-color: #eef2f3; --card-bg: #ffffff; --text-color: #333333; --text-muted: #6c757d; --border-color: #e9ecef; --input-bg: #f8f9fa; --utme-green: #007a4d;}
         body.dark-mode { --bg-color: #121212; --card-bg: #1e1e1e; --text-color: #e0e0e0; --text-muted: #a0a0a0; --border-color: #333333; --input-bg: #2c2c2c; }
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: 0.3s; 
-               /* Subtle background pattern like TestDriller */
                background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23007a4d" fill-opacity="0.03"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
         }
         
@@ -24,7 +23,6 @@
         .top-navbar { background: var(--utme-green); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; color: white;}
         .dark-toggle-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;}
 
-        /* HUB GRID STYLES */
         .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
         
         .hub-card { border-radius: 10px; padding: 25px 15px; text-align: center; text-decoration: none; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: transform 0.2s, box-shadow 0.2s; height: 150px; position: relative; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);}
@@ -34,7 +32,6 @@
         
         .new-badge { position: absolute; top: 10px; right: 10px; background: #ff4757; color: white; font-size: 0.65rem; font-weight: 900; padding: 3px 8px; border-radius: 12px; text-transform: uppercase;}
 
-        /* Exact Colors from TestDriller */
         .bg-practice { background: #e0e7ff; } .bg-practice i { color: #3730a3; }
         .bg-classroom { background: #ffe4e6; } .bg-classroom i { color: #be123c; }
         .bg-search { background: #dcfce7; } .bg-search i { color: #166534; }
@@ -66,10 +63,9 @@
         <nav class="nav flex-column mt-3">
             <a href="student_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
             
-            <a href="jamb_simulator.html" class="nav-link"><i class="fas fa-robot"></i> AI JAMB Simulator</a>
+            <a href="student_utme.html" class="nav-link"><i class="fas fa-robot"></i> AI JAMB Simulator</a>
             
             <a href="student_utme_hub.html" class="nav-link active fw-bold text-warning"><i class="fas fa-university"></i> Real UTME Hub</a>
-            
             <a href="student_results.html" class="nav-link"><i class="fas fa-chart-line"></i> Results & Analytics</a>
             <a href="student_messages.html" class="nav-link"><i class="fas fa-envelope"></i> Messages</a>
             <hr class="mx-3 my-4 border-secondary">
@@ -174,7 +170,6 @@
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) return window.location.href = 'login.html';
 
-            // Get total count of real questions uploaded by teachers
             try {
                 const { count } = await supabase.from('question_bank').select('*', { count: 'exact', head: true });
                 document.getElementById('dbCount').innerText = count ? count.toLocaleString() : '0';
