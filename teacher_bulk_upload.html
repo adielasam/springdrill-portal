@@ -7,6 +7,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <link href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
     <style>
         :root { --bg-color: #f4f7fa; --card-bg: #ffffff; --text-color: #333333; --text-muted: #6c757d; --border-color: #e9ecef; --input-bg: #f8f9fa; --utme-green: #007a4d;}
         body.dark-mode { --bg-color: #121212; --card-bg: #1e1e1e; --text-color: #e0e0e0; --text-muted: #a0a0a0; --border-color: #333333; --input-bg: #2c2c2c; }
@@ -28,7 +34,7 @@
         
         .preview-table-container { max-height: 400px; overflow-y: auto; display: none; margin-top: 20px; border-radius: 8px; border: 1px solid var(--border-color); }
         .custom-table { width: 100%; margin: 0; color: var(--text-color); font-size: 0.85rem;}
-        .custom-table th { background: var(--input-bg); padding: 12px 15px; text-transform: uppercase; color: var(--text-muted); position: sticky; top: 0;}
+        .custom-table th { background: var(--input-bg); padding: 12px 15px; text-transform: uppercase; color: var(--text-muted); position: sticky; top: 0; z-index: 10;}
         .custom-table td { padding: 12px 15px; border-bottom: 1px solid var(--border-color); }
 
         .nav-pills .nav-link.active { background-color: var(--utme-green); color: white; font-weight: bold;}
@@ -36,6 +42,12 @@
         
         .form-control, .form-select { background-color: var(--input-bg); border-color: var(--border-color); color: var(--text-color); }
         .form-control:focus, .form-select:focus { border-color: var(--utme-green); box-shadow: none; background-color: var(--card-bg); color: var(--text-color);}
+
+        /* Quill Editor Styling Fixes for Dark Mode */
+        .ql-toolbar { background: var(--input-bg); border-color: var(--border-color) !important; border-top-left-radius: 6px; border-top-right-radius: 6px;}
+        .ql-container { border-color: var(--border-color) !important; border-bottom-left-radius: 6px; border-bottom-right-radius: 6px; font-size: 1rem; color: var(--text-color);}
+        body.dark-mode .ql-stroke { stroke: var(--text-color); }
+        body.dark-mode .ql-fill { fill: var(--text-color); }
 
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; color: white;}
     </style>
@@ -100,7 +112,7 @@
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="pills-manual-tab" data-bs-toggle="pill" data-bs-target="#pills-manual" type="button" role="tab">
-                        <i class="fas fa-image me-2"></i> Manual Entry (With Diagram/Image)
+                        <i class="fas fa-keyboard me-2"></i> Advanced Entry (Formulas & Images)
                     </button>
                 </li>
             </ul>
@@ -117,7 +129,7 @@
                     <div class="upload-zone" onclick="document.getElementById('csvFileInput').click()">
                         <i class="fas fa-cloud-upload-alt fs-1 text-success mb-3"></i>
                         <h4 class="fw-bold" style="color: var(--text-color);">Click to select a CSV file</h4>
-                        <p class="text-muted m-0">Best for English, Literature, and text-based subjects.</p>
+                        <p class="text-muted m-0">Best for English, Literature, and standard text-based subjects.</p>
                     </div>
 
                     <div id="previewSection" style="display: none;">
@@ -137,53 +149,78 @@
 
                 <div class="tab-pane fade" id="pills-manual" role="tabpanel">
                     <div class="alert alert-info border-0 mb-4">
-                        <i class="fas fa-info-circle me-2"></i> Use this section for Physics, Math, Biology, or any question that requires a diagram or chart.
+                        <i class="fas fa-info-circle me-2"></i> Use this editor to insert complex Math formulas, scientific symbols, superscripts, or diagrams.
                     </div>
 
                     <form id="manualQuestionForm" onsubmit="saveManualQuestion(event)">
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <label class="form-label fw-bold small text-muted">Subject</label>
-                                <input type="text" class="form-control fw-bold" id="m_subject" placeholder="e.g. Biology" required>
+                                <label class="form-label fw-bold small text-muted">Subject <span class="text-danger">*</span></label>
+                                <select class="form-select fw-bold" id="m_subject" required>
+                                    <option value="">-- Select Subject --</option>
+                                    <option value="English Language">English Language</option>
+                                    <option value="Mathematics">Mathematics</option>
+                                    <option value="Physics">Physics</option>
+                                    <option value="Chemistry">Chemistry</option>
+                                    <option value="Biology">Biology</option>
+                                    <option value="Economics">Economics</option>
+                                    <option value="Government">Government</option>
+                                    <option value="Commerce">Commerce</option>
+                                    <option value="Accounting">Accounting</option>
+                                    <option value="Literature">Literature</option>
+                                    <option value="Geography">Geography</option>
+                                    <option value="CRK">CRK</option>
+                                    <option value="IRK">IRK</option>
+                                    <option value="Computer Studies">Computer Studies</option>
+                                    <option value="Agriculture">Agriculture</option>
+                                </select>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-bold small text-muted">Exam Year (Optional)</label>
-                                <input type="text" class="form-control" id="m_year" placeholder="e.g. 2019">
+                                <label class="form-label fw-bold small text-muted">Exam Year <span class="text-danger">*</span></label>
+                                <select class="form-select fw-bold" id="m_year" required>
+                                    <option value="">-- Select Year --</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+                                    <option value="2022">2022</option>
+                                    <option value="2021">2021</option>
+                                    <option value="2020">2020</option>
+                                </select>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-bold small text-muted">Topic (Optional)</label>
-                                <input type="text" class="form-control" id="m_topic" placeholder="e.g. Cell Structure">
+                                <input type="text" class="form-control" id="m_topic" placeholder="e.g. Differentiation">
                             </div>
 
                             <div class="col-12 mt-3">
-                                <label class="form-label fw-bold small text-muted">Question Text</label>
-                                <textarea class="form-control" id="m_text" rows="3" placeholder="Type the question here..." required></textarea>
+                                <label class="form-label fw-bold small text-muted">Question Content <span class="text-danger">*</span> (Use the <strong><i>fx</i></strong> button for formulas)</label>
+                                <div id="quillEditor" style="height: 180px; background: var(--card-bg);"></div>
                             </div>
 
                             <div class="col-12 mt-3">
-                                <label class="form-label fw-bold small text-muted"><i class="fas fa-image me-1"></i> Attach Diagram/Image (Optional)</label>
+                                <label class="form-label fw-bold small text-muted"><i class="fas fa-image me-1"></i> Attach Diagram (Optional)</label>
                                 <input type="file" class="form-control" id="m_image" accept="image/*">
                             </div>
 
                             <div class="col-md-6 mt-3">
-                                <label class="form-label fw-bold small text-muted">Option A</label>
+                                <label class="form-label fw-bold small text-muted">Option A <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="m_opt_a" required>
                             </div>
                             <div class="col-md-6 mt-3">
-                                <label class="form-label fw-bold small text-muted">Option B</label>
+                                <label class="form-label fw-bold small text-muted">Option B <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="m_opt_b" required>
                             </div>
                             <div class="col-md-6 mt-3">
-                                <label class="form-label fw-bold small text-muted">Option C</label>
+                                <label class="form-label fw-bold small text-muted">Option C <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="m_opt_c" required>
                             </div>
                             <div class="col-md-6 mt-3">
-                                <label class="form-label fw-bold small text-muted">Option D</label>
+                                <label class="form-label fw-bold small text-muted">Option D <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="m_opt_d" required>
                             </div>
 
                             <div class="col-md-4 mt-4">
-                                <label class="form-label fw-bold small text-muted text-success">Correct Option</label>
+                                <label class="form-label fw-bold small text-muted text-success">Correct Option <span class="text-danger">*</span></label>
                                 <select class="form-select fw-bold border-success text-success" id="m_correct" required>
                                     <option value="A">Option A</option>
                                     <option value="B">Option B</option>
@@ -208,10 +245,10 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
+        // UI Initialization
         window.toggleTheme = () => {
             const body = document.body; body.classList.toggle('dark-mode');
             const isDark = body.classList.contains('dark-mode');
@@ -220,8 +257,10 @@
         };
         if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') window.toggleTheme();
 
+        // Global Variables
         let parsedQuestions = [];
         let uploaderId = null;
+        let quill; // The Rich Text Editor instance
 
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
@@ -231,12 +270,28 @@
             if (!profile || profile.role !== 'teacher') return window.location.href = 'login.html';
             
             uploaderId = session.user.id;
+
+            // Initialize Quill Formula Editor
+            quill = new Quill('#quillEditor', {
+                theme: 'snow',
+                modules: {
+                    formula: true, // Enables the formula functionality via KaTeX
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+                        [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['formula'],                                      // FORMULA BUTTON (fx)
+                        ['clean']                                         // remove formatting button
+                    ]
+                },
+                placeholder: 'Type the question text here. Click the [fx] button to insert math formulas...'
+            });
         }
 
         // ================= CSV LOGIC =================
         window.downloadTemplate = () => {
             const headers = "Subject,Exam_Year,Topic,Question_Text,Option_A,Option_B,Option_C,Option_D,Correct_Option,Explanation\n";
-            const sampleRow = "English Language,2017,Lexis,The boy ___ to school everyday.,go,goes,went,going,B,Goes is singular present tense.\n";
+            const sampleRow = "English Language,2024,Lexis,The boy ___ to school everyday.,go,goes,went,going,B,Goes is singular present tense.\n";
             const blob = new Blob([headers + sampleRow], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -296,9 +351,18 @@
             }
         };
 
-        // ================= MANUAL ENTRY (IMAGE) LOGIC =================
+        // ================= MANUAL ENTRY (RICH TEXT + FORMULAS + IMAGE) LOGIC =================
         window.saveManualQuestion = async (e) => {
             e.preventDefault();
+            
+            // Extract the HTML content generated by the Quill Editor
+            const rawQuestionHTML = quill.root.innerHTML;
+            
+            // Simple validation to make sure they actually typed something in the editor
+            if (quill.getText().trim() === '') {
+                return alert("Please enter the question text in the editor box.");
+            }
+
             const loader = document.getElementById('loadingOverlay');
             loader.style.display = 'flex';
             document.getElementById('uploadStatusTitle').innerText = "Saving Question...";
@@ -308,30 +372,26 @@
                 let imageUrl = null;
                 const fileInput = document.getElementById('m_image');
 
-                // If an image was selected, upload it to the Supabase Storage Bucket first
+                // Image Upload Logic
                 if (fileInput.files.length > 0) {
                     const file = fileInput.files[0];
                     const fileExt = file.name.split('.').pop();
                     const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
                     
-                    const { data: uploadData, error: uploadError } = await supabase.storage
-                        .from('question_images')
-                        .upload(fileName, file);
-
+                    const { data: uploadData, error: uploadError } = await supabase.storage.from('question_images').upload(fileName, file);
                     if (uploadError) throw new Error("Image Upload Failed: " + uploadError.message);
 
-                    // Get the public URL of the image
                     const { data: publicUrlData } = supabase.storage.from('question_images').getPublicUrl(fileName);
                     imageUrl = publicUrlData.publicUrl;
                 }
 
-                // Insert the full question into the database
+                // Database Insert (Saving the HTML formatted text!)
                 const { error: dbError } = await supabase.from('question_bank').insert([{
-                    subject: document.getElementById('m_subject').value.trim(),
-                    exam_year: document.getElementById('m_year').value.trim() || null,
+                    subject: document.getElementById('m_subject').value,
+                    exam_year: document.getElementById('m_year').value,
                     topic: document.getElementById('m_topic').value.trim() || null,
-                    question_text: document.getElementById('m_text').value.trim(),
-                    image_url: imageUrl,  // <-- Saving the image link!
+                    question_text: rawQuestionHTML, // Saved with formulas intact!
+                    image_url: imageUrl, 
                     option_a: document.getElementById('m_opt_a').value.trim(),
                     option_b: document.getElementById('m_opt_b').value.trim(),
                     option_c: document.getElementById('m_opt_c').value.trim(),
@@ -343,8 +403,11 @@
 
                 if (dbError) throw new Error(dbError.message);
 
-                alert("Success! The question (and diagram) has been saved to the JAMB Database.");
+                alert("Success! The question (with formulas/diagrams) has been saved.");
+                
+                // Reset Form
                 document.getElementById('manualQuestionForm').reset();
+                quill.setContents([]); // Clear the editor
                 loader.style.display = 'none';
 
             } catch (err) {
