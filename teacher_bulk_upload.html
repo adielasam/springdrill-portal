@@ -43,7 +43,6 @@
         .form-control, .form-select { background-color: var(--input-bg); border-color: var(--border-color); color: var(--text-color); }
         .form-control:focus, .form-select:focus { border-color: var(--utme-green); box-shadow: none; background-color: var(--card-bg); color: var(--text-color);}
 
-        /* Quill Editor Styling Fixes for Dark Mode */
         .ql-toolbar { background: var(--input-bg); border-color: var(--border-color) !important; border-top-left-radius: 6px; border-top-right-radius: 6px;}
         .ql-container { border-color: var(--border-color) !important; border-bottom-left-radius: 6px; border-bottom-right-radius: 6px; font-size: 1rem; color: var(--text-color);}
         body.dark-mode .ql-stroke { stroke: var(--text-color); }
@@ -158,21 +157,33 @@
                                 <label class="form-label fw-bold small text-muted">Subject <span class="text-danger">*</span></label>
                                 <select class="form-select fw-bold" id="m_subject" required>
                                     <option value="">-- Select Subject --</option>
-                                    <option value="English Language">English Language</option>
-                                    <option value="Mathematics">Mathematics</option>
-                                    <option value="Physics">Physics</option>
-                                    <option value="Chemistry">Chemistry</option>
-                                    <option value="Biology">Biology</option>
-                                    <option value="Economics">Economics</option>
-                                    <option value="Government">Government</option>
-                                    <option value="Commerce">Commerce</option>
-                                    <option value="Accounting">Accounting</option>
-                                    <option value="Literature">Literature</option>
-                                    <option value="Geography">Geography</option>
-                                    <option value="CRK">CRK</option>
-                                    <option value="IRK">IRK</option>
-                                    <option value="Computer Studies">Computer Studies</option>
+                                    <option value="English">English</option>
+                                    <option value="Accounts">Accounts</option>
                                     <option value="Agriculture">Agriculture</option>
+                                    <option value="Arabic">Arabic</option>
+                                    <option value="Biology">Biology</option>
+                                    <option value="Chemistry">Chemistry</option>
+                                    <option value="Commerce">Commerce</option>
+                                    <option value="Computer Studies">Computer Studies</option>
+                                    <option value="CRK">CRK</option>
+                                    <option value="Economics">Economics</option>
+                                    <option value="Fine Art">Fine Art</option>
+                                    <option value="French">French</option>
+                                    <option value="Geography">Geography</option>
+                                    <option value="Government">Government</option>
+                                    <option value="Hausa">Hausa</option>
+                                    <option value="History">History</option>
+                                    <option value="Home Economics">Home Economics</option>
+                                    <option value="Igbo">Igbo</option>
+                                    <option value="IRK">IRK</option>
+                                    <option value="Literature">Literature</option>
+                                    <option value="Literature Textbooks">Literature Textbooks</option>
+                                    <option value="Mathematics">Mathematics</option>
+                                    <option value="Music">Music</option>
+                                    <option value="PHE">PHE</option>
+                                    <option value="Physics">Physics</option>
+                                    <option value="The Lekki Headmaster">The Lekki Headmaster</option>
+                                    <option value="Yoruba">Yoruba</option>
                                 </select>
                             </div>
                             <div class="col-md-4">
@@ -245,10 +256,11 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
-        // UI Initialization
         window.toggleTheme = () => {
             const body = document.body; body.classList.toggle('dark-mode');
             const isDark = body.classList.contains('dark-mode');
@@ -257,10 +269,9 @@
         };
         if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') window.toggleTheme();
 
-        // Global Variables
         let parsedQuestions = [];
         let uploaderId = null;
-        let quill; // The Rich Text Editor instance
+        let quill; 
 
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
@@ -271,24 +282,22 @@
             
             uploaderId = session.user.id;
 
-            // Initialize Quill Formula Editor
             quill = new Quill('#quillEditor', {
                 theme: 'snow',
                 modules: {
-                    formula: true, // Enables the formula functionality via KaTeX
+                    formula: true,
                     toolbar: [
-                        ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-                        [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'script': 'sub'}, { 'script': 'super' }],
                         [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        ['formula'],                                      // FORMULA BUTTON (fx)
-                        ['clean']                                         // remove formatting button
+                        ['formula'],
+                        ['clean']
                     ]
                 },
                 placeholder: 'Type the question text here. Click the [fx] button to insert math formulas...'
             });
         }
 
-        // ================= CSV LOGIC =================
         window.downloadTemplate = () => {
             const headers = "Subject,Exam_Year,Topic,Question_Text,Option_A,Option_B,Option_C,Option_D,Correct_Option,Explanation\n";
             const sampleRow = "English Language,2024,Lexis,The boy ___ to school everyday.,go,goes,went,going,B,Goes is singular present tense.\n";
@@ -351,14 +360,11 @@
             }
         };
 
-        // ================= MANUAL ENTRY (RICH TEXT + FORMULAS + IMAGE) LOGIC =================
         window.saveManualQuestion = async (e) => {
             e.preventDefault();
             
-            // Extract the HTML content generated by the Quill Editor
             const rawQuestionHTML = quill.root.innerHTML;
             
-            // Simple validation to make sure they actually typed something in the editor
             if (quill.getText().trim() === '') {
                 return alert("Please enter the question text in the editor box.");
             }
@@ -372,7 +378,6 @@
                 let imageUrl = null;
                 const fileInput = document.getElementById('m_image');
 
-                // Image Upload Logic
                 if (fileInput.files.length > 0) {
                     const file = fileInput.files[0];
                     const fileExt = file.name.split('.').pop();
@@ -385,12 +390,11 @@
                     imageUrl = publicUrlData.publicUrl;
                 }
 
-                // Database Insert (Saving the HTML formatted text!)
                 const { error: dbError } = await supabase.from('question_bank').insert([{
                     subject: document.getElementById('m_subject').value,
                     exam_year: document.getElementById('m_year').value,
                     topic: document.getElementById('m_topic').value.trim() || null,
-                    question_text: rawQuestionHTML, // Saved with formulas intact!
+                    question_text: rawQuestionHTML, 
                     image_url: imageUrl, 
                     option_a: document.getElementById('m_opt_a').value.trim(),
                     option_b: document.getElementById('m_opt_b').value.trim(),
@@ -405,9 +409,8 @@
 
                 alert("Success! The question (with formulas/diagrams) has been saved.");
                 
-                // Reset Form
                 document.getElementById('manualQuestionForm').reset();
-                quill.setContents([]); // Clear the editor
+                quill.setContents([]); 
                 loader.style.display = 'none';
 
             } catch (err) {
