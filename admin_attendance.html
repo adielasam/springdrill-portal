@@ -77,11 +77,14 @@
 
         <div class="control-panel">
             <div class="row g-3 align-items-end">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label fw-bold text-muted small">Select Date</label>
                     <input type="date" id="dateFilter" class="form-control form-control-lg fw-bold" onchange="loadAttendance()">
                 </div>
-                <div class="col-md-5">
+                <div class="col-md-2">
+                    <button class="btn btn-outline-secondary btn-lg w-100 fw-bold" onclick="clearDateFilter()" title="Show All Records"><i class="fas fa-history me-1"></i> All Time</button>
+                </div>
+                <div class="col-md-4">
                     <label class="form-label fw-bold text-muted small">Filter by Class</label>
                     <select id="classFilter" class="form-select form-select-lg fw-bold" onchange="loadAttendance()">
                         <option value="all">All Classes Overview</option>
@@ -98,7 +101,7 @@
                 <thead>
                     <tr>
                         <th width="35%">Student Name</th>
-                        <th width="20%">Class</th>
+                        <th width="20%">Class / Reg No.</th>
                         <th width="25%">Time Logged</th>
                         <th width="20%" class="text-center">Status</th>
                     </tr>
@@ -121,6 +124,11 @@
         };
         if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { window.toggleTheme(); }
 
+        window.clearDateFilter = () => {
+            document.getElementById('dateFilter').value = ""; // Erases the date entirely to show EVERYTHING
+            window.loadAttendance();
+        };
+
         async function initialize() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
@@ -132,7 +140,7 @@
                     classes.forEach(c => { classSelect.innerHTML += `<option value="${c.id}">${c.name}</option>`; });
                 }
 
-                // Force date to standard local format
+                // Default to today
                 const today = new Date();
                 const y = today.getFullYear();
                 const m = String(today.getMonth() + 1).padStart(2, '0');
@@ -161,13 +169,15 @@
                     supabase.from('classes').select('*')
                 ]);
 
-                if (rawAtt.error) throw rawAtt.error;
+                // 🚨 DIAGNOSTIC CHECK: Is the database actually empty?
+                if (rawAtt.error || !rawAtt.data || rawAtt.data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-danger fw-bold"><i class="fas fa-database fs-1 mb-3 opacity-50"></i><br>0 records found in database.<br><small class="text-muted">If the teacher saved it, it failed silently on the teacher's screen.</small></td></tr>`;
+                    return;
+                }
 
                 const classMap = {};
                 if (allClasses.data) allClasses.data.forEach(c => classMap[c.id] = c.name);
 
-                // 🚨 BULLETPROOF ID TRAP FIX 🚨
-                // Strips all spaces and uppercases so "SD/26/9037 " perfectly matches "sd/26/9037"
                 const studentMap = {};
                 if (allStudents.data) {
                     allStudents.data.forEach(s => {
@@ -179,42 +189,30 @@
                 }
 
                 const filteredRecords = rawAtt.data.filter(record => {
-                    // Match Student ID safely
                     const rawId = record.student_id || record.user_id || record.studentId || record.reg_number || "";
                     const cleanId = String(rawId).trim().toLowerCase();
                     const studentObj = studentMap[cleanId];
 
-                    // 🚨 BULLETPROOF DATE FIX 🚨
-                    let dbDateString = "";
-                    const recDateRaw = record.date || record.created_at || "";
-                    if (recDateRaw.includes('T')) {
-                        dbDateString = recDateRaw.split('T')[0];
-                    } else {
-                        try {
-                            const dObj = new Date(recDateRaw);
-                            const y = dObj.getFullYear();
-                            const m = String(dObj.getMonth() + 1).padStart(2, '0');
-                            const day = String(dObj.getDate()).padStart(2, '0');
-                            dbDateString = `${y}-${m}-${day}`;
-                        } catch(e) {
-                            dbDateString = recDateRaw.substring(0, 10);
-                        }
-                    }
-                    const dateMatch = (dbDateString === selectedDate);
+                    // Safely extract the date
+                    const dbDateString = record.created_at ? record.created_at.split('T')[0] : (record.date ? record.date.split('T')[0] : "");
+                    
+                    // If selectedDate is empty (All Time button clicked), dateMatch is automatically true!
+                    const dateMatch = !selectedDate || (dbDateString === selectedDate);
                     
                     // Match Class safely
-                    const recClassId = record.class_id || (studentObj ? studentObj.class_id : null);
+                    const recClassId = record.class_id || record.className || (studentObj ? studentObj.class_id : null);
                     const selectedClassName = classMap[selectedClass]; 
-                    const classMatch = (selectedClass === 'all') || (recClassId == selectedClass) || (record.class_id === selectedClassName);
+                    const classMatch = (selectedClass === 'all') || (recClassId == selectedClass) || (recClassId == selectedClassName);
 
                     record.studentObj = studentObj;
-                    record.cleanId = rawId; // Save raw ID just in case
+                    record.cleanId = rawId; 
+                    record.displayDate = dbDateString;
                     
                     return dateMatch && classMatch;
                 });
 
                 if (filteredRecords.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted"><i class="fas fa-calendar-times fs-1 mb-3 opacity-25"></i><br>No attendance records found. Try changing the filter to "All Classes Overview".</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted"><i class="fas fa-calendar-times fs-1 mb-3 opacity-25"></i><br>No attendance records found for this specific date/class.<br><small>Click the <b>"All Time"</b> button to see everything.</small></td></tr>';
                     return;
                 }
 
@@ -225,14 +223,16 @@
                     else if (stat.includes('late')) badge = `<span class="badge-late"><i class="fas fa-clock me-2"></i>Late</span>`;
                     else badge = `<span class="badge-absent"><i class="fas fa-times me-2"></i>Absent</span>`;
                     
-                    const studentName = record.studentObj ? `${record.studentObj.first_name} ${record.studentObj.surname || ''}` : `<span class="text-danger fw-bold">ID: ${record.cleanId || 'Unknown'}</span>`;
-                    const className = record.studentObj ? record.studentObj.className : (classMap[record.class_id] || record.class_id || 'Unknown Class');
-                    const timeString = new Date(record.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const studentName = record.studentObj ? `${record.studentObj.first_name} ${record.studentObj.surname || ''}` : `<span class="text-danger fw-bold">Unlinked Student</span>`;
+                    const className = record.studentObj ? record.studentObj.className : (classMap[record.class_id] || record.class_id || record.className || `Reg: ${record.cleanId}`);
+                    
+                    let timeString = record.displayDate;
+                    if (record.created_at) timeString += " " + new Date(record.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                     return `<tr>
                         <td class="fw-bold"><i class="fas fa-user-circle me-2 text-muted"></i> ${studentName}</td>
                         <td><span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary">${className}</span></td>
-                        <td><i class="far fa-clock me-1 text-muted"></i> ${timeString}</td>
+                        <td><i class="far fa-clock me-1 text-muted"></i> <small>${timeString}</small></td>
                         <td class="text-center">${badge}</td>
                     </tr>`;
                 }).join('');
