@@ -39,7 +39,7 @@
 
     <div id="loadingOverlay">
         <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
-        <h4 class="fw-bold" style="color: var(--text-muted);">Loading Records...</h4>
+        <h4 class="fw-bold" style="color: var(--text-muted);">Syncing Data...</h4>
     </div>
 
     <div class="sidebar" id="sidebar">
@@ -103,7 +103,7 @@
                     </tr>
                 </thead>
                 <tbody id="attendanceTableBody">
-                    </tbody>
+                </tbody>
             </table>
         </div>
     </div>
@@ -125,15 +125,20 @@
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
 
-                const { data: classes } = await supabase.from('classes').select('id, name').order('name');
+                const { data: classes } = await supabase.from('classes').select('*').order('name');
                 if (classes) {
                     const classSelect = document.getElementById('classFilter');
                     classes.forEach(c => { classSelect.innerHTML += `<option value="${c.id}">${c.name}</option>`; });
                 }
 
-                document.getElementById('dateFilter').valueAsDate = new Date();
+                // Set date exactly to today's local format
+                const today = new Date();
+                const y = today.getFullYear();
+                const m = String(today.getMonth() + 1).padStart(2, '0');
+                const d = String(today.getDate()).padStart(2, '0');
+                document.getElementById('dateFilter').value = `${y}-${m}-${d}`;
+                
                 await loadAttendance();
-
                 document.getElementById('loadingOverlay').style.display = 'none';
             } catch (err) {
                 console.error(err);
@@ -149,53 +154,60 @@
             const selectedClass = document.getElementById('classFilter').value;
 
             try {
-                // 🚨 BULLETPROOF JAVASCRIPT JOIN METHOD 🚨
-                // 1. Download flat attendance data (No SQL joins!)
-                const { data: rawAtt, error: attError } = await supabase.from('attendance').select('*').order('created_at', { ascending: false });
-                if (attError) throw new Error("Attendance Table Error: " + attError.message);
+                // 1. Fetch raw data independently
+                const [rawAtt, allStudents, allClasses] = await Promise.all([
+                    supabase.from('attendance').select('*').order('created_at', { ascending: false }),
+                    supabase.from('students').select('*'),
+                    supabase.from('classes').select('*')
+                ]);
 
-                // 2. Download all students and classes separately
-                const { data: allStudents, error: stuError } = await supabase.from('students').select('id, user_id, first_name, surname, class_id, classes(name)');
-                if (stuError) throw new Error("Students Table Error: " + stuError.message);
+                if (rawAtt.error) throw rawAtt.error;
 
-                // 3. Map students for instant matching
+                // 2. Map Classes & Students
+                const classMap = {};
+                if (allClasses.data) allClasses.data.forEach(c => classMap[c.id] = c.name);
+
                 const studentMap = {};
-                if (allStudents) {
-                    allStudents.forEach(s => {
+                if (allStudents.data) {
+                    allStudents.data.forEach(s => {
+                        s.className = classMap[s.class_id] || 'Unassigned';
                         studentMap[s.id] = s;
-                        studentMap[s.user_id] = s; // Map both just in case!
+                        if(s.user_id) studentMap[s.user_id] = s;
                     });
                 }
 
-                // 4. Manually combine them in the browser
-                const mergedRecords = rawAtt.map(record => {
-                    const studentIdToMatch = record.student_id || record.user_id;
-                    return { ...record, students: studentMap[studentIdToMatch] || null };
-                });
+                // 3. Combine them safely
+                const filteredRecords = rawAtt.data.filter(record => {
+                    const sId = record.student_id || record.user_id || record.studentId;
+                    const studentObj = studentMap[sId];
 
-                // Filter by Date and Class
-                const filteredRecords = mergedRecords.filter(record => {
-                    if (!record.students) return false; 
-
-                    const recordDate = record.date || record.created_at; 
-                    const dbDateString = new Date(recordDate).toISOString().split('T')[0];
-
+                    // Date matching (Extract just the YYYY-MM-DD part)
+                    const rDate = record.date || record.created_at || "";
+                    const dbDateString = rDate.substring(0, 10);
                     const dateMatch = dbDateString === selectedDate;
-                    const classMatch = selectedClass === 'all' || record.students.class_id == selectedClass;
 
+                    // Class matching
+                    const recClassId = record.class_id || (studentObj ? studentObj.class_id : 'unknown');
+                    const classMatch = (selectedClass === 'all') || (recClassId == selectedClass);
+
+                    // Map it back to the record for rendering
+                    record.studentObj = studentObj;
+                    
                     return dateMatch && classMatch;
                 });
 
                 if (filteredRecords.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted"><i class="fas fa-calendar-times fs-1 mb-3 opacity-25"></i><br>No attendance records found for this date.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted"><i class="fas fa-calendar-times fs-1 mb-3 opacity-25"></i><br>No attendance records found for this date. Try changing the class filter to "All Classes Overview".</td></tr>';
                     return;
                 }
 
                 tbody.innerHTML = filteredRecords.map(record => {
                     const isPresent = String(record.status).toLowerCase().includes('present');
                     const badge = isPresent ? `<span class="badge-present"><i class="fas fa-check me-2"></i>Present</span>` : `<span class="badge-absent"><i class="fas fa-times me-2"></i>Absent</span>`;
-                    const studentName = `${record.students.first_name} ${record.students.surname || ''}`;
-                    const className = record.students.classes?.name || 'Unassigned';
+                    
+                    // Fallback to "Unknown" if student ID doesn't perfectly match
+                    const studentName = record.studentObj ? `${record.studentObj.first_name} ${record.studentObj.surname || ''}` : `<span class="text-danger">ID: ${record.student_id || record.user_id || 'N/A'}</span>`;
+                    const className = record.studentObj ? record.studentObj.className : 'Unknown';
                     const timeString = new Date(record.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                     return `<tr>
@@ -208,7 +220,7 @@
 
             } catch (err) {
                 console.error("Failed to load attendance:", err);
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-danger fw-bold"><i class="fas fa-exclamation-triangle fs-2 mb-2"></i><br>JS Join Error: ${err.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-danger fw-bold"><i class="fas fa-exclamation-triangle fs-2 mb-2"></i><br>Data Error: ${err.message}</td></tr>`;
             }
         };
 
