@@ -31,6 +31,7 @@
         
         .badge-present { background-color: rgba(39, 174, 96, 0.15); color: #27ae60; padding: 6px 12px; border-radius: 20px; font-weight: bold; border: 1px solid rgba(39, 174, 96, 0.3);}
         .badge-absent { background-color: rgba(231, 76, 60, 0.15); color: #e74c3c; padding: 6px 12px; border-radius: 20px; font-weight: bold; border: 1px solid rgba(231, 76, 60, 0.3);}
+        .badge-late { background-color: rgba(241, 196, 15, 0.15); color: #f39c12; padding: 6px 12px; border-radius: 20px; font-weight: bold; border: 1px solid rgba(241, 196, 15, 0.3);}
 
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
@@ -131,7 +132,7 @@
                     classes.forEach(c => { classSelect.innerHTML += `<option value="${c.id}">${c.name}</option>`; });
                 }
 
-                // Set date exactly to today's local format
+                // Force date to standard local format
                 const today = new Date();
                 const y = today.getFullYear();
                 const m = String(today.getMonth() + 1).padStart(2, '0');
@@ -154,7 +155,6 @@
             const selectedClass = document.getElementById('classFilter').value;
 
             try {
-                // 1. Fetch raw data independently
                 const [rawAtt, allStudents, allClasses] = await Promise.all([
                     supabase.from('attendance').select('*').order('created_at', { ascending: false }),
                     supabase.from('students').select('*'),
@@ -163,59 +163,70 @@
 
                 if (rawAtt.error) throw rawAtt.error;
 
-                // 2. Map Classes & Students
                 const classMap = {};
                 if (allClasses.data) allClasses.data.forEach(c => classMap[c.id] = c.name);
 
-                // TRAP FIX: Map by ID, User_ID, AND Reg_Number!
+                // 🚨 BULLETPROOF ID TRAP FIX 🚨
+                // Strips all spaces and uppercases so "SD/26/9037 " perfectly matches "sd/26/9037"
                 const studentMap = {};
                 if (allStudents.data) {
                     allStudents.data.forEach(s => {
                         s.className = classMap[s.class_id] || 'Unassigned';
-                        studentMap[s.id] = s;
-                        if(s.user_id) studentMap[s.user_id] = s;
-                        if(s.reg_number) studentMap[s.reg_number] = s; 
+                        if (s.id) studentMap[String(s.id).trim().toLowerCase()] = s;
+                        if (s.user_id) studentMap[String(s.user_id).trim().toLowerCase()] = s;
+                        if (s.reg_number) studentMap[String(s.reg_number).trim().toLowerCase()] = s; 
                     });
                 }
 
-                // 3. Combine them safely and bypass the Date Trap
                 const filteredRecords = rawAtt.data.filter(record => {
-                    const sId = record.student_id || record.user_id || record.studentId || record.reg_number;
-                    const studentObj = studentMap[sId];
+                    // Match Student ID safely
+                    const rawId = record.student_id || record.user_id || record.studentId || record.reg_number || "";
+                    const cleanId = String(rawId).trim().toLowerCase();
+                    const studentObj = studentMap[cleanId];
 
-                    // DATE TRAP FIX: Force standardize the date format
+                    // 🚨 BULLETPROOF DATE FIX 🚨
                     let dbDateString = "";
-                    try {
-                        const rDate = new Date(record.created_at);
-                        const y = rDate.getFullYear();
-                        const m = String(rDate.getMonth() + 1).padStart(2, '0');
-                        const d = String(rDate.getDate()).padStart(2, '0');
-                        dbDateString = `${y}-${m}-${d}`;
-                    } catch(e) { console.error(e); }
-
-                    const dateMatch = dbDateString === selectedDate;
+                    const recDateRaw = record.date || record.created_at || "";
+                    if (recDateRaw.includes('T')) {
+                        dbDateString = recDateRaw.split('T')[0];
+                    } else {
+                        try {
+                            const dObj = new Date(recDateRaw);
+                            const y = dObj.getFullYear();
+                            const m = String(dObj.getMonth() + 1).padStart(2, '0');
+                            const day = String(dObj.getDate()).padStart(2, '0');
+                            dbDateString = `${y}-${m}-${day}`;
+                        } catch(e) {
+                            dbDateString = recDateRaw.substring(0, 10);
+                        }
+                    }
+                    const dateMatch = (dbDateString === selectedDate);
                     
-                    // Match Class
-                    const recClassId = record.class_id || (studentObj ? studentObj.class_id : 'unknown');
-                    const classMatch = (selectedClass === 'all') || (recClassId == selectedClass);
+                    // Match Class safely
+                    const recClassId = record.class_id || (studentObj ? studentObj.class_id : null);
+                    const selectedClassName = classMap[selectedClass]; 
+                    const classMatch = (selectedClass === 'all') || (recClassId == selectedClass) || (record.class_id === selectedClassName);
 
                     record.studentObj = studentObj;
+                    record.cleanId = rawId; // Save raw ID just in case
                     
                     return dateMatch && classMatch;
                 });
 
                 if (filteredRecords.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted"><i class="fas fa-calendar-times fs-1 mb-3 opacity-25"></i><br>No attendance records found. Ensure the correct date is selected or change filter to "All Classes Overview".</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted"><i class="fas fa-calendar-times fs-1 mb-3 opacity-25"></i><br>No attendance records found. Try changing the filter to "All Classes Overview".</td></tr>';
                     return;
                 }
 
                 tbody.innerHTML = filteredRecords.map(record => {
-                    const isPresent = String(record.status).toLowerCase().includes('present');
-                    const badge = isPresent ? `<span class="badge-present"><i class="fas fa-check me-2"></i>Present</span>` : `<span class="badge-absent"><i class="fas fa-times me-2"></i>Absent</span>`;
+                    const stat = String(record.status).toLowerCase();
+                    let badge = '';
+                    if (stat.includes('present')) badge = `<span class="badge-present"><i class="fas fa-check me-2"></i>Present</span>`;
+                    else if (stat.includes('late')) badge = `<span class="badge-late"><i class="fas fa-clock me-2"></i>Late</span>`;
+                    else badge = `<span class="badge-absent"><i class="fas fa-times me-2"></i>Absent</span>`;
                     
-                    const rawID = record.student_id || record.reg_number || 'Unknown ID';
-                    const studentName = record.studentObj ? `${record.studentObj.first_name} ${record.studentObj.surname || ''}` : `<span class="text-danger fw-bold">Unlinked Student (${rawID})</span>`;
-                    const className = record.studentObj ? record.studentObj.className : 'Unknown Class';
+                    const studentName = record.studentObj ? `${record.studentObj.first_name} ${record.studentObj.surname || ''}` : `<span class="text-danger fw-bold">ID: ${record.cleanId || 'Unknown'}</span>`;
+                    const className = record.studentObj ? record.studentObj.className : (classMap[record.class_id] || record.class_id || 'Unknown Class');
                     const timeString = new Date(record.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                     return `<tr>
