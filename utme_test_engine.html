@@ -8,7 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         /* CBT ENGINE STRICT STYLING */
-        body { background-color: #f4f7fa; color: #333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; user-select: none; /* Prevent text highlighting */ }
+        body { background-color: #f4f7fa; color: #333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; user-select: none; }
         
         /* Top Navigation Bar */
         .exam-header { background: #004d34; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000;}
@@ -94,10 +94,14 @@
             <small style="display:block; font-size: 0.7rem; color: rgba(255,255,255,0.7); font-weight: bold; text-transform: uppercase;">Time Remaining</small>
             <div class="timer-text" id="timeDisplay">00:00:00</div>
         </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-light fw-bold" id="closeExamBtn" onclick="closeExamManually()"><i class="fas fa-times me-2"></i> Close Exam</button>
+            <button class="btn btn-danger fw-bold" id="submitTopBtn" onclick="submitExamManually()"><i class="fas fa-paper-plane me-2"></i> Submit</button>
+        </div>
     </header>
 
-    <div class="subject-tabs" id="subjectTabsContainer">
-        </div>
+    <div class="subject-tabs" id="subjectTabsContainer"></div>
 
     <div class="exam-container">
         
@@ -146,8 +150,7 @@
             </div>
 
             <div class="grid-title" id="gridTitle">Navigation Grid</div>
-            <div class="number-grid" id="navigationGrid">
-                </div>
+            <div class="number-grid" id="navigationGrid"></div>
 
             <button class="submit-btn" onclick="submitExamManually()"><i class="fas fa-check-circle me-2"></i> SUBMIT EXAM</button>
         </div>
@@ -157,28 +160,19 @@
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
-        // --- EXAM STATE ---
         let testConfig = null;
         let studentProfile = null;
-        
-        // Data Structure: { "Mathematics": [ {q1}, {q2} ], "English": [ {q1} ] }
         let questionsBySubject = {}; 
-        
-        // Tracking: { "Mathematics": { 0: "A", 1: "C" }, "English": {} }
         let userAnswers = {}; 
-
         let currentSubject = "";
         let currentIndex = 0;
         let totalSeconds = 0;
         let timerInterval = null;
 
-        // --- INITIALIZATION ---
         async function init() {
-            // 1. Authenticate
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) return window.location.href = 'login.html';
 
-            // 2. Load Config from Previous Page
             const configData = sessionStorage.getItem('UTME_TEST_CONFIG');
             if (!configData) {
                 alert("Exam configuration lost. Returning to setup.");
@@ -187,7 +181,6 @@
             testConfig = JSON.parse(configData);
 
             try {
-                // Fetch Student Name
                 const { data: profile } = await supabase.from('users').select('name, reg_number').eq('id', session.user.id).single();
                 if(profile) {
                     studentProfile = profile;
@@ -195,13 +188,11 @@
                     document.getElementById('headerReg').innerText = "REG: " + (profile.reg_number || 'N/A');
                 }
 
-                // Initialize answer tracking arrays
                 testConfig.subjects.forEach(sub => {
                     questionsBySubject[sub] = [];
                     userAnswers[sub] = {};
                 });
 
-                // Fetch Database Questions!
                 await fetchRealQuestions();
 
             } catch(e) {
@@ -211,22 +202,17 @@
         }
 
         async function fetchRealQuestions() {
-            // Build the query
             let query = supabase.from('question_bank').select('*').in('subject', testConfig.subjects);
             
-            // If they didn't pick "RANDOM", filter by the exact year
             if (testConfig.year && testConfig.year !== 'RANDOM') {
                 query = query.eq('exam_year', testConfig.year);
             }
 
             const { data: qData, error } = await query;
-            
             if (error) throw error;
 
-            // Sort data into subjects
             if (qData) {
                 qData.forEach(q => {
-                    // Match to correct subject array
                     const subKey = testConfig.subjects.find(s => s.toLowerCase() === q.subject.toLowerCase()) || q.subject;
                     if(questionsBySubject[subKey]) {
                         questionsBySubject[subKey].push(q);
@@ -234,25 +220,18 @@
                 });
             }
 
-            // Shuffle if requested
             if (testConfig.shuffleQuestions) {
                 for (let sub in questionsBySubject) {
                     questionsBySubject[sub] = questionsBySubject[sub].sort(() => Math.random() - 0.5);
                 }
             }
 
-            // Setup UI
             buildSubjectTabs();
             startTimer();
-            
-            // Hide loading, show exam
             document.getElementById('loadingScreen').style.display = 'none';
-            
-            // Switch to the first subject
             switchSubject(testConfig.subjects[0]);
         }
 
-        // --- UI BUILDERS ---
         function buildSubjectTabs() {
             const container = document.getElementById('subjectTabsContainer');
             container.innerHTML = testConfig.subjects.map(sub => `
@@ -264,14 +243,10 @@
 
         window.switchSubject = (subjectName) => {
             currentSubject = subjectName;
-            currentIndex = 0; // Reset to question 1 of that subject
-
-            // Update Tabs UI
+            currentIndex = 0; 
             document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
             document.getElementById(`tab_${subjectName.replace(/\s+/g, '')}`).classList.add('active');
-            
             document.getElementById('gridTitle').innerText = subjectName.toUpperCase() + " GRID";
-
             renderNavigationGrid();
             displayCurrentQuestion();
         };
@@ -292,13 +267,10 @@
 
             const q = questions[currentIndex];
             
-            // Header Stats
             document.getElementById('qNumberDisplay').innerText = currentIndex + 1;
             document.getElementById('qTotalDisplay').innerText = questions.length;
             document.getElementById('yearBadge').innerText = q.exam_year || 'Random';
-
-            // Text and Image
-            document.getElementById('qText').innerText = q.question_text;
+            document.getElementById('qText').innerHTML = q.question_text;
             
             const imgEl = document.getElementById('qImage');
             if (q.image_url) {
@@ -308,36 +280,28 @@
                 imgEl.style.display = 'none';
             }
 
-            // Options
             document.getElementById('textA').innerText = q.option_a;
             document.getElementById('textB').innerText = q.option_b;
             document.getElementById('textC').innerText = q.option_c;
             document.getElementById('textD').innerText = q.option_d;
 
-            // Reset Styles
-            document.querySelectorAll('.option-label').forEach(lbl => labelStyleReset(lbl));
+            document.querySelectorAll('.option-label').forEach(lbl => lbl.classList.remove('selected'));
             document.querySelectorAll('.option-input').forEach(rad => rad.checked = false);
 
-            // Restore Answer if previously selected
             const savedAns = userAnswers[currentSubject][currentIndex];
             if (savedAns) {
                 document.getElementById(`radio${savedAns}`).checked = true;
                 document.getElementById(`label${savedAns}`).classList.add('selected');
             }
 
-            // Update Grid Selection Marker
             updateGridHighlights();
-
-            // Disable Next/Prev buttons if at edges
             document.getElementById('btnPrev').disabled = (currentIndex === 0);
             document.getElementById('btnNext').disabled = (currentIndex === questions.length - 1);
         }
 
-        // --- INTERACTION LOGIC ---
         window.navigate = (direction) => {
             const questions = questionsBySubject[currentSubject];
             if (!questions) return;
-            
             const newIndex = currentIndex + direction;
             if (newIndex >= 0 && newIndex < questions.length) {
                 currentIndex = newIndex;
@@ -351,57 +315,40 @@
         };
 
         window.selectOption = (optionLetter) => {
-            // Update tracking
             userAnswers[currentSubject][currentIndex] = optionLetter;
-            
-            // Visual update radio
             document.getElementById(`radio${optionLetter}`).checked = true;
-            document.querySelectorAll('.option-label').forEach(lbl => labelStyleReset(lbl));
+            document.querySelectorAll('.option-label').forEach(lbl => lbl.classList.remove('selected'));
             document.getElementById(`label${optionLetter}`).classList.add('selected');
-
-            // Update Grid Button Color
             const gridBtn = document.getElementById(`gridBtn_${currentIndex}`);
             if (gridBtn) gridBtn.classList.add('answered');
         };
 
-        function labelStyleReset(lbl) {
-            lbl.classList.remove('selected');
-        }
-
-        // --- GRID LOGIC ---
         function renderNavigationGrid() {
             const questions = questionsBySubject[currentSubject];
             if (!questions) return;
-
             const grid = document.getElementById('navigationGrid');
             grid.innerHTML = questions.map((_, idx) => {
-                // If answered, add 'answered' class
                 const isAnswered = userAnswers[currentSubject][idx] ? 'answered' : '';
                 return `<div class="grid-btn ${isAnswered}" id="gridBtn_${idx}" onclick="jumpToQuestion(${idx})">${idx + 1}</div>`;
             }).join('');
         }
 
         function updateGridHighlights() {
-            // Remove 'current' from all
             document.querySelectorAll('.grid-btn').forEach(btn => btn.classList.remove('current'));
-            // Add 'current' to active
             const activeBtn = document.getElementById(`gridBtn_${currentIndex}`);
             if(activeBtn) activeBtn.classList.add('current');
         }
 
-        // --- TIMER LOGIC ---
         function startTimer() {
-            // Parse "HH:MM:SS"
             const timeParts = testConfig.time.split(':');
             let h = parseInt(timeParts[0]) || 0;
             let m = parseInt(timeParts[1]) || 0;
             let s = parseInt(timeParts[2]) || 0;
-            
             totalSeconds = (h * 3600) + (m * 60) + s;
 
             if (testConfig.mode === 'study') {
                 document.getElementById('timeDisplay').innerText = "STUDY MODE";
-                return; // No countdown in study mode
+                return; 
             }
 
             timerInterval = setInterval(() => {
@@ -410,30 +357,29 @@
                     autoSubmitExam();
                     return;
                 }
-                
                 totalSeconds--;
-                
                 let hrs = Math.floor(totalSeconds / 3600);
                 let mins = Math.floor((totalSeconds % 3600) / 60);
                 let secs = totalSeconds % 60;
-
-                const formatted = 
+                document.getElementById('timeDisplay').innerText = 
                     String(hrs).padStart(2, '0') + ':' + 
                     String(mins).padStart(2, '0') + ':' + 
                     String(secs).padStart(2, '0');
-                
-                const display = document.getElementById('timeDisplay');
-                display.innerText = formatted;
-
-                // Warning color below 5 minutes
                 if (totalSeconds < 300) {
                     document.getElementById('timerBox').classList.add('timer-warning');
-                    display.classList.add('text-danger');
+                    document.getElementById('timeDisplay').classList.add('text-danger');
                 }
             }, 1000);
         }
 
-        // --- SUBMISSION LOGIC ---
+        // --- NEW: CLOSE EXAM LOGIC ---
+        window.closeExamManually = () => {
+            if (confirm("Are you sure you want to close this exam? Your progress will NOT be saved.")) {
+                clearInterval(timerInterval);
+                window.location.href = 'utme_practice_setup.html';
+            }
+        };
+
         window.submitExamManually = () => {
             if (confirm("Are you sure you want to submit your exam? You cannot undo this action.")) {
                 processSubmission();
@@ -450,7 +396,6 @@
             document.getElementById('loadingScreen').style.display = 'flex';
             document.getElementById('loadingScreen').innerHTML = `<i class="fas fa-spinner fa-spin fa-4x text-success mb-3"></i><h2 class="fw-bold" style="color: #004d34;">Calculating Results...</h2>`;
 
-            // Calculate Scores
             let totalScore = 0;
             let totalPossible = 0;
             let breakdown = {};
@@ -458,25 +403,14 @@
             for (let sub in questionsBySubject) {
                 let subScore = 0;
                 const questions = questionsBySubject[sub];
-                
                 questions.forEach((q, index) => {
-                    const studentAns = userAnswers[sub][index];
-                    // Correct Option stored in DB as "A", "B", "C", "D"
-                    if (studentAns === q.correct_option) {
-                        subScore++;
-                    }
+                    if (userAnswers[sub][index] === q.correct_option) subScore++;
                 });
-
-                breakdown[sub] = {
-                    score: subScore,
-                    total: questions.length
-                };
-                
+                breakdown[sub] = { score: subScore, total: questions.length };
                 totalScore += subScore;
                 totalPossible += questions.length;
             }
 
-            // Create Final Results Object
             const finalResults = {
                 score: totalScore,
                 total: totalPossible,
@@ -487,10 +421,7 @@
                 date_taken: new Date().toISOString()
             };
 
-            // Save to sessionStorage for the Results Page to read instantly
             sessionStorage.setItem('UTME_FINAL_RESULTS', JSON.stringify(finalResults));
-
-            // Redirect to Results Page
             window.location.href = 'utme_test_results.html';
         }
 
