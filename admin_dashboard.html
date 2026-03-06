@@ -8,24 +8,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* GLOBAL DARK MODE ENGINE */
-        :root { 
-            --bg-color: #f4f7fa; 
-            --card-bg: #ffffff; 
-            --text-color: #333333; 
-            --text-muted: #6c757d; 
-            --border-color: #e9ecef; 
-            --input-bg: #f8f9fa; 
-        }
-        body.dark-mode { 
-            --bg-color: #121212; 
-            --card-bg: #1e1e1e; 
-            --text-color: #e0e0e0; 
-            --text-muted: #a0a0a0; 
-            --border-color: #333333; 
-            --input-bg: #2c2c2c; 
-        }
-
+        :root { --bg-color: #f4f7fa; --card-bg: #ffffff; --text-color: #333333; --text-muted: #6c757d; --border-color: #e9ecef; --input-bg: #f8f9fa; }
+        body.dark-mode { --bg-color: #121212; --card-bg: #1e1e1e; --text-color: #e0e0e0; --text-muted: #a0a0a0; --border-color: #333333; --input-bg: #2c2c2c; }
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
         
         .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.1);}
@@ -38,9 +22,7 @@
         
         .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #007a4d; transition: all 0.3s; }
         .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
-        .dark-toggle-btn:hover { transform: scale(1.1); }
 
-        /* COLORFUL STAT CARDS */
         .color-stat-card { border-radius: 8px; padding: 20px 15px; color: white; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); height: 100%; display: flex; flex-direction: column; justify-content: center; transition: transform 0.3s;}
         .color-stat-card:hover { transform: translateY(-5px); }
         .color-stat-card h2 { font-weight: 900; font-size: 2.5rem; margin-bottom: 5px; }
@@ -53,12 +35,10 @@
         .bg-c-purple { background: linear-gradient(45deg, #9b59b6, #8e44ad); }
         .bg-c-red { background: linear-gradient(45deg, #e74c3c, #c0392b); } 
 
-        /* DASHBOARD WIDGETS */
         .dash-widget { background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.02); margin-bottom: 30px; overflow: hidden; transition: all 0.3s;}
         .widget-header { padding: 15px 20px; font-weight: bold; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--input-bg); color: var(--text-color);}
         .widget-body { padding: 20px; }
 
-        /* ATTENDANCE LIST STYLES */
         .att-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border-color); transition: background-color 0.2s; }
         .att-item:hover { background-color: var(--input-bg); cursor: pointer; }
         .att-item:last-child { border-bottom: none; }
@@ -113,7 +93,6 @@
         
         <nav class="nav flex-column mt-3">
             <a href="admin_dashboard.html" class="nav-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            
             <a href="admin_attendance.html" class="nav-link mt-2"><i class="fas fa-calendar-check text-info me-2"></i> Attendance Log</a>
 
             <a href="#usersMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
@@ -126,7 +105,6 @@
             </div>
 
             <a href="admin_league_table.html" class="nav-link mt-2"><i class="fas fa-trophy text-warning me-2"></i> League Table</a>
-
             <a href="admin_messages.html" class="nav-link mt-2"><i class="fas fa-envelope me-2"></i> Internal Mail</a>
 
             <hr class="mx-3 my-4 border-secondary">
@@ -152,42 +130,12 @@
         </div>
 
         <div class="row g-3 mb-4 row-cols-2 row-cols-md-3 row-cols-lg-6">
-            <div class="col">
-                <div class="color-stat-card bg-c-blue">
-                    <h2 id="statActiveStudents">0</h2>
-                    <p>Active Students</p>
-                </div>
-            </div>
-            <div class="col">
-                <div class="color-stat-card bg-c-teal">
-                    <h2 id="statMale">0</h2>
-                    <p>Male Students</p>
-                </div>
-            </div>
-            <div class="col">
-                <div class="color-stat-card bg-c-yellow">
-                    <h2 id="statFemale">0</h2>
-                    <p>Female Students</p>
-                </div>
-            </div>
-            <div class="col">
-                <div class="color-stat-card bg-c-cyan">
-                    <h2 id="statClasses">0</h2>
-                    <p>Classes</p>
-                </div>
-            </div>
-            <div class="col">
-                <div class="color-stat-card bg-c-purple">
-                    <h2 id="statTeachers">0</h2>
-                    <p>Teachers</p>
-                </div>
-            </div>
-            <div class="col">
-                <div class="color-stat-card bg-c-red">
-                    <h2 id="statPending">0</h2>
-                    <p>Pending Approvals</p>
-                </div>
-            </div>
+            <div class="col"><div class="color-stat-card bg-c-blue"><h2 id="statActiveStudents">0</h2><p>Active Students</p></div></div>
+            <div class="col"><div class="color-stat-card bg-c-teal"><h2 id="statMale">0</h2><p>Male Students</p></div></div>
+            <div class="col"><div class="color-stat-card bg-c-yellow"><h2 id="statFemale">0</h2><p>Female Students</p></div></div>
+            <div class="col"><div class="color-stat-card bg-c-cyan"><h2 id="statClasses">0</h2><p>Classes</p></div></div>
+            <div class="col"><div class="color-stat-card bg-c-purple"><h2 id="statTeachers">0</h2><p>Teachers</p></div></div>
+            <div class="col"><div class="color-stat-card bg-c-red"><h2 id="statPending">0</h2><p>Pending Approvals</p></div></div>
         </div>
 
         <div class="row g-4 mb-4">
@@ -211,7 +159,7 @@
                     </div>
                     <div class="p-0 flex-grow-1" id="attendanceListWidget" style="max-height: 350px; overflow-y: auto;">
                         <div class="text-center text-muted py-5">
-                            <i class="fas fa-spinner fa-spin fa-2x mb-2"></i><br>Checking classes...
+                            <i class="fas fa-spinner fa-spin fa-2x mb-2"></i><br>Checking database...
                         </div>
                     </div>
                 </div>
@@ -261,26 +209,16 @@
             <div class="col-lg-3">
                 <div class="row g-3">
                     <div class="col-12">
-                        <a href="admin_create_user.html" class="quick-link-card">
-                            <i class="fas fa-user-plus text-success"></i>
-                            <h6>Generate Account</h6>
-                        </a>
+                        <a href="admin_create_user.html" class="quick-link-card"><i class="fas fa-user-plus text-success"></i><h6>Generate Account</h6></a>
                     </div>
                     <div class="col-12">
-                        <a href="class_list.html" class="quick-link-card">
-                            <i class="fas fa-clipboard-list text-info"></i>
-                            <h6>Class Directory</h6>
-                        </a>
+                        <a href="class_list.html" class="quick-link-card"><i class="fas fa-clipboard-list text-info"></i><h6>Class Directory</h6></a>
                     </div>
                     <div class="col-12">
-                        <a href="admin_messages.html" class="quick-link-card">
-                            <i class="fas fa-envelope text-primary"></i>
-                            <h6>Internal Mail</h6>
-                        </a>
+                        <a href="admin_messages.html" class="quick-link-card"><i class="fas fa-envelope text-primary"></i><h6>Internal Mail</h6></a>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -288,7 +226,6 @@
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
-        // === UI TOGGLES ===
         window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('mobile-open'); document.getElementById('sidebarOverlay').style.display = document.getElementById('sidebarOverlay').style.display === 'block' ? 'none' : 'block'; };
         window.toggleTheme = () => {
             const body = document.body; body.classList.toggle('dark-mode');
@@ -299,7 +236,6 @@
         };
         if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { document.body.classList.add('dark-mode'); document.getElementById('themeIcon').className = 'fas fa-sun text-warning'; }
 
-        // === DASHBOARD LOGIC ===
         async function initializeDashboard() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
@@ -308,7 +244,6 @@
                 const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
                 if(profile) document.getElementById('navAdminName').innerText = profile.name.split(' ')[0];
 
-                // Fetch Advanced Stats
                 const { count: activeStudents } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', true);
                 document.getElementById('statActiveStudents').innerText = activeStudents || 0;
 
@@ -327,7 +262,6 @@
                 const { count: teacherCount } = await supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'teacher');
                 document.getElementById('statTeachers').innerText = teacherCount || 0;
 
-                // Render Chart & Widgets
                 await renderClassChart();
                 await fetchRecentAttendance();
                 await populateLeagueWidget();
@@ -340,11 +274,9 @@
             }
         }
 
-        // === CLASS DISTRIBUTION CHART ===
         async function renderClassChart() {
             try {
                 const { data: students } = await supabase.from('students').select('classes(name)').eq('approved', true);
-                
                 const classCounts = {};
                 if (students) {
                     students.forEach(s => {
@@ -352,101 +284,105 @@
                         classCounts[cName] = (classCounts[cName] || 0) + 1;
                     });
                 }
-
                 const labels = Object.keys(classCounts);
                 const data = Object.values(classCounts);
-                
                 const bgColors = ['#3498db', '#34495e', '#2ecc71', '#e67e22', '#9b59b6', '#e74c3c', '#f1c40f', '#1abc9c', '#00bcd4', '#795548', '#8bc34a', '#3f51b5'];
 
                 const ctx = document.getElementById('classDistributionChart').getContext('2d');
                 window.classChartInstance = new Chart(ctx, {
                     type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Number of Students',
-                            data: data,
-                            backgroundColor: bgColors.slice(0, labels.length),
-                            borderRadius: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: { beginAtZero: true, ticks: { stepSize: 5 } },
-                            x: { grid: { display: false } }
-                        }
-                    }
+                    data: { labels: labels, datasets: [{ label: 'Number of Students', data: data, backgroundColor: bgColors.slice(0, labels.length), borderRadius: 4 }] },
+                    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 5 } }, x: { grid: { display: false } } } }
                 });
             } catch(e) { console.error("Chart Error:", e); }
         }
 
-        // 🚨 RESTORED: THE MISSING ATTENDANCE WIDGET (Where the Red X was) 🚨
+        // 🚨 BULLETPROOF ATTENDANCE WIDGET FILTER 🚨
         async function fetchRecentAttendance() {
             try {
-                // Fetch attendance joined with the student's class name
-                const { data: attData, error } = await supabase
-                    .from('attendance')
-                    .select('status, created_at, students(classes(name))')
-                    .order('created_at', { ascending: false });
-
                 const attContainer = document.getElementById('attendanceListWidget');
+                
+                const [rawAtt, allStudents, allClasses] = await Promise.all([
+                    supabase.from('attendance').select('*').order('created_at', { ascending: false }),
+                    supabase.from('students').select('*'),
+                    supabase.from('classes').select('*')
+                ]);
 
-                if (error || !attData || attData.length === 0) {
+                if (rawAtt.error || !rawAtt.data || rawAtt.data.length === 0) {
                     attContainer.innerHTML = '<div class="text-center text-muted py-5 small"><i class="fas fa-info-circle fs-2 mb-2 opacity-50"></i><br>No attendance submitted today.</div>';
                     return;
                 }
 
-                const todayLocal = new Date().toDateString();
-                const todayAtt = attData.filter(r => new Date(r.created_at).toDateString() === todayLocal);
+                const classMap = {};
+                if (allClasses.data) allClasses.data.forEach(c => classMap[c.id] = c.name);
 
-                if (todayAtt.length === 0) {
-                    attContainer.innerHTML = '<div class="text-center text-muted py-5 small"><i class="fas fa-info-circle fs-2 mb-2 opacity-50"></i><br>No attendance submitted today.</div>';
-                    return;
+                const studentMap = {};
+                if (allStudents.data) {
+                    allStudents.data.forEach(s => {
+                        if (s.id) studentMap[String(s.id).trim().toLowerCase()] = s;
+                        if (s.user_id) studentMap[String(s.user_id).trim().toLowerCase()] = s;
+                        if (s.reg_number) studentMap[String(s.reg_number).trim().toLowerCase()] = s; 
+                    });
                 }
 
-                // Group the data by Class Name
+                const today = new Date();
+                const todayLocalString = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+
                 let classCounts = {};
-                todayAtt.forEach(r => {
-                    const cName = r.students?.classes?.name || 'General';
-                    if (!classCounts[cName]) classCounts[cName] = { present: 0, absent: 0 };
+                let foundToday = false;
+
+                rawAtt.data.forEach(record => {
+                    // FORCE DATE BY CREATED_AT (Ignores teacher formatting completely!)
+                    const dbDateString = record.created_at ? record.created_at.split('T')[0] : "";
                     
-                    if (String(r.status).toLowerCase().includes('present')) {
-                        classCounts[cName].present++;
-                    } else {
-                        classCounts[cName].absent++;
+                    if (dbDateString === todayLocalString) {
+                        foundToday = true;
+                        
+                        const rawId = record.student_id || record.user_id || record.studentId || record.reg_number || "";
+                        const cleanId = String(rawId).trim().toLowerCase();
+                        const stu = studentMap[cleanId];
+                        
+                        let cName = 'Unknown Class';
+                        if (stu && classMap[stu.class_id]) cName = classMap[stu.class_id];
+                        else if (classMap[record.class_id]) cName = classMap[record.class_id];
+                        else if (record.class_id) cName = record.class_id; 
+                        else if (record.className) cName = record.className;
+                        
+                        if (!classCounts[cName]) classCounts[cName] = { present: 0, absent: 0, late: 0 };
+                        
+                        const stat = String(record.status).toLowerCase();
+                        if (stat.includes('present')) classCounts[cName].present++;
+                        else if (stat.includes('late')) classCounts[cName].late++;
+                        else classCounts[cName].absent++;
                     }
                 });
 
-                // Render the list
-                if(Object.keys(classCounts).length > 0) {
-                    attContainer.innerHTML = Object.entries(classCounts).map(([className, counts]) => `
-                        <div class="att-item">
-                            <div>
-                                <h6 class="mb-1 fw-bold" style="color: var(--text-color);">${className}</h6>
-                                <span class="badge bg-success bg-opacity-10 text-success border border-success me-1"><i class="fas fa-check me-1"></i>${counts.present} Present</span>
-                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger"><i class="fas fa-times me-1"></i>${counts.absent} Absent</span>
-                            </div>
-                            <i class="fas fa-chevron-right text-muted" style="font-size: 0.8rem; opacity: 0.5;"></i>
-                        </div>
-                    `).join('');
-                } else {
-                    attContainer.innerHTML = '<div class="text-center text-muted py-4 small">No class data found.</div>';
+                if (!foundToday) {
+                    attContainer.innerHTML = '<div class="text-center text-muted py-5 small"><i class="fas fa-info-circle fs-2 mb-2 opacity-50"></i><br>No attendance submitted today.</div>';
+                    return;
                 }
+
+                attContainer.innerHTML = Object.entries(classCounts).map(([className, counts]) => `
+                    <div class="att-item d-flex justify-content-between align-items-center p-3 border-bottom">
+                        <div>
+                            <h6 class="mb-1 fw-bold" style="color: var(--text-color);">${className}</h6>
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success me-1"><i class="fas fa-check me-1"></i>${counts.present}</span>
+                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger"><i class="fas fa-times me-1"></i>${counts.absent}</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-muted" style="font-size: 0.8rem; opacity: 0.5;"></i>
+                    </div>
+                `).join('');
 
             } catch (err) {
                 console.error("Attendance Widget Error:", err);
-                document.getElementById('attendanceListWidget').innerHTML = '<div class="text-center text-danger py-4 small">Failed to load attendance data.</div>';
+                document.getElementById('attendanceListWidget').innerHTML = '<div class="text-center text-danger py-4 small">Failed to load attendance widget.</div>';
             }
         }
 
-        // === LEAGUE TABLE WIDGET ===
         async function populateLeagueWidget() {
             try {
                 const { data: students } = await supabase.from('students').select('user_id, first_name, surname, classes(name)').eq('approved', true);
                 const { data: results } = await supabase.from('test_results').select('student_id, score');
-
                 const pointsMap = {};
                 if (results) {
                     results.forEach(r => {
@@ -454,7 +390,6 @@
                         pointsMap[r.student_id] += r.score;
                     });
                 }
-
                 let rankings = students.map(s => ({
                     name: `${s.first_name} ${s.surname || ''}`,
                     class_name: s.classes?.name || 'Unassigned',
@@ -466,50 +401,32 @@
                     tbody.innerHTML = `<tr><td colspan="3" class="text-center py-4" style="color: var(--text-muted);">No points recorded yet.</td></tr>`;
                     return;
                 }
-
                 tbody.innerHTML = rankings.map((s, index) => {
                     const rank = index + 1;
                     let rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
                     let iconHtml = rank <= 3 ? `<i class="fas fa-medal"></i>` : rank;
-                    return `
-                        <tr>
-                            <td class="text-center"><div class="rank-badge ${rankClass}">${iconHtml}</div></td>
-                            <td><div class="fw-bold">${s.name}</div><div class="small" style="color: var(--text-muted);">${s.class_name}</div></td>
-                            <td class="text-center fw-bold text-success">${s.points} Pts</td>
-                        </tr>
-                    `;
+                    return `<tr><td class="text-center"><div class="rank-badge ${rankClass}">${iconHtml}</div></td><td><div class="fw-bold">${s.name}</div><div class="small" style="color: var(--text-muted);">${s.class_name}</div></td><td class="text-center fw-bold text-success">${s.points} Pts</td></tr>`;
                 }).join('');
             } catch(e) { console.error("League Error:", e); }
         }
 
-        // === BIRTHDAY WIDGET ===
         async function fetchBirthdays() {
             try {
                 const currentMonth = new Date().getMonth();
                 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                
                 const { data: students } = await supabase.from('students').select('first_name, surname, dob').not('dob', 'is', null);
                 const bdayContainer = document.getElementById('birthdayWidgetBody');
 
-                if (!students || students.length === 0) {
-                    bdayContainer.innerHTML = '<div class="text-center text-muted py-3 small">No birthdays recorded.</div>';
-                    return;
-                }
+                if (!students || students.length === 0) { bdayContainer.innerHTML = '<div class="text-center text-muted py-3 small">No birthdays recorded.</div>'; return; }
 
-                const birthdaysThisMonth = students.filter(s => new Date(s.dob).getMonth() === currentMonth)
-                                                  .sort((a, b) => new Date(a.dob).getDate() - new Date(b.dob).getDate());
+                const birthdaysThisMonth = students.filter(s => new Date(s.dob).getMonth() === currentMonth).sort((a, b) => new Date(a.dob).getDate() - new Date(b.dob).getDate());
 
                 if (birthdaysThisMonth.length === 0) {
                     bdayContainer.innerHTML = '<div class="text-center text-muted py-3 small">No birthdays this month.</div>';
                 } else {
                     bdayContainer.innerHTML = birthdaysThisMonth.map(s => {
                         const bDate = new Date(s.dob);
-                        return `
-                            <div class="bday-item">
-                                <div class="bday-date">${bDate.getDate()} <span class="d-block" style="font-size:0.7rem;">${monthNames[bDate.getMonth()]}</span></div>
-                                <div><h6 class="mb-0 fw-bold" style="color: var(--text-color);">${s.first_name} ${s.surname || ''}</h6><small style="color: var(--text-muted);">Student</small></div>
-                            </div>
-                        `;
+                        return `<div class="bday-item"><div class="bday-date">${bDate.getDate()} <span class="d-block" style="font-size:0.7rem;">${monthNames[bDate.getMonth()]}</span></div><div><h6 class="mb-0 fw-bold" style="color: var(--text-color);">${s.first_name} ${s.surname || ''}</h6><small style="color: var(--text-muted);">Student</small></div></div>`;
                     }).join('');
                 }
             } catch (err) { console.error(err); }
