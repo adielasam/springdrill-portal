@@ -3,170 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRINGDRILL - UTME Simulator</title>
+    <title>SPRINGDRILL - UTME Hub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --bg-color: #f4f7fa; --card-bg: #ffffff; --text-color: #333333; --text-muted: #6c757d; --border-color: #e9ecef; --input-bg: #f8f9fa; }
+        :root { --bg-color: #eef2f3; --card-bg: #ffffff; --text-color: #333333; --text-muted: #6c757d; --border-color: #e9ecef; --input-bg: #f8f9fa; --utme-green: #007a4d;}
         body.dark-mode { --bg-color: #121212; --card-bg: #1e1e1e; --text-color: #e0e0e0; --text-muted: #a0a0a0; --border-color: #333333; --input-bg: #2c2c2c; }
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: 0.3s; }
-        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; transition: 0.3s; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: 0.3s; 
+               background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23007a4d" fill-opacity="0.03"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+        }
+        
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; box-shadow: 4px 0 15px rgba(0,0,0,0.1);}
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: 0.3s; display: flex; align-items: center; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; text-decoration: none; display: flex; align-items: center; font-size: 0.95rem;}
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
-        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: 0.3s; }
-        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #27ae60;}
-        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .utme-container { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
-        .utme-header { background-color: #27ae60; color: white; padding: 15px 25px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; font-size: 1.2rem;}
+
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
+        .top-navbar { background: var(--utme-green); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; color: white;}
+        .dark-toggle-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;}
+
+        /* HUB GRID STYLES */
+        .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
         
-        .subject-grid { padding: 20px 25px; border-bottom: 2px solid var(--border-color); display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; background: var(--input-bg); max-height: 300px; overflow-y: auto;}
-        .subject-item { display: flex; align-items: center; gap: 10px; font-weight: 600; cursor: pointer; font-size: 0.95rem;}
-        .subject-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #27ae60;}
+        .hub-card { border-radius: 10px; padding: 25px 15px; text-align: center; text-decoration: none; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: transform 0.2s, box-shadow 0.2s; height: 150px; position: relative; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);}
+        .hub-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); color: inherit; }
+        .hub-card i { font-size: 2.5rem; margin-bottom: 15px; }
+        .hub-card h5 { font-weight: 700; font-size: 1.1rem; margin: 0; color: #333;}
         
-        .config-area { padding: 30px 25px; display: flex; gap: 30px; flex-wrap: wrap;}
-        .config-col-left, .config-col-right { flex: 1; min-width: 250px; }
-        .subject-accordion-header { background: #27ae60; color: white; padding: 10px 15px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; margin-bottom: 15px;}
-        .form-label { font-weight: 600; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px; display: block;}
-        .form-select, .form-control { border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); border-radius: 4px; padding: 8px 12px; width: 100%; transition: 0.3s;}
-        .config-col-center { flex: 1; min-width: 250px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 1px dashed var(--border-color); border-right: 1px dashed var(--border-color); padding: 0 20px;}
-        .utme-avatar { width: 150px; height: 150px; border-radius: 50%; background-color: #27ae60; display: flex; justify-content: center; align-items: center; color: white; font-size: 5rem; margin-bottom: 20px;}
-        .btn-start { background-color: #1976d2; color: white; border: none; width: 100%; padding: 12px; font-size: 1.2rem; font-weight: bold; border-radius: 30px; transition: 0.3s; margin-top: 15px;}
-        .fieldset-box { border: 1px solid var(--border-color); border-radius: 4px; padding: 15px; margin-bottom: 20px; position: relative;}
-        .fieldset-legend { position: absolute; top: -10px; left: 10px; background: var(--card-bg); padding: 0 10px; font-size: 0.85rem; font-weight: bold; color: var(--text-muted);}
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .new-badge { position: absolute; top: 10px; right: 10px; background: #ff4757; color: white; font-size: 0.65rem; font-weight: 900; padding: 3px 8px; border-radius: 12px; text-transform: uppercase;}
+
+        .bg-practice { background: #e0e7ff; } .bg-practice i { color: #3730a3; }
+        .bg-classroom { background: #ffe4e6; } .bg-classroom i { color: #be123c; }
+        .bg-search { background: #dcfce7; } .bg-search i { color: #166534; }
+        .bg-analysis { background: #f3e8ff; } .bg-analysis i { color: #6b21a8; }
+        .bg-games { background: #fef3c7; } .bg-games i { color: #854d0e; }
+        .bg-literature { background: #ffedd5; } .bg-literature i { color: #9a3412; }
+        .bg-challenge { background: #fae8ff; } .bg-challenge i { color: #86198f; }
+        .bg-career { background: #e0e7ff; } .bg-career i { color: #3f51b5; }
+        .bg-dictionary { background: #ffe4e6; } .bg-dictionary i { color: #e91e63; }
+
+        .ai-banner { background: white; border-radius: 10px; overflow: hidden; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 6px rgba(0,0,0,0.05);}
+        .ai-banner img { width: 100%; height: auto; object-fit: cover;}
+        .ai-banner-text { padding: 20px; text-align: center; }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .mobile-menu-toggle { display: inline-block !important; }
+        }
+        .mobile-menu-toggle { display: none; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
     </style>
 </head>
 <body>
-    <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i><h4 class="fw-bold" style="color: var(--text-muted);">Initializing Simulator...</h4></div>
 
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
+        <div class="sidebar-brand">
             <h5 class="text-white fw-bold m-0"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
         </div>
         <nav class="nav flex-column mt-3">
             <a href="student_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
-            <a href="student_utme.html" class="nav-link active fw-bold" style="color: #2ecc71;"><i class="fas fa-university"></i> UTME Simulator</a>
-            <a href="student_results.html" class="nav-link"><i class="fas fa-chart-bar text-warning"></i> My Results</a>
+            
+            <a href="utme_simulator.html" class="nav-link"><i class="fas fa-robot"></i> AI JAMB Simulator</a>
+            
+            <a href="student_utme_hub.html" class="nav-link active fw-bold text-warning"><i class="fas fa-university"></i> Real UTME Hub</a>
+            
+            <a href="student_results.html" class="nav-link"><i class="fas fa-chart-line"></i> Results & Analytics</a>
+            <a href="student_messages.html" class="nav-link"><i class="fas fa-envelope"></i> Messages</a>
+            <hr class="mx-3 my-4 border-secondary">
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Logout</a>
         </nav>
     </div>
 
     <div class="main-content">
         <div class="top-navbar">
-            <div class="fw-bold d-none d-md-block" style="color: var(--text-muted);"><i class="fas fa-university me-2 text-success"></i> Test Preparation Center</div>
-            <button class="dark-toggle-btn" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
-        </div>
-
-        <div class="utme-container">
-            <div class="utme-header"><span>Practice For UTME</span></div>
-
-            <div class="p-2 text-center border-bottom fw-bold" style="background: var(--card-bg); color: var(--text-muted);">
-                Select One or More Subjects (Max 4 for JAMB)
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="fw-bold fs-5"><i class="fas fa-university me-2"></i> SPRINGDRILL UTME HUB</div>
             </div>
-            
-            <div class="subject-grid">
-                <label class="subject-item"><input type="checkbox" checked value="English Language"> English Language</label>
-                <label class="subject-item"><input type="checkbox" value="Mathematics"> Mathematics</label>
-                <label class="subject-item"><input type="checkbox" value="Physics"> Physics</label>
-                <label class="subject-item"><input type="checkbox" value="Chemistry"> Chemistry</label>
-                <label class="subject-item"><input type="checkbox" value="Biology"> Biology</label>
-                <label class="subject-item"><input type="checkbox" value="Agricultural Science"> Agricultural Science</label>
-                <label class="subject-item"><input type="checkbox" value="Economics"> Economics</label>
-                <label class="subject-item"><input type="checkbox" value="Government"> Government</label>
-                <label class="subject-item"><input type="checkbox" value="Literature in English"> Literature in English</label>
-                <label class="subject-item"><input type="checkbox" value="Christian Religious Studies"> CRS</label>
-                <label class="subject-item"><input type="checkbox" value="Islamic Studies"> Islamic Studies</label>
-                <label class="subject-item"><input type="checkbox" value="Commerce"> Commerce</label>
-                <label class="subject-item"><input type="checkbox" value="Geography"> Geography</label>
-                <label class="subject-item"><input type="checkbox" value="History"> History</label>
-                <label class="subject-item"><input type="checkbox" value="Principles of Accounts"> Principles of Accounts</label>
-                <label class="subject-item"><input type="checkbox" value="French"> French</label>
-                <label class="subject-item"><input type="checkbox" value="Hausa"> Hausa</label>
-                <label class="subject-item"><input type="checkbox" value="Igbo"> Igbo</label>
-                <label class="subject-item"><input type="checkbox" value="Yoruba"> Yoruba</label>
-                <label class="subject-item"><input type="checkbox" value="Music"> Music</label>
-                <label class="subject-item"><input type="checkbox" value="Visual Arts"> Visual/Fine Arts</label>
-                <label class="subject-item"><input type="checkbox" value="Computer Studies"> Computer Studies</label>
-                <label class="subject-item"><input type="checkbox" value="Physical and Health Education"> Physical & Health Ed.</label>
-            </div>
-
-            <div class="config-area">
-                <div class="config-col-left">
-                    <div class="subject-accordion-header">
-                        <div><i class="fas fa-chevron-down me-2"></i> Configuration</div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Number of questions per subject</label>
-                        <select class="form-select" id="questionCountSelect">
-                            <option value="10">10 Questions</option>
-                            <option value="20">20 Questions</option>
-                            <option value="40" selected>40 Questions</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="config-col-center">
-                    <div class="utme-avatar"><i class="fas fa-user"></i></div>
-                    <input type="text" class="form-control text-center fw-bold fs-5 rounded-pill mb-2" id="displayStudentName" readonly value="Loading...">
-                    <button class="btn-start" onclick="startSimulator()"><i class="fas fa-play-circle me-2"></i> Get Started</button>
-                </div>
-
-                <div class="config-col-right">
-                    <div class="fieldset-box mt-3">
-                        <span class="fieldset-legend">Total Time</span>
-                        <select class="form-select border-0 bg-transparent fw-bold" id="examTimeSelect" style="padding: 0;">
-                            <option value="1800">00:30:00 (30 Mins)</option>
-                            <option value="3600">01:00:00 (1 Hour)</option>
-                            <option value="5400">01:30:00 (1.5 Hours)</option>
-                            <option value="7200" selected>02:00:00 (2 Hours)</option>
-                            <option value="10800">03:00:00 (3 Hours)</option>
-                        </select>
-                    </div>
-                </div>
+            <div class="d-flex align-items-center">
+                <span class="me-3 fw-bold"><i class="fas fa-database text-warning me-1"></i> <span id="dbCount">Loading...</span> Real Questions Live</span>
+                <button class="dark-toggle-btn" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
             </div>
         </div>
+
+        <div class="row g-4">
+            <div class="col-xl-8 col-lg-7">
+                <div class="hub-grid">
+                    
+                    <a href="utme_practice_setup.html" class="hub-card bg-practice">
+                        <i class="fas fa-rocket"></i>
+                        <h5>Practice For UTME</h5>
+                        <small class="text-muted mt-2 fw-bold" style="font-size: 0.7rem;">WITH REAL PAST QUESTIONS</small>
+                    </a>
+
+                    <a href="#" class="hub-card bg-classroom" onclick="alert('eClassroom coming soon!')">
+                        <div class="new-badge">New</div>
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <h5>Classroom</h5>
+                    </a>
+
+                    <a href="#" class="hub-card bg-search" onclick="alert('Question Search coming soon!')">
+                        <i class="fas fa-search"></i>
+                        <h5>Question Search</h5>
+                    </a>
+
+                    <a href="#" class="hub-card bg-analysis" onclick="alert('Advanced Analytics coming soon!')">
+                        <i class="fas fa-chart-line"></i>
+                        <h5>Performance Analysis</h5>
+                    </a>
+
+                    <a href="#" class="hub-card bg-games" onclick="alert('Educational Games coming soon!')">
+                        <i class="fas fa-gamepad"></i>
+                        <h5>Educational Games</h5>
+                    </a>
+
+                    <a href="#" class="hub-card bg-literature" onclick="alert('Literature Books coming soon!')">
+                        <i class="fas fa-book-open"></i>
+                        <h5>UTME Literature Books</h5>
+                    </a>
+
+                    <a href="#" class="hub-card bg-challenge" onclick="alert('UTME Challenge coming soon!')">
+                        <i class="fas fa-trophy"></i>
+                        <h5>UTME Challenge</h5>
+                    </a>
+
+                    <a href="#" class="hub-card bg-career" onclick="alert('Career guidance coming soon!')">
+                        <i class="fas fa-user-md"></i>
+                        <h5>Career And Institutions</h5>
+                    </a>
+
+                    <a href="#" class="hub-card bg-dictionary" onclick="alert('Dictionary coming soon!')">
+                        <i class="fas fa-spell-check"></i>
+                        <h5>Dictionary</h5>
+                    </a>
+
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-lg-5">
+                <div class="ai-banner">
+                    <div class="bg-success text-white p-2 text-center fw-bold" style="font-size: 0.8rem; letter-spacing: 2px;">NEW FEATURE</div>
+                    <div class="ai-banner-text flex-grow-1 d-flex flex-column justify-content-center">
+                        <h3 class="fw-bold text-success mb-3">AI TUTOR <i class="fas fa-robot text-warning"></i></h3>
+                        <p class="text-muted mb-4">Experience AI-Powered Tutoring. Ask questions, get detailed explanations, and master complex topics instantly.</p>
+                        <button class="btn btn-success btn-lg fw-bold rounded-pill shadow-sm mt-auto" onclick="alert('Clara AI Tutor coming soon!')">Chat with CLARA</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
+        window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('mobile-open');
         window.toggleTheme = () => {
             const body = document.body; body.classList.toggle('dark-mode');
             const isDark = body.classList.contains('dark-mode');
             localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
             document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
         };
-        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { window.toggleTheme(); }
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') window.toggleTheme();
 
         async function init() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return window.location.href = 'login.html';
+
             try {
-                const { data: { session } } = await supabase.auth.getSession();
-                if (!session) return window.location.href = 'login.html';
-                const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
-                if(profile) document.getElementById('displayStudentName').value = profile.name;
-                document.getElementById('loadingOverlay').style.display = 'none';
-            } catch (err) { console.error(err); }
+                const { count } = await supabase.from('question_bank').select('*', { count: 'exact', head: true });
+                document.getElementById('dbCount').innerText = count ? count.toLocaleString() : '0';
+            } catch(e) { console.error(e); }
         }
 
-        window.startSimulator = () => {
-            const checkboxes = document.querySelectorAll('.subject-grid input[type="checkbox"]:checked');
-            const selectedSubjects = Array.from(checkboxes).map(cb => cb.value);
-            const questionCount = document.getElementById('questionCountSelect').value;
-            const examTime = document.getElementById('examTimeSelect').value;
-
-            if (selectedSubjects.length === 0) return alert("Select at least one subject.");
-            if (selectedSubjects.length > 4) return alert("JAMB allows a maximum of 4 subjects.");
-
-            // Save everything to localStorage so the exam engine can read it!
-            localStorage.setItem('UTME_SUBJECTS', JSON.stringify(selectedSubjects));
-            localStorage.setItem('UTME_QUESTION_COUNT', questionCount); 
-            localStorage.setItem('UTME_EXAM_TIME', examTime); // NEW: Save time!
-
-            window.location.href = 'student_utme_exam.html';
-        };
-
         document.addEventListener('DOMContentLoaded', init);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
     </script>
 </body>
 </html>

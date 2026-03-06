@@ -21,7 +21,6 @@
 
         .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
         
-        /* TESTDRILLER SETUP UI STYLES */
         .setup-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid var(--border-color); }
         .setup-header { background: var(--utme-green); color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 1.1rem;}
         .setup-header a { color: white; text-decoration: none; transition: 0.2s;}
@@ -31,18 +30,15 @@
         
         .section-title { font-size: 0.9rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); margin-bottom: 15px; border-bottom: 2px solid var(--border-color); padding-bottom: 5px;}
         
-        /* Subjects Grid */
         .subject-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 30px;}
         .form-check-label { font-weight: 600; color: var(--text-color); cursor: pointer;}
         
-        /* Center Profile Area */
         .profile-area { text-align: center; padding: 20px; border-right: 1px solid var(--border-color); height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;}
         .profile-icon-large { width: 120px; height: 120px; background: #4ade80; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 4rem; margin-bottom: 15px; box-shadow: 0 10px 20px rgba(74, 222, 128, 0.3);}
         .student-name-box { background: var(--input-bg); border: 1px solid var(--border-color); padding: 8px 20px; border-radius: 6px; font-weight: bold; width: 100%; max-width: 250px; margin-bottom: 20px;}
         .btn-start { background: #3b82f6; color: white; font-weight: bold; font-size: 1.1rem; padding: 12px 30px; border-radius: 30px; border: none; width: 100%; max-width: 250px; transition: 0.3s; box-shadow: 0 8px 15px rgba(59, 130, 246, 0.3);}
         .btn-start:hover { background: #2563eb; transform: translateY(-2px); color: white;}
 
-        /* Right Side Controls */
         .control-group { margin-bottom: 20px; }
         .control-group select, .control-group input { background-color: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); font-weight: 600; }
         .mode-desc { font-size: 0.75rem; color: var(--text-muted); background: var(--input-bg); padding: 8px; border-radius: 4px; margin-top: 5px; border: 1px solid var(--border-color);}
@@ -65,7 +61,9 @@
         </div>
         <nav class="nav flex-column mt-3">
             <a href="student_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
-            <a href="jamb_simulator.html" class="nav-link"><i class="fas fa-robot"></i> AI JAMB Simulator</a>
+            
+            <a href="utme_simulator.html" class="nav-link"><i class="fas fa-robot"></i> AI JAMB Simulator</a>
+            
             <a href="student_utme_hub.html" class="nav-link active fw-bold text-warning"><i class="fas fa-university"></i> Real UTME Hub</a>
             <a href="student_results.html" class="nav-link"><i class="fas fa-chart-line"></i> Results & Analytics</a>
             <a href="student_messages.html" class="nav-link"><i class="fas fa-envelope"></i> Messages</a>
@@ -181,7 +179,6 @@
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
-        // Display user name on load
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) return window.location.href = 'login.html';
@@ -189,7 +186,6 @@
             try {
                 const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
                 if (profile) {
-                    // Get first name for display
                     const firstName = profile.name.split(' ')[0];
                     document.getElementById('displayStudentName').innerText = firstName;
                 }
@@ -198,7 +194,6 @@
             }
         }
 
-        // Change the description text based on Mode selected
         window.updateModeDesc = () => {
             const mode = document.getElementById('examMode').value;
             const desc = document.getElementById('modeDescription');
@@ -211,9 +206,7 @@
             alert("Topic filtering will be available soon! For now, exams will cover all topics.");
         };
 
-        // GATHER SETTINGS AND LAUNCH TEST ENGINE
         window.startPractice = () => {
-            // 1. Get selected subjects
             const checkboxes = document.querySelectorAll('.subject-checkbox');
             let selectedSubjects = [];
             checkboxes.forEach(cb => {
@@ -227,7 +220,6 @@
                 return alert("JAMB allows a maximum of 4 subjects per sitting. Please deselect some subjects.");
             }
 
-            // 2. Gather all configuration data
             const config = {
                 subjects: selectedSubjects,
                 year: document.getElementById('examYear').value,
@@ -235,13 +227,10 @@
                 time: document.getElementById('examTime').value,
                 shuffleQuestions: document.getElementById('shuffleQuestions').checked,
                 shuffleOptions: document.getElementById('shuffleOptions').checked,
-                isRealUTME: true // Flag to tell engine to fetch from database, not AI
+                isRealUTME: true
             };
 
-            // 3. Save to SessionStorage so the next page can read it
             sessionStorage.setItem('UTME_TEST_CONFIG', JSON.stringify(config));
-
-            // 4. Send them to the actual test interface! (We will build this next)
             window.location.href = 'utme_test_engine.html';
         };
 
