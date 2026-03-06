@@ -48,7 +48,11 @@
             <div style="font-size: 0.8rem; opacity: 0.8;" id="headerSubtitle">UTME Practice Simulator</div>
         </div>
         <div class="timer-box" id="timerDisplay">--:--:--</div>
-        <button class="btn btn-danger fw-bold shadow-sm" id="mainActionBtn" onclick="submitExam()"><i class="fas fa-paper-plane me-2"></i> Submit Exam</button>
+        
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-light fw-bold shadow-sm" id="closeExamBtn" onclick="closeExam()"><i class="fas fa-times me-2"></i> Close Exam</button>
+            <button class="btn btn-danger fw-bold shadow-sm" id="mainActionBtn" onclick="submitExam()"><i class="fas fa-paper-plane me-2"></i> Submit Exam</button>
+        </div>
     </header>
 
     <div class="subject-tabs" id="subjectTabsContainer"></div>
@@ -87,7 +91,6 @@
         const QUESTIONS_PER_SUBJECT = parseInt(localStorage.getItem('UTME_QUESTION_COUNT')) || 40; 
         let totalSeconds = parseInt(localStorage.getItem('UTME_EXAM_TIME')) || 7200; 
 
-        // NEW: Auto-Retry System
         async function fetchExamQuestions(subject, count, retries = 2) {
             for (let attempt = 0; attempt <= retries; attempt++) {
                 try {
@@ -96,12 +99,11 @@
                     });
                     if (error) throw error;
                     if (!data || !Array.isArray(data)) throw new Error("Invalid AI output format.");
-                    return data; // Success! Return the questions.
+                    return data; 
                 } catch (error) {
                     console.error(`Attempt ${attempt + 1} failed for ${subject}:`, error.message);
                     
                     if (attempt === retries) {
-                        // If it fails 3 times in a row, THEN we show the error.
                         return [{
                             question_text: `Network Error. Could not load questions for ${subject} after multiple attempts.`,
                             options: { "A": "Opt A", "B": "Opt B", "C": "Opt C", "D": "Opt D" },
@@ -109,7 +111,6 @@
                         }];
                     }
                     
-                    // Wait 2.5 seconds before trying again to let the server breathe
                     await new Promise(resolve => setTimeout(resolve, 2500));
                 }
             }
@@ -124,7 +125,6 @@
             updateTimerDisplay();
             subjects = JSON.parse(localStorage.getItem('UTME_SUBJECTS')) || ["English Language"];
             
-            // 1. Fetch the first subject so the student can start immediately
             const firstSub = subjects[0];
             const firstData = await fetchExamQuestions(firstSub, QUESTIONS_PER_SUBJECT);
             examData[firstSub] = firstData;
@@ -132,21 +132,18 @@
             correctAnswers[firstSub] = {};
             firstData.forEach((q, i) => correctAnswers[firstSub][i] = q.correct_option);
 
-            // Hide loading screen and start exam
             document.getElementById('loadingOverlay').style.display = 'none';
             renderTabs(); loadSubject(0); startTimer();
 
-            // 2. Sequentially load the remaining subjects in the background to prevent Rate Limits!
             (async () => {
                 for (let i = 1; i < subjects.length; i++) {
                     const sub = subjects[i];
-                    // The 'await' here forces the browser to wait for the previous to finish
                     const data = await fetchExamQuestions(sub, QUESTIONS_PER_SUBJECT);
                     examData[sub] = data;
                     userAnswers[sub] = {};
                     correctAnswers[sub] = {};
                     data.forEach((q, idx) => correctAnswers[sub][idx] = q.correct_option);
-                    renderTabs(); // Remove the loading spinner for this subject
+                    renderTabs(); 
                 }
             })();
         }
@@ -243,6 +240,14 @@
             }, 1000);
         }
 
+        // NEW: Close Exam Logic
+        window.closeExam = () => {
+            if(confirm("Are you sure you want to close this exam? Your progress will NOT be saved and no score will be recorded.")) {
+                clearInterval(timerInterval);
+                window.location.href = 'student_utme.html'; // Takes them back to setup page
+            }
+        };
+
         window.submitExam = () => { if(confirm("Are you sure you want to submit your exam?")) autoSubmitExam(); };
 
         async function autoSubmitExam() {
@@ -289,6 +294,9 @@
                 document.getElementById('timerDisplay').innerHTML = `<span class="text-warning">${finalJambScore} / 400</span>`;
                 document.getElementById('navigatorTitle').innerText = "Review Navigator";
                 
+                // Hide the close button in review mode since Submit turns into "Back to Dashboard"
+                document.getElementById('closeExamBtn').style.display = 'none';
+
                 const mainBtn = document.getElementById('mainActionBtn');
                 mainBtn.className = "btn btn-primary fw-bold shadow-sm";
                 mainBtn.innerHTML = '<i class="fas fa-home me-2"></i> Back to Dashboard';
