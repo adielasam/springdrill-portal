@@ -154,7 +154,7 @@
             <div class="col-lg-4">
                 <div class="dash-widget h-100 d-flex flex-column">
                     <div class="widget-header">
-                        <span class="text-success"><i class="fas fa-clipboard-user me-2"></i> Today's Attendance</span>
+                        <span class="text-success"><i class="fas fa-clipboard-user me-2"></i> Latest Attendance</span>
                         <a href="admin_attendance.html" class="small text-decoration-none">View All</a>
                     </div>
                     <div class="p-0 flex-grow-1" id="attendanceListWidget" style="max-height: 350px; overflow-y: auto;">
@@ -297,7 +297,7 @@
             } catch(e) { console.error("Chart Error:", e); }
         }
 
-        // 🚨 BULLETPROOF ATTENDANCE WIDGET FILTER 🚨
+        // 🚨 BULLETPROOF ATTENDANCE WIDGET 🚨
         async function fetchRecentAttendance() {
             try {
                 const attContainer = document.getElementById('attendanceListWidget');
@@ -309,7 +309,7 @@
                 ]);
 
                 if (rawAtt.error || !rawAtt.data || rawAtt.data.length === 0) {
-                    attContainer.innerHTML = '<div class="text-center text-muted py-5 small"><i class="fas fa-info-circle fs-2 mb-2 opacity-50"></i><br>No attendance submitted today.</div>';
+                    attContainer.innerHTML = '<div class="text-center text-muted py-5 small"><i class="fas fa-database fs-2 mb-2 opacity-50"></i><br>0 records found in the database.</div>';
                     return;
                 }
 
@@ -325,19 +325,18 @@
                     });
                 }
 
-                const today = new Date();
-                const todayLocalString = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+                // Instead of strict "Today Only", let's find the most recent date used in the database so it NEVER shows a blank box
+                let targetDateString = "";
+                if (rawAtt.data.length > 0) {
+                    targetDateString = rawAtt.data[0].created_at ? rawAtt.data[0].created_at.split('T')[0] : (rawAtt.data[0].date ? rawAtt.data[0].date.split('T')[0] : "");
+                }
 
                 let classCounts = {};
-                let foundToday = false;
-
+                
                 rawAtt.data.forEach(record => {
-                    // FORCE DATE BY CREATED_AT (Ignores teacher formatting completely!)
-                    const dbDateString = record.created_at ? record.created_at.split('T')[0] : "";
+                    const dbDateString = record.created_at ? record.created_at.split('T')[0] : (record.date ? record.date.split('T')[0] : "");
                     
-                    if (dbDateString === todayLocalString) {
-                        foundToday = true;
-                        
+                    if (dbDateString === targetDateString) {
                         const rawId = record.student_id || record.user_id || record.studentId || record.reg_number || "";
                         const cleanId = String(rawId).trim().toLowerCase();
                         const stu = studentMap[cleanId];
@@ -357,11 +356,6 @@
                     }
                 });
 
-                if (!foundToday) {
-                    attContainer.innerHTML = '<div class="text-center text-muted py-5 small"><i class="fas fa-info-circle fs-2 mb-2 opacity-50"></i><br>No attendance submitted today.</div>';
-                    return;
-                }
-
                 attContainer.innerHTML = Object.entries(classCounts).map(([className, counts]) => `
                     <div class="att-item d-flex justify-content-between align-items-center p-3 border-bottom">
                         <div>
@@ -369,7 +363,10 @@
                             <span class="badge bg-success bg-opacity-10 text-success border border-success me-1"><i class="fas fa-check me-1"></i>${counts.present}</span>
                             <span class="badge bg-danger bg-opacity-10 text-danger border border-danger"><i class="fas fa-times me-1"></i>${counts.absent}</span>
                         </div>
-                        <i class="fas fa-chevron-right text-muted" style="font-size: 0.8rem; opacity: 0.5;"></i>
+                        <div class="text-end">
+                            <small class="text-muted d-block" style="font-size: 0.7rem;">Date: ${targetDateString}</small>
+                            <i class="fas fa-chevron-right text-muted" style="font-size: 0.8rem; opacity: 0.5;"></i>
+                        </div>
                     </div>
                 `).join('');
 
