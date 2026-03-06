@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRINGDRILL - UTME Hub</title>
+    <title>SPRINGDRILL - UTME Simulator</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --bg-color: #eef2f3; --card-bg: #ffffff; --text-color: #333333; --text-muted: #6c757d; --border-color: #e9ecef; --input-bg: #f8f9fa; --utme-green: #007a4d;}
+        :root { --bg-color: #f4f7fa; --card-bg: #ffffff; --text-color: #333333; --text-muted: #6c757d; --border-color: #e9ecef; --input-bg: #f8f9fa; --utme-green: #27ae60;}
         body.dark-mode { --bg-color: #121212; --card-bg: #1e1e1e; --text-color: #e0e0e0; --text-muted: #a0a0a0; --border-color: #333333; --input-bg: #2c2c2c; }
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: 0.3s; 
-               background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23007a4d" fill-opacity="0.03"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
-        }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: 0.3s; }
         
         .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; box-shadow: 4px 0 15px rgba(0,0,0,0.1);}
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
@@ -20,39 +18,23 @@
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
 
         .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
-        .top-navbar { background: var(--utme-green); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; color: white;}
-        .dark-toggle-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;}
-
-        /* HUB GRID STYLES */
-        .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
         
-        .hub-card { border-radius: 10px; padding: 25px 15px; text-align: center; text-decoration: none; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: transform 0.2s, box-shadow 0.2s; height: 150px; position: relative; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);}
-        .hub-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); color: inherit; }
-        .hub-card i { font-size: 2.5rem; margin-bottom: 15px; }
-        .hub-card h5 { font-weight: 700; font-size: 1.1rem; margin: 0; color: #333;}
+        .setup-card { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow: hidden;}
+        .setup-header { background: var(--utme-green); color: white; padding: 15px 20px; font-weight: bold; font-size: 1.1rem;}
         
-        .new-badge { position: absolute; top: 10px; right: 10px; background: #ff4757; color: white; font-size: 0.65rem; font-weight: 900; padding: 3px 8px; border-radius: 12px; text-transform: uppercase;}
+        .subject-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin: 20px 0 40px 0; }
+        .form-check-label { font-weight: 600; cursor: pointer; color: var(--text-color);}
+        
+        .config-box { border: 1px solid var(--utme-green); border-radius: 8px; overflow: hidden; height: 100%;}
+        .config-header { background: var(--utme-green); color: white; padding: 10px 15px; font-weight: bold; font-size: 0.9rem;}
+        .config-body { padding: 20px; background: var(--input-bg);}
 
-        .bg-practice { background: #e0e7ff; } .bg-practice i { color: #3730a3; }
-        .bg-classroom { background: #ffe4e6; } .bg-classroom i { color: #be123c; }
-        .bg-search { background: #dcfce7; } .bg-search i { color: #166534; }
-        .bg-analysis { background: #f3e8ff; } .bg-analysis i { color: #6b21a8; }
-        .bg-games { background: #fef3c7; } .bg-games i { color: #854d0e; }
-        .bg-literature { background: #ffedd5; } .bg-literature i { color: #9a3412; }
-        .bg-challenge { background: #fae8ff; } .bg-challenge i { color: #86198f; }
-        .bg-career { background: #e0e7ff; } .bg-career i { color: #3f51b5; }
-        .bg-dictionary { background: #ffe4e6; } .bg-dictionary i { color: #e91e63; }
+        .profile-circle { width: 120px; height: 120px; background: var(--utme-green); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 4rem; margin: 0 auto 20px auto; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);}
+        .name-plate { background: var(--input-bg); border: 1px solid var(--border-color); padding: 10px; border-radius: 30px; font-weight: bold; text-align: center; margin-bottom: 20px;}
+        .btn-start { background: #1976d2; color: white; font-weight: bold; border-radius: 30px; padding: 12px 0; width: 100%; transition: 0.3s; border: none;}
+        .btn-start:hover { background: #1565c0; transform: translateY(-2px);}
 
-        .ai-banner { background: white; border-radius: 10px; overflow: hidden; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 6px rgba(0,0,0,0.05);}
-        .ai-banner img { width: 100%; height: auto; object-fit: cover;}
-        .ai-banner-text { padding: 20px; text-align: center; }
-
-        @media (max-width: 992px) {
-            .sidebar { transform: translateX(-100%); }
-            .main-content { margin-left: 0; padding: 15px; }
-            .mobile-menu-toggle { display: inline-block !important; }
-        }
-        .mobile-menu-toggle { display: none; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
     </style>
 </head>
 <body>
@@ -64,119 +46,101 @@
         <nav class="nav flex-column mt-3">
             <a href="student_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
             
-            <a href="utme_simulator.html" class="nav-link"><i class="fas fa-robot"></i> AI JAMB Simulator</a>
+            <a href="student_utme.html" class="nav-link active fw-bold text-success"><i class="fas fa-robot"></i> AI JAMB Simulator</a>
             
-            <a href="student_utme_hub.html" class="nav-link active fw-bold text-warning"><i class="fas fa-university"></i> Real UTME Hub</a>
-            
-            <a href="student_results.html" class="nav-link"><i class="fas fa-chart-line"></i> Results & Analytics</a>
+            <a href="student_utme_hub.html" class="nav-link"><i class="fas fa-university text-warning"></i> Real UTME Hub</a>
+            <a href="student_results.html" class="nav-link"><i class="fas fa-chart-line"></i> My Results</a>
             <a href="student_messages.html" class="nav-link"><i class="fas fa-envelope"></i> Messages</a>
             <hr class="mx-3 my-4 border-secondary">
-            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Logout</a>
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Secure Logout</a>
         </nav>
     </div>
 
     <div class="main-content">
-        <div class="top-navbar">
-            <div class="d-flex align-items-center">
-                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-                <div class="fw-bold fs-5"><i class="fas fa-university me-2"></i> SPRINGDRILL UTME HUB</div>
-            </div>
-            <div class="d-flex align-items-center">
-                <span class="me-3 fw-bold"><i class="fas fa-database text-warning me-1"></i> <span id="dbCount">Loading...</span> Real Questions Live</span>
-                <button class="dark-toggle-btn" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
-            </div>
+        <div class="top-navbar border-start border-4 border-success">
+            <div class="fw-bold text-muted"><i class="fas fa-desktop me-2"></i> Test Preparation Center</div>
         </div>
 
-        <div class="row g-4">
-            <div class="col-xl-8 col-lg-7">
-                <div class="hub-grid">
-                    
-                    <a href="utme_practice_setup.html" class="hub-card bg-practice">
-                        <i class="fas fa-rocket"></i>
-                        <h5>Practice For UTME</h5>
-                        <small class="text-muted mt-2 fw-bold" style="font-size: 0.7rem;">WITH REAL PAST QUESTIONS</small>
-                    </a>
-
-                    <a href="#" class="hub-card bg-classroom" onclick="alert('eClassroom coming soon!')">
-                        <div class="new-badge">New</div>
-                        <i class="fas fa-chalkboard-teacher"></i>
-                        <h5>Classroom</h5>
-                    </a>
-
-                    <a href="#" class="hub-card bg-search" onclick="alert('Question Search coming soon!')">
-                        <i class="fas fa-search"></i>
-                        <h5>Question Search</h5>
-                    </a>
-
-                    <a href="#" class="hub-card bg-analysis" onclick="alert('Advanced Analytics coming soon!')">
-                        <i class="fas fa-chart-line"></i>
-                        <h5>Performance Analysis</h5>
-                    </a>
-
-                    <a href="#" class="hub-card bg-games" onclick="alert('Educational Games coming soon!')">
-                        <i class="fas fa-gamepad"></i>
-                        <h5>Educational Games</h5>
-                    </a>
-
-                    <a href="#" class="hub-card bg-literature" onclick="alert('Literature Books coming soon!')">
-                        <i class="fas fa-book-open"></i>
-                        <h5>UTME Literature Books</h5>
-                    </a>
-
-                    <a href="#" class="hub-card bg-challenge" onclick="alert('UTME Challenge coming soon!')">
-                        <i class="fas fa-trophy"></i>
-                        <h5>UTME Challenge</h5>
-                    </a>
-
-                    <a href="#" class="hub-card bg-career" onclick="alert('Career guidance coming soon!')">
-                        <i class="fas fa-user-md"></i>
-                        <h5>Career And Institutions</h5>
-                    </a>
-
-                    <a href="#" class="hub-card bg-dictionary" onclick="alert('Dictionary coming soon!')">
-                        <i class="fas fa-spell-check"></i>
-                        <h5>Dictionary</h5>
-                    </a>
-
+        <div class="setup-card">
+            <div class="setup-header">Practice For UTME</div>
+            
+            <div class="p-4">
+                <div class="text-center text-muted fw-bold mb-3 small">Select One or More Subjects (Max 4 for JAMB)</div>
+                
+                <div class="subject-row">
+                    <div class="form-check"><input class="form-check-input sub-checkbox" type="checkbox" value="English Language" id="sub_eng" checked><label class="form-check-label" for="sub_eng">English</label></div>
+                    <div class="form-check"><input class="form-check-input sub-checkbox" type="checkbox" value="Mathematics" id="sub_mat" checked><label class="form-check-label" for="sub_mat">Mathematics</label></div>
+                    <div class="form-check"><input class="form-check-input sub-checkbox" type="checkbox" value="Physics" id="sub_phy"><label class="form-check-label" for="sub_phy">Physics</label></div>
+                    <div class="form-check"><input class="form-check-input sub-checkbox" type="checkbox" value="Chemistry" id="sub_che"><label class="form-check-label" for="sub_che">Chemistry</label></div>
+                    <div class="form-check"><input class="form-check-input sub-checkbox" type="checkbox" value="Biology" id="sub_bio"><label class="form-check-label" for="sub_bio">Biology</label></div>
+                    <div class="form-check"><input class="form-check-input sub-checkbox" type="checkbox" value="Economics" id="sub_eco"><label class="form-check-label" for="sub_eco">Economics</label></div>
                 </div>
-            </div>
 
-            <div class="col-xl-4 col-lg-5">
-                <div class="ai-banner">
-                    <div class="bg-success text-white p-2 text-center fw-bold" style="font-size: 0.8rem; letter-spacing: 2px;">NEW FEATURE</div>
-                    <div class="ai-banner-text flex-grow-1 d-flex flex-column justify-content-center">
-                        <h3 class="fw-bold text-success mb-3">AI TUTOR <i class="fas fa-robot text-warning"></i></h3>
-                        <p class="text-muted mb-4">Experience AI-Powered Tutoring. Ask questions, get detailed explanations, and master complex topics instantly.</p>
-                        <button class="btn btn-success btn-lg fw-bold rounded-pill shadow-sm mt-auto" onclick="alert('Clara AI Tutor coming soon!')">Chat with CLARA</button>
+                <div class="row align-items-center g-4">
+                    <div class="col-md-4">
+                        <div class="config-box">
+                            <div class="config-header"><i class="fas fa-chevron-down me-2"></i> Configuration</div>
+                            <div class="config-body">
+                                <label class="form-label text-muted fw-bold small">Number of questions per subject</label>
+                                <select id="qCount" class="form-select fw-bold">
+                                    <option value="10">10 Questions</option>
+                                    <option value="20">20 Questions</option>
+                                    <option value="30">30 Questions</option>
+                                    <option value="40">40 Questions</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 text-center px-4">
+                        <div class="profile-circle"><i class="fas fa-user"></i></div>
+                        <div class="name-plate text-uppercase" id="studentNameDisplay">Loading...</div>
+                        <button class="btn-start" onclick="startAIExam()"><i class="fas fa-play-circle me-2"></i> Get Started</button>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label text-muted fw-bold small">Total Time</label>
+                        <select id="examTime" class="form-select fw-bold border-0 bg-light shadow-sm">
+                            <option value="7200">02:00:00</option>
+                            <option value="5400">01:30:00</option>
+                            <option value="3600">01:00:00</option>
+                        </select>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
-
-        window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('mobile-open');
-        window.toggleTheme = () => {
-            const body = document.body; body.classList.toggle('dark-mode');
-            const isDark = body.classList.contains('dark-mode');
-            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
-            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
-        };
-        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') window.toggleTheme();
 
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) return window.location.href = 'login.html';
 
+            // NO APPROVAL CHECK HERE! Safe and simple data fetch.
             try {
-                const { count } = await supabase.from('question_bank').select('*', { count: 'exact', head: true });
-                document.getElementById('dbCount').innerText = count ? count.toLocaleString() : '0';
+                const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
+                if (profile) document.getElementById('studentNameDisplay').innerText = profile.name;
             } catch(e) { console.error(e); }
         }
+
+        window.startAIExam = () => {
+            const checkboxes = document.querySelectorAll('.sub-checkbox');
+            let selected = [];
+            checkboxes.forEach(cb => { if(cb.checked) selected.push(cb.value); });
+
+            if (selected.length === 0) return alert("Please select at least one subject.");
+            if (selected.length > 4) return alert("Maximum of 4 subjects allowed for JAMB.");
+
+            // Save settings to localStorage exactly as your exam engine expects them
+            localStorage.setItem('UTME_SUBJECTS', JSON.stringify(selected));
+            localStorage.setItem('UTME_QUESTION_COUNT', document.getElementById('qCount').value);
+            localStorage.setItem('UTME_EXAM_TIME', document.getElementById('examTime').value);
+
+            // Redirect to the exam engine file you just showed me
+            window.location.href = 'student_utme_exam.html'; 
+        };
 
         document.addEventListener('DOMContentLoaded', init);
         document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
