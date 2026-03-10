@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - JAMB Database Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+    <style>
+        :root { --bg-color: #f4f7fa; --card-bg: #ffffff; --text-color: #333333; --text-muted: #6c757d; --border-color: #e9ecef; --input-bg: #f8f9fa; --utme-green: #007a4d;}
+        body.dark-mode { --bg-color: #121212; --card-bg: #1e1e1e; --text-color: #e0e0e0; --text-muted: #a0a0a0; --border-color: #333333; --input-bg: #2c2c2c; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: 0.3s; }
+        
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; box-shadow: 4px 0 15px rgba(0,0,0,0.1);}
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 10px 20px; margin: 2px 10px; border-radius: 5px; text-decoration: none; display: flex; align-items: center; font-size: 0.95rem;}
+        .nav-link i { width: 25px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
+
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--utme-green); }
+        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;}
+
+        .manager-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 5px 20px rgba(0,0,0,0.03); padding: 25px; margin-bottom: 30px;}
+        
+        .filter-bar { background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 15px; align-items: center; border: 1px solid var(--border-color);}
+        
+        .custom-table { width: 100%; margin: 0; color: var(--text-color); font-size: 0.9rem;}
+        .custom-table th { background: var(--input-bg); padding: 15px; text-transform: uppercase; color: var(--text-muted); font-size: 0.8rem; font-weight: 800; border-bottom: 2px solid var(--border-color);}
+        .custom-table td { padding: 15px; border-bottom: 1px solid var(--border-color); vertical-align: middle;}
+        
+        .action-btn { padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.8rem; cursor: pointer; border: none; transition: 0.2s;}
+        .btn-edit { background: rgba(52, 152, 219, 0.1); color: #3498db; border: 1px solid rgba(52, 152, 219, 0.3);}
+        .btn-edit:hover { background: #3498db; color: white;}
+        .btn-delete { background: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.3);}
+        .btn-delete:hover { background: #e74c3c; color: white;}
+
+        .modal-content { background-color: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); }
+        .modal-header { border-bottom: 1px solid var(--border-color); }
+        .modal-footer { border-top: 1px solid var(--border-color); }
+        .form-control, .form-select { background-color: var(--input-bg); border-color: var(--border-color); color: var(--text-color); }
+        .form-control:focus, .form-select:focus { border-color: var(--utme-green); box-shadow: none; background-color: var(--card-bg); color: var(--text-color);}
+        
+        .ql-toolbar { background: var(--input-bg); border-color: var(--border-color) !important; border-top-left-radius: 6px; border-top-right-radius: 6px;}
+        .ql-container { border-color: var(--border-color) !important; border-bottom-left-radius: 6px; border-bottom-right-radius: 6px; font-size: 1rem; color: var(--text-color);}
+        body.dark-mode .ql-stroke { stroke: var(--text-color); }
+        body.dark-mode .ql-fill { fill: var(--text-color); }
+        
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; color: white;}
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay">
+        <i class="fas fa-spinner fa-spin fa-4x text-warning mb-3"></i>
+        <h3 class="fw-bold" id="loadingText">Processing...</h3>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <h5 class="text-white fw-bold m-0"><i class="fas fa-chalkboard-teacher text-warning me-2"></i> STAFF PORTAL</h5>
+        </div>
+        <nav class="nav flex-column mt-3">
+            <a href="teacher_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="teacher_class_list.html" class="nav-link"><i class="fas fa-users"></i> Class Roster</a>
+            
+            <a href="#cbtMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
+                <span><i class="fas fa-laptop-code me-2"></i> CBT Console</span><i class="fas fa-caret-down"></i>
+            </a>
+            
+            <div class="collapse show bg-dark mx-2 mt-1 rounded pb-2" id="cbtMenu">
+                
+                <div class="px-3 py-1 text-muted small fw-bold mt-2" style="font-size: 0.7rem; letter-spacing: 1px;">SCHOOL EXAMS</div>
+                <a href="create_test.html" class="nav-link small py-1"><i class="fas fa-plus-circle me-2"></i> Create Exam</a>
+                <a href="question_bank.html" class="nav-link small py-1"><i class="fas fa-server me-2"></i> School Q-Bank</a>
+                <a href="manage_cbt.html" class="nav-link small py-1"><i class="fas fa-list me-2"></i> Manage Exams</a>
+                
+                <div class="px-3 py-1 text-warning small fw-bold mt-3 border-top border-secondary pt-2" style="font-size: 0.7rem; letter-spacing: 1px;">REAL JAMB HUB</div>
+                <a href="teacher_bulk_upload.html" class="nav-link small py-1"><i class="fas fa-upload me-2"></i> JAMB Uploader</a>
+                <a href="jamb_question_bank.html" class="nav-link small py-1 active text-warning fw-bold"><i class="fas fa-database me-2"></i> JAMB Q-Bank</a>
+            </div>
+
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Secure Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="fw-bold d-flex align-items-center" style="color: var(--text-muted);">
+                <i class="fas fa-database me-2"></i> JAMB Master Database Manager
+            </div>
+            <button class="dark-toggle-btn" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
+        </div>
+
+        <div class="manager-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="fw-bold m-0 text-warning">Real UTME Questions</h4>
+                    <p class="text-muted m-0 small">View, edit, or delete authentic JAMB questions active in the Hub.</p>
+                </div>
+                <a href="teacher_bulk_upload.html" class="btn btn-warning fw-bold text-dark"><i class="fas fa-plus me-2"></i> Upload More Questions</a>
+            </div>
+
+            <div class="filter-bar">
+                <div class="fw-bold text-muted small me-2"><i class="fas fa-filter"></i> Filters:</div>
+                <select class="form-select form-select-sm fw-bold w-auto" id="filterSubject">
+                    <option value="ALL">All Subjects</option>
+                    <option value="English">English</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Biology">Biology</option>
+                    <option value="Economics">Economics</option>
+                    <option value="Government">Government</option>
+                    <option value="Literature">Literature</option>
+                    <option value="CRK">CRK</option>
+                    <option value="Accounts">Accounts</option>
+                    <option value="Commerce">Commerce</option>
+                    </select>
+                <select class="form-select form-select-sm fw-bold w-auto" id="filterYear">
+                    <option value="ALL">All Years</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                </select>
+                <button class="btn btn-primary btn-sm fw-bold px-4" onclick="loadQuestions()"><i class="fas fa-search me-1"></i> Search</button>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%;">Subject & Year</th>
+                            <th style="width: 45%;">Question Snippet</th>
+                            <th style="width: 15%;">Correct Ans</th>
+                            <th style="width: 25%; text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="questionsTableBody">
+                        <tr><td colspan="4" class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i> Loading database...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-muted small mt-3 fw-bold" id="resultCount">Showing 0 questions.</div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark border-0">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-edit me-2"></i> Edit JAMB Question</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="editForm">
+                        <input type="hidden" id="edit_id">
+                        
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">Subject</label>
+                                <input type="text" class="form-control fw-bold" id="edit_subject" disabled>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">Exam Year</label>
+                                <input type="text" class="form-control" id="edit_year">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Question Text (Formulas Supported)</label>
+                            <div id="quillEditEditor" style="height: 120px; background: var(--card-bg);"></div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">Option A</label>
+                                <input type="text" class="form-control" id="edit_opt_a" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">Option B</label>
+                                <input type="text" class="form-control" id="edit_opt_b" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">Option C</label>
+                                <input type="text" class="form-control" id="edit_opt_c" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">Option D</label>
+                                <input type="text" class="form-control" id="edit_opt_d" required>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-success">Correct Option</label>
+                                <select class="form-select fw-bold border-success text-success" id="edit_correct" required>
+                                    <option value="A">Option A</option>
+                                    <option value="B">Option B</option>
+                                    <option value="C">Option C</option>
+                                    <option value="D">Option D</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning fw-bold px-4" onclick="saveEdit()"><i class="fas fa-save me-2"></i> Save Fix</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        let currentQuestions = [];
+        let quillEditor;
+        let editModalInstance;
+
+        window.toggleTheme = () => {
+            const body = document.body; body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') window.toggleTheme();
+
+        async function init() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return window.location.href = 'login.html';
+
+            const { data: profile } = await supabase.from('users').select('role').eq('id', session.user.id).single();
+            if (!profile || profile.role !== 'teacher') return window.location.href = 'login.html';
+
+            quillEditor = new Quill('#quillEditEditor', {
+                theme: 'snow',
+                modules: {
+                    formula: true,
+                    toolbar: [
+                        ['bold', 'italic'], [{ 'script': 'sub'}, { 'script': 'super' }], ['formula'], ['clean']
+                    ]
+                }
+            });
+
+            editModalInstance = new bootstrap.Modal(document.getElementById('editModal'));
+
+            loadQuestions(); 
+        }
+
+        window.loadQuestions = async () => {
+            const subject = document.getElementById('filterSubject').value;
+            const year = document.getElementById('filterYear').value;
+
+            document.getElementById('questionsTableBody').innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i> Searching database...</td></tr>`;
+
+            // THIS POINTS TO THE JAMB TABLE: question_bank
+            let query = supabase.from('question_bank').select('*').order('created_at', { ascending: false }).limit(100);
+
+            if (subject !== 'ALL') query = query.eq('subject', subject);
+            if (year !== 'ALL') query = query.eq('exam_year', year);
+
+            const { data, error } = await query;
+            
+            if (error) {
+                document.getElementById('questionsTableBody').innerHTML = `<tr><td colspan="4" class="text-danger text-center">Error loading questions.</td></tr>`;
+                return;
+            }
+
+            currentQuestions = data || [];
+            document.getElementById('resultCount').innerText = `Showing latest ${currentQuestions.length} JAMB questions.`;
+            renderTable();
+        };
+
+        function renderTable() {
+            const tbody = document.getElementById('questionsTableBody');
+            
+            if (currentQuestions.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted fw-bold">No questions found matching your filter.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = currentQuestions.map(q => {
+                const cleanText = q.question_text ? q.question_text.replace(/<[^>]+>/g, '').substring(0, 60) + '...' : 'No text';
+                
+                return `
+                    <tr>
+                        <td>
+                            <div class="fw-bold text-warning">${q.subject}</div>
+                            <div class="small text-muted"><i class="fas fa-calendar-alt me-1"></i> ${q.exam_year || 'N/A'}</div>
+                        </td>
+                        <td>
+                            ${q.image_url ? '<i class="fas fa-image text-primary me-1" title="Contains Image"></i> ' : ''}
+                            ${cleanText}
+                        </td>
+                        <td><span class="badge bg-success shadow-sm fs-6">${q.correct_option}</span></td>
+                        <td style="text-align: right;">
+                            <button class="action-btn btn-edit me-2" onclick="openEditModal('${q.id}')"><i class="fas fa-edit me-1"></i> Edit</button>
+                            <button class="action-btn btn-delete" onclick="deleteQuestion('${q.id}')"><i class="fas fa-trash me-1"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        window.openEditModal = (id) => {
+            const q = currentQuestions.find(item => item.id == id);
+            if (!q) return;
+
+            document.getElementById('edit_id').value = q.id;
+            document.getElementById('edit_subject').value = q.subject;
+            document.getElementById('edit_year').value = q.exam_year || '';
+            document.getElementById('edit_opt_a').value = q.option_a;
+            document.getElementById('edit_opt_b').value = q.option_b;
+            document.getElementById('edit_opt_c').value = q.option_c;
+            document.getElementById('edit_opt_d').value = q.option_d;
+            document.getElementById('edit_correct').value = q.correct_option;
+
+            quillEditor.root.innerHTML = q.question_text;
+            editModalInstance.show();
+        };
+
+        window.saveEdit = async () => {
+            const id = document.getElementById('edit_id').value;
+            const updatedHTMLText = quillEditor.root.innerHTML;
+
+            if (quillEditor.getText().trim() === '') {
+                return alert("Question text cannot be empty.");
+            }
+
+            const loader = document.getElementById('loadingOverlay');
+            loader.style.display = 'flex';
+            document.getElementById('loadingText').innerText = "Saving Corrections...";
+
+            try {
+                // SAVING EDITS TO THE JAMB TABLE
+                const { error } = await supabase.from('question_bank').update({
+                    exam_year: document.getElementById('edit_year').value || null,
+                    question_text: updatedHTMLText,
+                    option_a: document.getElementById('edit_opt_a').value.trim(),
+                    option_b: document.getElementById('edit_opt_b').value.trim(),
+                    option_c: document.getElementById('edit_opt_c').value.trim(),
+                    option_d: document.getElementById('edit_opt_d').value.trim(),
+                    correct_option: document.getElementById('edit_correct').value
+                }).eq('id', id);
+
+                if (error) throw error;
+
+                editModalInstance.hide();
+                loader.style.display = 'none';
+                loadQuestions(); 
+
+            } catch(e) {
+                console.error(e);
+                alert("Failed to update: " + e.message);
+                loader.style.display = 'none';
+            }
+        };
+
+        window.deleteQuestion = async (id) => {
+            if (!confirm("CRITICAL WARNING: Are you absolutely sure you want to delete this JAMB question? It will be permanently removed from the master database.")) return;
+
+            const loader = document.getElementById('loadingOverlay');
+            loader.style.display = 'flex';
+            document.getElementById('loadingText').innerText = "Trashing Question...";
+
+            try {
+                const { error } = await supabase.from('question_bank').delete().eq('id', id);
+                if (error) throw error;
+                
+                loader.style.display = 'none';
+                loadQuestions(); 
+            } catch(e) {
+                console.error(e);
+                alert("Delete failed: " + e.message);
+                loader.style.display = 'none';
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', init);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
+    </script>
+</body>
+</html>
