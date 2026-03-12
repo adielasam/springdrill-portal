@@ -44,6 +44,11 @@
         .status-btn.late:hover { border-color: #f39c12; color: #f39c12; }
         .status-btn.late.active { background: rgba(241, 196, 15, 0.15); color: #f39c12; border-color: #f39c12; }
 
+        /* ONLY AVATAR CSS ADDED HERE */
+        .student-profile-container { display: flex; align-items: center; gap: 15px; }
+        .student-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color); background-color: var(--input-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
+        .student-name-box { display: flex; flex-direction: column; line-height: 1.2;}
+
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
@@ -214,10 +219,24 @@
             const tbody = document.getElementById('rosterBody');
             tbody.innerHTML = rosterData.map((s, index) => {
                 const state = attendanceState[s.id];
+                
+                // ONLY AVATAR LOGIC ADDED HERE
+                const fName = s.first_name || "Student";
+                const lName = s.surname || "";
+                const dynamicAvatarUrl = `https://ui-avatars.com/api/?name=${fName}+${lName}&background=e8f5e9&color=007a4d&bold=true`;
+                const finalAvatar = s.profile_image || dynamicAvatarUrl;
+
                 return `
                     <tr>
                         <td class="text-center fw-bold text-muted">${index + 1}</td>
-                        <td class="fw-bold" style="color: var(--text-color);">${s.first_name} ${s.surname || ''}</td>
+                        <td>
+                            <div class="student-profile-container">
+                                <img src="${finalAvatar}" class="student-avatar" alt="Profile">
+                                <div class="student-name-box">
+                                    <span class="fw-bold" style="color: var(--text-color); font-size: 1.05rem;">${fName} ${lName}</span>
+                                </div>
+                            </div>
+                        </td>
                         <td class="fw-bold text-primary">${s.reg_number || 'N/A'}</td>
                         <td>
                             <div class="status-group">
