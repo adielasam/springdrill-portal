@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRINGDRILL - Attendance Log</title>
+    <title>SPRINGDRILL - Attendance Tracker</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -13,7 +13,7 @@
         
         .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; box-shadow: 4px 0 15px rgba(0,0,0,0.1);}
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; text-decoration: none; display: flex; align-items: center;}
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; text-decoration: none; display: flex; align-items: center; font-size: 0.95rem;}
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
 
@@ -21,21 +21,28 @@
         .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--utme-green); }
         .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;}
 
-        .control-panel { background: var(--card-bg); border-radius: 10px; padding: 20px; border: 1px solid var(--border-color); margin-bottom: 25px; }
-        .form-control, .form-select { background-color: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); }
+        .control-panel { background: var(--card-bg); border-radius: 10px; padding: 20px; border: 1px solid var(--border-color); margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);}
         
-        .table-wrapper { background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border-color); overflow: hidden; }
+        .roster-card { background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02);}
+        .roster-header { background: var(--utme-green); color: white; padding: 15px 20px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        
         .custom-table { width: 100%; margin: 0; color: var(--text-color); }
-        .custom-table th { background: var(--input-bg); padding: 15px 20px; font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); border-bottom: 2px solid var(--border-color); font-weight: 700;}
+        .custom-table th { padding: 15px 20px; font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); border-bottom: 2px solid var(--border-color); background: var(--input-bg);}
         .custom-table td { padding: 15px 20px; vertical-align: middle; border-bottom: 1px solid var(--border-color); }
-        
-        /* ADMIN AVATAR CSS */
-        .student-profile-container { display: flex; align-items: center; gap: 12px; }
-        .student-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color); background-color: var(--input-bg);}
+        .custom-table tr:hover { background-color: rgba(0,0,0,0.02); }
 
-        .badge-present { background-color: rgba(39, 174, 96, 0.15); color: #27ae60; padding: 6px 12px; border-radius: 20px; font-weight: bold; border: 1px solid rgba(39, 174, 96, 0.3);}
-        .badge-absent { background-color: rgba(231, 76, 60, 0.15); color: #e74c3c; padding: 6px 12px; border-radius: 20px; font-weight: bold; border: 1px solid rgba(231, 76, 60, 0.3);}
-        .badge-late { background-color: rgba(241, 196, 15, 0.15); color: #f39c12; padding: 6px 12px; border-radius: 20px; font-weight: bold; border: 1px solid rgba(241, 196, 15, 0.3);}
+        /* STATUS BUTTONS */
+        .status-group { display: flex; gap: 8px; justify-content: center; }
+        .status-btn { padding: 6px 15px; font-size: 0.85rem; font-weight: bold; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-muted); cursor: pointer; transition: 0.2s; }
+        
+        .status-btn.present:hover { border-color: #27ae60; color: #27ae60; }
+        .status-btn.present.active { background: rgba(39, 174, 96, 0.15); color: #27ae60; border-color: #27ae60; }
+        
+        .status-btn.absent:hover { border-color: #e74c3c; color: #e74c3c; }
+        .status-btn.absent.active { background: rgba(231, 76, 60, 0.15); color: #e74c3c; border-color: #e74c3c; }
+        
+        .status-btn.late:hover { border-color: #f39c12; color: #f39c12; }
+        .status-btn.late.active { background: rgba(241, 196, 15, 0.15); color: #f39c12; border-color: #f39c12; }
 
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
@@ -44,26 +51,32 @@
 
     <div id="loadingOverlay">
         <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
-        <h4 class="fw-bold" style="color: var(--text-muted);">Syncing Data...</h4>
+        <h4 class="fw-bold" style="color: var(--text-muted);">Authenticating...</h4>
     </div>
 
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <h5 class="text-white fw-bold m-0"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
+            <h5 class="text-white fw-bold m-0"><i class="fas fa-chalkboard-teacher text-warning me-2"></i> STAFF PORTAL</h5>
         </div>
         
         <nav class="nav flex-column mt-3">
-            <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="admin_attendance.html" class="nav-link active fw-bold"><i class="fas fa-calendar-check text-warning me-2"></i> Attendance Log</a>
-            <a href="#usersMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
-                <span><i class="fas fa-users me-2"></i> Accounts</span><i class="fas fa-caret-down"></i>
+            <a href="teacher_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="teacher_class_list.html" class="nav-link"><i class="fas fa-users"></i> Class Roster & 360°</a>
+            <a href="teacher_attendance.html" class="nav-link active"><i class="fas fa-calendar-check text-warning"></i> Attendance Tracker</a>
+            <a href="teacher_eclassroom.html" class="nav-link"><i class="fas fa-video text-danger"></i> eClassroom</a>
+            <a href="teacher_subjects.html" class="nav-link"><i class="fas fa-book"></i> Materials & AI Planner</a>
+
+            <a href="#cbtMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
+                <span><i class="fas fa-laptop-code me-2"></i> CBT Console</span><i class="fas fa-caret-down"></i>
             </a>
-            <div class="collapse show bg-dark mx-2 mt-1 rounded" id="usersMenu">
-                <a href="admin_create_user.html" class="nav-link small py-2"><i class="fas fa-user-plus me-2"></i> Generate Account</a>
-                <a href="manage_users.html" class="nav-link small py-2"><i class="fas fa-user-check me-2"></i> Approvals</a>
-                <a href="class_list.html" class="nav-link small py-2"><i class="fas fa-clipboard-list me-2"></i> Class Data</a>
+            <div class="collapse bg-dark mx-2 mt-1 rounded" id="cbtMenu">
+                <a href="create_test.html" class="nav-link small py-2"><i class="fas fa-plus-circle me-2"></i> Create Exam</a>
+                <a href="question_bank.html" class="nav-link small py-2"><i class="fas fa-database me-2"></i> Question Bank</a>
+                <a href="manage_cbt.html" class="nav-link small py-2"><i class="fas fa-list me-2"></i> Manage Exams</a>
+                <a href="test_results.html" class="nav-link small py-2"><i class="fas fa-chart-bar me-2"></i> Result Manager</a>
             </div>
-            <a href="admin_league_table.html" class="nav-link mt-2"><i class="fas fa-trophy text-warning me-2"></i> League Table</a>
+
+            <a href="teacher_messages.html" class="nav-link mt-2"><i class="fas fa-envelope"></i> Communications</a>
             <hr class="mx-3 my-4 border-secondary">
             <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Secure Logout</a>
         </nav>
@@ -71,49 +84,56 @@
 
     <div class="main-content">
         <div class="top-navbar">
-            <div class="fw-bold d-none d-md-block" style="color: var(--text-muted);"><i class="fas fa-calendar-alt me-2"></i> Master Attendance Log</div>
+            <div class="fw-bold d-none d-md-block" style="color: var(--text-muted);"><i class="fas fa-calendar-check me-2"></i> Daily Attendance Tracker</div>
             <button class="dark-toggle-btn me-3" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
-        </div>
-
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="fw-bold m-0">Student Attendance Records</h3>
         </div>
 
         <div class="control-panel">
             <div class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label fw-bold text-muted small">Select Date</label>
-                    <input type="date" id="dateFilter" class="form-control form-control-lg fw-bold" onchange="loadAttendance()">
-                </div>
-                <div class="col-md-2">
-                    <button class="btn btn-outline-secondary btn-lg w-100 fw-bold" onclick="clearDateFilter()" title="Show All Records"><i class="fas fa-history me-1"></i> All Time</button>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-bold text-muted small">Filter by Class</label>
-                    <select id="classFilter" class="form-select form-select-lg fw-bold" onchange="loadAttendance()">
-                        <option value="all">All Classes Overview</option>
+                <div class="col-md-5">
+                    <label class="form-label fw-bold text-muted small">Select Class Roster</label>
+                    <select id="classSelect" class="form-select form-select-lg fw-bold">
+                        <option value="">-- Choose a Class --</option>
                     </select>
                 </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold text-muted small">Attendance Date</label>
+                    <input type="date" id="dateSelect" class="form-control form-control-lg fw-bold">
+                </div>
                 <div class="col-md-3">
-                    <button class="btn btn-success btn-lg w-100 fw-bold" onclick="loadAttendance()"><i class="fas fa-sync-alt me-2"></i> Refresh</button>
+                    <button class="btn btn-success btn-lg w-100 fw-bold" onclick="loadRoster()"><i class="fas fa-list-ul me-2"></i> Load Roster</button>
                 </div>
             </div>
         </div>
 
-        <div class="table-wrapper table-responsive mb-5">
-            <table class="custom-table">
-                <thead>
-                    <tr>
-                        <th width="35%">Student Name</th>
-                        <th width="20%">Class / Reg No.</th>
-                        <th width="25%">Time Logged</th>
-                        <th width="20%" class="text-center">Status</th>
-                    </tr>
-                </thead>
-                <tbody id="attendanceTableBody">
-                </tbody>
-            </table>
+        <div class="roster-card" id="rosterSection" style="display: none;">
+            <div class="roster-header">
+                <span><i class="fas fa-clipboard-list me-2"></i> Mark Register</span>
+                <span class="badge bg-light text-dark" id="displayDateBadge">Date</span>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th width="10%" class="text-center">S/N</th>
+                            <th width="35%">Student Name</th>
+                            <th width="25%">Reg Number</th>
+                            <th width="30%" class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rosterBody">
+                        </tbody>
+                </table>
+            </div>
+            
+            <div class="p-4 bg-light border-top d-flex justify-content-end">
+                <button class="btn btn-primary btn-lg fw-bold shadow-sm px-5" id="saveBtn" onclick="saveAttendance()">
+                    <i class="fas fa-save me-2"></i> Save Daily Attendance
+                </button>
+            </div>
         </div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -128,129 +148,132 @@
         };
         if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { window.toggleTheme(); }
 
-        window.clearDateFilter = () => {
-            document.getElementById('dateFilter').value = ""; 
-            window.loadAttendance();
-        };
+        let currentClassId = '';
+        let currentDate = '';
+        let rosterData = [];
+        let attendanceState = {}; // Object matching student UUIDs to their current status
 
         async function initialize() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
 
-                const { data: classes } = await supabase.from('classes').select('*').order('name');
+                // Load Teacher's Classes
+                const { data: classes } = await supabase.from('classes').select('id, name').order('name');
                 if (classes) {
-                    const classSelect = document.getElementById('classFilter');
-                    classes.forEach(c => { classSelect.innerHTML += `<option value="${c.id}">${c.name}</option>`; });
+                    const sel = document.getElementById('classSelect');
+                    classes.forEach(c => sel.innerHTML += `<option value="${c.id}">${c.name}</option>`);
                 }
 
+                // Set Date default
                 const today = new Date();
                 const y = today.getFullYear();
                 const m = String(today.getMonth() + 1).padStart(2, '0');
                 const d = String(today.getDate()).padStart(2, '0');
-                document.getElementById('dateFilter').value = `${y}-${m}-${d}`;
-                
-                await loadAttendance();
+                document.getElementById('dateSelect').value = `${y}-${m}-${d}`;
+
                 document.getElementById('loadingOverlay').style.display = 'none';
-            } catch (err) {
-                console.error(err);
-                document.getElementById('loadingOverlay').style.display = 'none';
-            }
+            } catch(e) { console.error(e); }
         }
 
-        window.loadAttendance = async () => {
-            const tbody = document.getElementById('attendanceTableBody');
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin fa-2x mb-2"></i><br>Fetching records...</td></tr>';
+        window.loadRoster = async () => {
+            currentClassId = document.getElementById('classSelect').value;
+            currentDate = document.getElementById('dateSelect').value;
 
-            const selectedDate = document.getElementById('dateFilter').value; 
-            const selectedClass = document.getElementById('classFilter').value;
+            if (!currentClassId) return alert("Please select a class first.");
+            if (!currentDate) return alert("Please select a date.");
+
+            document.getElementById('rosterSection').style.display = 'block';
+            document.getElementById('displayDateBadge').innerText = new Date(currentDate).toDateString();
+            document.getElementById('rosterBody').innerHTML = '<tr><td colspan="4" class="text-center py-5"><i class="fas fa-spinner fa-spin fa-2x text-success"></i></td></tr>';
 
             try {
-                const [rawAtt, allStudents, allClasses] = await Promise.all([
-                    supabase.from('attendance').select('*').order('created_at', { ascending: false }),
-                    supabase.from('students').select('*'),
-                    supabase.from('classes').select('*')
-                ]);
+                // Fetch Students
+                const { data: students, error } = await supabase.from('students').select('*').eq('class_id', currentClassId).eq('approved', true).order('first_name');
+                if (error) throw error;
 
-                if (rawAtt.error || !rawAtt.data || rawAtt.data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-danger fw-bold"><i class="fas fa-database fs-1 mb-3 opacity-50"></i><br>0 records found in database.<br><small class="text-muted">If the teacher saved it, it failed silently on the teacher's screen.</small></td></tr>`;
+                if (!students || students.length === 0) {
+                    document.getElementById('rosterBody').innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted">No students found in this class.</td></tr>';
                     return;
                 }
 
-                const classMap = {};
-                if (allClasses.data) allClasses.data.forEach(c => classMap[c.id] = c.name);
+                rosterData = students;
+                attendanceState = {};
+                
+                // Set default state to 'Present'
+                students.forEach(s => attendanceState[s.id] = 'Present');
 
-                const studentMap = {};
-                if (allStudents.data) {
-                    allStudents.data.forEach(s => {
-                        s.className = classMap[s.class_id] || 'Unassigned';
-                        if (s.id) studentMap[String(s.id).trim().toLowerCase()] = s;
-                        if (s.user_id) studentMap[String(s.user_id).trim().toLowerCase()] = s;
-                        if (s.reg_number) studentMap[String(s.reg_number).trim().toLowerCase()] = s; 
-                    });
-                }
-
-                const filteredRecords = rawAtt.data.filter(record => {
-                    const rawId = record.student_id || record.user_id || record.studentId || record.reg_number || "";
-                    const cleanId = String(rawId).trim().toLowerCase();
-                    const studentObj = studentMap[cleanId];
-
-                    const dbDateString = record.created_at ? record.created_at.split('T')[0] : (record.date ? record.date.split('T')[0] : "");
-                    const dateMatch = !selectedDate || (dbDateString === selectedDate);
-                    
-                    const recClassId = record.class_id || record.className || (studentObj ? studentObj.class_id : null);
-                    const selectedClassName = classMap[selectedClass]; 
-                    const classMatch = (selectedClass === 'all') || (recClassId == selectedClass) || (recClassId == selectedClassName);
-
-                    record.studentObj = studentObj;
-                    record.cleanId = rawId; 
-                    record.displayDate = dbDateString;
-                    
-                    return dateMatch && classMatch;
-                });
-
-                if (filteredRecords.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted"><i class="fas fa-calendar-times fs-1 mb-3 opacity-25"></i><br>No attendance records found for this specific date/class.<br><small>Click the <b>"All Time"</b> button to see everything.</small></td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = filteredRecords.map(record => {
-                    const stat = String(record.status).toLowerCase();
-                    let badge = '';
-                    if (stat.includes('present')) badge = `<span class="badge-present"><i class="fas fa-check me-2"></i>Present</span>`;
-                    else if (stat.includes('late')) badge = `<span class="badge-late"><i class="fas fa-clock me-2"></i>Late</span>`;
-                    else badge = `<span class="badge-absent"><i class="fas fa-times me-2"></i>Absent</span>`;
-                    
-                    const fName = record.studentObj ? record.studentObj.first_name : "Unknown";
-                    const lName = record.studentObj ? (record.studentObj.surname || "") : "Student";
-                    
-                    // DYNAMIC AVATAR FOR ADMIN SCREEN
-                    const dynamicAvatarUrl = `https://ui-avatars.com/api/?name=${fName}+${lName}&background=f1c40f&color=000&bold=true`;
-                    const finalAvatar = (record.studentObj && record.studentObj.profile_image) ? record.studentObj.profile_image : dynamicAvatarUrl;
-                    
-                    const studentNameDisplay = record.studentObj ? `${fName} ${lName}` : `<span class="text-danger fw-bold">Unlinked Student</span>`;
-                    const className = record.studentObj ? record.studentObj.className : (classMap[record.class_id] || record.class_id || record.className || `Reg: ${record.cleanId}`);
-                    
-                    let timeString = record.displayDate;
-                    if (record.created_at) timeString += " " + new Date(record.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                    return `<tr>
-                        <td>
-                            <div class="student-profile-container">
-                                <img src="${finalAvatar}" class="student-avatar" alt="User">
-                                <span class="fw-bold">${studentNameDisplay}</span>
-                            </div>
-                        </td>
-                        <td><span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary">${className}</span></td>
-                        <td><i class="far fa-clock me-1 text-muted"></i> <small>${timeString}</small></td>
-                        <td class="text-center">${badge}</td>
-                    </tr>`;
-                }).join('');
+                renderTable();
 
             } catch (err) {
-                console.error("Failed to load attendance:", err);
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-danger fw-bold"><i class="fas fa-exclamation-triangle fs-2 mb-2"></i><br>Data Error: ${err.message}</td></tr>`;
+                document.getElementById('rosterBody').innerHTML = `<tr><td colspan="4" class="text-center py-5 text-danger">Error: ${err.message}</td></tr>`;
             }
+        };
+
+        function renderTable() {
+            const tbody = document.getElementById('rosterBody');
+            tbody.innerHTML = rosterData.map((s, index) => {
+                const state = attendanceState[s.id];
+                return `
+                    <tr>
+                        <td class="text-center fw-bold text-muted">${index + 1}</td>
+                        <td class="fw-bold" style="color: var(--text-color);">${s.first_name} ${s.surname || ''}</td>
+                        <td class="fw-bold text-primary">${s.reg_number || 'N/A'}</td>
+                        <td>
+                            <div class="status-group">
+                                <button class="status-btn present ${state === 'Present' ? 'active' : ''}" onclick="setStatus('${s.id}', 'Present')">Present</button>
+                                <button class="status-btn absent ${state === 'Absent' ? 'active' : ''}" onclick="setStatus('${s.id}', 'Absent')">Absent</button>
+                                <button class="status-btn late ${state === 'Late' ? 'active' : ''}" onclick="setStatus('${s.id}', 'Late')">Late</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        window.setStatus = (studentId, status) => {
+            attendanceState[studentId] = status;
+            renderTable(); // Re-render to update colors instantly
+        };
+
+        // 🚨 BULLETPROOF SAVE FUNCTION 🚨
+        window.saveAttendance = async () => {
+            const btn = document.getElementById('saveBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Saving to Database...';
+            btn.disabled = true;
+
+            try {
+                // Step 1: Wipe previous entries for this exact class and date to prevent duplicate records
+                await supabase.from('attendance')
+                    .delete()
+                    .eq('class_id', currentClassId)
+                    .eq('date', currentDate);
+
+                // Step 2: Build the payload perfectly matching our database columns
+                const payload = rosterData.map(s => ({
+                    student_id: s.id,
+                    class_id: currentClassId,
+                    date: currentDate,
+                    status: attendanceState[s.id]
+                }));
+
+                // Step 3: Insert and STRICTLY check for errors
+                const { error } = await supabase.from('attendance').insert(payload);
+
+                if (error) {
+                    // THIS IS WHAT WAS MISSING: If Supabase rejects it, THROW AN ERROR!
+                    throw new Error(error.message);
+                }
+
+                alert(`Success!\nAttendance for ${payload.length} students has been saved securely to the database.`);
+
+            } catch (err) {
+                console.error("Database Save Error:", err);
+                alert(`🚨 DATABASE REJECTED THE SAVE 🚨\n\nReason: ${err.message}\n\nPlease screenshot this error for the developer.`);
+            }
+
+            btn.innerHTML = '<i class="fas fa-save me-2"></i> Save Daily Attendance';
+            btn.disabled = false;
         };
 
         document.addEventListener('DOMContentLoaded', initialize);
