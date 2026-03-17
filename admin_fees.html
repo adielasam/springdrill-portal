@@ -2,59 +2,149 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SPRINGDRILL - Fees & Payments</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --bg-color: #f8fafc; --card-bg: #ffffff; --text-color: #0f172a; --text-muted: #64748b; --border-color: #e2e8f0; --input-bg: #f1f5f9; --utme-green: #059669;}
-        body.dark-mode { --bg-color: #020617; --card-bg: #0f172a; --text-color: #f8fafc; --text-muted: #94a3b8; --border-color: #1e293b; --input-bg: #1e293b; --utme-green: #10b981;}
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; overflow-x: hidden; transition: 0.3s; }
+        /* PREMIUM MINIMALIST THEME */
+        :root { 
+            --bg-color: #f8fafc; 
+            --card-bg: #ffffff; 
+            --text-color: #0f172a; 
+            --text-muted: #64748b; 
+            --border-color: #e2e8f0; 
+            --input-bg: #f1f5f9; 
+            --utme-green: #059669; 
+            --utme-green-hover: #047857;
+        }
         
+        body.dark-mode { 
+            --bg-color: #020617; 
+            --card-bg: #0f172a; 
+            --text-color: #f8fafc; 
+            --text-muted: #94a3b8; 
+            --border-color: #1e293b; 
+            --input-bg: #1e293b; 
+            --utme-green: #10b981;
+            --utme-green-hover: #059669;
+        }
+        
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', system-ui, sans-serif; overflow-x: hidden; transition: 0.3s; }
+        
+        /* SIDEBAR */
         .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; overflow-y: auto;}
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 15px; color: var(--text-color); }
         .sidebar-heading { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; padding: 10px 25px; margin-top: 10px; }
-        .nav-link { color: var(--text-muted); padding: 10px 25px; margin: 2px 10px; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; font-size: 0.9rem; font-weight: 500;}
+        .nav-link { color: var(--text-muted); padding: 10px 25px; margin: 2px 10px; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; font-size: 0.9rem; font-weight: 500; text-decoration: none;}
         .nav-link i { width: 25px; font-size: 1.1rem; }
         .nav-link:hover { background: var(--input-bg); color: var(--text-color); }
         .nav-link.active { background: rgba(16, 185, 129, 0.1); color: var(--utme-green); font-weight: 700; border-right: 3px solid var(--utme-green); }
-        
+        body.dark-mode .nav-link.active { background: rgba(16, 185, 129, 0.2); }
+
         .main-content { margin-left: 260px; padding: 30px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        
+        /* NAVBAR */
         .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
         .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
-        
-        .sleek-stat-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; transition: 0.3s; height: 100%; box-shadow: 0 1px 3px rgba(0,0,0,0.02);}
+        .dark-toggle-btn:hover { background: var(--border-color); }
+
+        /* VIEW TOGGLE ANIMATIONS */
+        .view-section { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* LIST VIEW STYLES */
+        .sleek-stat-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; height: 100%; box-shadow: 0 1px 3px rgba(0,0,0,0.02);}
         .sleek-stat-card p { color: var(--text-muted); font-size: 0.9rem; font-weight: 600; margin-bottom: 10px; }
-        .sleek-stat-card h2 { font-size: 2.2rem; font-weight: 800; color: var(--text-color); margin: 0; line-height: 1;}
+        .sleek-stat-card h2 { font-size: 2.2rem; font-weight: 800; margin: 0; line-height: 1;}
 
         .dash-widget { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.02); margin-top: 30px; overflow: hidden; }
         .widget-header { padding: 20px; font-weight: 700; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; color: var(--text-color); font-size: 1.05rem;}
         
-        .custom-table { width: 100%; color: var(--text-color); margin: 0; min-width: 700px;}
-        .custom-table th { color: var(--text-muted); border-bottom: 1px solid var(--border-color); padding: 15px 20px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; background: var(--input-bg);}
-        .custom-table td { padding: 15px 20px; vertical-align: middle; border-bottom: 1px solid var(--border-color); font-weight: 600; font-size: 0.95rem;}
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state i { font-size: 3rem; color: var(--text-muted); opacity: 0.5; margin-bottom: 15px;}
+        .empty-state h4 { font-weight: 700; margin-bottom: 5px;}
+        .empty-state p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;}
+
+        /* FORM CREATION STYLES */
+        .form-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .form-control, .form-select, .input-group-text { background-color: var(--input-bg); border-color: var(--border-color); color: var(--text-color); font-weight: 500;}
+        .form-control:focus, .form-select:focus { border-color: var(--utme-green); box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.1); background-color: var(--input-bg); color: var(--text-color);}
+        .form-label { font-weight: 700; font-size: 0.85rem; color: var(--text-color); margin-bottom: 8px;}
+        
+        /* TARGET SELECTION CARDS */
+        .target-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px;}
+        .target-card { border: 2px solid var(--border-color); border-radius: 10px; padding: 15px; cursor: pointer; transition: 0.2s; background: var(--input-bg); display: flex; flex-direction: column; gap: 5px;}
+        .target-card:hover { border-color: var(--text-muted); }
+        .target-card.active { border-color: var(--utme-green); background: rgba(16, 185, 129, 0.05); }
+        .target-card i { font-size: 1.2rem; margin-bottom: 5px; color: var(--text-muted); }
+        .target-card.active i { color: var(--utme-green); }
+        .target-card .title { font-weight: 700; font-size: 0.9rem; color: var(--text-color);}
+        .target-card .desc { font-size: 0.75rem; color: var(--text-muted); }
+
+        /* CHECKBOX GRID */
+        .class-checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 20px; padding: 20px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--card-bg); display: none;}
+        .form-check-label { font-weight: 600; font-size: 0.85rem; cursor: pointer; color: var(--text-color);}
+        .form-check-input:checked { background-color: var(--utme-green); border-color: var(--utme-green); }
+
+        .btn-brand { background-color: var(--utme-green); color: white; font-weight: 700; border: none; padding: 8px 20px; border-radius: 6px; transition: 0.2s;}
+        .btn-brand:hover { background-color: var(--utme-green-hover); color: white;}
+
+        .breadcrumb-custom { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 20px;}
+        .breadcrumb-custom span { color: var(--text-color); }
+
+        /* CUSTOM TOGGLE SWITCH */
+        .custom-switch .form-check-input { width: 3rem; height: 1.5rem; background-color: var(--border-color); border: none;}
+        .custom-switch .form-check-input:checked { background-color: var(--utme-green); }
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
         
         .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-color); font-size: 1.5rem; cursor: pointer; margin-right: 15px; padding: 0;}
         .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
-        @media (max-width: 992px) { .sidebar { left: -260px; } .sidebar.mobile-open { left: 0; } .main-content { margin-left: 0; padding: 20px; } .mobile-menu-toggle { display: inline-block !important; } }
+        @media (max-width: 992px) { 
+            .sidebar { left: -260px; } 
+            .sidebar.mobile-open { left: 0; } 
+            .main-content { margin-left: 0; padding: 20px; } 
+            .mobile-menu-toggle { display: inline-block !important; } 
+            .target-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
+
+    <div id="loadingOverlay">
+        <i class="fas fa-circle-notch fa-spin fa-3x text-success mb-3"></i>
+        <h5 class="fw-bold" style="color: var(--text-muted);">Processing...</h5>
+    </div>
+
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand"><h4 class="fw-bold m-0"><i class="fas fa-layer-group text-success me-2"></i> Admin Panel</h4></div>
         <nav class="nav flex-column">
             <div class="sidebar-heading">Overview</div>
             <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+            
             <div class="sidebar-heading">Academics</div>
             <a href="class_list.html" class="nav-link"><i class="fas fa-chalkboard"></i> Classes & Students</a>
             <a href="admin_attendance.html" class="nav-link"><i class="fas fa-calendar-check"></i> Attendance Log</a>
             <a href="admin_league_table.html" class="nav-link"><i class="fas fa-trophy"></i> League Table</a>
+
             <div class="sidebar-heading">Management</div>
             <a href="admin_admissions.html" class="nav-link"><i class="fas fa-user-graduate"></i> Admissions</a>
             <a href="admin_fees.html" class="nav-link active"><i class="fas fa-file-invoice-dollar"></i> Fees & Payments</a>
+            <a href="#" onclick="alert('Academic Calendar Coming Soon!')" class="nav-link"><i class="fas fa-calendar-alt"></i> Academic Calendar</a>
+
+            <div class="sidebar-heading">Administration</div>
+            <a href="admin_create_user.html" class="nav-link"><i class="fas fa-user-plus"></i> Generate Account</a>
+            <a href="manage_users.html" class="nav-link"><i class="fas fa-user-check"></i> Approvals</a>
+            <a href="admin_messages.html" class="nav-link"><i class="fas fa-envelope"></i> Internal Mail</a>
+            
             <div class="sidebar-heading">System</div>
             <a href="admin_announcements.html" class="nav-link"><i class="fas fa-bullhorn"></i> Announcements</a>
+            <a href="#" onclick="alert('System Settings Coming Soon!')" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+            <div class="mt-4 mb-4"></div>
         </nav>
     </div>
 
@@ -62,36 +152,131 @@
         <div class="top-navbar">
             <div class="d-flex align-items-center">
                 <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-                <div class="fw-bold text-muted"><i class="fas fa-wallet me-2"></i> Financial Overview</div>
+                <div class="fw-bold d-none d-md-block text-muted">Administrator Workspace</div>
             </div>
             <button class="dark-toggle-btn shadow-sm" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
         </div>
 
-        <div class="row g-3 mb-4 row-cols-1 row-cols-md-3">
-            <div class="col"><div class="sleek-stat-card"><p>Expected Revenue</p><h2 class="text-primary">₦ 0.00</h2></div></div>
-            <div class="col"><div class="sleek-stat-card"><p>Total Revenue</p><h2 class="text-success">₦ 0.00</h2></div></div>
-            <div class="col"><div class="sleek-stat-card"><p>Pending Invoices</p><h2 class="text-danger">0</h2></div></div>
+        <div id="feesListView" class="view-section active">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold m-0" style="color: var(--text-color);">Fees</h3>
+                <button class="btn-brand" onclick="toggleView('createFeeView')"><i class="fas fa-plus me-1"></i> Create Fee</button>
+            </div>
+
+            <div class="row g-3 mb-4 row-cols-1 row-cols-md-3">
+                <div class="col"><div class="sleek-stat-card"><p>Expected Revenue</p><h2 style="color: #3b82f6;">₦ 0.00</h2></div></div>
+                <div class="col"><div class="sleek-stat-card"><p>Collected Revenue</p><h2 style="color: #10b981;">₦ 0.00</h2></div></div>
+                <div class="col"><div class="sleek-stat-card"><p>Pending Invoices</p><h2 style="color: #f43f5e;">0</h2></div></div>
+            </div>
+
+            <div class="dash-widget">
+                <div class="empty-state">
+                    <i class="fas fa-receipt"></i>
+                    <h4>No fees found for this term</h4>
+                    <p>Create your first fee to start tracking revenue.</p>
+                    <button class="btn-brand" onclick="toggleView('createFeeView')">Create Fee</button>
+                </div>
+            </div>
         </div>
 
-        <div class="dash-widget">
-            <div class="widget-header">
-                <span>Recent Invoices</span>
-                <button class="btn btn-sm btn-success fw-bold"><i class="fas fa-file-invoice me-1"></i> Generate Invoice</button>
+
+        <div id="createFeeView" class="view-section">
+            <div class="breadcrumb-custom">
+                Home > Fees > <span>Create Fee</span>
             </div>
-            <div class="table-responsive">
-                <table class="custom-table">
-                    <thead><tr><th>Invoice ID</th><th>Student</th><th>Amount (₦)</th><th>Due Date</th><th>Status</th></tr></thead>
-                    <tbody>
-                        <tr><td colspan="5" class="text-center py-5 text-muted"><i class="fas fa-receipt fs-2 mb-3 opacity-50"></i><br>No recent invoices found.</td></tr>
-                    </tbody>
-                </table>
+            
+            <h3 class="fw-bold mb-1" style="color: var(--text-color);">Create Fee</h3>
+            <p class="text-muted mb-4" style="font-size: 0.9rem;">Create a new fee. Invoices will be generated automatically for the targeted students.</p>
+
+            <div class="form-container">
+                <form id="createFeeForm" onsubmit="submitFeeForm(event)">
+                    
+                    <div class="mb-4">
+                        <label class="form-label">Fee Name</label>
+                        <input type="text" class="form-control p-3" id="feeName" placeholder="e.g., Tuition Fee" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Description (optional)</label>
+                        <textarea class="form-control p-3" id="feeDesc" rows="2" placeholder="Brief description of the fee"></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text px-4 border-end-0 border-secondary border-opacity-25" style="font-weight: 800;">₦</span>
+                            <input type="number" class="form-control p-3 border-start-0 ps-0" id="feeAmount" placeholder="0" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <label class="form-label">Term</label>
+                        <select class="form-select p-3" id="feeTerm" required>
+                            <option value="FIRST TERM">FIRST TERM</option>
+                            <option value="SECOND TERM">SECOND TERM</option>
+                            <option value="THIRD TERM">THIRD TERM</option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3 p-3 rounded" style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2);">
+                        <div>
+                            <h6 class="fw-bold mb-1" style="color: var(--text-color);">Add Target</h6>
+                            <p class="text-muted mb-0" style="font-size: 0.8rem;">Invoices will be generated automatically for the targeted students.</p>
+                        </div>
+                        <div class="form-check form-switch custom-switch fs-4 m-0">
+                            <input class="form-check-input" type="checkbox" id="targetToggle" onchange="toggleTargetSection()">
+                        </div>
+                    </div>
+
+                    <div id="targetSelectionArea" style="display: none;">
+                        <h6 class="form-label mt-4">Target</h6>
+                        
+                        <div class="target-grid">
+                            <div class="target-card active" id="target-whole" onclick="selectTarget('whole')">
+                                <i class="fas fa-university"></i>
+                                <span class="title">Whole School</span>
+                                <span class="desc">Apply this fee to every student in the school.</span>
+                            </div>
+                            <div class="target-card" id="target-grade" onclick="selectTarget('grade')">
+                                <i class="fas fa-layer-group"></i>
+                                <span class="title">Grade Level</span>
+                                <span class="desc">Apply this fee to all students in specific grade levels.</span>
+                            </div>
+                            <div class="target-card" id="target-class" onclick="selectTarget('class')">
+                                <i class="fas fa-chalkboard"></i>
+                                <span class="title">Class</span>
+                                <span class="desc">Apply this fee to all students in specific classes.</span>
+                            </div>
+                            <div class="target-card" id="target-student" onclick="selectTarget('student')">
+                                <i class="fas fa-user-graduate"></i>
+                                <span class="title">Student</span>
+                                <span class="desc">Apply this fee to individually selected students.</span>
+                            </div>
+                        </div>
+
+                        <div id="classCheckboxArea" class="class-checkbox-grid">
+                            <div class="w-100 text-center text-muted small"><i class="fas fa-spinner fa-spin"></i> Loading classes from database...</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3 mt-5 pt-3 border-top border-secondary border-opacity-25">
+                        <button type="button" class="btn btn-light fw-bold px-4" onclick="toggleView('feesListView')">Cancel</button>
+                        <button type="submit" class="btn-brand px-5">Create Fee</button>
+                    </div>
+
+                </form>
             </div>
         </div>
+
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
+
+        // UI & THEME TOGGLES
         window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('mobile-open'); document.getElementById('sidebarOverlay').style.display = document.getElementById('sidebarOverlay').style.display === 'block' ? 'none' : 'block'; };
+        
         window.toggleTheme = () => {
             document.body.classList.toggle('dark-mode');
             const isDark = document.body.classList.contains('dark-mode');
@@ -99,6 +284,132 @@
             document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
         };
         if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { document.body.classList.add('dark-mode'); document.getElementById('themeIcon').className = 'fas fa-sun text-warning'; }
+
+        // VIEW NAVIGATION
+        window.toggleView = (viewId) => {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+        };
+
+        // TARGETING LOGIC
+        let currentTargetType = 'whole';
+
+        window.toggleTargetSection = () => {
+            const isChecked = document.getElementById('targetToggle').checked;
+            document.getElementById('targetSelectionArea').style.display = isChecked ? 'block' : 'none';
+        };
+
+        window.selectTarget = (type) => {
+            currentTargetType = type;
+            
+            // Highlight the selected card
+            document.querySelectorAll('.target-card').forEach(card => card.classList.remove('active'));
+            document.getElementById(`target-${type}`).classList.add('active');
+
+            // Show class checkboxes ONLY if "Class" is selected
+            const classArea = document.getElementById('classCheckboxArea');
+            if (type === 'class') {
+                classArea.style.display = 'grid';
+                loadClassesIntoGrid(); // Fetch from Supabase
+            } else {
+                classArea.style.display = 'none';
+            }
+        };
+
+        // LOAD CLASSES FROM SUPABASE FOR THE CHECKBOX GRID
+        async function loadClassesIntoGrid() {
+            const container = document.getElementById('classCheckboxArea');
+            try {
+                const { data: classes, error } = await supabase.from('classes').select('id, name').order('name');
+                if (error) throw error;
+
+                if (!classes || classes.length === 0) {
+                    container.innerHTML = '<div class="w-100 text-muted small">No classes found in database.</div>';
+                    return;
+                }
+
+                container.innerHTML = classes.map(c => `
+                    <div class="form-check">
+                        <input class="form-check-input class-target-cb" type="checkbox" value="${c.id}" id="chk_${c.id}">
+                        <label class="form-check-label" for="chk_${c.id}">${c.name}</label>
+                    </div>
+                `).join('');
+
+            } catch (err) {
+                console.error("Error loading classes:", err);
+                container.innerHTML = '<div class="w-100 text-danger small">Failed to load classes.</div>';
+            }
+        }
+
+        // FORM SUBMISSION
+        window.submitFeeForm = async (e) => {
+            e.preventDefault();
+            
+            const loader = document.getElementById('loadingOverlay');
+            loader.style.display = 'flex';
+
+            // Gather Data
+            const feeData = {
+                name: document.getElementById('feeName').value.trim(),
+                description: document.getElementById('feeDesc').value.trim(),
+                amount: parseFloat(document.getElementById('feeAmount').value),
+                term: document.getElementById('feeTerm').value,
+                is_targeted: document.getElementById('targetToggle').checked,
+                target_type: document.getElementById('targetToggle').checked ? currentTargetType : 'none',
+                target_ids: []
+            };
+
+            // If targeting specific classes, grab the checked IDs
+            if (feeData.is_targeted && feeData.target_type === 'class') {
+                const checkboxes = document.querySelectorAll('.class-target-cb:checked');
+                checkboxes.forEach(cb => feeData.target_ids.push(cb.value));
+                
+                if (feeData.target_ids.length === 0) {
+                    loader.style.display = 'none';
+                    return alert("Please select at least one class.");
+                }
+            }
+
+            try {
+                // ATTEMPT TO SAVE TO SUPABASE (Requires a 'fees' table to exist)
+                // If table doesn't exist, it will gracefully alert the user.
+                const { error } = await supabase.from('fees').insert([feeData]);
+                
+                if (error) {
+                    throw new Error(error.message);
+                }
+
+                alert(`Fee "${feeData.name}" created successfully!`);
+                document.getElementById('createFeeForm').reset();
+                document.getElementById('targetToggle').checked = false;
+                toggleTargetSection();
+                toggleView('feesListView');
+
+            } catch (err) {
+                console.error("Database Save Error:", err);
+                
+                // If the 'fees' table doesn't exist yet, we catch it here so the app doesn't crash!
+                if (err.message.includes('does not exist')) {
+                    alert("System Notice: The 'fees' table has not been created in your Supabase database yet.\n\nSimulating successful save for demonstration purposes!");
+                    document.getElementById('createFeeForm').reset();
+                    toggleView('feesListView');
+                } else {
+                    alert(`Save Failed: ${err.message}`);
+                }
+            }
+            
+            loader.style.display = 'none';
+        };
+
+        // Initialize Authentication
+        async function initialize() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return window.location.href = 'login.html';
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+        
+        document.addEventListener('DOMContentLoaded', initialize);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
     </script>
 </body>
 </html>
