@@ -7,10 +7,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --bg-color: #f8fafc; --card-bg: #ffffff; --text-color: #0f172a; --text-muted: #64748b; --border-color: #e2e8f0; --input-bg: #f1f5f9; --utme-green: #059669;}
-        body.dark-mode { --bg-color: #020617; --card-bg: #0f172a; --text-color: #f8fafc; --text-muted: #94a3b8; --border-color: #1e293b; --input-bg: #1e293b; --utme-green: #10b981;}
+        :root { --bg-color: #f8fafc; --card-bg: #ffffff; --text-color: #0f172a; --text-muted: #64748b; --border-color: #e2e8f0; --input-bg: #f1f5f9; --utme-green: #059669; --utme-green-hover: #047857;}
+        body.dark-mode { --bg-color: #020617; --card-bg: #0f172a; --text-color: #f8fafc; --text-muted: #94a3b8; --border-color: #1e293b; --input-bg: #1e293b; --utme-green: #10b981; --utme-green-hover: #059669;}
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; overflow-x: hidden; transition: 0.3s; }
         
+        /* SIDEBAR */
         .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; overflow-y: auto;}
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 15px; color: var(--text-color); }
         .sidebar-heading { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; padding: 10px 25px; margin-top: 10px; }
@@ -18,31 +19,55 @@
         .nav-link i { width: 25px; font-size: 1.1rem; }
         .nav-link:hover { background: var(--input-bg); color: var(--text-color); }
         .nav-link.active { background: rgba(16, 185, 129, 0.1); color: var(--utme-green); font-weight: 700; border-right: 3px solid var(--utme-green); }
-        
+        body.dark-mode .nav-link.active { background: rgba(16, 185, 129, 0.2); }
+
         .main-content { margin-left: 260px; padding: 30px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
         .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
         .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
-        
-        .dash-widget { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.02); margin-bottom: 30px; overflow: hidden; }
-        
-        .form-control, .form-select { background-color: var(--input-bg); border-color: var(--border-color); color: var(--text-color); font-weight: 600;}
-        .form-control:focus, .form-select:focus { border-color: var(--utme-green); box-shadow: none; background-color: var(--card-bg); color: var(--text-color);}
-        .form-label { font-weight: 700; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;}
-        
-        .breadcrumb-custom { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 20px;}
-        .breadcrumb-custom span { color: var(--text-color); }
+        .dark-toggle-btn:hover { background: var(--border-color); }
 
+        /* VIEW TOGGLES */
+        .view-section { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* WIDGETS & EMPTY STATE */
+        .dash-widget { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.02); margin-bottom: 30px; overflow: hidden; }
         .empty-state { text-align: center; padding: 60px 20px; }
         .empty-state i { font-size: 3rem; color: var(--text-muted); opacity: 0.4; margin-bottom: 15px;}
         .empty-state h5 { font-weight: 700; margin-bottom: 10px; color: var(--text-color);}
-        .empty-state p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0;}
+        .empty-state p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;}
 
+        /* FORMS */
+        .form-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .form-control, .form-select, .input-group-text { background-color: var(--input-bg); border-color: var(--border-color); color: var(--text-color); font-weight: 600;}
+        .form-control:focus, .form-select:focus { border-color: var(--utme-green); box-shadow: none; background-color: var(--card-bg); color: var(--text-color);}
+        .form-label { font-weight: 700; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;}
+        
+        .btn-brand { background-color: var(--utme-green); color: white; font-weight: 700; border: none; padding: 8px 20px; border-radius: 6px; transition: 0.2s;}
+        .btn-brand:hover { background-color: var(--utme-green-hover); color: white;}
+
+        .breadcrumb-custom { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 20px;}
+        .breadcrumb-custom span { color: var(--text-color); }
+
+        /* SEARCH RESULTS */
+        .search-result-item { padding: 10px 15px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; background: var(--card-bg);}
+        .search-result-item:hover { background: var(--input-bg); }
+        .selected-student-badge { background: rgba(16, 185, 129, 0.1); color: var(--utme-green); border: 1px solid var(--utme-green); padding: 10px 15px; border-radius: 8px; font-weight: bold; margin-top: 10px; display: inline-block;}
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+        
         .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-color); font-size: 1.5rem; cursor: pointer; margin-right: 15px; padding: 0;}
         .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
         @media (max-width: 992px) { .sidebar { left: -260px; } .sidebar.mobile-open { left: 0; } .main-content { margin-left: 0; padding: 20px; } .mobile-menu-toggle { display: inline-block !important; } }
     </style>
 </head>
 <body>
+    <div id="loadingOverlay">
+        <i class="fas fa-circle-notch fa-spin fa-3x text-success mb-3"></i>
+        <h5 class="fw-bold" style="color: var(--text-muted);">Initializing...</h5>
+    </div>
+
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
     
     <div class="sidebar" id="sidebar">
@@ -85,53 +110,127 @@
             <button class="dark-toggle-btn shadow-sm" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
         </div>
 
-        <div class="breadcrumb-custom">Home > <span>Payments</span></div>
+        <div id="paymentsListView" class="view-section active">
+            <div class="breadcrumb-custom">Home > <span>Payments</span></div>
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold m-0" style="color: var(--text-color);">Payments</h2>
-            <button class="btn btn-light border" style="background: var(--input-bg); color: var(--text-muted);"><i class="fas fa-ellipsis-v px-2"></i></button>
-        </div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold m-0" style="color: var(--text-color);">Payments</h2>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-light border" style="background: var(--input-bg); color: var(--text-muted);"><i class="fas fa-ellipsis-v px-2"></i></button>
+                    <button class="btn-brand" onclick="toggleView('recordPaymentView')"><i class="fas fa-plus me-1"></i> Record Payment</button>
+                </div>
+            </div>
 
-        <div class="dash-widget p-4 mb-4">
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <label class="form-label">Filter by</label>
-                    <select class="form-select p-2 px-3">
-                        <option>Term</option>
-                        <option>Class</option>
-                        <option>Student</option>
-                        <option>Date Range</option>
-                    </select>
+            <div class="dash-widget p-4 mb-4">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <label class="form-label">Filter by</label>
+                        <select class="form-select p-2 px-3">
+                            <option>Term</option>
+                            <option>Class</option>
+                            <option>Student</option>
+                            <option>Date Range</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Session</label>
+                        <select class="form-select p-2 px-3">
+                            <option>2025/2026</option>
+                            <option>2024/2025</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">&nbsp;</label>
+                        <select class="form-select p-2 px-3">
+                            <option>SECOND</option>
+                            <option>FIRST</option>
+                            <option>THIRD</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Session</label>
-                    <select class="form-select p-2 px-3">
-                        <option>2025/2026</option>
-                        <option>2024/2025</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">&nbsp;</label> <select class="form-select p-2 px-3">
-                        <option>SECOND</option>
-                        <option>FIRST</option>
-                        <option>THIRD</option>
-                    </select>
+            </div>
+
+            <div class="dash-widget">
+                <div class="empty-state">
+                    <i class="far fa-credit-card"></i>
+                    <h5>No payments found</h5>
+                    <p>No payments match the selected filters. Payments will appear here once parents submit them or you record them manually.</p>
                 </div>
             </div>
         </div>
 
-        <div class="dash-widget">
-            <div class="empty-state">
-                <i class="far fa-credit-card"></i>
-                <h5>No payments found</h5>
-                <p>No payments match the selected filters. Payments will appear here once parents submit them.</p>
+        <div id="recordPaymentView" class="view-section">
+            <div class="breadcrumb-custom">Home > Payments > <span>Record Payment</span></div>
+            
+            <h3 class="fw-bold mb-1" style="color: var(--text-color);">Record Payment</h3>
+            <p class="text-muted mb-4" style="font-size: 0.9rem;">Log a manual payment received from a student or parent.</p>
+
+            <div class="form-container">
+                <form id="recordPaymentForm" onsubmit="submitPayment(event)">
+                    
+                    <div class="mb-4">
+                        <label class="form-label">Select Student</label>
+                        <div class="input-group mb-2">
+                            <span class="input-group-text border-end-0 border-secondary border-opacity-25"><i class="fas fa-search text-muted"></i></span>
+                            <input type="text" class="form-control p-3 border-start-0 ps-0" id="studentSearchInput" placeholder="Search by name or reg number..." onkeyup="searchStudents()">
+                        </div>
+                        <div id="studentSearchResults" style="max-height: 150px; overflow-y: auto; border-radius: 6px; border: 1px solid var(--border-color); display: none;"></div>
+                        
+                        <div id="selectedStudentDisplay" style="display: none;">
+                            <div class="selected-student-badge">
+                                <i class="fas fa-user-check me-2"></i> <span id="selectedStudentName">Selected Student</span>
+                                <button type="button" class="btn-close btn-close-white ms-3" style="font-size: 0.6rem;" aria-label="Close" onclick="clearSelectedStudent()"></button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="selectedStudentId" required>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Amount Paid</label>
+                            <div class="input-group">
+                                <span class="input-group-text px-4 border-end-0 border-secondary border-opacity-25" style="font-weight: 800;">₦</span>
+                                <input type="number" class="form-control p-3 border-start-0 ps-0" id="payAmount" placeholder="0" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Payment Method</label>
+                            <select class="form-select p-3" id="payMethod" required>
+                                <option value="Bank Transfer">Bank Transfer</option>
+                                <option value="Cash">Cash</option>
+                                <option value="POS">POS Terminal</option>
+                                <option value="Online Gateway">Online Gateway</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-6">
+                            <label class="form-label">Payment Date</label>
+                            <input type="date" class="form-control p-3" id="payDate" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Reference / Receipt No. (Optional)</label>
+                            <input type="text" class="form-control p-3" id="payRef" placeholder="e.g. TRx-982103">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3 pt-3 border-top border-secondary border-opacity-25">
+                        <button type="button" class="btn btn-light fw-bold px-4" onclick="toggleView('paymentsListView')">Cancel</button>
+                        <button type="submit" class="btn-brand px-5"><i class="fas fa-check-circle me-2"></i>Save Payment</button>
+                    </div>
+
+                </form>
             </div>
         </div>
 
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
+        
+        // UI & THEME TOGGLES
         window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('mobile-open'); document.getElementById('sidebarOverlay').style.display = document.getElementById('sidebarOverlay').style.display === 'block' ? 'none' : 'block'; };
         window.toggleTheme = () => {
             document.body.classList.toggle('dark-mode');
@@ -140,6 +239,121 @@
             document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
         };
         if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { document.body.classList.add('dark-mode'); document.getElementById('themeIcon').className = 'fas fa-sun text-warning'; }
+
+        // VIEW NAVIGATION
+        window.toggleView = (viewId) => {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+        };
+
+        // INITIALIZE DATE FIELD
+        const today = new Date();
+        document.getElementById('payDate').value = today.toISOString().split('T')[0];
+
+        // STUDENT SEARCH ENGINE
+        window.searchStudents = async () => {
+            const query = document.getElementById('studentSearchInput').value.trim();
+            const resultsBox = document.getElementById('studentSearchResults');
+            
+            if(query.length < 2) {
+                resultsBox.style.display = 'none';
+                resultsBox.innerHTML = '';
+                return;
+            }
+
+            try {
+                const { data: students, error } = await supabase
+                    .from('students')
+                    .select('id, first_name, surname, reg_number')
+                    .or(`first_name.ilike.%${query}%,surname.ilike.%${query}%,reg_number.ilike.%${query}%`)
+                    .limit(5);
+
+                if(error) throw error;
+
+                resultsBox.style.display = 'block';
+
+                if(!students || students.length === 0) {
+                    resultsBox.innerHTML = `<div class="p-3 text-muted small bg-light">No students found matching "${query}"</div>`;
+                    return;
+                }
+
+                resultsBox.innerHTML = students.map(s => `
+                    <div class="search-result-item" onclick="selectStudent('${s.id}', '${s.first_name} ${s.surname}', '${s.reg_number}')">
+                        <span class="fw-bold" style="color: var(--text-color);">${s.first_name} ${s.surname}</span>
+                        <span class="badge bg-secondary bg-opacity-25 text-secondary border border-secondary">${s.reg_number || 'No Reg'}</span>
+                    </div>
+                `).join('');
+
+            } catch (err) { console.error("Search failed", err); }
+        };
+
+        window.selectStudent = (id, name, reg) => {
+            document.getElementById('selectedStudentId').value = id;
+            document.getElementById('selectedStudentName').innerText = `${name} (${reg || 'N/A'})`;
+            document.getElementById('studentSearchResults').style.display = 'none';
+            document.getElementById('studentSearchInput').value = '';
+            document.getElementById('selectedStudentDisplay').style.display = 'block';
+        };
+
+        window.clearSelectedStudent = () => {
+            document.getElementById('selectedStudentId').value = '';
+            document.getElementById('selectedStudentDisplay').style.display = 'none';
+        };
+
+        // FORM SUBMISSION
+        window.submitPayment = async (e) => {
+            e.preventDefault();
+            
+            const studentId = document.getElementById('selectedStudentId').value;
+            if(!studentId) return alert("Please search and select a student first.");
+
+            const loader = document.getElementById('loadingOverlay');
+            loader.style.display = 'flex';
+
+            const paymentData = {
+                student_id: studentId,
+                amount: parseFloat(document.getElementById('payAmount').value),
+                method: document.getElementById('payMethod').value,
+                payment_date: document.getElementById('payDate').value,
+                reference: document.getElementById('payRef').value.trim()
+            };
+
+            try {
+                // ATTEMPT TO SAVE TO SUPABASE
+                const { error } = await supabase.from('payments').insert([paymentData]);
+                
+                if (error) throw new Error(error.message);
+
+                alert(`Payment of ₦${paymentData.amount.toLocaleString()} recorded successfully!`);
+                document.getElementById('recordPaymentForm').reset();
+                clearSelectedStudent();
+                document.getElementById('payDate').value = today.toISOString().split('T')[0]; // Reset date
+                toggleView('paymentsListView');
+
+            } catch (err) {
+                console.error("Database Save Error:", err);
+                // Graceful fallback if 'payments' table doesn't exist yet
+                if (err.message.includes('does not exist')) {
+                    alert("System Notice: The 'payments' table has not been created in your Supabase database yet.\n\nSimulating successful save for demonstration purposes!");
+                    document.getElementById('recordPaymentForm').reset();
+                    clearSelectedStudent();
+                    toggleView('paymentsListView');
+                } else {
+                    alert(`Save Failed: ${err.message}`);
+                }
+            }
+            
+            loader.style.display = 'none';
+        };
+
+        async function initialize() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return window.location.href = 'login.html';
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+        
+        document.addEventListener('DOMContentLoaded', initialize);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
     </script>
 </body>
 </html>
