@@ -88,6 +88,13 @@
         .form-check-label { font-weight: 600; font-size: 0.85rem; cursor: pointer; color: var(--text-color);}
         .form-check-input:checked { background-color: var(--utme-green); border-color: var(--utme-green); }
 
+        /* STUDENT SEARCH STYLES */
+        .student-search-area { display: none; margin-top: 20px; padding: 20px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--card-bg); }
+        .search-result-item { padding: 10px 15px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s;}
+        .search-result-item:hover { background: var(--input-bg); }
+        .search-result-item:last-child { border-bottom: none; }
+        .selected-student-badge { background: rgba(16, 185, 129, 0.1); color: var(--utme-green); border: 1px solid var(--utme-green); padding: 10px 15px; border-radius: 8px; font-weight: bold; margin-top: 10px; display: inline-block;}
+
         .btn-brand { background-color: var(--utme-green); color: white; font-weight: 700; border: none; padding: 8px 20px; border-radius: 6px; transition: 0.2s;}
         .btn-brand:hover { background-color: var(--utme-green-hover); color: white;}
 
@@ -97,6 +104,13 @@
         /* CUSTOM TOGGLE SWITCH */
         .custom-switch .form-check-input { width: 3rem; height: 1.5rem; background-color: var(--border-color); border: none;}
         .custom-switch .form-check-input:checked { background-color: var(--utme-green); }
+
+        /* CONFIRMATION MODAL SPECIFIC (Matches Screenshot) */
+        #confirmModal .modal-content { background-color: #020617; color: white; border: 1px solid #1e293b; border-radius: 12px; }
+        .summary-row { display: flex; padding: 8px 0; border-bottom: 1px solid #1e293b; font-size: 0.9rem;}
+        .summary-row:last-child { border-bottom: none; }
+        .summary-label { width: 100px; color: #94a3b8; font-weight: bold;}
+        .summary-value { font-weight: 600; color: #f8fafc;}
 
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
         
@@ -189,7 +203,7 @@
             <p class="text-muted mb-4" style="font-size: 0.9rem;">Create a new fee. Invoices will be generated automatically for the targeted students.</p>
 
             <div class="form-container">
-                <form id="createFeeForm" onsubmit="submitFeeForm(event)">
+                <form id="createFeeForm" onsubmit="preflightFeeCheck(event)">
                     
                     <div class="mb-4">
                         <label class="form-label">Fee Name</label>
@@ -254,8 +268,34 @@
                             </div>
                         </div>
 
+                        <div id="gradeCheckboxArea" class="class-checkbox-grid">
+                            <div class="form-check"><input class="form-check-input grade-target-cb" type="checkbox" value="Pre-Nursery" id="g_pn"><label class="form-check-label" for="g_pn">Pre-Nursery</label></div>
+                            <div class="form-check"><input class="form-check-input grade-target-cb" type="checkbox" value="Nursery" id="g_n"><label class="form-check-label" for="g_n">Nursery 1-3</label></div>
+                            <div class="form-check"><input class="form-check-input grade-target-cb" type="checkbox" value="Kindergarten" id="g_k"><label class="form-check-label" for="g_k">Kindergarten</label></div>
+                            <div class="form-check"><input class="form-check-input grade-target-cb" type="checkbox" value="Primary" id="g_p"><label class="form-check-label" for="g_p">Primary (Basic) 1-6</label></div>
+                            <div class="form-check"><input class="form-check-input grade-target-cb" type="checkbox" value="JSS" id="g_jss"><label class="form-check-label" for="g_jss">Junior Secondary (JSS 1-3)</label></div>
+                            <div class="form-check"><input class="form-check-input grade-target-cb" type="checkbox" value="SSS" id="g_sss"><label class="form-check-label" for="g_sss">Senior Secondary (SSS 1-3)</label></div>
+                        </div>
+
                         <div id="classCheckboxArea" class="class-checkbox-grid">
                             <div class="w-100 text-center text-muted small"><i class="fas fa-spinner fa-spin"></i> Loading classes from database...</div>
+                        </div>
+
+                        <div id="studentSearchArea" class="student-search-area">
+                            <label class="form-label text-muted small">Search Student</label>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control" id="studentSearchInput" placeholder="Search by name or reg number..." onkeyup="searchStudents()">
+                            </div>
+                            <div id="studentSearchResults" style="max-height: 150px; overflow-y: auto; border-radius: 6px;"></div>
+                            
+                            <div id="selectedStudentDisplay" style="display: none;">
+                                <div class="selected-student-badge">
+                                    <i class="fas fa-user-check me-2"></i> <span id="selectedStudentName">Selected Student</span>
+                                    <button type="button" class="btn-close btn-close-white ms-3" style="font-size: 0.6rem;" aria-label="Close" onclick="clearSelectedStudent()"></button>
+                                </div>
+                            </div>
+                            <input type="hidden" id="selectedStudentId">
                         </div>
                     </div>
 
@@ -270,9 +310,40 @@
 
     </div>
 
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body p-4">
+                    <h4 class="fw-bold mb-3">Create Fee?</h4>
+                    <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 20px;">Please review the fee details below. Fee information <strong>cannot be edited</strong> once created.</p>
+                    
+                    <div class="mb-4">
+                        <div class="summary-row"><div class="summary-label">Name</div><div class="summary-value" id="summaryName">--</div></div>
+                        <div class="summary-row"><div class="summary-label">Amount</div><div class="summary-value" id="summaryAmount" style="color: #10b981;">--</div></div>
+                        <div class="summary-row"><div class="summary-label">Term</div><div class="summary-value" id="summaryTerm">--</div></div>
+                        <div class="summary-row"><div class="summary-label">Target</div><div class="summary-value" id="summaryTarget">--</div></div>
+                        <div class="summary-row border-0"><div class="summary-label">Est. Students</div><div class="summary-value" id="summaryCount">Calculating...</div></div>
+                    </div>
+
+                    <p style="color: #94a3b8; font-size: 0.85rem;">This will generate invoices and notify parents. This action cannot be undone.</p>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <button type="button" class="btn btn-outline-secondary text-white border-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-success fw-bold" style="background-color: #10b981; border: none;" onclick="finalDatabaseExecution()">Yes, Create Fee</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
+
+        // Variables for final submission
+        let pendingFeeData = null;
+        let confirmModalInstance = null;
 
         // UI & THEME TOGGLES
         window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('mobile-open'); document.getElementById('sidebarOverlay').style.display = document.getElementById('sidebarOverlay').style.display === 'block' ? 'none' : 'block'; };
@@ -302,31 +373,24 @@
         window.selectTarget = (type) => {
             currentTargetType = type;
             
-            // Highlight the selected card
             document.querySelectorAll('.target-card').forEach(card => card.classList.remove('active'));
             document.getElementById(`target-${type}`).classList.add('active');
 
-            // Show class checkboxes ONLY if "Class" is selected
-            const classArea = document.getElementById('classCheckboxArea');
-            if (type === 'class') {
-                classArea.style.display = 'grid';
-                loadClassesIntoGrid(); // Fetch from Supabase
-            } else {
-                classArea.style.display = 'none';
-            }
+            // Toggle Visibility
+            document.getElementById('gradeCheckboxArea').style.display = type === 'grade' ? 'grid' : 'none';
+            document.getElementById('classCheckboxArea').style.display = type === 'class' ? 'grid' : 'none';
+            document.getElementById('studentSearchArea').style.display = type === 'student' ? 'block' : 'none';
+
+            if (type === 'class') loadClassesIntoGrid(); 
         };
 
-        // LOAD CLASSES FROM SUPABASE FOR THE CHECKBOX GRID
+        // LOAD CLASSES FROM SUPABASE
         async function loadClassesIntoGrid() {
             const container = document.getElementById('classCheckboxArea');
             try {
                 const { data: classes, error } = await supabase.from('classes').select('id, name').order('name');
                 if (error) throw error;
-
-                if (!classes || classes.length === 0) {
-                    container.innerHTML = '<div class="w-100 text-muted small">No classes found in database.</div>';
-                    return;
-                }
+                if (!classes || classes.length === 0) return container.innerHTML = '<div class="w-100 text-muted small">No classes found.</div>';
 
                 container.innerHTML = classes.map(c => `
                     <div class="form-check">
@@ -334,78 +398,161 @@
                         <label class="form-check-label" for="chk_${c.id}">${c.name}</label>
                     </div>
                 `).join('');
-
             } catch (err) {
-                console.error("Error loading classes:", err);
                 container.innerHTML = '<div class="w-100 text-danger small">Failed to load classes.</div>';
             }
         }
 
-        // FORM SUBMISSION
-        window.submitFeeForm = async (e) => {
-            e.preventDefault();
+        // STUDENT SEARCH ENGINE
+        window.searchStudents = async () => {
+            const query = document.getElementById('studentSearchInput').value.trim();
+            const resultsBox = document.getElementById('studentSearchResults');
             
-            const loader = document.getElementById('loadingOverlay');
-            loader.style.display = 'flex';
-
-            // Gather Data
-            const feeData = {
-                name: document.getElementById('feeName').value.trim(),
-                description: document.getElementById('feeDesc').value.trim(),
-                amount: parseFloat(document.getElementById('feeAmount').value),
-                term: document.getElementById('feeTerm').value,
-                is_targeted: document.getElementById('targetToggle').checked,
-                target_type: document.getElementById('targetToggle').checked ? currentTargetType : 'none',
-                target_ids: []
-            };
-
-            // If targeting specific classes, grab the checked IDs
-            if (feeData.is_targeted && feeData.target_type === 'class') {
-                const checkboxes = document.querySelectorAll('.class-target-cb:checked');
-                checkboxes.forEach(cb => feeData.target_ids.push(cb.value));
-                
-                if (feeData.target_ids.length === 0) {
-                    loader.style.display = 'none';
-                    return alert("Please select at least one class.");
-                }
+            if(query.length < 2) {
+                resultsBox.innerHTML = '';
+                return;
             }
 
             try {
-                // ATTEMPT TO SAVE TO SUPABASE (Requires a 'fees' table to exist)
-                // If table doesn't exist, it will gracefully alert the user.
-                const { error } = await supabase.from('fees').insert([feeData]);
-                
-                if (error) {
-                    throw new Error(error.message);
+                // Search by name or reg number
+                const { data: students, error } = await supabase
+                    .from('students')
+                    .select('id, first_name, surname, reg_number')
+                    .or(`first_name.ilike.%${query}%,surname.ilike.%${query}%,reg_number.ilike.%${query}%`)
+                    .limit(5);
+
+                if(error) throw error;
+
+                if(!students || students.length === 0) {
+                    resultsBox.innerHTML = `<div class="p-2 text-muted small">No students found matching "${query}"</div>`;
+                    return;
                 }
 
-                alert(`Fee "${feeData.name}" created successfully!`);
+                resultsBox.innerHTML = students.map(s => `
+                    <div class="search-result-item" onclick="selectIndividualStudent('${s.id}', '${s.first_name} ${s.surname}', '${s.reg_number}')">
+                        <span class="fw-bold" style="color: var(--text-color);">${s.first_name} ${s.surname}</span>
+                        <span class="badge bg-secondary">${s.reg_number || 'N/A'}</span>
+                    </div>
+                `).join('');
+
+            } catch (err) { console.error("Search failed", err); }
+        };
+
+        window.selectIndividualStudent = (id, name, reg) => {
+            document.getElementById('selectedStudentId').value = id;
+            document.getElementById('selectedStudentName').innerText = `${name} (${reg || 'N/A'})`;
+            document.getElementById('studentSearchResults').innerHTML = '';
+            document.getElementById('studentSearchInput').value = '';
+            document.getElementById('selectedStudentDisplay').style.display = 'block';
+        };
+
+        window.clearSelectedStudent = () => {
+            document.getElementById('selectedStudentId').value = '';
+            document.getElementById('selectedStudentDisplay').style.display = 'none';
+        };
+
+        // PRE-FLIGHT CHECK (Triggers Modal)
+        window.preflightFeeCheck = async (e) => {
+            e.preventDefault();
+            
+            const isTargeted = document.getElementById('targetToggle').checked;
+            const targetType = isTargeted ? currentTargetType : 'none';
+            let targetIds = [];
+            let estimatedStudents = "Calculating...";
+            let targetDisplayStr = "Whole School";
+
+            // Validation & Array Building
+            if (isTargeted) {
+                if (targetType === 'grade') {
+                    const cbs = document.querySelectorAll('.grade-target-cb:checked');
+                    cbs.forEach(cb => targetIds.push(cb.value));
+                    if (targetIds.length === 0) return alert("Please select at least one Grade Level.");
+                    targetDisplayStr = `Grade: ${targetIds.join(', ')}`;
+                } 
+                else if (targetType === 'class') {
+                    const cbs = document.querySelectorAll('.class-target-cb:checked');
+                    cbs.forEach(cb => targetIds.push(cb.value));
+                    if (targetIds.length === 0) return alert("Please select at least one Class.");
+                    targetDisplayStr = `${targetIds.length} Specific Classes`;
+                }
+                else if (targetType === 'student') {
+                    const sId = document.getElementById('selectedStudentId').value;
+                    if (!sId) return alert("Please search and select a specific student.");
+                    targetIds.push(sId);
+                    targetDisplayStr = `Individual Student: ${document.getElementById('selectedStudentName').innerText}`;
+                    estimatedStudents = "1 Student";
+                }
+            }
+
+            const amount = parseFloat(document.getElementById('feeAmount').value);
+            const formattedAmount = `₦ ${amount.toLocaleString()}`;
+
+            // Save state globally
+            pendingFeeData = {
+                name: document.getElementById('feeName').value.trim(),
+                description: document.getElementById('feeDesc').value.trim(),
+                amount: amount,
+                term: document.getElementById('feeTerm').value,
+                is_targeted: isTargeted,
+                target_type: targetType,
+                target_ids: targetIds
+            };
+
+            // Populate Modal
+            document.getElementById('summaryName').innerText = pendingFeeData.name;
+            document.getElementById('summaryAmount').innerText = formattedAmount;
+            document.getElementById('summaryTerm').innerText = pendingFeeData.term;
+            document.getElementById('summaryTarget').innerText = targetDisplayStr;
+            document.getElementById('summaryCount').innerText = estimatedStudents;
+
+            if(!confirmModalInstance) confirmModalInstance = new bootstrap.Modal(document.getElementById('confirmModal'));
+            confirmModalInstance.show();
+
+            // Run a quick async check to get student count (unless it's already 1)
+            if(targetType !== 'student') {
+                try {
+                    let query = supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', true);
+                    if(isTargeted && targetType === 'class') query = query.in('class_id', targetIds);
+                    // Note: Grade level logic requires a joining table in Supabase, assuming simple count for now
+                    
+                    const { count } = await query;
+                    document.getElementById('summaryCount').innerText = `${count || 0} Students`;
+                } catch(e) { document.getElementById('summaryCount').innerText = "Count unavailable"; }
+            }
+        };
+
+        // ACTUAL DATABASE INSERT
+        window.finalDatabaseExecution = async () => {
+            if(!pendingFeeData) return;
+            
+            confirmModalInstance.hide();
+            const loader = document.getElementById('loadingOverlay');
+            loader.style.display = 'flex';
+
+            try {
+                const { error } = await supabase.from('fees').insert([pendingFeeData]);
+                if (error) throw new Error(error.message);
+
+                alert(`Fee "${pendingFeeData.name}" created successfully!`);
                 document.getElementById('createFeeForm').reset();
                 document.getElementById('targetToggle').checked = false;
                 toggleTargetSection();
                 toggleView('feesListView');
+                // You could call fetchRecentFees() here to update the dashboard list
 
             } catch (err) {
                 console.error("Database Save Error:", err);
-                
-                // If the 'fees' table doesn't exist yet, we catch it here so the app doesn't crash!
-                if (err.message.includes('does not exist')) {
-                    alert("System Notice: The 'fees' table has not been created in your Supabase database yet.\n\nSimulating successful save for demonstration purposes!");
-                    document.getElementById('createFeeForm').reset();
-                    toggleView('feesListView');
-                } else {
-                    alert(`Save Failed: ${err.message}`);
-                }
+                alert(`Save Failed: ${err.message}`);
             }
             
             loader.style.display = 'none';
         };
 
-        // Initialize Authentication
         async function initialize() {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) return window.location.href = 'login.html';
             document.getElementById('loadingOverlay').style.display = 'none';
+            confirmModalInstance = new bootstrap.Modal(document.getElementById('confirmModal'));
         }
         
         document.addEventListener('DOMContentLoaded', initialize);
