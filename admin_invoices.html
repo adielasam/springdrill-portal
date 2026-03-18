@@ -11,6 +11,7 @@
         body.dark-mode { --bg-color: #020617; --card-bg: #0f172a; --text-color: #f8fafc; --text-muted: #94a3b8; --border-color: #1e293b; --input-bg: #1e293b; --utme-green: #10b981; --utme-green-hover: #059669;}
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; overflow-x: hidden; transition: 0.3s; }
         
+        /* SIDEBAR */
         .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; overflow-y: auto;}
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 15px; color: var(--text-color); }
         .sidebar-heading { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; padding: 10px 25px; margin-top: 10px; }
@@ -18,30 +19,70 @@
         .nav-link i { width: 25px; font-size: 1.1rem; }
         .nav-link:hover { background: var(--input-bg); color: var(--text-color); }
         .nav-link.active { background: rgba(16, 185, 129, 0.1); color: var(--utme-green); font-weight: 700; border-right: 3px solid var(--utme-green); }
-        
+        body.dark-mode .nav-link.active { background: rgba(16, 185, 129, 0.2); }
+
         .main-content { margin-left: 260px; padding: 30px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
         .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
         .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
-        
+        .dark-toggle-btn:hover { background: var(--border-color); }
+
+        /* VIEW TOGGLES */
+        .view-section { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* WIDGETS & EMPTY STATE */
         .dash-widget { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.02); margin-bottom: 30px; overflow: hidden; }
-        
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state i { font-size: 3rem; color: var(--text-muted); opacity: 0.4; margin-bottom: 15px;}
+        .empty-state h5 { font-weight: 700; margin-bottom: 10px; color: var(--text-color);}
+        .empty-state p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;}
+
+        .btn-brand { background-color: var(--utme-green); color: white; font-weight: 700; border: none; padding: 10px 20px; border-radius: 6px; transition: 0.2s;}
+        .btn-brand:hover { background-color: var(--utme-green-hover); color: white;}
+
         .breadcrumb-custom { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 20px;}
         .breadcrumb-custom span { color: var(--text-color); }
 
-        .btn-brand { background-color: var(--utme-green); color: white; font-weight: 700; border: none; padding: 8px 20px; border-radius: 6px; transition: 0.2s;}
-        .btn-brand:hover { background-color: var(--utme-green-hover); color: white;}
+        /* INVOICE TABLE STYLES */
+        .custom-table { width: 100%; color: var(--text-color); margin: 0; min-width: 900px; border-collapse: collapse;}
+        .custom-table th { color: var(--text-muted); border-bottom: 1px solid var(--border-color); padding: 15px 20px; font-size: 0.75rem; text-transform: capitalize; font-weight: 600; background: var(--card-bg);}
+        .custom-table td { padding: 15px 20px; vertical-align: middle; border-bottom: 1px solid var(--border-color); font-weight: 600; font-size: 0.85rem;}
+        .custom-table tbody tr { cursor: pointer; transition: 0.2s; }
+        .custom-table tbody tr:hover { background-color: var(--input-bg); }
+        
+        .badge-status { padding: 5px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;}
+        .status-settled { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid #10b981; }
+        .status-partial { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid #f59e0b; }
+        .status-unpaid { background: rgba(244, 63, 94, 0.1); color: #f43f5e; border: 1px solid #f43f5e; }
 
-        .empty-state { text-align: center; padding: 80px 20px; }
-        .empty-state i { font-size: 3.5rem; color: var(--text-muted); opacity: 0.4; margin-bottom: 20px;}
-        .empty-state h5 { font-weight: 700; margin-bottom: 10px; color: var(--text-color);}
-        .empty-state p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px;}
+        /* INVOICE DETAILS GRID */
+        .detail-label { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+        .detail-value { color: var(--text-color); font-size: 1rem; font-weight: 700; margin-bottom: 20px; }
+        .detail-value.amount { color: #10b981; font-size: 1.2rem; }
 
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+        
         .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-color); font-size: 1.5rem; cursor: pointer; margin-right: 15px; padding: 0;}
         .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
         @media (max-width: 992px) { .sidebar { left: -260px; } .sidebar.mobile-open { left: 0; } .main-content { margin-left: 0; padding: 20px; } .mobile-menu-toggle { display: inline-block !important; } }
+        
+        /* PRINT STYLES */
+        @media print {
+            .sidebar, .top-navbar, .breadcrumb-custom, button { display: none !important; }
+            .main-content { margin: 0; padding: 0; }
+            .dash-widget { box-shadow: none; border: none; }
+            body.dark-mode { background: #fff; color: #000; }
+            body.dark-mode .detail-value, body.dark-mode .detail-label { color: #000; }
+        }
     </style>
 </head>
 <body>
+    <div id="loadingOverlay">
+        <i class="fas fa-circle-notch fa-spin fa-3x text-success mb-3"></i>
+        <h5 class="fw-bold" style="color: var(--text-muted);">Generating Invoices...</h5>
+    </div>
+
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
     
     <div class="sidebar" id="sidebar">
@@ -49,29 +90,17 @@
         <nav class="nav flex-column">
             <div class="sidebar-heading">Overview</div>
             <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
-            
             <div class="sidebar-heading">Academics</div>
             <a href="class_list.html" class="nav-link"><i class="fas fa-chalkboard"></i> Classes & Students</a>
             <a href="admin_attendance.html" class="nav-link"><i class="fas fa-calendar-check"></i> Attendance Log</a>
             <a href="admin_league_table.html" class="nav-link"><i class="fas fa-trophy"></i> League Table</a>
-
             <div class="sidebar-heading">Management</div>
             <a href="admin_admissions.html" class="nav-link"><i class="fas fa-user-graduate"></i> Admissions</a>
             <a href="admin_fees.html" class="nav-link"><i class="fas fa-money-bill-wave"></i> Fees</a>
             <a href="admin_payments.html" class="nav-link"><i class="fas fa-credit-card"></i> Payments</a>
             <a href="admin_invoices.html" class="nav-link active"><i class="fas fa-file-invoice"></i> Invoices</a>
-            <a href="#" onclick="alert('Academic Calendar Coming Soon!')" class="nav-link"><i class="fas fa-calendar-alt"></i> Calendar</a>
-            <a href="#" onclick="alert('Academic Session Coming Soon!')" class="nav-link"><i class="fas fa-calendar-check"></i> Academic session</a>
-
-            <div class="sidebar-heading">Administration</div>
-            <a href="admin_create_user.html" class="nav-link"><i class="fas fa-user-plus"></i> Generate Account</a>
-            <a href="manage_users.html" class="nav-link"><i class="fas fa-user-check"></i> Approvals</a>
-            <a href="admin_messages.html" class="nav-link"><i class="fas fa-envelope"></i> Internal Mail</a>
-            
             <div class="sidebar-heading">System</div>
             <a href="admin_announcements.html" class="nav-link"><i class="fas fa-bullhorn"></i> Announcements</a>
-            <a href="#" onclick="alert('System Settings Coming Soon!')" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
-            <div class="mt-4 mb-4"></div>
         </nav>
     </div>
 
@@ -84,26 +113,116 @@
             <button class="dark-toggle-btn shadow-sm" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
         </div>
 
-        <div class="breadcrumb-custom">Home > <span>Invoices</span></div>
+        <div id="invoicesListView" class="view-section active">
+            <div class="breadcrumb-custom">Home > <span>Invoices</span></div>
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold m-0" style="color: var(--text-color);">Invoices</h2>
-            <button class="btn-brand"><i class="fas fa-plus me-2"></i>Manual Invoice</button>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold m-0" style="color: var(--text-color);">Invoices</h2>
+                <button class="btn-brand" onclick="loadInvoices()"><i class="fas fa-sync-alt me-2"></i>Refresh List</button>
+            </div>
+
+            <div class="dash-widget p-3 mb-4">
+                <div class="row g-4 align-items-center">
+                    <div class="col-md-4">
+                        <label class="form-label" style="font-size: 0.75rem;">Status</label>
+                        <select class="form-select p-2" id="filterStatus" onchange="renderInvoicesTable()" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">
+                            <option value="All statuses">All statuses</option>
+                            <option value="UNPAID">Unpaid</option>
+                            <option value="PARTIAL">Partial</option>
+                            <option value="SETTLED">Settled</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dash-widget">
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <h5>No invoices generated</h5>
+                    <p>No invoices match your filter, or you haven't created any fees yet.</p>
+                </div>
+                
+                <div class="table-responsive" id="tableContainer" style="display: none;">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Fee</th>
+                                <th>Amount</th>
+                                <th>Settled</th>
+                                <th>Balance</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoicesTableBody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
-        <div class="dash-widget">
-            <div class="empty-state">
-                <i class="fas fa-file-invoice-dollar"></i>
-                <h5>No invoices generated</h5>
-                <p>When you create targeted fees in the Fees module, student invoices will appear here.</p>
-                <a href="admin_fees.html" class="btn btn-light border fw-bold text-muted mt-2 px-4 py-2">Go to Fees</a>
+        <div id="invoiceDetailView" class="view-section">
+            <div class="breadcrumb-custom">Home > Invoices > <span id="breadStudentName">Invoice Details</span></div>
+            
+            <div class="dash-widget p-4 p-md-5">
+                <h3 class="fw-bold mb-1" style="color: var(--text-color);">Invoice Details</h3>
+                <p class="text-muted mb-4" id="invDetailId">INV-XXXXXXXX</p>
+
+                <div class="d-flex gap-2 mb-5">
+                    <button class="btn btn-light border fw-bold px-4" style="background: var(--input-bg); color: var(--text-color);" onclick="window.print()"><i class="fas fa-print me-2"></i>Print</button>
+                    <button class="btn-brand px-4" onclick="downloadPDF()"><i class="fas fa-download me-2"></i>Download PDF</button>
+                    <button class="btn btn-light border fw-bold px-4 ms-auto" style="background: var(--input-bg); color: var(--text-muted);" onclick="toggleView('invoicesListView')"><i class="fas fa-arrow-left me-2"></i>Back</button>
+                </div>
+
+                <div class="mb-4">
+                    <span class="badge-status" id="invDetailStatus">STATUS</span>
+                </div>
+
+                <div class="row g-4 border-top border-bottom border-secondary border-opacity-25 py-4 mb-4">
+                    <div class="col-6 col-md-3">
+                        <div class="detail-label">Student</div>
+                        <div class="detail-value text-uppercase" id="invDetailStudent">--</div>
+                        
+                        <div class="detail-label mt-4">Invoice ID</div>
+                        <div class="detail-value" id="invDetailId2" style="color: #10b981;">--</div>
+                    </div>
+                    
+                    <div class="col-6 col-md-3">
+                        <div class="detail-label">Fee Name</div>
+                        <div class="detail-value text-uppercase" id="invDetailFee">--</div>
+                        
+                        <div class="detail-label mt-4">Term</div>
+                        <div class="detail-value" id="invDetailTerm">--</div>
+                    </div>
+
+                    <div class="col-6 col-md-3">
+                        <div class="detail-label">Total Amount</div>
+                        <div class="detail-value" id="invDetailAmount">₦0</div>
+                        
+                        <div class="detail-label mt-4">Settled Amount</div>
+                        <div class="detail-value" id="invDetailSettled" style="color: #10b981;">₦0</div>
+                    </div>
+
+                    <div class="col-6 col-md-3">
+                        <div class="detail-label">Outstanding Balance</div>
+                        <div class="detail-value amount" id="invDetailBalance" style="color: #f43f5e;">₦0</div>
+                        
+                        <div class="detail-label mt-4">Date Created</div>
+                        <div class="detail-value" id="invDetailDate">--</div>
+                    </div>
+                </div>
             </div>
         </div>
 
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
+        
+        let allGeneratedInvoices = []; // Holds the dynamically generated invoices
+
+        // UI TOGGLES
         window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('mobile-open'); document.getElementById('sidebarOverlay').style.display = document.getElementById('sidebarOverlay').style.display === 'block' ? 'none' : 'block'; };
         window.toggleTheme = () => {
             document.body.classList.toggle('dark-mode');
@@ -112,6 +231,186 @@
             document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
         };
         if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { document.body.classList.add('dark-mode'); document.getElementById('themeIcon').className = 'fas fa-sun text-warning'; }
+
+        window.toggleView = (viewId) => {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+        };
+
+        // THE MAGIC ALGORITHM: Generate Invoices by merging Fees, Students, and Payments
+        window.loadInvoices = async () => {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            try {
+                // 1. Fetch all required data at once
+                const [feesRes, studentsRes, paymentsRes] = await Promise.all([
+                    supabase.from('fees').select('*'),
+                    supabase.from('students').select('id, first_name, surname, class_id'),
+                    supabase.from('payments').select('student_id, linked_fee_id, amount').eq('status', 'Approved')
+                ]);
+
+                const fees = feesRes.data || [];
+                const students = studentsRes.data || [];
+                const payments = paymentsRes.data || [];
+
+                allGeneratedInvoices = [];
+
+                // 2. Loop through every fee created by the admin
+                fees.forEach(fee => {
+                    let targetedStudents = [];
+                    
+                    // Figure out who owes this fee
+                    if (fee.target_type === 'whole') {
+                        targetedStudents = students;
+                    } else if (fee.target_type === 'class') {
+                        const classIds = fee.target_ids || [];
+                        targetedStudents = students.filter(s => classIds.includes(s.class_id));
+                    } else if (fee.target_type === 'student') {
+                        const studentIds = fee.target_ids || [];
+                        targetedStudents = students.filter(s => studentIds.includes(s.id));
+                    }
+
+                    // 3. Create an invoice record for each targeted student
+                    targetedStudents.forEach(student => {
+                        // Find all approved payments this specific student made for this specific fee
+                        const studentPayments = payments.filter(p => p.student_id === student.id && p.linked_fee_id === fee.id);
+                        
+                        // Calculate Math
+                        const settledAmount = studentPayments.reduce((sum, p) => sum + parseFloat(p.amount), 0);
+                        const balance = parseFloat(fee.amount) - settledAmount;
+
+                        // Determine Status
+                        let status = 'UNPAID';
+                        if (settledAmount > 0 && balance > 0) status = 'PARTIAL';
+                        if (balance <= 0) status = 'SETTLED';
+
+                        // Generate a clean Invoice ID
+                        const shortFeeId = fee.id ? fee.id.substring(0,8).toUpperCase() : 'FEE';
+                        const shortStuId = student.id ? student.id.substring(0,4).toUpperCase() : 'STU';
+
+                        allGeneratedInvoices.push({
+                            id: `INV-${shortFeeId}-${shortStuId}`,
+                            fee_id: fee.id,
+                            student_id: student.id,
+                            student_name: `${student.first_name} ${student.surname}`,
+                            fee_name: fee.name,
+                            term: fee.term,
+                            total_amount: parseFloat(fee.amount),
+                            settled: settledAmount,
+                            balance: balance < 0 ? 0 : balance, // Prevent negative balance if overpaid
+                            status: status,
+                            date_created: fee.created_at
+                        });
+                    });
+                });
+
+                // 4. Render the table
+                renderInvoicesTable();
+
+            } catch (err) {
+                console.error("Invoice Generation Error:", err);
+                if (err.message.includes('does not exist')) {
+                    alert("System Notice: You have not created the 'fees' or 'payments' tables yet. Please complete the previous steps.");
+                }
+            }
+            document.getElementById('loadingOverlay').style.display = 'none';
+        };
+
+        // Render Table based on filter
+        window.renderInvoicesTable = () => {
+            const filterStatus = document.getElementById('filterStatus').value;
+            const emptyState = document.getElementById('emptyState');
+            const tableContainer = document.getElementById('tableContainer');
+            const tbody = document.getElementById('invoicesTableBody');
+
+            // Apply Status Filter
+            const filteredInvoices = allGeneratedInvoices.filter(inv => {
+                if (filterStatus === 'All statuses') return true;
+                return inv.status === filterStatus;
+            });
+
+            if (filteredInvoices.length === 0) {
+                emptyState.style.display = 'block';
+                tableContainer.style.display = 'none';
+            } else {
+                emptyState.style.display = 'none';
+                tableContainer.style.display = 'block';
+
+                tbody.innerHTML = filteredInvoices.map((inv, index) => {
+                    let statusClass = 'status-unpaid';
+                    if(inv.status === 'SETTLED') statusClass = 'status-settled';
+                    if(inv.status === 'PARTIAL') statusClass = 'status-partial';
+
+                    // Using the array index to easily grab the data when clicked
+                    return `
+                        <tr onclick="openInvoiceDetails(${index})">
+                            <td class="text-uppercase">${inv.student_name}</td>
+                            <td>${inv.fee_name}</td>
+                            <td>₦${inv.total_amount.toLocaleString()}</td>
+                            <td>₦${inv.settled.toLocaleString()}</td>
+                            <td>₦${inv.balance.toLocaleString()}</td>
+                            <td><span class="badge-status ${statusClass}">${inv.status}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        };
+
+        // OPEN DETAILS PAGE
+        window.openInvoiceDetails = (index) => {
+            const filterStatus = document.getElementById('filterStatus').value;
+            const filteredInvoices = allGeneratedInvoices.filter(inv => {
+                if (filterStatus === 'All statuses') return true;
+                return inv.status === filterStatus;
+            });
+            
+            const inv = filteredInvoices[index];
+            if(!inv) return;
+
+            // Set Data
+            document.getElementById('breadStudentName').innerText = `Invoice — ${inv.student_name}`;
+            document.getElementById('invDetailId').innerText = inv.id;
+            document.getElementById('invDetailId2').innerText = inv.id;
+            
+            document.getElementById('invDetailStudent').innerText = inv.student_name;
+            document.getElementById('invDetailFee').innerText = inv.fee_name;
+            document.getElementById('invDetailTerm').innerText = inv.term;
+            
+            document.getElementById('invDetailAmount').innerText = `₦${inv.total_amount.toLocaleString()}`;
+            document.getElementById('invDetailSettled').innerText = `₦${inv.settled.toLocaleString()}`;
+            
+            const balanceEl = document.getElementById('invDetailBalance');
+            balanceEl.innerText = `₦${inv.balance.toLocaleString()}`;
+            balanceEl.style.color = inv.balance === 0 ? '#10b981' : '#f43f5e';
+
+            const dateObj = new Date(inv.date_created);
+            document.getElementById('invDetailDate').innerText = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' });
+
+            const statusBadge = document.getElementById('invDetailStatus');
+            statusBadge.innerText = inv.status;
+            statusBadge.className = 'badge-status'; // reset
+            if(inv.status === 'SETTLED') statusBadge.classList.add('status-settled');
+            else if(inv.status === 'PARTIAL') statusBadge.classList.add('status-partial');
+            else statusBadge.classList.add('status-unpaid');
+
+            // Switch view
+            toggleView('invoiceDetailView');
+        };
+
+        // PDF SIMULATOR
+        window.downloadPDF = () => {
+            alert("Preparing PDF download...\n\n(Note: In a production app, this triggers a library like jsPDF to convert the HTML to a downloadable file.)");
+        };
+
+        async function initialize() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return window.location.href = 'login.html';
+            
+            // Generate invoices on load
+            await loadInvoices();
+        }
+        
+        document.addEventListener('DOMContentLoaded', initialize);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login.html'; });
     </script>
 </body>
 </html>
