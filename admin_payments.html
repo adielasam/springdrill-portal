@@ -144,10 +144,10 @@
                 <div class="row g-4">
                     <div class="col-md-3">
                         <label class="form-label">Filter by</label>
-                        <select class="form-select p-2 px-3">
-                            <option>Term</option>
-                            <option>Class</option>
-                            <option>Date Range</option>
+                        <select class="form-select p-2 px-3" id="filterBy" onchange="updateFilterUI()">
+                            <option value="All">All Payments</option>
+                            <option value="Term">Term</option>
+                            <option value="Class">Class</option>
                         </select>
                     </div>
                     <div class="col-md-3">
@@ -161,17 +161,15 @@
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">Session</label>
-                        <select class="form-select p-2 px-3">
-                            <option>2025/2026</option>
-                            <option>2024/2025</option>
+                        <select class="form-select p-2 px-3" id="filterSession" onchange="loadPayments()">
+                            <option value="2025/2026">2025/2026</option>
+                            <option value="2024/2025">2024/2025</option>
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">Term</label>
-                        <select class="form-select p-2 px-3">
-                            <option>SECOND</option>
-                            <option>FIRST</option>
-                            <option>THIRD</option>
+                        <label class="form-label" id="filterSecondaryLabel">Any</label>
+                        <select class="form-select p-2 px-3" id="filterSecondary" onchange="loadPayments()" disabled>
+                            <option value="All">N/A</option>
                         </select>
                     </div>
                 </div>
@@ -313,26 +311,108 @@
         const today = new Date();
         document.getElementById('payDate').value = today.toISOString().split('T')[0];
 
-        // FETCH AND RENDER PAYMENTS INTO TABLE
+        // --- NEW SMART FILTER LOGIC ---
+        window.updateFilterUI = async () => {
+            const filterBy = document.getElementById('filterBy').value;
+            const label = document.getElementById('filterSecondaryLabel');
+            const select = document.getElementById('filterSecondary');
+
+            if (filterBy === 'Term') {
+                label.innerText = 'Term';
+                select.innerHTML = `
+                    <option value="All">All Terms</option>
+                    <option value="FIRST">FIRST</option>
+                    <option value="SECOND">SECOND</option>
+                    <option value="THIRD">THIRD</option>
+                `;
+                select.disabled = false;
+            } else if (filterBy === 'Class') {
+                label.innerText = 'Class';
+                select.innerHTML = '<option value="All">Loading classes...</option>';
+                select.disabled = true;
+
+                try {
+                    const { data: classes } = await supabase.from('classes').select('name').order('name');
+                    if (classes && classes.length > 0) {
+                        select.innerHTML = '<option value="All">All Classes</option>' + classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+                    } else {
+                        select.innerHTML = '<option value="All">No classes found</option>';
+                    }
+                } catch(e) {
+                    select.innerHTML = '<option value="All">Error loading</option>';
+                }
+                select.disabled = false;
+            } else {
+                // "All Payments" selected
+                label.innerText = 'Any';
+                select.innerHTML = '<option value="All">N/A</option>';
+                select.disabled = true;
+            }
+            loadPayments();
+        };
+
+        // FETCH AND FILTER PAYMENTS INTO TABLE
         window.loadPayments = async () => {
             try {
-                const { data: payments, error } = await supabase.from('payments').select('*').order('created_at', { ascending: false });
-                if (error) throw error;
+                // Fetch all base data to process filters
+                const [paymentsRes, studentsRes, classesRes, feesRes] = await Promise.all([
+                    supabase.from('payments').select('*').order('created_at', { ascending: false }),
+                    supabase.from('students').select('id, first_name, surname, class_id'),
+                    supabase.from('classes').select('id, name'),
+                    supabase.from('fees').select('id, term')
+                ]);
 
-                // Also fetch students to match IDs to Names
-                const { data: students } = await supabase.from('students').select('id, first_name, surname');
+                if (paymentsRes.error) throw paymentsRes.error;
+                const payments = paymentsRes.data || [];
+
+                // Build Maps for quick lookup
+                const classMap = {};
+                if (classesRes.data) classesRes.data.forEach(c => classMap[c.id] = c.name);
+
                 const studentMap = {};
-                if (students) {
-                    students.forEach(s => studentMap[s.id] = `${s.first_name} ${s.surname}`);
+                if (studentsRes.data) {
+                    studentsRes.data.forEach(s => studentMap[s.id] = {
+                        name: `${s.first_name} ${s.surname}`,
+                        className: classMap[s.class_id] || 'Unknown'
+                    });
                 }
 
+                const feeMap = {};
+                if (feesRes.data) feesRes.data.forEach(f => feeMap[f.id] = f);
+
+                // Get Current Filter Values
                 const filterStatus = document.getElementById('filterStatus').value;
-                
-                // Filter the data based on the dropdown!
-                const filteredPayments = payments ? payments.filter(p => {
-                    if (filterStatus === 'All statuses') return true;
-                    return p.status === filterStatus;
-                }) : [];
+                const filterBy = document.getElementById('filterBy').value;
+                const filterSecondary = document.getElementById('filterSecondary').value;
+
+                // --- MULTI-CONDITION FILTER ENGINE ---
+                const filteredPayments = payments.filter(p => {
+                    // Rule 1: Status must match (unless 'All statuses')
+                    if (filterStatus !== 'All statuses' && p.status !== filterStatus) return false;
+
+                    // Rule 2: Secondary Filter (Term or Class) must match
+                    if (filterBy !== 'All' && filterSecondary !== 'All') {
+                        
+                        if (filterBy === 'Class') {
+                            // Does the student's class match the dropdown?
+                            const studentClass = studentMap[p.student_id]?.className;
+                            if (studentClass !== filterSecondary) return false;
+                        } 
+                        else if (filterBy === 'Term') {
+                            // Does the linked fee term match the dropdown?
+                            const feeTerm = p.linked_fee_id && feeMap[p.linked_fee_id] ? feeMap[p.linked_fee_id].term : null;
+                            
+                            // If payment has no linked fee, we exclude it when strictly filtering by Term, 
+                            // OR we check if the term includes 'FIRST', 'SECOND', etc.
+                            if (!feeTerm || !feeTerm.toUpperCase().includes(filterSecondary.toUpperCase())) {
+                                return false;
+                            }
+                        }
+                    }
+                    
+                    // If it survived all rules, keep it!
+                    return true;
+                });
 
                 const emptyState = document.getElementById('emptyState');
                 const tableContainer = document.getElementById('tableContainer');
@@ -346,9 +426,8 @@
                     tableContainer.style.display = 'block';
 
                     tbody.innerHTML = filteredPayments.map(p => {
-                        const studentName = studentMap[p.student_id] || 'Unknown Student';
+                        const studentName = studentMap[p.student_id]?.name || 'Unknown Student';
                         const amountStr = `₦${parseFloat(p.amount).toLocaleString()}`;
-                        // Format date like '18 Mar 2026'
                         const dateObj = new Date(p.payment_date);
                         const dateStr = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
                         
@@ -485,7 +564,6 @@
                 clearSelectedStudent();
                 document.getElementById('payDate').value = today.toISOString().split('T')[0]; 
                 
-                // GO BACK AND REFRESH DATA
                 toggleView('paymentsListView');
 
             } catch (err) {
@@ -498,8 +576,8 @@
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) return window.location.href = 'login.html';
             
-            // LOAD PAYMENTS IMMEDIATELY ON BOOT
-            await loadPayments();
+            // Set initial filter state and load data
+            await updateFilterUI(); 
             
             document.getElementById('loadingOverlay').style.display = 'none';
         }
