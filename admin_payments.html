@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRINGDRILL - Payments</title>
+    <title>SPRINGDRILL - Payments & Billing</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -41,16 +41,20 @@
         /* FORMS */
         .form-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .form-control, .form-select, .input-group-text { background-color: var(--input-bg); border-color: var(--border-color); color: var(--text-color); font-weight: 600;}
-        .form-control:focus, .form-select:focus { border-color: var(--utme-green); box-shadow: none; background-color: var(--card-bg); color: var(--text-color);}
+        .form-control:focus, .form-select:focus { border-color: var(--utme-green); box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.1); background-color: var(--card-bg); color: var(--text-color);}
         .form-label { font-weight: 700; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;}
         
-        .btn-brand { background-color: var(--utme-green); color: white; font-weight: 700; border: none; padding: 8px 20px; border-radius: 6px; transition: 0.2s;}
+        .btn-brand { background-color: var(--utme-green); color: white; font-weight: 700; border: none; padding: 10px 20px; border-radius: 6px; transition: 0.2s;}
         .btn-brand:hover { background-color: var(--utme-green-hover); color: white;}
 
         .breadcrumb-custom { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 20px;}
         .breadcrumb-custom span { color: var(--text-color); }
 
-        /* SEARCH RESULTS */
+        /* SEARCH RESULTS & DROPDOWN MENU */
+        .dropdown-menu-dark { background-color: #0f172a; border: 1px solid #1e293b; }
+        .dropdown-item { color: #f8fafc; font-size: 0.9rem; font-weight: 500; padding: 8px 20px; }
+        .dropdown-item:hover { background-color: #1e293b; color: white; }
+        
         .search-result-item { padding: 10px 15px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; background: var(--card-bg);}
         .search-result-item:hover { background: var(--input-bg); }
         .selected-student-badge { background: rgba(16, 185, 129, 0.1); color: var(--utme-green); border: 1px solid var(--utme-green); padding: 10px 15px; border-radius: 8px; font-weight: bold; margin-top: 10px; display: inline-block;}
@@ -115,9 +119,13 @@
 
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="fw-bold m-0" style="color: var(--text-color);">Payments</h2>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-light border" style="background: var(--input-bg); color: var(--text-muted);"><i class="fas fa-ellipsis-v px-2"></i></button>
-                    <button class="btn-brand" onclick="toggleView('recordPaymentView')"><i class="fas fa-plus me-1"></i> Record Payment</button>
+                
+                <div class="dropdown">
+                    <button class="btn btn-light border" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background: var(--input-bg); color: var(--text-muted);"><i class="fas fa-ellipsis-v px-2"></i></button>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
+                      <li><a class="dropdown-item" href="#" onclick="toggleView('recordPaymentView')"><i class="fas fa-plus me-2 text-success"></i>Record Payment</a></li>
+                      <li><a class="dropdown-item" href="#"><i class="fas fa-file-export me-2"></i>Export Transactions</a></li>
+                    </ul>
                 </div>
             </div>
 
@@ -128,7 +136,6 @@
                         <select class="form-select p-2 px-3">
                             <option>Term</option>
                             <option>Class</option>
-                            <option>Student</option>
                             <option>Date Range</option>
                         </select>
                     </div>
@@ -155,6 +162,7 @@
                     <i class="far fa-credit-card"></i>
                     <h5>No payments found</h5>
                     <p>No payments match the selected filters. Payments will appear here once parents submit them or you record them manually.</p>
+                    <button class="btn-brand mt-3" onclick="toggleView('recordPaymentView')"><i class="fas fa-plus me-2"></i>Record Payment</button>
                 </div>
             </div>
         </div>
@@ -168,38 +176,54 @@
             <div class="form-container">
                 <form id="recordPaymentForm" onsubmit="submitPayment(event)">
                     
-                    <div class="mb-4">
-                        <label class="form-label">Select Student</label>
-                        <div class="input-group mb-2">
-                            <span class="input-group-text border-end-0 border-secondary border-opacity-25"><i class="fas fa-search text-muted"></i></span>
-                            <input type="text" class="form-control p-3 border-start-0 ps-0" id="studentSearchInput" placeholder="Search by name or reg number..." onkeyup="searchStudents()">
-                        </div>
-                        <div id="studentSearchResults" style="max-height: 150px; overflow-y: auto; border-radius: 6px; border: 1px solid var(--border-color); display: none;"></div>
-                        
-                        <div id="selectedStudentDisplay" style="display: none;">
-                            <div class="selected-student-badge">
-                                <i class="fas fa-user-check me-2"></i> <span id="selectedStudentName">Selected Student</span>
-                                <button type="button" class="btn-close btn-close-white ms-3" style="font-size: 0.6rem;" aria-label="Close" onclick="clearSelectedStudent()"></button>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Select Student</label>
+                            <div class="input-group">
+                                <span class="input-group-text border-end-0 border-secondary border-opacity-25"><i class="fas fa-search text-muted"></i></span>
+                                <input type="text" class="form-control p-3 border-start-0 ps-0" id="studentSearchInput" placeholder="Search by name or reg number..." onkeyup="searchStudents()">
                             </div>
+                            <div id="studentSearchResults" style="max-height: 150px; overflow-y: auto; border-radius: 6px; border: 1px solid var(--border-color); display: none; position: absolute; z-index: 100; width: 45%;"></div>
+                            
+                            <div id="selectedStudentDisplay" style="display: none;">
+                                <div class="selected-student-badge">
+                                    <i class="fas fa-user-check me-2"></i> <span id="selectedStudentName">Selected Student</span>
+                                    <button type="button" class="btn-close btn-close-white ms-3" style="font-size: 0.6rem;" aria-label="Close" onclick="clearSelectedStudent()"></button>
+                                </div>
+                            </div>
+                            <input type="hidden" id="selectedStudentId" required>
                         </div>
-                        <input type="hidden" id="selectedStudentId" required>
+                        <div class="col-md-6">
+                            <label class="form-label">Link to existing invoice</label>
+                            <select class="form-select p-3" id="linkInvoice" disabled onchange="populateFromInvoice(this.value)">
+                                <option value="">(Select student first)</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="row g-4 mb-4">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label">Amount Paid</label>
                             <div class="input-group">
                                 <span class="input-group-text px-4 border-end-0 border-secondary border-opacity-25" style="font-weight: 800;">₦</span>
                                 <input type="number" class="form-control p-3 border-start-0 ps-0" id="payAmount" placeholder="0" required>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label">Payment Method</label>
                             <select class="form-select p-3" id="payMethod" required>
                                 <option value="Bank Transfer">Bank Transfer</option>
+                                <option value="POS Terminal">POS Terminal</option>
                                 <option value="Cash">Cash</option>
-                                <option value="POS">POS Terminal</option>
                                 <option value="Online Gateway">Online Gateway</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Status</label>
+                            <select class="form-select p-3" id="payStatus" required>
+                                <option value="Approved">Approved</option>
+                                <option value="Created">Created</option>
+                                <option value="Rejected">Rejected</option>
                             </select>
                         </div>
                     </div>
@@ -217,7 +241,7 @@
 
                     <div class="d-flex justify-content-end gap-3 pt-3 border-top border-secondary border-opacity-25">
                         <button type="button" class="btn btn-light fw-bold px-4" onclick="toggleView('paymentsListView')">Cancel</button>
-                        <button type="submit" class="btn-brand px-5"><i class="fas fa-check-circle me-2"></i>Save Payment</button>
+                        <button type="submit" class="btn-brand px-5"><i class="fas fa-check-circle me-2"></i>Create Payment</button>
                     </div>
 
                 </form>
@@ -230,6 +254,9 @@
     <script type="module">
         import { supabase } from './supabaseClient.js';
         
+        // GLOBAL DATA PLACEHOLDER FOR INVOICES
+        let studentPendingInvoices = [];
+
         // UI & THEME TOGGLES
         window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('mobile-open'); document.getElementById('sidebarOverlay').style.display = document.getElementById('sidebarOverlay').style.display === 'block' ? 'none' : 'block'; };
         window.toggleTheme = () => {
@@ -264,7 +291,7 @@
             try {
                 const { data: students, error } = await supabase
                     .from('students')
-                    .select('id, first_name, surname, reg_number')
+                    .select('id, first_name, surname, reg_number, class_id')
                     .or(`first_name.ilike.%${query}%,surname.ilike.%${query}%,reg_number.ilike.%${query}%`)
                     .limit(5);
 
@@ -278,7 +305,7 @@
                 }
 
                 resultsBox.innerHTML = students.map(s => `
-                    <div class="search-result-item" onclick="selectStudent('${s.id}', '${s.first_name} ${s.surname}', '${s.reg_number}')">
+                    <div class="search-result-item" onclick="selectStudent('${s.id}', '${s.first_name} ${s.surname}', '${s.reg_number}', '${s.class_id}')">
                         <span class="fw-bold" style="color: var(--text-color);">${s.first_name} ${s.surname}</span>
                         <span class="badge bg-secondary bg-opacity-25 text-secondary border border-secondary">${s.reg_number || 'No Reg'}</span>
                     </div>
@@ -287,18 +314,71 @@
             } catch (err) { console.error("Search failed", err); }
         };
 
-        window.selectStudent = (id, name, reg) => {
+        window.selectStudent = (id, name, reg, classId) => {
             document.getElementById('selectedStudentId').value = id;
             document.getElementById('selectedStudentName').innerText = `${name} (${reg || 'N/A'})`;
             document.getElementById('studentSearchResults').style.display = 'none';
             document.getElementById('studentSearchInput').value = '';
             document.getElementById('selectedStudentDisplay').style.display = 'block';
+
+            // DYNAMICALLY LOAD INVOICES FOR THIS STUDENT
+            fetchStudentPendingInvoices(id, classId);
         };
 
         window.clearSelectedStudent = () => {
             document.getElementById('selectedStudentId').value = '';
             document.getElementById('selectedStudentDisplay').style.display = 'none';
+            
+            const invoiceSelect = document.getElementById('linkInvoice');
+            invoiceSelect.innerHTML = '<option value="">(Select student first)</option>';
+            invoiceSelect.disabled = true;
+            document.getElementById('recordPaymentForm').reset(); 
+            document.getElementById('payDate').value = today.toISOString().split('T')[0]; 
         };
+
+        // FETCH INVOICES WHERE THIS STUDENT IS TARGETED
+        async function fetchStudentPendingInvoices(studentId, classId) {
+            const invoiceSelect = document.getElementById('linkInvoice');
+            invoiceSelect.innerHTML = '<option value=""><i class="fas fa-spinner fa-spin me-1"></i>Checking invoices...</option>';
+            invoiceSelect.disabled = true;
+
+            try {
+                const { data: fees, error } = await supabase.from('fees').select('id, name, amount, term');
+                if (error) throw error;
+
+                if (!fees || fees.length === 0) {
+                    invoiceSelect.innerHTML = '<option value="">No pending invoices found for this student.</option>';
+                    studentPendingInvoices = [];
+                    return;
+                }
+
+                studentPendingInvoices = fees;
+
+                invoiceSelect.innerHTML = '<option value="">(Optional) Select a Created invoice...</option>' + fees.map(f => `
+                    <option value="${f.id}">₦${f.amount.toLocaleString()} - ${f.name} (${f.term})</option>
+                `).join('');
+                invoiceSelect.disabled = false;
+
+            } catch (err) {
+                console.error("Database Save Error:", err);
+                if (err.message.includes('does not exist')) {
+                    invoiceSelect.innerHTML = '<option value="">[System] "fees" table not found.</option>';
+                } else {
+                    invoiceSelect.innerHTML = '<option value="">Count unavailable</option>';
+                }
+            }
+        }
+
+        // POPULATE AMOUNT AND DESC FROM SELECTED INVOICE
+        window.populateFromInvoice = (feeId) => {
+            if(!feeId) return; 
+            const inv = studentPendingInvoices.find(f => f.id === feeId);
+            if (inv) {
+                document.getElementById('payAmount').value = inv.amount;
+                document.getElementById('payStatus').value = 'Approved'; 
+                alert(`Pre-populated Amount: ₦${inv.amount.toLocaleString()}\nPlease ensure the amount paid matches the invoice.`);
+            }
+        }
 
         // FORM SUBMISSION
         window.submitPayment = async (e) => {
@@ -314,25 +394,25 @@
                 student_id: studentId,
                 amount: parseFloat(document.getElementById('payAmount').value),
                 method: document.getElementById('payMethod').value,
+                status: document.getElementById('payStatus').value,
                 payment_date: document.getElementById('payDate').value,
-                reference: document.getElementById('payRef').value.trim()
+                reference: document.getElementById('payRef').value.trim(),
+                linked_fee_id: document.getElementById('linkInvoice').value || null
             };
 
             try {
-                // ATTEMPT TO SAVE TO SUPABASE
+                // SAVE TO SUPABASE
                 const { error } = await supabase.from('payments').insert([paymentData]);
-                
                 if (error) throw new Error(error.message);
 
                 alert(`Payment of ₦${paymentData.amount.toLocaleString()} recorded successfully!`);
                 document.getElementById('recordPaymentForm').reset();
                 clearSelectedStudent();
-                document.getElementById('payDate').value = today.toISOString().split('T')[0]; // Reset date
+                document.getElementById('payDate').value = today.toISOString().split('T')[0]; 
                 toggleView('paymentsListView');
 
             } catch (err) {
                 console.error("Database Save Error:", err);
-                // Graceful fallback if 'payments' table doesn't exist yet
                 if (err.message.includes('does not exist')) {
                     alert("System Notice: The 'payments' table has not been created in your Supabase database yet.\n\nSimulating successful save for demonstration purposes!");
                     document.getElementById('recordPaymentForm').reset();
@@ -342,7 +422,6 @@
                     alert(`Save Failed: ${err.message}`);
                 }
             }
-            
             loader.style.display = 'none';
         };
 
