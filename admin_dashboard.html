@@ -114,7 +114,7 @@
 
     <div id="loadingOverlay">
         <i class="fas fa-circle-notch fa-spin fa-3x text-success mb-3"></i>
-        <h5 class="fw-bold" style="color: var(--text-muted);">Initializing Workspace...</h5>
+        <h5 class="fw-bold" style="color: var(--text-muted);">Syncing Workspace...</h5>
     </div>
 
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -200,12 +200,12 @@
 
         <h5 class="section-title">Overview</h5>
         <div class="row g-3 mb-5 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-6">
-            <div class="col"><div class="sleek-stat-card"><p>Enrolled Students</p><h2 id="statActiveStudents">0</h2></div></div>
-            <div class="col"><div class="sleek-stat-card"><p>Male Students</p><h2 id="statMale">0</h2></div></div>
-            <div class="col"><div class="sleek-stat-card"><p>Female Students</p><h2 id="statFemale">0</h2></div></div>
-            <div class="col"><div class="sleek-stat-card"><p>Active Classes</p><h2 id="statClasses">0</h2></div></div>
-            <div class="col"><div class="sleek-stat-card"><p>Staff & Teachers</p><h2 id="statTeachers">0</h2></div></div>
-            <div class="col"><div class="sleek-stat-card"><p>Pending Admissions</p><h2 id="statPending">0</h2></div></div>
+            <div class="col"><div class="sleek-stat-card"><p>Enrolled Students</p><h2 id="statActiveStudents"><i class="fas fa-spinner fa-spin fs-6 text-muted"></i></h2></div></div>
+            <div class="col"><div class="sleek-stat-card"><p>Male Students</p><h2 id="statMale"><i class="fas fa-spinner fa-spin fs-6 text-muted"></i></h2></div></div>
+            <div class="col"><div class="sleek-stat-card"><p>Female Students</p><h2 id="statFemale"><i class="fas fa-spinner fa-spin fs-6 text-muted"></i></h2></div></div>
+            <div class="col"><div class="sleek-stat-card"><p>Active Classes</p><h2 id="statClasses"><i class="fas fa-spinner fa-spin fs-6 text-muted"></i></h2></div></div>
+            <div class="col"><div class="sleek-stat-card"><p>Staff & Teachers</p><h2 id="statTeachers"><i class="fas fa-spinner fa-spin fs-6 text-muted"></i></h2></div></div>
+            <div class="col"><div class="sleek-stat-card"><p>Pending Admissions</p><h2 id="statPending"><i class="fas fa-spinner fa-spin fs-6 text-muted"></i></h2></div></div>
         </div>
 
         <h5 class="section-title">Quick Actions</h5>
@@ -302,33 +302,47 @@
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = 'login.html';
 
-                const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
-                if(profile) document.getElementById('navAdminName').innerText = profile.name.split(' ')[0];
+                // 1. Fetch profile silently in background
+                supabase.from('users').select('name').eq('id', session.user.id).single().then(({data: profile}) => {
+                    if(profile) document.getElementById('navAdminName').innerText = profile.name.split(' ')[0];
+                });
 
-                const { count: activeStudents } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', true);
+                // 2. THE OPTIMIZATION: Fire ALL heavy database requests concurrently using Promise.all
+                const [
+                    { count: activeStudents },
+                    { count: pendingCount },
+                    { count: maleCount },
+                    { count: femaleCount },
+                    { count: classCount },
+                    { count: teacherCount }
+                ] = await Promise.all([
+                    supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', true),
+                    supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', false),
+                    supabase.from('students').select('*', { count: 'exact', head: true }).eq('gender', 'Male').eq('approved', true),
+                    supabase.from('students').select('*', { count: 'exact', head: true }).eq('gender', 'Female').eq('approved', true),
+                    supabase.from('classes').select('*', { count: 'exact', head: true }),
+                    supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'teacher')
+                ]);
+
+                // Update the UI instantly
                 document.getElementById('statActiveStudents').innerText = activeStudents || 0;
-
-                const { count: pendingCount } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', false);
                 document.getElementById('statPending').innerText = pendingCount || 0;
-
-                const { count: maleCount } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('gender', 'Male').eq('approved', true);
                 document.getElementById('statMale').innerText = maleCount || 0;
-
-                const { count: femaleCount } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('gender', 'Female').eq('approved', true);
                 document.getElementById('statFemale').innerText = femaleCount || 0;
-
-                const { count: classCount } = await supabase.from('classes').select('*', { count: 'exact', head: true });
                 document.getElementById('statClasses').innerText = classCount || 0;
-
-                const { count: teacherCount } = await supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'teacher');
                 document.getElementById('statTeachers').innerText = teacherCount || 0;
 
-                await renderClassChart();
-                await fetchRecentAttendance();
-                await populateLeagueWidget();
-                await fetchBirthdays();
-
+                // 3. Hide the loading screen NOW (Perceived performance increase)
                 document.getElementById('loadingOverlay').style.display = 'none';
+
+                // 4. Let the bottom widgets fetch their own data quietly in the background
+                Promise.all([
+                    renderClassChart(),
+                    fetchRecentAttendance(),
+                    populateLeagueWidget(),
+                    fetchBirthdays()
+                ]).catch(console.error);
+
             } catch (err) {
                 console.error(err);
                 document.getElementById('loadingOverlay').style.display = 'none';
