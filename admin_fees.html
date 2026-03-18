@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SPRINGDRILL - Fees & Payments</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -10,6 +10,7 @@
         :root { --bg-color: #f8fafc; --card-bg: #ffffff; --text-color: #0f172a; --text-muted: #64748b; --border-color: #e2e8f0; --input-bg: #f1f5f9; --utme-green: #059669; --utme-green-hover: #047857;}
         body.dark-mode { --bg-color: #020617; --card-bg: #0f172a; --text-color: #f8fafc; --text-muted: #94a3b8; --border-color: #1e293b; --input-bg: #1e293b; --utme-green: #10b981; --utme-green-hover: #059669;}
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', system-ui, sans-serif; overflow-x: hidden; transition: 0.3s; }
+        
         .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; overflow-y: auto;}
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 15px; color: var(--text-color); }
         .sidebar-heading { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; padding: 10px 25px; margin-top: 10px; }
@@ -21,35 +22,38 @@
         .nav-link[data-bs-toggle="collapse"]::after { content: '\f107'; font-family: 'Font Awesome 6 Free'; font-weight: 900; margin-left: auto; transition: transform 0.3s; font-size: 0.8rem;}
         .nav-link[data-bs-toggle="collapse"][aria-expanded="true"]::after { transform: rotate(180deg); }
         .collapse-inner .nav-link { padding-left: 45px; font-size: 0.85rem; }
+
         .main-content { margin-left: 260px; padding: 30px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
         .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
         .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+        
         .view-section { display: none; animation: fadeIn 0.3s ease-in-out; }
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
         .sleek-stat-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; height: 100%; box-shadow: 0 1px 3px rgba(0,0,0,0.02);}
         .sleek-stat-card p { color: var(--text-muted); font-size: 0.9rem; font-weight: 600; margin-bottom: 10px; }
         .sleek-stat-card h2 { font-size: 1.8rem; font-weight: 800; margin: 0; line-height: 1; color: var(--text-color);}
+        
         .dash-widget { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.02); margin-top: 30px; overflow: hidden; }
         .empty-state { text-align: center; padding: 60px 20px; }
         .empty-state i { font-size: 3rem; color: var(--text-muted); opacity: 0.5; margin-bottom: 15px;}
         .empty-state h4 { font-weight: 700; margin-bottom: 5px;}
         .empty-state p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;}
+        
         .form-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .form-control, .form-select, .input-group-text { background-color: var(--input-bg); border-color: var(--border-color); color: var(--text-color); font-weight: 500;}
         .form-control:focus, .form-select:focus { border-color: var(--utme-green); box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.1); background-color: var(--input-bg); color: var(--text-color);}
         .form-label { font-weight: 700; font-size: 0.85rem; color: var(--text-color); margin-bottom: 8px;}
+        
         .target-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px;}
         .target-card { border: 2px solid var(--border-color); border-radius: 10px; padding: 15px; cursor: pointer; transition: 0.2s; background: var(--input-bg); display: flex; flex-direction: column; gap: 5px;}
         .target-card.active { border-color: var(--utme-green); background: rgba(16, 185, 129, 0.05); }
         .target-card i { font-size: 1.2rem; margin-bottom: 5px; color: var(--text-muted); }
         .target-card.active i { color: var(--utme-green); }
         .target-card .title { font-weight: 700; font-size: 0.9rem; color: var(--text-color);}
-        .target-card .desc { font-size: 0.75rem; color: var(--text-muted); }
+        
         .class-checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 20px; padding: 20px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--card-bg); display: none;}
-        .student-search-area { display: none; margin-top: 20px; padding: 20px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--card-bg); }
-        .search-result-item { padding: 10px 15px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; justify-content: space-between; align-items: center;}
-        .selected-student-badge { background: rgba(16, 185, 129, 0.1); color: var(--utme-green); border: 1px solid var(--utme-green); padding: 10px 15px; border-radius: 8px; font-weight: bold; margin-top: 10px; display: inline-block;}
         .btn-brand { background-color: var(--utme-green); color: white; font-weight: 700; border: none; padding: 8px 20px; border-radius: 6px; transition: 0.2s;}
         .breadcrumb-custom { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 20px;}
         .breadcrumb-custom span { color: var(--text-color); }
@@ -60,11 +64,18 @@
         .custom-table { width: 100%; color: var(--text-color); margin: 0; min-width: 800px; border-collapse: collapse;}
         .custom-table th { color: var(--text-muted); border-bottom: 1px solid var(--border-color); padding: 15px 20px; font-size: 0.75rem; text-transform: capitalize; font-weight: 600; background: var(--card-bg);}
         .custom-table td { padding: 15px 20px; vertical-align: middle; border-bottom: 1px solid var(--border-color); font-weight: 600; font-size: 0.85rem;}
+        .custom-table tbody tr { cursor: pointer; transition: 0.2s; }
+        .custom-table tbody tr:hover { background-color: var(--input-bg); }
+
+        .badge-status { padding: 5px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;}
+        .status-settled { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid #10b981; }
+        .status-ongoing { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid #f59e0b; }
+        .status-open { background: rgba(244, 63, 94, 0.1); color: #f43f5e; border: 1px solid #f43f5e; }
 
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
         .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-color); font-size: 1.5rem; cursor: pointer; margin-right: 15px; padding: 0;}
         .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
-        @media (max-width: 992px) { .sidebar { left: -260px; } .sidebar.mobile-open { left: 0; } .main-content { margin-left: 0; padding: 20px; } .mobile-menu-toggle { display: inline-block !important; } .target-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 992px) { .sidebar { left: -260px; } .sidebar.mobile-open { left: 0; } .main-content { margin-left: 0; padding: 20px; } .mobile-menu-toggle { display: inline-block !important; } }
     </style>
 </head>
 <body>
@@ -77,23 +88,19 @@
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-brand">
-            <h4 class="fw-bold m-0"><i class="fas fa-layer-group text-success me-2"></i> Admin Panel</h4>
-        </div>
+        <div class="sidebar-brand"><h4 class="fw-bold m-0"><i class="fas fa-layer-group text-success me-2"></i> Admin Panel</h4></div>
         <nav class="nav flex-column">
             <div class="sidebar-heading">Overview</div>
             <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-fw fa-home"></i> Dashboard</a>
             <div class="sidebar-heading">Management</div>
-            <a href="#managementMenu" data-bs-toggle="collapse" aria-expanded="true" class="nav-link">
-                <i class="fas fa-fw fa-briefcase"></i> Operations
-            </a>
+            <a href="#managementMenu" data-bs-toggle="collapse" aria-expanded="true" class="nav-link"><i class="fas fa-fw fa-briefcase"></i> Operations</a>
             <div class="collapse collapse-inner show" id="managementMenu">
                 <a href="admin_admissions.html" class="nav-link"><i class="fas fa-fw fa-user-graduate"></i> Admissions</a>
                 <a href="admin_fees.html" class="nav-link active"><i class="fas fa-fw fa-money-bill-wave"></i> Fees</a>
                 <a href="admin_payments.html" class="nav-link"><i class="fas fa-fw fa-credit-card"></i> Payments</a>
                 <a href="admin_invoices.html" class="nav-link"><i class="fas fa-fw fa-file-invoice"></i> Invoices</a>
             </div>
-            </nav>
+        </nav>
     </div>
 
     <div class="main-content">
@@ -172,11 +179,51 @@
                 </form>
             </div>
         </div>
+
+        <div id="feeDetailView" class="view-section">
+            <div class="breadcrumb-custom">Home > Fees > <span id="detailBreadcrumb">Fee Details</span></div>
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold mb-1" style="color: var(--text-color);" id="detailFeeName">Fee Name</h3>
+                    <p class="text-muted m-0"><span id="detailFeeTerm">Term</span> • ₦<span id="detailFeeAmount">0</span> per student</p>
+                </div>
+                <button class="btn btn-light border fw-bold px-4" style="background: var(--input-bg); color: var(--text-muted);" onclick="toggleView('feesListView')"><i class="fas fa-arrow-left me-2"></i>Back</button>
+            </div>
+
+            <div class="dash-widget">
+                <div class="p-3 border-bottom border-secondary border-opacity-25 d-flex justify-content-between align-items-center bg-light bg-opacity-10">
+                    <span class="fw-bold">Targeted Students</span>
+                    <span class="badge bg-primary rounded-pill" id="detailStudentCount">0</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Expected</th>
+                                <th>Paid</th>
+                                <th>Balance</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feeDetailsTableBody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
+
+        // Globals to prevent re-fetching when clicking details
+        let globalFees = [];
+        let globalStudents = [];
+        let globalPayments = [];
 
         window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('mobile-open'); document.getElementById('sidebarOverlay').style.display = document.getElementById('sidebarOverlay').style.display === 'block' ? 'none' : 'block'; };
         window.toggleTheme = () => {
@@ -207,24 +254,20 @@
             if(classes) container.innerHTML = classes.map(c => `<div class="form-check"><input class="form-check-input class-target-cb" type="checkbox" value="${c.id}" id="chk_${c.id}"><label class="form-check-label" for="chk_${c.id}">${c.name}</label></div>`).join('');
         }
 
-        // ==========================================
-        // DYNAMIC DATA FETCHING LOGIC
-        // ==========================================
         window.loadFeesData = async () => {
             document.getElementById('loadingOverlay').style.display = 'flex';
             try {
-                // Fetch Fees, Students, and Payments
                 const [feesRes, studentsRes, paymentsRes] = await Promise.all([
                     supabase.from('fees').select('*').order('created_at', { ascending: false }),
-                    supabase.from('students').select('id, class_id'),
-                    supabase.from('payments').select('amount, linked_fee_id').eq('status', 'Approved')
+                    supabase.from('students').select('id, first_name, surname, class_id'),
+                    supabase.from('payments').select('student_id, amount, linked_fee_id').eq('status', 'Approved')
                 ]);
 
-                const fees = feesRes.data || [];
-                const students = studentsRes.data || [];
-                const payments = paymentsRes.data || [];
+                globalFees = feesRes.data || [];
+                globalStudents = studentsRes.data || [];
+                globalPayments = paymentsRes.data || [];
 
-                if (fees.length === 0) {
+                if (globalFees.length === 0) {
                     document.getElementById('feesTableContainer').style.display = 'none';
                     document.getElementById('feesEmptyState').style.display = 'block';
                     document.getElementById('loadingOverlay').style.display = 'none';
@@ -239,15 +282,14 @@
                 const tbody = document.getElementById('feesTableBody');
                 tbody.innerHTML = '';
 
-                fees.forEach(fee => {
+                globalFees.forEach((fee, index) => {
                     let targetCount = 0;
                     
-                    // Count how many students this fee applies to
                     if (!fee.is_targeted || fee.target_type === 'whole' || fee.target_type === 'none') {
-                        targetCount = students.length;
+                        targetCount = globalStudents.length;
                     } else if (fee.target_type === 'class') {
-                        const cIds = fee.target_ids || [];
-                        targetCount = students.filter(s => cIds.map(String).includes(String(s.class_id))).length;
+                        const cIds = (fee.target_ids || []).map(String);
+                        targetCount = globalStudents.filter(s => cIds.includes(String(s.class_id))).length;
                     } else if (fee.target_type === 'student') {
                         targetCount = (fee.target_ids || []).length;
                     }
@@ -255,13 +297,13 @@
                     const feeExpected = parseFloat(fee.amount) * targetCount;
                     totalExpected += feeExpected;
 
-                    // Calculate collected money for this specific fee
-                    const feePayments = payments.filter(p => String(p.linked_fee_id) === String(fee.id));
+                    const feePayments = globalPayments.filter(p => String(p.linked_fee_id) === String(fee.id));
                     const feeCollected = feePayments.reduce((sum, p) => sum + parseFloat(p.amount), 0);
                     totalCollected += feeCollected;
 
+                    // ROW IS NOW CLICKABLE
                     tbody.innerHTML += `
-                        <tr>
+                        <tr onclick="openFeeDetails(${index})">
                             <td class="fw-bold">${fee.name} <div class="small text-muted fw-normal">${fee.term}</div></td>
                             <td>₦${parseFloat(fee.amount).toLocaleString()}</td>
                             <td><span class="badge bg-success bg-opacity-10 text-success border border-success">ACTIVE</span></td>
@@ -271,7 +313,6 @@
                     `;
                 });
 
-                // Update Top Metrics
                 document.getElementById('metricExpected').innerText = `₦${totalExpected.toLocaleString()}`;
                 document.getElementById('metricCollected').innerText = `₦${totalCollected.toLocaleString()}`;
                 document.getElementById('metricOutstanding').innerText = `₦${Math.max(0, totalExpected - totalCollected).toLocaleString()}`;
@@ -280,6 +321,58 @@
 
             } catch (err) { console.error(err); }
             document.getElementById('loadingOverlay').style.display = 'none';
+        };
+
+        // NEW: OPEN FEE DETAILS TO SEE STUDENTS
+        window.openFeeDetails = (index) => {
+            const fee = globalFees[index];
+            if(!fee) return;
+
+            document.getElementById('detailBreadcrumb').innerText = fee.name;
+            document.getElementById('detailFeeName').innerText = fee.name;
+            document.getElementById('detailFeeTerm').innerText = fee.term;
+            document.getElementById('detailFeeAmount').innerText = parseFloat(fee.amount).toLocaleString();
+
+            let targetedStudents = [];
+            if (!fee.is_targeted || fee.target_type === 'whole' || fee.target_type === 'none') {
+                targetedStudents = globalStudents;
+            } else if (fee.target_type === 'class') {
+                const classIds = (fee.target_ids || []).map(String);
+                targetedStudents = globalStudents.filter(s => classIds.includes(String(s.class_id)));
+            } else if (fee.target_type === 'student') {
+                const studentIds = (fee.target_ids || []).map(String);
+                targetedStudents = globalStudents.filter(s => studentIds.includes(String(s.id)));
+            }
+
+            document.getElementById('detailStudentCount').innerText = targetedStudents.length;
+
+            const tbody = document.getElementById('feeDetailsTableBody');
+            if(targetedStudents.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">No students targeted by this fee.</td></tr>';
+            } else {
+                tbody.innerHTML = targetedStudents.map(student => {
+                    const studentPayments = globalPayments.filter(p => String(p.student_id) === String(student.id) && String(p.linked_fee_id) === String(fee.id));
+                    const settledAmount = studentPayments.reduce((sum, p) => sum + parseFloat(p.amount), 0);
+                    const balance = parseFloat(fee.amount) - settledAmount;
+
+                    let statusClass = 'status-open';
+                    let statusText = 'OPEN';
+                    if (settledAmount > 0 && balance > 0) { statusClass = 'status-ongoing'; statusText = 'ONGOING'; }
+                    if (balance <= 0) { statusClass = 'status-settled'; statusText = 'SETTLED'; }
+
+                    return `
+                        <tr>
+                            <td class="text-uppercase">${student.first_name} ${student.surname}</td>
+                            <td>₦${parseFloat(fee.amount).toLocaleString()}</td>
+                            <td style="color: #10b981;">₦${settledAmount.toLocaleString()}</td>
+                            <td style="color: #f43f5e;">₦${balance > 0 ? balance.toLocaleString() : 0}</td>
+                            <td><span class="badge-status ${statusClass}">${statusText}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            toggleView('feeDetailView');
         };
 
         window.finalDatabaseExecution = async (e) => {
@@ -311,6 +404,8 @@
         };
 
         document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return window.location.href = 'login.html';
             await loadFeesData();
         });
     </script>
