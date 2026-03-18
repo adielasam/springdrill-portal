@@ -220,7 +220,7 @@
     <script type="module">
         import { supabase } from './supabaseClient.js';
         
-        let allGeneratedInvoices = []; // Holds the dynamically generated invoices
+        let allGeneratedInvoices = []; 
 
         // UI TOGGLES
         window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('mobile-open'); document.getElementById('sidebarOverlay').style.display = document.getElementById('sidebarOverlay').style.display === 'block' ? 'none' : 'block'; };
@@ -237,11 +237,11 @@
             document.getElementById(viewId).classList.add('active');
         };
 
-        // THE MAGIC ALGORITHM: Generate Invoices by merging Fees, Students, and Payments
+        // THE MAGIC ALGORITHM (UPDATED)
         window.loadInvoices = async () => {
             document.getElementById('loadingOverlay').style.display = 'flex';
             try {
-                // 1. Fetch all required data at once
+                // Fetch data
                 const [feesRes, studentsRes, paymentsRes] = await Promise.all([
                     supabase.from('fees').select('*'),
                     supabase.from('students').select('id, first_name, surname, class_id'),
@@ -254,36 +254,31 @@
 
                 allGeneratedInvoices = [];
 
-                // 2. Loop through every fee created by the admin
                 fees.forEach(fee => {
                     let targetedStudents = [];
                     
-                    // Figure out who owes this fee
-                    if (fee.target_type === 'whole') {
+                    // FIX: If the target switch was off or set to 'none', we default to 'Whole School'
+                    if (!fee.is_targeted || fee.target_type === 'whole' || fee.target_type === 'none') {
                         targetedStudents = students;
                     } else if (fee.target_type === 'class') {
                         const classIds = fee.target_ids || [];
-                        targetedStudents = students.filter(s => classIds.includes(s.class_id));
+                        targetedStudents = students.filter(s => classIds.includes(String(s.class_id)));
                     } else if (fee.target_type === 'student') {
                         const studentIds = fee.target_ids || [];
-                        targetedStudents = students.filter(s => studentIds.includes(s.id));
+                        targetedStudents = students.filter(s => studentIds.includes(String(s.id)));
                     }
 
-                    // 3. Create an invoice record for each targeted student
+                    // Create invoices
                     targetedStudents.forEach(student => {
-                        // Find all approved payments this specific student made for this specific fee
-                        const studentPayments = payments.filter(p => p.student_id === student.id && p.linked_fee_id === fee.id);
+                        const studentPayments = payments.filter(p => String(p.student_id) === String(student.id) && String(p.linked_fee_id) === String(fee.id));
                         
-                        // Calculate Math
                         const settledAmount = studentPayments.reduce((sum, p) => sum + parseFloat(p.amount), 0);
                         const balance = parseFloat(fee.amount) - settledAmount;
 
-                        // Determine Status
                         let status = 'UNPAID';
                         if (settledAmount > 0 && balance > 0) status = 'PARTIAL';
                         if (balance <= 0) status = 'SETTLED';
 
-                        // Generate a clean Invoice ID
                         const shortFeeId = fee.id ? fee.id.substring(0,8).toUpperCase() : 'FEE';
                         const shortStuId = student.id ? student.id.substring(0,4).toUpperCase() : 'STU';
 
@@ -296,21 +291,18 @@
                             term: fee.term,
                             total_amount: parseFloat(fee.amount),
                             settled: settledAmount,
-                            balance: balance < 0 ? 0 : balance, // Prevent negative balance if overpaid
+                            balance: balance < 0 ? 0 : balance,
                             status: status,
                             date_created: fee.created_at
                         });
                     });
                 });
 
-                // 4. Render the table
+                // Render table
                 renderInvoicesTable();
 
             } catch (err) {
                 console.error("Invoice Generation Error:", err);
-                if (err.message.includes('does not exist')) {
-                    alert("System Notice: You have not created the 'fees' or 'payments' tables yet. Please complete the previous steps.");
-                }
             }
             document.getElementById('loadingOverlay').style.display = 'none';
         };
@@ -322,7 +314,7 @@
             const tableContainer = document.getElementById('tableContainer');
             const tbody = document.getElementById('invoicesTableBody');
 
-            // Apply Status Filter
+            // Ensure we start fresh
             const filteredInvoices = allGeneratedInvoices.filter(inv => {
                 if (filterStatus === 'All statuses') return true;
                 return inv.status === filterStatus;
@@ -340,7 +332,6 @@
                     if(inv.status === 'SETTLED') statusClass = 'status-settled';
                     if(inv.status === 'PARTIAL') statusClass = 'status-partial';
 
-                    // Using the array index to easily grab the data when clicked
                     return `
                         <tr onclick="openInvoiceDetails(${index})">
                             <td class="text-uppercase">${inv.student_name}</td>
@@ -366,7 +357,6 @@
             const inv = filteredInvoices[index];
             if(!inv) return;
 
-            // Set Data
             document.getElementById('breadStudentName').innerText = `Invoice — ${inv.student_name}`;
             document.getElementById('invDetailId').innerText = inv.id;
             document.getElementById('invDetailId2').innerText = inv.id;
@@ -387,16 +377,14 @@
 
             const statusBadge = document.getElementById('invDetailStatus');
             statusBadge.innerText = inv.status;
-            statusBadge.className = 'badge-status'; // reset
+            statusBadge.className = 'badge-status'; 
             if(inv.status === 'SETTLED') statusBadge.classList.add('status-settled');
             else if(inv.status === 'PARTIAL') statusBadge.classList.add('status-partial');
             else statusBadge.classList.add('status-unpaid');
 
-            // Switch view
             toggleView('invoiceDetailView');
         };
 
-        // PDF SIMULATOR
         window.downloadPDF = () => {
             alert("Preparing PDF download...\n\n(Note: In a production app, this triggers a library like jsPDF to convert the HTML to a downloadable file.)");
         };
@@ -405,7 +393,8 @@
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) return window.location.href = 'login.html';
             
-            // Generate invoices on load
+            // Set default dropdown state visually and load
+            document.getElementById('filterStatus').value = 'All statuses';
             await loadInvoices();
         }
         
