@@ -1,8 +1,12 @@
 'use client';
 
-import { login } from './actions';
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jmxyopohngslqvzknjnt.supabase.co';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_yGvqUxGlwiJuSkFN4VOpWw_nKYmo-vl';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 function LoginForm() {
   const searchParams = useSearchParams();
@@ -29,10 +33,44 @@ function LoginForm() {
     setIsDark(dark);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setIsLoading(true);
-    // Let the form naturally submit to the action
-    // We are just hooking in to show loading state
+    setError(null);
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    try {
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (authError) throw authError;
+
+      const { data: profile, error: profileErr } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', authData.user.id)
+        .single();
+
+      if (profileErr || !profile) throw new Error('Could not verify account role.');
+
+      if (profile.role === 'admin') {
+        window.location.href = '/admin_dashboard';
+      } else if (profile.role === 'teacher') {
+        window.location.href = '/teacher_dashboard';
+      } else if (profile.role === 'student') {
+        window.location.href = '/student_dashboard';
+      } else {
+        throw new Error('Invalid role assigned to this account.');
+      }
+    } catch (err: any) {
+      setError(err.message);
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -82,7 +120,7 @@ function LoginForm() {
           <h3>Account Login</h3>
           {error && <div className="alert alert-danger">{error}</div>}
           
-          <form action={login} onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit}>
             <div className="mb-3">
               <label className="form-label"><i className="fas fa-envelope me-1"></i> USERNAME OR EMAIL</label>
               <div className="input-group">
