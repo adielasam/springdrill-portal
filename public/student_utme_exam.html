@@ -116,9 +116,14 @@
         async function fetchExamQuestions(subject, count, retries = 2) {
             for (let attempt = 0; attempt <= retries; attempt++) {
                 try {
-                    const { data, error } = await supabase.functions.invoke('generate-utme-questions', {
-                        body: { subject: subject, count: count }
+                    const res = await fetch('/api/generate-utme-questions', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ subject: subject, count: count })
                     });
+                    if (!res.ok) throw new Error("Failed to load questions from server.");
+                    const data = await res.json();
+                    const error = data.error;
                     if (error) throw error;
                     if (!data || !Array.isArray(data)) throw new Error("Invalid AI output format.");
                     return data; 

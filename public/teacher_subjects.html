@@ -403,15 +403,22 @@
             txtBox.innerHTML = '<div class="text-center py-5"><i class="fas fa-cogs fa-spin fa-3x text-primary mb-3"></i><br><span class="fw-bold text-muted" style="font-size: 1.1rem;">Analyzing curriculum and drafting comprehensive lesson note...</span></div>';
 
             try {
-                // IMPORTANT: Make sure 'generate-lesson' is exactly what your edge function is named in Supabase
-                const { data, error } = await supabase.functions.invoke('generate-lesson', {
-                    body: { 
+                // Call Next.js API Route instead of Supabase Edge Function
+                const res = await fetch('/api/generate-lesson', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
                         targetClass: cls, 
                         subject: sub,
                         topic: topic, 
                         extra: "Generate the 5 standard NERDC sections clearly."
-                    }
+                    })
                 });
+
+                if (!res.ok) throw new Error("Failed to generate lesson from server.");
+                
+                const data = await res.json();
+                const error = data.error;
 
                 if (error) throw error;
                 
