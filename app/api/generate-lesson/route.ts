@@ -4,32 +4,35 @@ export async function POST(req: Request) {
   try {
     const { targetClass, subject, topic, extra } = await req.json();
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
-      return NextResponse.json({ error: 'GEMINI_API_KEY is not set' }, { status: 500 });
+      return NextResponse.json({ error: 'OPENROUTER_API_KEY is not set' }, { status: 500 });
     }
 
     const promptText = `Act as an expert Nigerian educator. Create a comprehensive lesson plan for ${targetClass} on the subject of ${subject}, focusing on the topic: ${topic}. ${extra || ''}`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: promptText }] }],
-        generationConfig: {
-          temperature: 0.7,
-        }
+        "model": "google/gemini-1.5-flash",
+        "messages": [
+          {"role": "user", "content": promptText}
+        ]
       })
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Gemini API Error:", errorText);
+      console.error("OpenRouter API Error:", errorText);
       return NextResponse.json({ error: 'Failed to generate content' }, { status: 500 });
     }
 
     const data = await response.json();
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "No content generated.";
+    const reply = data.choices?.[0]?.message?.content || "No content generated.";
 
     return NextResponse.json({ reply });
   } catch (error: any) {
