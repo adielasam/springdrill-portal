@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - Payments & Billing</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --bg-color: #f8fafc; --card-bg: #ffffff; --text-color: #0f172a; --text-muted: #64748b; --border-color: #e2e8f0; --input-bg: #f1f5f9; --utme-green: #059669; --utme-green-hover: #047857;}
+        body.dark-mode { --bg-color: #020617; --card-bg: #0f172a; --text-color: #f8fafc; --text-muted: #94a3b8; --border-color: #1e293b; --input-bg: #1e293b; --utme-green: #10b981; --utme-green-hover: #059669;}
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; overflow-x: hidden; transition: 0.3s; }
+        
+        /* SIDEBAR */
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; overflow-y: auto;}
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 15px; color: var(--text-color); }
+        .sidebar-heading { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; padding: 10px 25px; margin-top: 10px; }
+        .nav-link { color: var(--text-muted); padding: 10px 25px; margin: 2px 10px; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; font-size: 0.9rem; font-weight: 500; text-decoration: none;}
+        .nav-link i { width: 25px; font-size: 1.1rem; }
+        .nav-link:hover { background: var(--input-bg); color: var(--text-color); }
+        .nav-link.active { background: rgba(16, 185, 129, 0.1); color: var(--utme-green); font-weight: 700; border-right: 3px solid var(--utme-green); }
+        body.dark-mode .nav-link.active { background: rgba(16, 185, 129, 0.2); }
+
+        .main-content { margin-left: 260px; padding: 30px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
+        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+        .dark-toggle-btn:hover { background: var(--border-color); }
+
+        /* VIEW TOGGLES */
+        .view-section { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* WIDGETS & EMPTY STATE */
+        .dash-widget { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.02); margin-bottom: 30px; overflow: hidden; }
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state i { font-size: 3rem; color: var(--text-muted); opacity: 0.4; margin-bottom: 15px;}
+        .empty-state h5 { font-weight: 700; margin-bottom: 10px; color: var(--text-color);}
+        .empty-state p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;}
+
+        /* FORMS */
+        .form-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .form-control, .form-select, .input-group-text { background-color: var(--input-bg); border-color: var(--border-color); color: var(--text-color); font-weight: 600;}
+        .form-control:focus, .form-select:focus { border-color: var(--utme-green); box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.1); background-color: var(--card-bg); color: var(--text-color);}
+        .form-label { font-weight: 700; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;}
+        
+        .btn-brand { background-color: var(--utme-green); color: white; font-weight: 700; border: none; padding: 10px 20px; border-radius: 6px; transition: 0.2s;}
+        .btn-brand:hover { background-color: var(--utme-green-hover); color: white;}
+
+        .breadcrumb-custom { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 20px;}
+        .breadcrumb-custom span { color: var(--text-color); }
+
+        /* SEARCH RESULTS & DROPDOWN MENU */
+        .dropdown-menu-dark { background-color: #0f172a; border: 1px solid #1e293b; }
+        .dropdown-item { color: #f8fafc; font-size: 0.9rem; font-weight: 500; padding: 8px 20px; }
+        .dropdown-item:hover { background-color: #1e293b; color: white; }
+        
+        .search-result-item { padding: 10px 15px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; background: var(--card-bg);}
+        .search-result-item:hover { background: var(--input-bg); }
+        .selected-student-badge { background: rgba(16, 185, 129, 0.1); color: var(--utme-green); border: 1px solid var(--utme-green); padding: 10px 15px; border-radius: 8px; font-weight: bold; margin-top: 10px; display: inline-block;}
+
+        /* PAYMENTS TABLE STYLES */
+        .custom-table { width: 100%; color: var(--text-color); margin: 0; min-width: 900px; border-collapse: collapse;}
+        .custom-table th { color: var(--text-muted); border-bottom: 1px solid var(--border-color); padding: 15px 20px; font-size: 0.75rem; text-transform: capitalize; font-weight: 600; background: var(--card-bg);}
+        .custom-table td { padding: 15px 20px; vertical-align: middle; border-bottom: 1px solid var(--border-color); font-weight: 600; font-size: 0.85rem;}
+        
+        .badge-status { padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;}
+        .status-approved { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid #10b981; }
+        .status-created { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid #3b82f6; }
+        .status-rejected { background: rgba(244, 63, 94, 0.1); color: #f43f5e; border: 1px solid #f43f5e; }
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+        
+        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-color); font-size: 1.5rem; cursor: pointer; margin-right: 15px; padding: 0;}
+        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
+        @media (max-width: 992px) { .sidebar { left: -260px; } .sidebar.mobile-open { left: 0; } .main-content { margin-left: 0; padding: 20px; } .mobile-menu-toggle { display: inline-block !important; } }
+    </style>
+</head>
+<body>
+    <div id="loadingOverlay">
+        <i class="fas fa-circle-notch fa-spin fa-3x text-success mb-3"></i>
+        <h5 class="fw-bold" style="color: var(--text-muted);">Initializing...</h5>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand"><h4 class="fw-bold m-0"><i class="fas fa-layer-group text-success me-2"></i> Admin Panel</h4></div>
+        <nav class="nav flex-column">
+            <div class="sidebar-heading">Overview</div>
+            <a href="admin_dashboard" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+            
+            <div class="sidebar-heading">Academics</div>
+            <a href="class_list" class="nav-link"><i class="fas fa-chalkboard"></i> Classes & Students</a>
+            <a href="admin_attendance" class="nav-link"><i class="fas fa-calendar-check"></i> Attendance Log</a>
+            <a href="admin_league_table" class="nav-link"><i class="fas fa-trophy"></i> League Table</a>
+
+            <div class="sidebar-heading">Management</div>
+            <a href="admin_admissions" class="nav-link"><i class="fas fa-user-graduate"></i> Admissions</a>
+            <a href="admin_fees" class="nav-link"><i class="fas fa-money-bill-wave"></i> Fees</a>
+            <a href="admin_payments" class="nav-link active"><i class="fas fa-credit-card"></i> Payments</a>
+            <a href="admin_invoices" class="nav-link"><i class="fas fa-file-invoice"></i> Invoices</a>
+            <a href="#" onclick="alert('Academic Calendar Coming Soon!')" class="nav-link"><i class="fas fa-calendar-alt"></i> Calendar</a>
+            <a href="#" onclick="alert('Academic Session Coming Soon!')" class="nav-link"><i class="fas fa-calendar-check"></i> Academic session</a>
+
+            <div class="sidebar-heading">Administration</div>
+            <a href="admin_create_user" class="nav-link"><i class="fas fa-user-plus"></i> Generate Account</a>
+            <a href="manage_users" class="nav-link"><i class="fas fa-user-check"></i> Approvals</a>
+            <a href="admin_messages" class="nav-link"><i class="fas fa-envelope"></i> Internal Mail</a>
+            
+            <div class="sidebar-heading">System</div>
+            <a href="admin_announcements" class="nav-link"><i class="fas fa-bullhorn"></i> Announcements</a>
+            <a href="#" onclick="alert('System Settings Coming Soon!')" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+            <div class="mt-4 mb-4"></div>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="fw-bold text-muted d-none d-sm-block"><i class="fas fa-credit-card me-2"></i> Revenue Tracking</div>
+            </div>
+            <button class="dark-toggle-btn shadow-sm" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
+        </div>
+
+        <div id="paymentsListView" class="view-section active">
+            <div class="breadcrumb-custom">Home > <span>Payments</span></div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold m-0" style="color: var(--text-color);">Payments</h2>
+                
+                <div class="dropdown">
+                    <button class="btn btn-light border" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background: var(--input-bg); color: var(--text-muted);"><i class="fas fa-ellipsis-v px-2"></i></button>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
+                      <li><a class="dropdown-item" href="#" onclick="toggleView('recordPaymentView')"><i class="fas fa-plus me-2 text-success"></i>Record Payment</a></li>
+                      <li><a class="dropdown-item" href="#" onclick="loadPayments()"><i class="fas fa-sync-alt me-2 text-primary"></i>Refresh Data</a></li>
+                      <li><a class="dropdown-item" href="#"><i class="fas fa-file-export me-2"></i>Export Transactions</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="dash-widget p-4 mb-4">
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <label class="form-label">Filter by</label>
+                        <select class="form-select p-2 px-3" id="filterBy" onchange="updateFilterUI()">
+                            <option value="All">All Payments</option>
+                            <option value="Term">Term</option>
+                            <option value="Class">Class</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-select p-2 px-3" id="filterStatus" onchange="loadPayments()">
+                            <option value="All statuses">All statuses</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Created">Created</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Session</label>
+                        <select class="form-select p-2 px-3" id="filterSession" onchange="loadPayments()">
+                            <option value="2025/2026">2025/2026</option>
+                            <option value="2024/2025">2024/2025</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" id="filterSecondaryLabel">Any</label>
+                        <select class="form-select p-2 px-3" id="filterSecondary" onchange="loadPayments()" disabled>
+                            <option value="All">N/A</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dash-widget">
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <i class="far fa-credit-card"></i>
+                    <h5>No payments found</h5>
+                    <p>No payments match the selected filters.</p>
+                </div>
+                
+                <div class="table-responsive" id="tableContainer" style="display: none;">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Reference</th>
+                                <th>Proof</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentsTableBody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="recordPaymentView" class="view-section">
+            <div class="breadcrumb-custom">Home > Payments > <span>Record Payment</span></div>
+            
+            <h3 class="fw-bold mb-1" style="color: var(--text-color);">Record Payment</h3>
+            <p class="text-muted mb-4" style="font-size: 0.9rem;">Log a manual payment received from a student or parent.</p>
+
+            <div class="form-container">
+                <form id="recordPaymentForm" onsubmit="submitPayment(event)">
+                    
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Select Student</label>
+                            <div class="input-group">
+                                <span class="input-group-text border-end-0 border-secondary border-opacity-25"><i class="fas fa-search text-muted"></i></span>
+                                <input type="text" class="form-control p-3 border-start-0 ps-0" id="studentSearchInput" placeholder="Search by name or reg number..." onkeyup="searchStudents()">
+                            </div>
+                            <div id="studentSearchResults" style="max-height: 150px; overflow-y: auto; border-radius: 6px; border: 1px solid var(--border-color); display: none; position: absolute; z-index: 100; width: 45%;"></div>
+                            
+                            <div id="selectedStudentDisplay" style="display: none;">
+                                <div class="selected-student-badge">
+                                    <i class="fas fa-user-check me-2"></i> <span id="selectedStudentName">Selected Student</span>
+                                    <button type="button" class="btn-close btn-close-white ms-3" style="font-size: 0.6rem;" aria-label="Close" onclick="clearSelectedStudent()"></button>
+                                </div>
+                            </div>
+                            <input type="hidden" id="selectedStudentId" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Link to existing invoice</label>
+                            <select class="form-select p-3" id="linkInvoice" disabled onchange="populateFromInvoice(this.value)">
+                                <option value="">(Select student first)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label">Amount Paid</label>
+                            <div class="input-group">
+                                <span class="input-group-text px-4 border-end-0 border-secondary border-opacity-25" style="font-weight: 800;">₦</span>
+                                <input type="number" class="form-control p-3 border-start-0 ps-0" id="payAmount" placeholder="0" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Payment Method</label>
+                            <select class="form-select p-3" id="payMethod" required>
+                                <option value="Bank Transfer">Bank Transfer</option>
+                                <option value="OFFLINE">Offline / Cash</option>
+                                <option value="POS Terminal">POS Terminal</option>
+                                <option value="Online Gateway">Online Gateway</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Status</label>
+                            <select class="form-select p-3" id="payStatus" required>
+                                <option value="Approved">Approved</option>
+                                <option value="Created">Created</option>
+                                <option value="Rejected">Rejected</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-6">
+                            <label class="form-label">Payment Date</label>
+                            <input type="date" class="form-control p-3" id="payDate" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Reference / Receipt No. (Optional)</label>
+                            <input type="text" class="form-control p-3" id="payRef" placeholder="e.g. TRx-982103">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3 pt-3 border-top border-secondary border-opacity-25">
+                        <button type="button" class="btn btn-light fw-bold px-4" onclick="toggleView('paymentsListView')">Cancel</button>
+                        <button type="submit" class="btn-brand px-5"><i class="fas fa-check-circle me-2"></i>Create Payment</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+        
+        let studentPendingInvoices = [];
+
+        // UI TOGGLES
+        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('mobile-open'); document.getElementById('sidebarOverlay').style.display = document.getElementById('sidebarOverlay').style.display === 'block' ? 'none' : 'block'; };
+        window.toggleTheme = () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { document.body.classList.add('dark-mode'); document.getElementById('themeIcon').className = 'fas fa-sun text-warning'; }
+
+        window.toggleView = (viewId) => {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            if(viewId === 'paymentsListView') loadPayments(); // Refresh list when going back
+        };
+
+        const today = new Date();
+        document.getElementById('payDate').value = today.toISOString().split('T')[0];
+
+        // --- NEW SMART FILTER LOGIC ---
+        window.updateFilterUI = async () => {
+            const filterBy = document.getElementById('filterBy').value;
+            const label = document.getElementById('filterSecondaryLabel');
+            const select = document.getElementById('filterSecondary');
+
+            if (filterBy === 'Term') {
+                label.innerText = 'Term';
+                select.innerHTML = `
+                    <option value="All">All Terms</option>
+                    <option value="FIRST">FIRST</option>
+                    <option value="SECOND">SECOND</option>
+                    <option value="THIRD">THIRD</option>
+                `;
+                select.disabled = false;
+            } else if (filterBy === 'Class') {
+                label.innerText = 'Class';
+                select.innerHTML = '<option value="All">Loading classes...</option>';
+                select.disabled = true;
+
+                try {
+                    const { data: classes } = await supabase.from('classes').select('name').order('name');
+                    if (classes && classes.length > 0) {
+                        select.innerHTML = '<option value="All">All Classes</option>' + classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+                    } else {
+                        select.innerHTML = '<option value="All">No classes found</option>';
+                    }
+                } catch(e) {
+                    select.innerHTML = '<option value="All">Error loading</option>';
+                }
+                select.disabled = false;
+            } else {
+                // "All Payments" selected
+                label.innerText = 'Any';
+                select.innerHTML = '<option value="All">N/A</option>';
+                select.disabled = true;
+            }
+            loadPayments();
+        };
+
+        // FETCH AND FILTER PAYMENTS INTO TABLE
+        window.loadPayments = async () => {
+            try {
+                // Fetch all base data to process filters
+                const [paymentsRes, studentsRes, classesRes, feesRes] = await Promise.all([
+                    supabase.from('payments').select('*').order('created_at', { ascending: false }),
+                    supabase.from('students').select('id, first_name, surname, class_id'),
+                    supabase.from('classes').select('id, name'),
+                    supabase.from('fees').select('id, term')
+                ]);
+
+                if (paymentsRes.error) throw paymentsRes.error;
+                const payments = paymentsRes.data || [];
+
+                // Build Maps for quick lookup
+                const classMap = {};
+                if (classesRes.data) classesRes.data.forEach(c => classMap[c.id] = c.name);
+
+                const studentMap = {};
+                if (studentsRes.data) {
+                    studentsRes.data.forEach(s => studentMap[s.id] = {
+                        name: `${s.first_name} ${s.surname}`,
+                        className: classMap[s.class_id] || 'Unknown'
+                    });
+                }
+
+                const feeMap = {};
+                if (feesRes.data) feesRes.data.forEach(f => feeMap[f.id] = f);
+
+                // Get Current Filter Values
+                const filterStatus = document.getElementById('filterStatus').value;
+                const filterBy = document.getElementById('filterBy').value;
+                const filterSecondary = document.getElementById('filterSecondary').value;
+
+                // --- MULTI-CONDITION FILTER ENGINE ---
+                const filteredPayments = payments.filter(p => {
+                    // Rule 1: Status must match (unless 'All statuses')
+                    if (filterStatus !== 'All statuses' && p.status !== filterStatus) return false;
+
+                    // Rule 2: Secondary Filter (Term or Class) must match
+                    if (filterBy !== 'All' && filterSecondary !== 'All') {
+                        
+                        if (filterBy === 'Class') {
+                            // Does the student's class match the dropdown?
+                            const studentClass = studentMap[p.student_id]?.className;
+                            if (studentClass !== filterSecondary) return false;
+                        } 
+                        else if (filterBy === 'Term') {
+                            // Does the linked fee term match the dropdown?
+                            const feeTerm = p.linked_fee_id && feeMap[p.linked_fee_id] ? feeMap[p.linked_fee_id].term : null;
+                            
+                            // If payment has no linked fee, we exclude it when strictly filtering by Term, 
+                            // OR we check if the term includes 'FIRST', 'SECOND', etc.
+                            if (!feeTerm || !feeTerm.toUpperCase().includes(filterSecondary.toUpperCase())) {
+                                return false;
+                            }
+                        }
+                    }
+                    
+                    // If it survived all rules, keep it!
+                    return true;
+                });
+
+                const emptyState = document.getElementById('emptyState');
+                const tableContainer = document.getElementById('tableContainer');
+                const tbody = document.getElementById('paymentsTableBody');
+
+                if (filteredPayments.length === 0) {
+                    emptyState.style.display = 'block';
+                    tableContainer.style.display = 'none';
+                } else {
+                    emptyState.style.display = 'none';
+                    tableContainer.style.display = 'block';
+
+                    tbody.innerHTML = filteredPayments.map(p => {
+                        const studentName = studentMap[p.student_id]?.name || 'Unknown Student';
+                        const amountStr = `₦${parseFloat(p.amount).toLocaleString()}`;
+                        const dateObj = new Date(p.payment_date);
+                        const dateStr = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                        
+                        let statusClass = 'status-created';
+                        if(p.status === 'Approved') statusClass = 'status-approved';
+                        if(p.status === 'Rejected') statusClass = 'status-rejected';
+
+                        return `
+                            <tr>
+                                <td style="text-transform: uppercase;">${studentName}</td>
+                                <td>${amountStr}</td>
+                                <td>${p.method}</td>
+                                <td>${dateStr}</td>
+                                <td><span class="badge-status ${statusClass}">${p.status}</span></td>
+                                <td class="text-muted">${p.reference || '—'}</td>
+                                <td class="text-muted">-</td>
+                                <td class="text-center"><button class="btn btn-sm btn-light border" style="background: transparent; color: var(--text-color);"><i class="fas fa-ellipsis-h"></i></button></td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+            } catch (err) {
+                console.error("Error loading payments:", err);
+            }
+        };
+
+        // STUDENT SEARCH ENGINE
+        window.searchStudents = async () => {
+            const query = document.getElementById('studentSearchInput').value.trim();
+            const resultsBox = document.getElementById('studentSearchResults');
+            
+            if(query.length < 2) {
+                resultsBox.style.display = 'none';
+                return;
+            }
+
+            try {
+                const { data: students, error } = await supabase.from('students').select('id, first_name, surname, reg_number, class_id').or(`first_name.ilike.%${query}%,surname.ilike.%${query}%,reg_number.ilike.%${query}%`).limit(5);
+                if(error) throw error;
+
+                resultsBox.style.display = 'block';
+                if(!students || students.length === 0) {
+                    resultsBox.innerHTML = `<div class="p-3 text-muted small bg-light">No students found matching "${query}"</div>`;
+                    return;
+                }
+
+                resultsBox.innerHTML = students.map(s => `
+                    <div class="search-result-item" onclick="selectStudent('${s.id}', '${s.first_name} ${s.surname}', '${s.reg_number}', '${s.class_id}')">
+                        <span class="fw-bold" style="color: var(--text-color);">${s.first_name} ${s.surname}</span>
+                        <span class="badge bg-secondary bg-opacity-25 text-secondary border border-secondary">${s.reg_number || 'No Reg'}</span>
+                    </div>
+                `).join('');
+            } catch (err) { console.error("Search failed", err); }
+        };
+
+        window.selectStudent = (id, name, reg, classId) => {
+            document.getElementById('selectedStudentId').value = id;
+            document.getElementById('selectedStudentName').innerText = `${name} (${reg || 'N/A'})`;
+            document.getElementById('studentSearchResults').style.display = 'none';
+            document.getElementById('studentSearchInput').value = '';
+            document.getElementById('selectedStudentDisplay').style.display = 'block';
+
+            fetchStudentPendingInvoices(id, classId);
+        };
+
+        window.clearSelectedStudent = () => {
+            document.getElementById('selectedStudentId').value = '';
+            document.getElementById('selectedStudentDisplay').style.display = 'none';
+            const invoiceSelect = document.getElementById('linkInvoice');
+            invoiceSelect.innerHTML = '<option value="">(Select student first)</option>';
+            invoiceSelect.disabled = true;
+            document.getElementById('recordPaymentForm').reset(); 
+            document.getElementById('payDate').value = today.toISOString().split('T')[0]; 
+        };
+
+        async function fetchStudentPendingInvoices(studentId, classId) {
+            const invoiceSelect = document.getElementById('linkInvoice');
+            invoiceSelect.innerHTML = '<option value=""><i class="fas fa-spinner fa-spin me-1"></i>Checking invoices...</option>';
+            invoiceSelect.disabled = true;
+
+            try {
+                const { data: fees, error } = await supabase.from('fees').select('id, name, amount, term');
+                if (error) throw error;
+                if (!fees || fees.length === 0) {
+                    invoiceSelect.innerHTML = '<option value="">No pending invoices found for this student.</option>';
+                    studentPendingInvoices = [];
+                    return;
+                }
+
+                studentPendingInvoices = fees;
+                invoiceSelect.innerHTML = '<option value="">(Optional) Select a Created invoice...</option>' + fees.map(f => `
+                    <option value="${f.id}">₦${f.amount.toLocaleString()} - ${f.name} (${f.term})</option>
+                `).join('');
+                invoiceSelect.disabled = false;
+
+            } catch (err) {
+                if (err.message.includes('does not exist')) invoiceSelect.innerHTML = '<option value="">[System] "fees" table not found.</option>';
+            }
+        }
+
+        window.populateFromInvoice = (feeId) => {
+            if(!feeId) return; 
+            const inv = studentPendingInvoices.find(f => f.id === feeId);
+            if (inv) {
+                document.getElementById('payAmount').value = inv.amount;
+                document.getElementById('payStatus').value = 'Approved'; 
+            }
+        }
+
+        window.submitPayment = async (e) => {
+            e.preventDefault();
+            const studentId = document.getElementById('selectedStudentId').value;
+            if(!studentId) return alert("Please search and select a student first.");
+
+            const loader = document.getElementById('loadingOverlay');
+            loader.style.display = 'flex';
+
+            const paymentData = {
+                student_id: studentId,
+                amount: parseFloat(document.getElementById('payAmount').value),
+                method: document.getElementById('payMethod').value,
+                status: document.getElementById('payStatus').value,
+                payment_date: document.getElementById('payDate').value,
+                reference: document.getElementById('payRef').value.trim() || null,
+                linked_fee_id: document.getElementById('linkInvoice').value || null
+            };
+
+            try {
+                const { error } = await supabase.from('payments').insert([paymentData]);
+                if (error) throw new Error(error.message);
+
+                alert(`Payment of ₦${paymentData.amount.toLocaleString()} recorded successfully!`);
+                document.getElementById('recordPaymentForm').reset();
+                clearSelectedStudent();
+                document.getElementById('payDate').value = today.toISOString().split('T')[0]; 
+                
+                toggleView('paymentsListView');
+
+            } catch (err) {
+                alert(`Save Failed: ${err.message}`);
+            }
+            loader.style.display = 'none';
+        };
+
+        async function initialize() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return window.location.href = 'login';
+            
+            // Set initial filter state and load data
+            await updateFilterUI(); 
+            
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+        
+        document.addEventListener('DOMContentLoaded', initialize);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login'; });
+    </script>
+</body>
+</html>

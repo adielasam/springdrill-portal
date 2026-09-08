@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPRINGDRILL - UTME Live Exam</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --bg-color: #e9ecef; --card-bg: #ffffff; --text-color: #333333; --text-muted: #6c757d; --border-color: #dee2e6; --input-bg: #f8f9fa; --utme-green: #27ae60; --utme-green-dark: #1e8449;}
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden;}
+        
+        .exam-header { background-color: var(--utme-green); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10;}
+        .timer-box { background: rgba(0,0,0,0.2); padding: 5px 15px; border-radius: 30px; font-family: monospace; font-size: 1.5rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.3);}
+        
+        .subject-tabs { background: var(--card-bg); border-bottom: 2px solid var(--border-color); display: flex; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch;}
+        .sub-tab { padding: 12px 20px; font-weight: bold; color: var(--text-muted); cursor: pointer; border-bottom: 4px solid transparent; transition: 0.2s;}
+        .sub-tab.active { color: var(--utme-green); border-bottom: 4px solid var(--utme-green); background: var(--input-bg); }
+        
+        .exam-body { flex: 1; display: flex; overflow: hidden; }
+        .question-area { flex: 3; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; background: var(--bg-color);}
+        
+        .q-number { font-size: 1.1rem; font-weight: 800; color: var(--utme-green); }
+        .q-text { font-size: 1.15rem; line-height: 1.6; margin-bottom: 25px; font-weight: 500;}
+        .option-label { display: flex; align-items: center; padding: 15px 20px; border: 2px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: 0.2s; background: var(--card-bg); font-size: 1.05rem; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
+        
+        .palette-area { flex: 1; min-width: 300px; max-width: 350px; background: var(--card-bg); border-left: 1px solid var(--border-color); display: flex; flex-direction: column;}
+        .palette-grid { padding: 15px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; overflow-y: auto;}
+        .q-node { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; border: 1px solid var(--border-color); border-radius: 4px; font-weight: bold; cursor: pointer; background: var(--input-bg); color: var(--text-muted);}
+        .q-node.answered { background: var(--utme-green); color: white; border-color: var(--utme-green-dark); }
+        .q-node.active-node { outline: 3px solid #3498db; outline-offset: -2px; }
+        .q-node.wrong-node { background: #e74c3c !important; color: white !important; border-color: #c0392b !important;}
+        
+        #loadingOverlay, #submitOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 20px;}
+        #submitOverlay { background: rgba(0,0,0,0.9); color: white; display: none; }
+
+        /* MOBILE FIXES FOR EXAM ENGINE */
+        @media (max-width: 768px) {
+            body { overflow-y: auto; }
+            .exam-header { flex-direction: column; gap: 10px; padding: 15px 10px; text-align: center; }
+            .timer-box { font-size: 1.3rem; width: 100%; padding: 8px; }
+            .exam-body { flex-direction: column; height: auto; overflow: visible;}
+            .question-area { padding: 15px; flex: none; }
+            .palette-area { flex: none; max-width: 100%; border-left: none; border-top: 3px solid var(--border-color); border-bottom: 20px solid var(--bg-color); }
+            .palette-grid { grid-template-columns: repeat(8, 1fr); max-height: 200px; padding: 10px; }
+            .option-label { padding: 12px 15px; font-size: 1rem; }
+            .btn { width: 100%; margin-bottom: 5px; }
+            .d-flex.gap-2 { flex-direction: column; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div id="loadingOverlay">
+        <i class="fas fa-circle-notch fa-spin fa-4x text-success mb-4"></i>
+        <h3 class="fw-bold" style="color: var(--text-color);">Preparing Exam Environment...</h3>
+        <p class="text-muted fs-5">Loading your first subject...</p>
+    </div>
+
+    <div id="submitOverlay">
+        <i class="fas fa-spinner fa-spin fa-4x text-success mb-4"></i>
+        <h2 class="fw-bold">Saving Scores to Database...</h2>
+        <p class="fs-5 text-light">Compiling your final results and corrections.</p>
+    </div>
+
+    <header class="exam-header">
+        <div>
+            <div class="fw-bold fs-6" id="studentNameDisplay">Loading...</div>
+            <div style="font-size: 0.75rem; opacity: 0.8;" id="headerSubtitle">UTME Practice Simulator</div>
+        </div>
+        <div class="timer-box" id="timerDisplay">--:--:--</div>
+        
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-light btn-sm fw-bold" id="closeExamBtn" onclick="closeExam()"><i class="fas fa-times me-1"></i> Close</button>
+            <button class="btn btn-danger btn-sm fw-bold shadow-sm" id="mainActionBtn" onclick="submitExam()"><i class="fas fa-paper-plane me-1"></i> Submit</button>
+        </div>
+    </header>
+
+    <div class="subject-tabs" id="subjectTabsContainer"></div>
+
+    <div class="exam-body">
+        <div class="question-area">
+            <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                <div class="q-number" id="questionNumberDisplay">Question 1</div>
+                <div class="badge bg-secondary" id="subjectBadgeDisplay">Loading...</div>
+            </div>
+            <div class="q-text" id="questionTextDisplay">Please wait...</div>
+            <div id="optionsContainer"></div>
+            
+            <div class="row mt-4 pt-3 border-top">
+                <div class="col-6"><button class="btn btn-outline-secondary w-100 fw-bold py-2" id="btnPrev" onclick="prevQuestion()"><i class="fas fa-arrow-left me-1"></i> Prev</button></div>
+                <div class="col-6"><button class="btn btn-primary w-100 fw-bold py-2" id="btnNext" onclick="nextQuestion()">Next <i class="fas fa-arrow-right ms-1"></i></button></div>
+            </div>
+        </div>
+        
+        <div class="palette-area">
+            <div class="p-2 bg-light border-bottom text-center fw-bold text-dark small" id="navigatorTitle">Question Navigator</div>
+            <div class="palette-grid" id="paletteGrid"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        let subjects = [];
+        let currentSubjectIndex = 0;
+        let currentQuestionIndex = 0;
+        let examData = {}; 
+        let userAnswers = {}; 
+        let correctAnswers = {}; 
+        let timerInterval;
+        let isReviewMode = false; 
+
+        const QUESTIONS_PER_SUBJECT = parseInt(localStorage.getItem('UTME_QUESTION_COUNT')) || 40; 
+        let totalSeconds = parseInt(localStorage.getItem('UTME_EXAM_TIME')) || 7200; 
+
+        async function fetchExamQuestions(subject, count, retries = 2) {
+            for (let attempt = 0; attempt <= retries; attempt++) {
+                try {
+                    const { data, error } = await supabase.functions.invoke('generate-utme-questions', {
+                        body: { subject: subject, count: count }
+                    });
+                    if (error) throw error;
+                    if (!data || !Array.isArray(data)) throw new Error("Invalid AI output format.");
+                    return data; 
+                } catch (error) {
+                    console.error(`Attempt ${attempt + 1} failed for ${subject}:`, error.message);
+                    
+                    if (attempt === retries) {
+                        return [{
+                            question_text: `Network Error. Could not load questions for ${subject} after multiple attempts.`,
+                            options: { "A": "Opt A", "B": "Opt B", "C": "Opt C", "D": "Opt D" },
+                            correct_option: "A"
+                        }];
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 2500));
+                }
+            }
+        }
+
+        async function initExam() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return window.location.href = 'login';
+            const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
+            if(profile) document.getElementById('studentNameDisplay').innerText = profile.name;
+
+            updateTimerDisplay();
+            subjects = JSON.parse(localStorage.getItem('UTME_SUBJECTS')) || ["English Language"];
+            
+            const firstSub = subjects[0];
+            const firstData = await fetchExamQuestions(firstSub, QUESTIONS_PER_SUBJECT);
+            examData[firstSub] = firstData;
+            userAnswers[firstSub] = {};
+            correctAnswers[firstSub] = {};
+            firstData.forEach((q, i) => correctAnswers[firstSub][i] = q.correct_option);
+
+            document.getElementById('loadingOverlay').style.display = 'none';
+            renderTabs(); loadSubject(0); startTimer();
+
+            (async () => {
+                for (let i = 1; i < subjects.length; i++) {
+                    const sub = subjects[i];
+                    const data = await fetchExamQuestions(sub, QUESTIONS_PER_SUBJECT);
+                    examData[sub] = data;
+                    userAnswers[sub] = {};
+                    correctAnswers[sub] = {};
+                    data.forEach((q, idx) => correctAnswers[sub][idx] = q.correct_option);
+                    renderTabs(); 
+                }
+            })();
+        }
+
+        function renderTabs() {
+            document.getElementById('subjectTabsContainer').innerHTML = subjects.map((sub, i) => {
+                const isReady = !!examData[sub]; 
+                const activeClass = i === currentSubjectIndex ? 'active' : '';
+                const spinner = isReady ? '' : '<i class="fas fa-spinner fa-spin ms-1" style="font-size:0.7rem;"></i>';
+                return `<div class="sub-tab ${activeClass}" style="opacity: ${isReady ? 1 : 0.6}; cursor: ${isReady ? 'pointer' : 'not-allowed'};" 
+                        ${isReady ? `onclick="window.loadSubject(${i})"` : ''}>${sub} ${spinner}</div>`;
+            }).join('');
+        }
+
+        window.loadSubject = (index) => { currentSubjectIndex = index; currentQuestionIndex = 0; renderTabs(); renderQuestion(); };
+
+        function renderQuestion() {
+            const sub = subjects[currentSubjectIndex];
+            const q = examData[sub][currentQuestionIndex];
+            document.getElementById('subjectBadgeDisplay').innerText = sub;
+            document.getElementById('questionNumberDisplay').innerText = `Question ${currentQuestionIndex + 1}`;
+            document.getElementById('questionTextDisplay').innerText = q.question_text;
+
+            const selectedAns = userAnswers[sub][currentQuestionIndex];
+            const correctAns = correctAnswers[sub][currentQuestionIndex];
+
+            document.getElementById('optionsContainer').innerHTML = Object.entries(q.options).map(([letter, text]) => {
+                let style = '';
+                let icon = '';
+
+                if (isReviewMode) {
+                    if (letter === correctAns) {
+                        style = 'border-color: #27ae60; background: rgba(39, 174, 96, 0.15);';
+                        icon = '<i class="fas fa-check-circle text-success ms-auto fs-4"></i>';
+                    } else if (letter === selectedAns && letter !== correctAns) {
+                        style = 'border-color: #e74c3c; background: rgba(231, 76, 60, 0.15); opacity: 0.8;';
+                        icon = '<i class="fas fa-times-circle text-danger ms-auto fs-4"></i>';
+                    }
+                } else {
+                    if (selectedAns === letter) style = 'border-color: #27ae60; background: rgba(39, 174, 96, 0.05);';
+                }
+
+                return `
+                <label class="option-label" style="${style}" ${!isReviewMode ? `onclick="window.selectOption('${letter}')"` : ''}>
+                    <span class="fw-bold me-3 text-primary">${letter}.</span> ${text} ${icon}
+                </label>`;
+            }).join('');
+            
+            document.getElementById('btnPrev').style.visibility = currentQuestionIndex === 0 ? 'hidden' : 'visible';
+            renderPalette();
+        }
+
+        function renderPalette() {
+            const sub = subjects[currentSubjectIndex];
+            const totalQs = examData[sub].length;
+            let html = '';
+            for(let i = 0; i < totalQs; i++) {
+                let nodeClass = '';
+                if (isReviewMode) {
+                    const picked = userAnswers[sub][i];
+                    const correct = correctAnswers[sub][i];
+                    if (picked === correct) nodeClass = 'answered'; 
+                    else if (picked !== undefined) nodeClass = 'wrong-node'; 
+                } else {
+                    if (userAnswers[sub][i] !== undefined) nodeClass = 'answered';
+                }
+                const isAct = i === currentQuestionIndex ? 'active-node' : '';
+                html += `<div class="q-node ${nodeClass} ${isAct}" onclick="window.jumpToQuestion(${i})">${i + 1}</div>`;
+            }
+            document.getElementById('paletteGrid').innerHTML = html;
+        }
+
+        window.selectOption = (letter) => { userAnswers[subjects[currentSubjectIndex]][currentQuestionIndex] = letter; renderQuestion(); };
+        window.jumpToQuestion = (i) => { currentQuestionIndex = i; renderQuestion(); };
+        window.nextQuestion = () => {
+            if (currentQuestionIndex < examData[subjects[currentSubjectIndex]].length - 1) { currentQuestionIndex++; renderQuestion(); }
+            else if (currentSubjectIndex < subjects.length - 1) { loadSubject(currentSubjectIndex + 1); }
+        };
+        window.prevQuestion = () => { if (currentQuestionIndex > 0) { currentQuestionIndex--; renderQuestion(); } };
+
+        function updateTimerDisplay() {
+            if(isReviewMode) return;
+            const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+            const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+            const s = Math.floor(totalSeconds % 60).toString().padStart(2, '0');
+            document.getElementById('timerDisplay').innerText = `${h}:${m}:${s}`;
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                totalSeconds--;
+                if (totalSeconds <= 0) autoSubmitExam();
+                else updateTimerDisplay();
+            }, 1000);
+        }
+
+        window.closeExam = () => {
+            if(confirm("Are you sure you want to close this exam? Your progress will NOT be saved.")) {
+                clearInterval(timerInterval);
+                window.location.href = 'student_utme'; 
+            }
+        };
+
+        window.submitExam = () => { if(confirm("Are you sure you want to submit your exam?")) autoSubmitExam(); };
+
+        async function autoSubmitExam() {
+            clearInterval(timerInterval);
+            document.getElementById('submitOverlay').style.display = 'flex';
+            
+            const scoresPerSubject = {};
+
+            subjects.forEach(sub => { 
+                let subCorrect = 0;
+                let subTotal = examData[sub].length;
+                for (let i = 0; i < subTotal; i++) {
+                    if (userAnswers[sub][i] === correctAnswers[sub][i]) subCorrect++;
+                }
+                scoresPerSubject[sub] = Math.round((subCorrect / subTotal) * 100);
+            });
+
+            const finalJambScore = Object.values(scoresPerSubject).reduce((a, b) => a + b, 0);
+
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                    const { error } = await supabase.from('test_results').insert([{
+                        student_id: session.user.id,
+                        test_id: 999,
+                        score: finalJambScore,
+                        total_score: 400,
+                        created_at: new Date().toISOString()
+                    }]);
+                    if (error) console.error("Database insert error:", error);
+                }
+            } catch (err) {
+                console.error("Failed to save to Supabase:", err.message);
+            }
+
+            setTimeout(() => {
+                document.getElementById('submitOverlay').style.display = 'none';
+                isReviewMode = true;
+                
+                document.getElementById('headerSubtitle').innerText = "CORRECTIONS & REVIEW MODE";
+                document.getElementById('timerDisplay').innerHTML = `<span class="text-warning">${finalJambScore} / 400</span>`;
+                document.getElementById('navigatorTitle').innerText = "Review Navigator";
+                
+                document.getElementById('closeExamBtn').style.display = 'none';
+                const mainBtn = document.getElementById('mainActionBtn');
+                mainBtn.className = "btn btn-primary btn-sm fw-bold shadow-sm";
+                mainBtn.innerHTML = '<i class="fas fa-home me-1"></i> Dashboard';
+                mainBtn.onclick = () => window.location.href = 'student_results';
+
+                alert(`Exam Submitted Successfully!\nYour JAMB Prediction Score: ${finalJambScore} / 400`);
+                
+                currentSubjectIndex = 0; currentQuestionIndex = 0;
+                renderTabs(); renderQuestion();
+            }, 2500);
+        }
+
+        document.addEventListener('DOMContentLoaded', initExam);
+    </script>
+</body>
+</html>

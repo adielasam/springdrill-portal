@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - Teacher eClassroom</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* GLOBAL DARK MODE ENGINE */
+        :root { 
+            --bg-color: #f4f7fa; 
+            --card-bg: #ffffff; 
+            --text-color: #333333; 
+            --text-muted: #6c757d; 
+            --border-color: #e9ecef; 
+            --input-bg: #f8f9fa; 
+        }
+        body.dark-mode { 
+            --bg-color: #121212; 
+            --card-bg: #1e1e1e; 
+            --text-color: #e0e0e0; 
+            --text-muted: #a0a0a0; 
+            --border-color: #333333; 
+            --input-bg: #2c2c2c; 
+        }
+
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+        
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center; text-decoration: none;}
+        .nav-link i { width: 25px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
+        
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #e74c3c; transition: all 0.3s; }
+        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        
+        .setup-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); padding: 30px; transition: all 0.3s;}
+        .form-label { font-weight: bold; font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted);}
+        .form-control, .form-select { padding: 10px 15px; border-radius: 6px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); transition: all 0.3s; }
+        .form-control:focus, .form-select:focus { border-color: #e74c3c; box-shadow: 0 0 0 0.25rem rgba(231, 76, 60, 0.25); background-color: var(--card-bg); color: var(--text-color); }
+        
+        .live-controls { display: none; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 25px 30px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 5px solid #2ecc71; border: 1px solid var(--border-color); transition: all 0.3s;}
+        .room-code-badge { background: var(--input-bg); border: 1px dashed var(--border-color); padding: 8px 15px; border-radius: 6px; font-family: monospace; font-size: 1.1rem; font-weight: bold; color: var(--text-color); letter-spacing: 1px;}
+        
+        .pulse { animation: pulse-animation 2s infinite; }
+        @keyframes pulse-animation { 0% { box-shadow: 0 0 0 0px rgba(220, 53, 69, 0.7); } 100% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); } }
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .top-navbar { padding: 15px; flex-direction: column; gap: 10px; }
+            .live-controls { flex-direction: column; text-align: center; gap: 20px; }
+            .mobile-menu-toggle { display: inline-block !important; }
+        }
+        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
+        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-danger mb-3"></i><h4 class="fw-bold" style="color: var(--text-muted);">Loading eClassroom...</h4></div>
+    
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
+            <h5 class="text-white fw-bold m-0"><i class="fas fa-graduation-cap text-warning me-2"></i> STAFF PORTAL</h5>
+            <button class="btn btn-sm btn-link text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        </div>
+        <nav class="nav flex-column mt-3">
+            <a href="teacher_dashboard" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="teacher_class_list" class="nav-link"><i class="fas fa-users"></i> Class Roster & 360°</a>
+            <a href="teacher_eclassroom" class="nav-link active"><i class="fas fa-video text-danger"></i> eClassroom</a>
+            <a href="teacher_subjects" class="nav-link"><i class="fas fa-book"></i> Materials & AI Planner</a>
+            <a href="teacher_messages" class="nav-link"><i class="fas fa-envelope"></i> Communications</a>
+            <hr class="mx-3 my-4 border-secondary">
+            <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-power-off"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="fw-bold d-none d-md-block" style="color: var(--text-muted);"><i class="fas fa-broadcast-tower me-2 text-danger"></i> Virtual eClassroom Studio</div>
+            </div>
+            <div class="d-flex align-items-center ms-auto">
+                <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
+                <div class="fw-bold d-flex align-items-center" style="color: var(--text-color);">
+                    <span id="teacherName">Teacher</span><i class="fas fa-user-circle ms-3 fs-4 text-success"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="live-controls" id="liveControls">
+            <div>
+                <span class="badge bg-danger pulse me-2">LIVE NOW</span>
+                <span class="fw-bold fs-4 d-block mt-2" id="displaySubject" style="color: var(--text-color);">Subject</span>
+                <div class="text-primary small mt-1 fw-bold"><i class="fas fa-info-circle me-1"></i> Tip: If a student cannot unmute, ask them to check their browser settings and allow Microphone access!</div>
+            </div>
+            <div class="d-flex align-items-center gap-3 flex-wrap justify-content-center">
+                <div class="text-center text-md-end me-2"><small class="d-block fw-bold" style="color: var(--text-muted);">JOIN CODE</small><div class="room-code-badge" id="displayRoomCode">XXXX</div></div>
+                <button class="btn btn-primary btn-lg fw-bold shadow" onclick="launchVideoRoom()"><i class="fas fa-external-link-alt me-2"></i> Enter Room</button>
+                <button class="btn btn-danger btn-lg fw-bold shadow" onclick="endLiveClass()"><i class="fas fa-power-off me-2"></i> End Class</button>
+            </div>
+        </div>
+
+        <div class="setup-card" id="setupFormArea" style="max-width: 600px; margin: 0 auto;">
+            <div class="text-center mb-4">
+                <i class="fas fa-video fa-3x text-danger mb-3"></i>
+                <h3 class="fw-bold" style="color: var(--text-color);">Start Virtual Class</h3>
+            </div>
+            <form id="startClassForm">
+                <div class="mb-3">
+                    <label class="form-label text-primary">Target Class</label>
+                    <select id="liveClassSelect" class="form-select fw-bold border-primary" required><option value="">Loading...</option></select>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Subject</label>
+                    <select id="liveSubjectSelect" class="form-select fw-bold" required><option value="">Loading...</option></select>
+                </div>
+                <button type="submit" class="btn btn-danger w-100 fw-bold py-3 fs-5 shadow" id="startBtn"><i class="fas fa-satellite-dish me-2"></i> GO LIVE NOW</button>
+            </form>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+        let currentUserId = null; let currentUserName = "Teacher"; let activeRoomId = null; let activeRoomUrl = "";
+
+        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('mobile-open'); document.getElementById('sidebarOverlay').style.display = document.getElementById('sidebarOverlay').style.display === 'block' ? 'none' : 'block'; };
+        
+        window.toggleTheme = () => {
+            const body = document.body; body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { document.body.classList.add('dark-mode'); document.getElementById('themeIcon').className = 'fas fa-sun text-warning'; }
+
+        async function initSetup() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = 'login';
+                currentUserId = session.user.id;
+
+                const { data: profile } = await supabase.from('users').select('name').eq('id', currentUserId).single();
+                if (profile) { currentUserName = profile.name; document.getElementById('teacherName').innerText = profile.name; }
+
+                const { data: classes } = await supabase.from('classes').select('*').order('id');
+                if (classes) {
+                    document.getElementById('liveClassSelect').innerHTML = `<option value="">-- Select Class --</option>` + classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                }
+
+                const { data: subjects } = await supabase.from('subjects').select('*').order('name');
+                if (subjects) {
+                    document.getElementById('liveSubjectSelect').innerHTML = `<option value="">-- Select Subject --</option>` + subjects.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+                }
+
+                document.getElementById('loadingOverlay').style.display = 'none';
+            } catch (err) { console.error(err); alert("Error loading module."); }
+        }
+
+        document.getElementById('startClassForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('startBtn'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Initializing...'; btn.disabled = true;
+
+            try {
+                const classId = document.getElementById('liveClassSelect').value;
+                const subject = document.getElementById('liveSubjectSelect').value;
+                const roomCode = `SD-${Math.random().toString(36).substring(2, 8).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+                const jitsiRoomName = `Springdrill_${roomCode.replace(/-/g, '')}`;
+
+                const { data: liveData, error } = await supabase.from('live_classes').insert([{ teacher_id: currentUserId, class_id: classId, subject_name: subject, room_code: roomCode, is_active: true }]).select().single();
+                if (error) throw error;
+                
+                activeRoomId = liveData.id;
+                const safeName = encodeURIComponent(`Teacher: ${currentUserName}`);
+                activeRoomUrl = `https://meet.jit.si/${jitsiRoomName}#userInfo.displayName=${safeName}`;
+
+                document.getElementById('setupFormArea').style.display = 'none';
+                document.getElementById('liveControls').style.display = 'flex';
+                document.getElementById('displaySubject').innerText = subject;
+                document.getElementById('displayRoomCode').innerText = roomCode;
+
+                launchVideoRoom();
+
+            } catch (err) { alert(err.message); btn.innerHTML = '<i class="fas fa-satellite-dish me-2"></i> GO LIVE NOW'; btn.disabled = false; }
+        });
+
+        window.launchVideoRoom = () => { if (activeRoomUrl) window.open(activeRoomUrl, '_blank'); };
+
+        window.endLiveClass = async () => {
+            if(!confirm("End live class? This will close the room for all students.")) return;
+            if (activeRoomId) await supabase.from('live_classes').update({ is_active: false }).eq('id', activeRoomId);
+            window.location.reload();
+        };
+
+        window.addEventListener('beforeunload', async () => { if (activeRoomId) await supabase.from('live_classes').update({ is_active: false }).eq('id', activeRoomId); });
+        document.addEventListener('DOMContentLoaded', initSetup);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login'; });
+    </script>
+</body>
+</html>

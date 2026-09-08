@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPRINGDRILL - My Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root { --bg-color: #f4f7fa; --card-bg: #ffffff; --text-color: #333333; --border-color: #e9ecef; --utme-green: #27ae60;}
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
+        
+        /* Mobile Optimized Sidebar */
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; transition: left 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.1);}
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; display: flex; align-items: center; text-decoration: none; transition: 0.3s; margin: 2px 10px; border-radius: 5px;}
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; border-left: 4px solid #f1c40f;}
+        
+        /* Main Layout */
+        .main-content { margin-left: 260px; padding: 40px; transition: margin-left 0.3s ease;}
+        .result-card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); padding: 25px; border: 1px solid var(--border-color); height: 100%;}
+        
+        .score-badge { font-size: 1.5rem; font-weight: 800; padding: 10px 15px; border-radius: 8px; background: rgba(39, 174, 96, 0.1); color: var(--utme-green); display: inline-block;}
+
+        /* Mobile Menu Toggles */
+        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--utme-green); font-size: 1.8rem; cursor: pointer; margin-right: 15px; }
+        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
+
+        @media (max-width: 992px) {
+            .sidebar { left: -260px; }
+            .sidebar.mobile-open { left: 0; }
+            .main-content { margin-left: 0; padding: 15px; }
+            .mobile-menu-toggle { display: inline-block !important; }
+            .header-container { flex-direction: column; align-items: flex-start !important; gap: 15px; }
+            .score-badge { font-size: 1.2rem; width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="d-flex justify-content-between align-items-center px-3 pb-3 border-bottom border-secondary mb-4">
+            <h5 class="fw-bold m-0 text-center w-100"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
+            <button class="btn btn-sm text-white d-lg-none position-absolute end-0 me-3" onclick="toggleSidebar()"><i class="fas fa-times fs-4"></i></button>
+        </div>
+        <nav class="nav flex-column">
+            <a href="student_dashboard" class="nav-link"><i class="fas fa-home me-2"></i> Dashboard</a>
+            <a href="student_utme" class="nav-link"><i class="fas fa-robot me-2"></i> AI JAMB Simulator</a>
+            <a href="student_utme_hub" class="nav-link text-warning fw-bold"><i class="fas fa-university me-2"></i> Real UTME Hub</a>
+            <a href="student_results" class="nav-link active fw-bold text-white"><i class="fas fa-chart-line me-2"></i> My Results</a>
+            <a href="student_messages" class="nav-link"><i class="fas fa-envelope me-2"></i> Messages</a>
+            <hr class="mx-3 my-4 border-secondary">
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off me-2"></i> Secure Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4 header-container">
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <h2 class="fw-bold m-0">Performance Analytics</h2>
+            </div>
+            <div class="score-badge shadow-sm" id="highestScoreBadge">Highest Score: -- / 400</div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="result-card">
+                    <h5 class="fw-bold mb-4"><i class="fas fa-chart-area text-primary me-2"></i> Score Progression Trend</h5>
+                    <canvas id="progressChart" height="200"></canvas>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="result-card" style="max-height: 500px; overflow-y: auto;">
+                    <h5 class="fw-bold mb-4 sticky-top bg-white pb-2 border-bottom"><i class="fas fa-history text-success me-2"></i> Recent Exams</h5>
+                    
+                    <div id="historyContainer">
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-spinner fa-spin fa-2x mb-2"></i><br>Loading your analytics...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        // Sidebar Toggle Logic
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+            const overlay = document.getElementById('sidebarOverlay');
+            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+        };
+
+        let progressChartInstance = null;
+
+        async function loadResults() {
+            try {
+                // 1. Authenticate User
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = 'login';
+
+                // 2. Fetch past exams from Supabase
+                const { data: scores, error } = await supabase
+                    .from('test_results')
+                    .select('score, created_at')
+                    .eq('student_id', session.user.id)
+                    .eq('test_id', 999) 
+                    .order('created_at', { ascending: false })
+                    .limit(10); // Fetch the last 10 exams
+
+                if (error) throw error;
+
+                const container = document.getElementById('historyContainer');
+                
+                if (scores && scores.length > 0) {
+                    // --- RENDER HISTORY LIST ---
+                    container.innerHTML = scores.map(s => {
+                        const scoreColor = s.score >= 200 ? 'text-success' : (s.score >= 150 ? 'text-warning' : 'text-danger');
+                        return `
+                        <div class="d-flex justify-content-between align-items-center border-bottom py-3">
+                            <div>
+                                <div class="fw-bold">${new Date(s.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                                <small class="text-muted"><i class="far fa-clock me-1"></i> ${new Date(s.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="fs-4 fw-bold ${scoreColor}">${s.score} <span class="fs-6 text-muted fw-normal">/ 400</span></div>
+                            </div>
+                        </div>
+                        `;
+                    }).join('');
+
+                    // --- RENDER HIGHEST SCORE BADGE ---
+                    const highestScore = Math.max(...scores.map(s => s.score));
+                    document.getElementById('highestScoreBadge').innerText = `Highest Score: ${highestScore} / 400`;
+
+                    // --- RENDER CHART.JS GRAPH ---
+                    const chronologicalScores = [...scores].reverse();
+                    
+                    const labels = chronologicalScores.map(s => new Date(s.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }));
+                    const dataPoints = chronologicalScores.map(s => s.score);
+
+                    const ctx = document.getElementById('progressChart').getContext('2d');
+                    
+                    if (progressChartInstance) progressChartInstance.destroy();
+
+                    progressChartInstance = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'JAMB Mock Score',
+                                data: dataPoints,
+                                borderColor: '#27ae60',
+                                backgroundColor: 'rgba(39, 174, 96, 0.15)',
+                                pointBackgroundColor: '#ffffff',
+                                pointBorderColor: '#27ae60',
+                                pointBorderWidth: 2,
+                                pointRadius: 5,
+                                fill: true,
+                                tension: 0.4 
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) { return `Score: ${context.parsed.y} / 400`; }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    min: 0,
+                                    max: 400,
+                                    grid: { color: '#e9ecef' }
+                                },
+                                x: {
+                                    grid: { display: false }
+                                }
+                            }
+                        }
+                    });
+
+                } else {
+                    container.innerHTML = `<div class="alert alert-info text-center mt-3">No exam data found. Head to the UTME Simulator to take your first test!</div>`;
+                }
+            } catch (err) {
+                console.error("Failed to load analytics", err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadResults);
+
+        document.getElementById('logoutBtn')?.addEventListener('click', async (e) => { 
+            e.preventDefault(); 
+            await supabase.auth.signOut(); 
+            window.location.href = 'login'; 
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - JAMB Question Bank</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <link href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+    <style>
+        :root { --bg-color: #f4f7fa; --card-bg: #ffffff; --text-color: #333333; --text-muted: #6c757d; --border-color: #e9ecef; --input-bg: #f8f9fa; --utme-green: #007a4d;}
+        body.dark-mode { --bg-color: #121212; --card-bg: #1e1e1e; --text-color: #e0e0e0; --text-muted: #a0a0a0; --border-color: #333333; --input-bg: #2c2c2c; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', sans-serif; overflow-x: hidden; transition: 0.3s; }
+        
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; box-shadow: 4px 0 15px rgba(0,0,0,0.1);}
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; text-decoration: none; display: flex; align-items: center; font-size: 0.95rem;}
+        .nav-link i { width: 25px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
+
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; }
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--utme-green); }
+        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;}
+
+        .upload-card { background: var(--card-bg); border-radius: 12px; padding: 30px; border: 1px solid var(--border-color); box-shadow: 0 5px 20px rgba(0,0,0,0.03); margin-bottom: 30px;}
+        .upload-zone { border: 2px dashed #007a4d; border-radius: 10px; padding: 40px 20px; text-align: center; cursor: pointer; transition: 0.3s; background: rgba(0, 122, 77, 0.02);}
+        .upload-zone:hover { background: rgba(0, 122, 77, 0.05); transform: translateY(-2px);}
+        
+        .preview-table-container { max-height: 400px; overflow-y: auto; display: none; margin-top: 20px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .custom-table { width: 100%; margin: 0; color: var(--text-color); font-size: 0.85rem;}
+        .custom-table th { background: var(--input-bg); padding: 12px 15px; text-transform: uppercase; color: var(--text-muted); position: sticky; top: 0; z-index: 10;}
+        .custom-table td { padding: 12px 15px; border-bottom: 1px solid var(--border-color); }
+
+        .nav-pills .nav-link.active { background-color: var(--utme-green); color: white; font-weight: bold;}
+        .nav-pills .nav-link { color: var(--text-muted); font-weight: bold; cursor: pointer; border-radius: 8px;}
+        
+        .form-control, .form-select { background-color: var(--input-bg); border-color: var(--border-color); color: var(--text-color); }
+        .form-control:focus, .form-select:focus { border-color: var(--utme-green); box-shadow: none; background-color: var(--card-bg); color: var(--text-color);}
+
+        .ql-toolbar { background: var(--input-bg); border-color: var(--border-color) !important; border-top-left-radius: 6px; border-top-right-radius: 6px;}
+        .ql-container { border-color: var(--border-color) !important; border-bottom-left-radius: 6px; border-bottom-right-radius: 6px; font-size: 1rem; color: var(--text-color);}
+        body.dark-mode .ql-stroke { stroke: var(--text-color); }
+        body.dark-mode .ql-fill { fill: var(--text-color); }
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; color: white;}
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay">
+        <i class="fas fa-spinner fa-spin fa-4x text-warning mb-3"></i>
+        <h3 class="fw-bold" id="uploadStatusTitle">Processing...</h3>
+        <p class="fs-5" id="uploadProgress">Please do not close this window.</p>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <h5 class="text-white fw-bold m-0"><i class="fas fa-chalkboard-teacher text-warning me-2"></i> STAFF PORTAL</h5>
+        </div>
+        <nav class="nav flex-column mt-3">
+            <a href="teacher_dashboard" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="teacher_class_list" class="nav-link"><i class="fas fa-users"></i> Class Roster & 360°</a>
+            <a href="teacher_attendance" class="nav-link"><i class="fas fa-calendar-check"></i> Attendance Tracker</a>
+            <a href="teacher_eclassroom" class="nav-link"><i class="fas fa-video text-danger"></i> eClassroom</a>
+            <a href="teacher_subjects" class="nav-link"><i class="fas fa-book"></i> Materials & AI Planner</a>
+
+            <a href="#cbtMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
+                <span><i class="fas fa-laptop-code me-2"></i> CBT Console</span><i class="fas fa-caret-down"></i>
+            </a>
+            <div class="collapse show bg-dark mx-2 mt-1 rounded" id="cbtMenu">
+                <a href="create_test" class="nav-link small py-2"><i class="fas fa-plus-circle me-2"></i> Create Exam</a>
+                <a href="question_bank" class="nav-link small py-2"><i class="fas fa-database me-2"></i> Question Bank</a>
+                <a href="teacher_bulk_upload" class="nav-link small py-2 active fw-bold text-warning"><i class="fas fa-upload me-2"></i> JAMB Uploader</a>
+                <a href="manage_cbt" class="nav-link small py-2"><i class="fas fa-list me-2"></i> Manage Exams</a>
+                <a href="test_results" class="nav-link small py-2"><i class="fas fa-chart-bar me-2"></i> Result Manager</a>
+            </div>
+
+            <a href="teacher_messages" class="nav-link mt-2"><i class="fas fa-envelope"></i> Communications</a>
+            <hr class="mx-3 my-4 border-secondary">
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Secure Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <div class="fw-bold d-none d-md-block" style="color: var(--text-muted);"><i class="fas fa-database me-2"></i> Real UTME Data Control</div>
+            </div>
+            <button class="dark-toggle-btn ms-auto" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold m-0">JAMB Question Bank Injector</h3>
+                <p class="text-muted">Import real JAMB questions into the master database for student CBTs.</p>
+            </div>
+        </div>
+
+        <div class="upload-card">
+            <ul class="nav nav-pills mb-4 pb-3 border-bottom" id="pills-tab" role="tablist">
+                <li class="nav-item me-2" role="presentation">
+                    <button class="nav-link active" id="pills-csv-tab" data-bs-toggle="pill" data-bs-target="#pills-csv" type="button" role="tab">
+                        <i class="fas fa-file-excel me-2"></i> Bulk CSV Upload (Text Only)
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pills-manual-tab" data-bs-toggle="pill" data-bs-target="#pills-manual" type="button" role="tab">
+                        <i class="fas fa-keyboard me-2"></i> Advanced Entry (Formulas & Images)
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="pills-tabContent">
+                
+                <div class="tab-pane fade show active" id="pills-csv" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold m-0">Fast Text Upload</h5>
+                        <button class="btn btn-outline-primary fw-bold shadow-sm" onclick="downloadTemplate()"><i class="fas fa-file-download me-2"></i> Download Template</button>
+                    </div>
+                    
+                    <input type="file" id="csvFileInput" accept=".csv" style="display: none;" onchange="handleFileSelect(event)">
+                    <div class="upload-zone" onclick="document.getElementById('csvFileInput').click()">
+                        <i class="fas fa-cloud-upload-alt fs-1 text-success mb-3"></i>
+                        <h4 class="fw-bold" style="color: var(--text-color);">Click to select a CSV file</h4>
+                        <p class="text-muted m-0">Best for English, Literature, and standard text-based subjects.</p>
+                    </div>
+
+                    <div id="previewSection" style="display: none;">
+                        <hr class="my-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="fw-bold m-0 text-success"><i class="fas fa-check-circle me-2"></i> File Ready: <span id="questionCount">0</span> Questions</h5>
+                            <button class="btn btn-success btn-lg fw-bold shadow" onclick="uploadCsvToDatabase()"><i class="fas fa-paper-plane me-2"></i> Publish to Database</button>
+                        </div>
+                        <div class="preview-table-container d-block">
+                            <table class="custom-table">
+                                <thead><tr><th>Subject</th><th>Year</th><th>Question</th><th>A</th><th>B</th><th>C</th><th>D</th><th>Ans</th></tr></thead>
+                                <tbody id="previewBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="pills-manual" role="tabpanel">
+                    <div class="alert alert-info border-0 mb-4">
+                        <i class="fas fa-info-circle me-2"></i> Use this editor to insert complex Math formulas, scientific symbols, superscripts, or diagrams.
+                    </div>
+
+                    <form id="manualQuestionForm" onsubmit="saveManualQuestion(event)">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small text-muted">Subject <span class="text-danger">*</span></label>
+                                <select class="form-select fw-bold" id="m_subject" required>
+                                    <option value="">-- Select Subject --</option>
+                                    <option value="English">English</option>
+                                    <option value="Accounts">Accounts</option>
+                                    <option value="Agriculture">Agriculture</option>
+                                    <option value="Arabic">Arabic</option>
+                                    <option value="Biology">Biology</option>
+                                    <option value="Chemistry">Chemistry</option>
+                                    <option value="Commerce">Commerce</option>
+                                    <option value="Computer Studies">Computer Studies</option>
+                                    <option value="CRK">CRK</option>
+                                    <option value="Economics">Economics</option>
+                                    <option value="Fine Art">Fine Art</option>
+                                    <option value="French">French</option>
+                                    <option value="Geography">Geography</option>
+                                    <option value="Government">Government</option>
+                                    <option value="Hausa">Hausa</option>
+                                    <option value="History">History</option>
+                                    <option value="Home Economics">Home Economics</option>
+                                    <option value="Igbo">Igbo</option>
+                                    <option value="IRK">IRK</option>
+                                    <option value="Literature">Literature</option>
+                                    <option value="Literature Textbooks">Literature Textbooks</option>
+                                    <option value="Mathematics">Mathematics</option>
+                                    <option value="Music">Music</option>
+                                    <option value="PHE">PHE</option>
+                                    <option value="Physics">Physics</option>
+                                    <option value="The Lekki Headmaster">The Lekki Headmaster</option>
+                                    <option value="Yoruba">Yoruba</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small text-muted">Exam Year <span class="text-danger">*</span></label>
+                                <select class="form-select fw-bold" id="m_year" required>
+                                    <option value="">-- Select Year --</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+                                    <option value="2022">2022</option>
+                                    <option value="2021">2021</option>
+                                    <option value="2020">2020</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small text-muted">Topic (Optional)</label>
+                                <input type="text" class="form-control" id="m_topic" placeholder="e.g. Differentiation">
+                            </div>
+
+                            <div class="col-12 mt-3">
+                                <label class="form-label fw-bold small text-muted">Question Content <span class="text-danger">*</span> (Use the <strong><i>fx</i></strong> button for formulas)</label>
+                                <div id="quillEditor" style="height: 180px; background: var(--card-bg);"></div>
+                            </div>
+
+                            <div class="col-12 mt-3">
+                                <label class="form-label fw-bold small text-muted"><i class="fas fa-image me-1"></i> Attach Diagram (Optional)</label>
+                                <input type="file" class="form-control" id="m_image" accept="image/*">
+                            </div>
+
+                            <div class="col-md-6 mt-3">
+                                <label class="form-label fw-bold small text-muted">Option A <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="m_opt_a" required>
+                            </div>
+                            <div class="col-md-6 mt-3">
+                                <label class="form-label fw-bold small text-muted">Option B <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="m_opt_b" required>
+                            </div>
+                            <div class="col-md-6 mt-3">
+                                <label class="form-label fw-bold small text-muted">Option C <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="m_opt_c" required>
+                            </div>
+                            <div class="col-md-6 mt-3">
+                                <label class="form-label fw-bold small text-muted">Option D <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="m_opt_d" required>
+                            </div>
+
+                            <div class="col-md-4 mt-4">
+                                <label class="form-label fw-bold small text-muted text-success">Correct Option <span class="text-danger">*</span></label>
+                                <select class="form-select fw-bold border-success text-success" id="m_correct" required>
+                                    <option value="A">Option A</option>
+                                    <option value="B">Option B</option>
+                                    <option value="C">Option C</option>
+                                    <option value="D">Option D</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-8 mt-4">
+                                <label class="form-label fw-bold small text-muted">Explanation / Solution (Optional)</label>
+                                <input type="text" class="form-control" id="m_exp" placeholder="Why is this the answer?">
+                            </div>
+
+                            <div class="col-12 mt-4 text-end">
+                                <button type="submit" class="btn btn-primary btn-lg fw-bold px-5"><i class="fas fa-save me-2"></i> Save Question to Database</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        window.toggleTheme = () => {
+            const body = document.body; body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') window.toggleTheme();
+
+        let parsedQuestions = [];
+        let uploaderId = null;
+        let quill; 
+
+        async function init() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return window.location.href = 'login';
+            
+            const { data: profile } = await supabase.from('users').select('role').eq('id', session.user.id).single();
+            if (!profile || profile.role !== 'teacher') return window.location.href = 'login';
+            
+            uploaderId = session.user.id;
+
+            quill = new Quill('#quillEditor', {
+                theme: 'snow',
+                modules: {
+                    formula: true,
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'script': 'sub'}, { 'script': 'super' }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['formula'],
+                        ['clean']
+                    ]
+                },
+                placeholder: 'Type the question text here. Click the [fx] button to insert math formulas...'
+            });
+        }
+
+        window.downloadTemplate = () => {
+            const headers = "Subject,Exam_Year,Topic,Question_Text,Option_A,Option_B,Option_C,Option_D,Correct_Option,Explanation\n";
+            const sampleRow = "English Language,2024,Lexis,The boy ___ to school everyday.,go,goes,went,going,B,Goes is singular present tense.\n";
+            const blob = new Blob([headers + sampleRow], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', ''); a.setAttribute('href', url); a.setAttribute('download', 'JAMB_Template.csv');
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        };
+
+        window.handleFileSelect = (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            Papa.parse(file, {
+                header: true, skipEmptyLines: true,
+                complete: function(results) {
+                    const data = results.data;
+                    if(!data[0].Subject || !data[0].Question_Text || !data[0].Correct_Option) {
+                        return alert("Invalid Format! Please use the downloaded template.");
+                    }
+
+                    parsedQuestions = data.map(row => ({
+                        subject: row.Subject.trim(),
+                        exam_year: row.Exam_Year ? row.Exam_Year.trim() : null,
+                        topic: row.Topic ? row.Topic.trim() : null,
+                        question_text: row.Question_Text.trim(),
+                        option_a: row.Option_A.trim(), option_b: row.Option_B.trim(), option_c: row.Option_C.trim(), option_d: row.Option_D.trim(),
+                        correct_option: row.Correct_Option.trim().toUpperCase(),
+                        explanation: row.Explanation ? row.Explanation.trim() : null,
+                        uploaded_by: uploaderId
+                    }));
+
+                    document.getElementById('questionCount').innerText = parsedQuestions.length;
+                    document.getElementById('previewBody').innerHTML = parsedQuestions.slice(0, 10).map(q => `<tr><td class="text-success">${q.subject}</td><td>${q.exam_year || '-'}</td><td>${q.question_text.substring(0,30)}...</td><td>${q.option_a}</td><td>${q.option_b}</td><td>${q.option_c}</td><td>${q.option_d}</td><td class="text-danger fw-bold">${q.correct_option}</td></tr>`).join('');
+                    document.getElementById('previewSection').style.display = 'block';
+                }
+            });
+        };
+
+        window.uploadCsvToDatabase = async () => {
+            if (parsedQuestions.length === 0) return;
+            if (!confirm(`Upload ${parsedQuestions.length} questions?`)) return;
+            
+            const loader = document.getElementById('loadingOverlay');
+            loader.style.display = 'flex';
+            document.getElementById('uploadStatusTitle').innerText = "Injecting Bulk Questions...";
+
+            try {
+                for (let i = 0; i < parsedQuestions.length; i += 500) {
+                    const batch = parsedQuestions.slice(i, i + 500);
+                    document.getElementById('uploadProgress').innerText = `Batch ${Math.ceil(i/500) + 1}...`;
+                    const { error } = await supabase.from('question_bank').insert(batch);
+                    if (error) throw error;
+                }
+                alert("SUCCESS! Questions are now live.");
+                window.location.reload();
+            } catch (err) {
+                console.error(err); alert("Error: " + err.message); loader.style.display = 'none';
+            }
+        };
+
+        window.saveManualQuestion = async (e) => {
+            e.preventDefault();
+            
+            const rawQuestionHTML = quill.root.innerHTML;
+            
+            if (quill.getText().trim() === '') {
+                return alert("Please enter the question text in the editor box.");
+            }
+
+            const loader = document.getElementById('loadingOverlay');
+            loader.style.display = 'flex';
+            document.getElementById('uploadStatusTitle').innerText = "Saving Question...";
+            document.getElementById('uploadProgress').innerText = "Uploading data and images...";
+
+            try {
+                let imageUrl = null;
+                const fileInput = document.getElementById('m_image');
+
+                if (fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                    
+                    const { data: uploadData, error: uploadError } = await supabase.storage.from('question_images').upload(fileName, file);
+                    if (uploadError) throw new Error("Image Upload Failed: " + uploadError.message);
+
+                    const { data: publicUrlData } = supabase.storage.from('question_images').getPublicUrl(fileName);
+                    imageUrl = publicUrlData.publicUrl;
+                }
+
+                const { error: dbError } = await supabase.from('question_bank').insert([{
+                    subject: document.getElementById('m_subject').value,
+                    exam_year: document.getElementById('m_year').value,
+                    topic: document.getElementById('m_topic').value.trim() || null,
+                    question_text: rawQuestionHTML, 
+                    image_url: imageUrl, 
+                    option_a: document.getElementById('m_opt_a').value.trim(),
+                    option_b: document.getElementById('m_opt_b').value.trim(),
+                    option_c: document.getElementById('m_opt_c').value.trim(),
+                    option_d: document.getElementById('m_opt_d').value.trim(),
+                    correct_option: document.getElementById('m_correct').value,
+                    explanation: document.getElementById('m_exp').value.trim() || null,
+                    uploaded_by: uploaderId
+                }]);
+
+                if (dbError) throw new Error(dbError.message);
+
+                alert("Success! The question (with formulas/diagrams) has been saved.");
+                
+                document.getElementById('manualQuestionForm').reset();
+                quill.setContents([]); 
+                loader.style.display = 'none';
+
+            } catch (err) {
+                console.error(err);
+                alert(err.message);
+                loader.style.display = 'none';
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', init);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login'; });
+    </script>
+</body>
+</html>

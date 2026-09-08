@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - Create Account</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* GLOBAL DARK MODE ENGINE */
+        :root { 
+            --bg-color: #f4f7fa; 
+            --card-bg: #ffffff; 
+            --text-color: #333333; 
+            --text-muted: #6c757d; 
+            --border-color: #e9ecef; 
+            --input-bg: #f8f9fa; 
+        }
+        body.dark-mode { 
+            --bg-color: #121212; 
+            --card-bg: #1e1e1e; 
+            --text-color: #e0e0e0; 
+            --text-muted: #a0a0a0; 
+            --border-color: #333333; 
+            --input-bg: #2c2c2c; 
+        }
+
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+        
+        /* Sidebar Styling */
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 20px; z-index: 1050; transition: transform 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center;}
+        .nav-link i { width: 25px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
+        
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        
+        /* Top Navbar */
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 5px solid #007a4d; transition: all 0.3s; }
+        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .dark-toggle-btn:hover { transform: scale(1.1); }
+
+        .edu-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: all 0.3s; }
+        .edu-header { background-color: #007a4d; color: white; padding: 15px 20px; border-radius: 4px 4px 0 0; font-weight: bold; font-size: 1.1rem; }
+        
+        .form-control, .form-select { padding: 10px 15px; border-radius: 4px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); transition: all 0.3s; font-weight: 500;}
+        .form-control:focus, .form-select:focus { border-color: #007a4d; box-shadow: 0 0 0 0.25rem rgba(0, 122, 77, 0.25); background-color: var(--card-bg); color: var(--text-color); }
+        
+        /* Readonly styles */
+        .form-control[readonly] { background-color: var(--border-color); opacity: 0.8; cursor: not-allowed; }
+
+        /* Dynamic Sections */
+        #teacherDetailsSection { display: none; background: var(--input-bg); padding: 20px; border-radius: 8px; border: 1px dashed #007a4d; transition: all 0.3s; }
+        #studentDetailsSection { display: none; background: var(--input-bg); padding: 20px; border-radius: 8px; border: 1px dashed #3498db; transition: all 0.3s; }
+
+        /* MOBILE OPTIMIZATION */
+        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
+        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
+        
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); box-shadow: 2px 0 15px rgba(0,0,0,0.3); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .mobile-menu-toggle { display: inline-block; }
+            .top-navbar { padding: 15px; flex-direction: column; gap: 15px; align-items: stretch; }
+            .header-profile-section { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
+            <h5 class="text-white fw-bold m-0"><i class="fas fa-graduation-cap text-warning me-2"></i> SPRINGDRILL</h5>
+            <button class="btn btn-sm btn-link text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        </div>
+        <nav class="nav flex-column mt-3">
+            <a href="admin_dashboard" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="#usersMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
+                <span><i class="fas fa-users me-2"></i> Accounts</span><i class="fas fa-caret-down"></i>
+            </a>
+            <div class="collapse show bg-dark mx-2 mt-1 rounded" id="usersMenu">
+                <a href="admin_create_user" class="nav-link small py-2 active text-success fw-bold"><i class="fas fa-user-plus me-2"></i> Generate Account</a>
+                <a href="manage_users" class="nav-link small py-2"><i class="fas fa-user-check me-2"></i> Approvals</a>
+                <a href="class_list" class="nav-link small py-2"><i class="fas fa-clipboard-list me-2"></i> Class Data</a>
+            </div>
+            
+            <a href="admin_league_table" class="nav-link mt-2"><i class="fas fa-trophy text-warning me-2"></i> League Table</a>
+            <a href="admin_messages" class="nav-link mt-2"><i class="fas fa-envelope me-2"></i> Internal Mail</a>
+            <hr class="mx-3 my-4 border-secondary">
+            <a href="#" id="logoutBtn" class="nav-link text-warning mt-auto"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="fw-bold d-none d-lg-block" style="color: var(--text-muted);"><i class="fas fa-shield-alt me-2"></i> System Administration</div>
+            </div>
+
+            <div class="header-profile-section mt-3 mt-lg-0">
+                <div class="d-flex align-items-center ms-auto">
+                    <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
+                    <div class="fw-bold d-flex align-items-center" style="color: var(--text-color);">
+                        <span id="adminName">Loading...</span><i class="fas fa-user-shield ms-3 fs-4 text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="edu-card">
+                    <div class="edu-header d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-user-plus me-2 text-warning"></i> Generate New Account</span>
+                    </div>
+                    <div class="p-4 p-md-5">
+                        <form id="createUserForm">
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold" style="color: var(--text-muted);">Full Name (First Last)</label>
+                                    <input type="text" id="userName" class="form-control" placeholder="e.g. John Doe" required>
+                                    <small class="text-success fw-bold mt-1 d-block"><i class="fas fa-magic"></i> Email will auto-generate based on this name.</small>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold" style="color: var(--text-muted);">Email Address</label>
+                                    <input type="email" id="userEmail" class="form-control text-primary fw-bold" placeholder="Auto-generated..." required readonly>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-bold" style="color: var(--text-muted);">Password</label>
+                                    <input type="password" id="userPassword" class="form-control fw-bold" placeholder="Enter secure password" required minlength="6">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-bold" style="color: var(--text-muted);">Account Role</label>
+                                    <select id="roleSelect" class="form-select border-primary fw-bold" required>
+                                        <option value="" disabled selected>Select Role...</option>
+                                        <option value="student">Student</option>
+                                        <option value="teacher">Teacher</option>
+                                        <option value="admin">Administrator</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-4">
+                                    <label class="form-label fw-bold" style="color: var(--text-muted);">Gender</label>
+                                    <select id="userGender" class="form-select fw-bold" required>
+                                        <option value="" disabled selected>Select Gender...</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="teacherDetailsSection" class="mb-4 mt-2 shadow-sm">
+                                <h6 class="fw-bold text-success mb-3"><i class="fas fa-chalkboard-teacher me-2"></i> Teacher Profile: Assign Classes</h6>
+                                <p class="small mb-3" style="color: var(--text-muted);">Tick all the classes this teacher is responsible for. They will only see students from these classes in their dashboard.</p>
+                                <div id="classCheckboxes" class="d-flex flex-wrap gap-3">
+                                    <div class="text-muted"><i class="fas fa-spinner fa-spin me-1"></i> Loading classes...</div>
+                                </div>
+                            </div>
+
+                            <div id="studentDetailsSection" class="mb-4 mt-2 shadow-sm">
+                                <h6 class="fw-bold text-primary mb-4" style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                                    <i class="fas fa-user-graduate me-2"></i> Student Profile Setup
+                                </h6>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold" style="color: var(--text-muted);">Registration No.</label>
+                                        <input type="text" id="regNumber" class="form-control fw-bold text-primary" readonly placeholder="Auto-generated">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold" style="color: var(--text-muted);">Assign Class <span class="text-danger">*</span></label>
+                                        <select id="studentClassSelect" class="form-select fw-bold">
+                                            <option value="" disabled selected>Select...</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold" style="color: var(--text-muted);">Date of Birth</label>
+                                        <input type="date" id="studentDOB" class="form-control">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold" style="color: var(--text-muted);">Parent/Guardian Name</label>
+                                        <input type="text" id="parentName" class="form-control" placeholder="Full name">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold text-success" style="color: var(--text-muted);">Passport Photo (Optional)</label>
+                                        <input type="file" id="studentPassport" class="form-control" accept="image/*">
+                                    </div>
+                                    <div class="col-md-12 mb-2">
+                                        <label class="form-label fw-bold" style="color: var(--text-muted);">Home Address</label>
+                                        <input type="text" id="studentAddress" class="form-control" placeholder="Residential address">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" id="btnSubmit" class="btn btn-success w-100 fw-bold py-3 mt-3 shadow" style="font-size: 1.1rem; letter-spacing: 0.5px;">
+                                <i class="fas fa-save me-2"></i> Generate Account
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        // === UI TOGGLES ===
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+            const overlay = document.getElementById('sidebarOverlay');
+            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+        };
+
+        window.toggleTheme = () => {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
+        }
+
+        // === AUTO GENERATE EMAIL ONLY ===
+        window.autoGenerateEmail = () => {
+            const nameVal = document.getElementById('userName').value.trim();
+            if (!nameVal) return;
+
+            const nameParts = nameVal.split(' ');
+            const firstName = nameParts[0].toLowerCase().replace(/[^a-z]/g, '');
+            const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1].toLowerCase().replace(/[^a-z]/g, '') : '';
+            
+            const rand = Math.floor(1000 + Math.random() * 9000);
+            const emailField = document.getElementById('userEmail');
+
+            emailField.value = `${firstName}${lastName ? '.' + lastName : ''}${rand}@springdrill.edu`;
+        };
+
+        document.getElementById('userName').addEventListener('blur', window.autoGenerateEmail);
+
+        function generateRegNum() {
+            const year = new Date().getFullYear().toString().slice(-2);
+            const rand = Math.floor(1000 + Math.random() * 9000);
+            return `SD/${year}/${rand}`;
+        }
+
+        // === LOGIC ===
+        async function loadInitialData() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = 'login';
+                
+                const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
+                if(profile) document.getElementById('adminName').innerText = profile.name;
+
+                const { data: classes, error } = await supabase.from('classes').select('id, name').order('name');
+                const cbContainer = document.getElementById('classCheckboxes');
+                const dropdown = document.getElementById('studentClassSelect');
+                
+                if (error || !classes.length) {
+                    cbContainer.innerHTML = '<span class="text-danger small">No classes found in the database.</span>';
+                    return;
+                }
+
+                cbContainer.innerHTML = classes.map(c => `
+                    <div class="form-check form-check-inline px-3 py-2 border rounded shadow-sm" style="background-color: var(--card-bg); border-color: var(--border-color) !important;">
+                        <input class="form-check-input class-cb" type="checkbox" id="class_${c.id}" value="${c.id}" style="cursor:pointer; border-color: var(--border-color);">
+                        <label class="form-check-label fw-bold ms-1" for="class_${c.id}" style="cursor:pointer; color: var(--text-color);">${c.name}</label>
+                    </div>
+                `).join('');
+
+                let options = '<option value="" disabled selected>Select Class...</option>';
+                classes.forEach(c => { options += `<option value="${c.id}">${c.name}</option>`; });
+                dropdown.innerHTML = options;
+
+            } catch (err) { console.error(err); }
+        }
+
+        document.getElementById('roleSelect').addEventListener('change', (e) => {
+            const role = e.target.value;
+            const teacherSec = document.getElementById('teacherDetailsSection');
+            const studentSec = document.getElementById('studentDetailsSection');
+            const classSelect = document.getElementById('studentClassSelect');
+            const regInput = document.getElementById('regNumber');
+
+            if (role === 'teacher') {
+                teacherSec.style.display = 'block';
+                studentSec.style.display = 'none';
+                classSelect.required = false;
+            } else if (role === 'student') {
+                teacherSec.style.display = 'none';
+                studentSec.style.display = 'block';
+                classSelect.required = true;
+                regInput.value = generateRegNum(); 
+            } else {
+                teacherSec.style.display = 'none';
+                studentSec.style.display = 'none';
+                classSelect.required = false;
+            }
+        });
+
+        document.getElementById('createUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmit');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Generating...';
+            btn.disabled = true;
+
+            const name = document.getElementById('userName').value.trim();
+            const email = document.getElementById('userEmail').value.trim();
+            const password = document.getElementById('userPassword').value;
+            const role = document.getElementById('roleSelect').value;
+            const gender = document.getElementById('userGender').value;
+
+            try {
+                // 1. Create User in Auth
+                const { data: authData, error: authErr } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: { data: { name: name, role: role, gender: gender } }
+                });
+
+                if (authErr) throw authErr;
+                if (!authData || !authData.user) throw new Error("Failed to generate authentication data.");
+                
+                const newUserId = authData.user.id;
+                
+                // Extract a username from the auto-generated email (e.g. davidsabbath8309)
+                const generatedUsername = email.split('@')[0];
+
+                // FIX: Add a brief 1.5-second delay to allow Database triggers to settle!
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // 2. EXPLICITLY CREATE THE USER IN PUBLIC.USERS
+                // ADDED THE REQUIRED "USERNAME" FIELD TO FIX THE NOT-NULL CONSTRAINT ERROR!
+                const { error: syncErr } = await supabase.from('users').upsert({
+                    id: newUserId,
+                    name: name,
+                    email: email,
+                    username: generatedUsername, 
+                    role: role,
+                    gender: gender
+                }, { onConflict: 'id' });
+                
+                if (syncErr) throw new Error("Database blocked user sync. " + syncErr.message);
+
+                // 3. Update Specific Data based on Role
+                if (role === 'teacher') {
+                    const assigned_classes = Array.from(document.querySelectorAll('.class-cb:checked')).map(cb => cb.value);
+                    await supabase.from('users').update({ assigned_classes: assigned_classes }).eq('id', newUserId);
+                } 
+                else if (role === 'student') {
+                    const nameParts = name.split(' ');
+                    const firstName = nameParts[0];
+                    const surname = nameParts.slice(1).join(' ');
+
+                    const regNum = document.getElementById('regNumber').value;
+                    const classId = document.getElementById('studentClassSelect').value;
+                    const dobValue = document.getElementById('studentDOB').value;
+                    const parentName = document.getElementById('parentName').value;
+                    const address = document.getElementById('studentAddress').value;
+                    const passportFile = document.getElementById('studentPassport').files[0];
+
+                    let passportUrl = null;
+
+                    // Upload Passport
+                    if (passportFile) {
+                        const fileExt = passportFile.name.split('.').pop();
+                        const fileName = `passport_${Date.now()}.${fileExt}`;
+                        const { error: uploadError } = await supabase.storage.from('passports').upload(fileName, passportFile);
+                        
+                        if (!uploadError) {
+                            const { data: pubData } = supabase.storage.from('passports').getPublicUrl(fileName);
+                            passportUrl = pubData.publicUrl;
+                        }
+                    }
+
+                    // Write Student Data
+                    const { error: stuErr } = await supabase.from('students').insert([{
+                        user_id: newUserId,
+                        first_name: firstName,
+                        surname: surname,
+                        gender: gender,
+                        reg_number: regNum,
+                        class_id: classId,
+                        dob: dobValue || null,
+                        parent_name: parentName,
+                        address: address,
+                        passport_url: passportUrl,
+                        approved: true 
+                    }]);
+
+                    if (stuErr) throw stuErr;
+                }
+
+                alert(`Account generated successfully!\n\nEmail: ${email}\nPassword: (As entered by you)\n\nPlease provide these credentials to the user.`);
+                
+                document.getElementById('createUserForm').reset();
+                document.getElementById('teacherDetailsSection').style.display = 'none';
+                document.getElementById('studentDetailsSection').style.display = 'none';
+
+            } catch (err) {
+                alert("Error: " + err.message);
+            } finally {
+                btn.innerHTML = '<i class="fas fa-save me-2"></i> Generate Account';
+                btn.disabled = false;
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', loadInitialData);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login';
+        });
+    </script>
+</body>
+</html>

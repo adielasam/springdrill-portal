@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - Staff Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* GLOBAL DARK MODE ENGINE */
+        :root { 
+            --bg-color: #f4f7fa; 
+            --card-bg: #ffffff; 
+            --text-color: #333333; 
+            --text-muted: #6c757d; 
+            --border-color: #e9ecef; 
+            --input-bg: #f8f9fa; 
+            --stat-icon-bg: #e8f5e9;
+        }
+        body.dark-mode { 
+            --bg-color: #121212; 
+            --card-bg: #1e1e1e; 
+            --text-color: #e0e0e0; 
+            --text-muted: #a0a0a0; 
+            --border-color: #333333; 
+            --input-bg: #2c2c2c; 
+            --stat-icon-bg: #1a2e21;
+        }
+
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+        
+        /* Sidebar Styling */
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.1);}
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; display: flex; align-items: center; font-size: 0.95rem; text-decoration: none;}
+        .nav-link i { width: 25px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
+
+        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        
+        /* Top Navbar */
+        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #007a4d; transition: all 0.3s; }
+        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .dark-toggle-btn:hover { transform: scale(1.1); }
+
+        /* Profile Banner */
+        .profile-banner { background: linear-gradient(135deg, #007a4d 0%, #004d34 100%); border-radius: 12px; padding: 30px; color: white; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 20px rgba(0, 122, 77, 0.2);}
+        .profile-banner h2 { font-weight: 800; margin-bottom: 5px; }
+        .profile-banner p { margin-bottom: 0; opacity: 0.9; font-size: 1.1rem; }
+
+        /* Stat Cards */
+        .stat-card { background: var(--card-bg); border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 20px; transition: all 0.3s; height: 100%;}
+        .stat-card:hover { transform: translateY(-5px); border-color: #007a4d; }
+        .stat-icon { width: 65px; height: 65px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: var(--input-bg); color: #007a4d;}
+        .stat-info h6 { font-weight: bold; color: var(--text-muted); margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;}
+        .stat-info h2 { font-weight: 900; color: var(--text-color); margin-bottom: 0; }
+
+        /* Quick Links Grid */
+        .quick-links-header { font-weight: 800; color: var(--text-color); margin-bottom: 20px; margin-top: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;}
+        .quick-link-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); padding: 25px; text-align: center; transition: all 0.3s; text-decoration: none; color: var(--text-color); display: block; box-shadow: 0 4px 15px rgba(0,0,0,0.02); position: relative;}
+        .quick-link-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-color: #007a4d; color: var(--text-color); }
+        .quick-link-card i { font-size: 2.5rem; color: #3498db; margin-bottom: 15px; }
+        .quick-link-card h5 { font-weight: 700; margin-bottom: 10px; }
+        .quick-link-card p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0; }
+
+        /* Notification Badge for Inbox */
+        .notification-badge { position: absolute; top: 15px; right: 15px; background: #e74c3c; color: white; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 20px; display: none; border: 2px solid var(--card-bg); box-shadow: 0 2px 5px rgba(231, 76, 60, 0.4);}
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .mobile-menu-toggle { display: inline-block !important; }
+            .top-navbar { padding: 15px; flex-direction: column; gap: 10px; }
+            .profile-banner { flex-direction: column; text-align: center; gap: 15px; }
+        }
+        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
+        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay">
+        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
+        <h4 class="fw-bold" style="color: var(--text-muted);">Loading Dashboard...</h4>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
+            <h5 class="text-white fw-bold m-0"><i class="fas fa-chalkboard-teacher text-warning me-2"></i> STAFF PORTAL</h5>
+            <button class="btn btn-sm btn-link text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <nav class="nav flex-column mt-3">
+            <a href="teacher_dashboard" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
+            
+            <a href="teacher_class_list" class="nav-link"><i class="fas fa-users"></i> Class Roster & 360°</a>
+
+            <a href="teacher_attendance" class="nav-link"><i class="fas fa-calendar-check"></i> Attendance Tracker</a>
+
+            <a href="teacher_eclassroom" class="nav-link"><i class="fas fa-video text-danger"></i> eClassroom</a>
+
+            <a href="teacher_subjects" class="nav-link"><i class="fas fa-book"></i> Materials & AI Planner</a>
+
+            <a href="#cbtMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
+                <span><i class="fas fa-laptop-code me-2"></i> CBT Console</span>
+                <i class="fas fa-caret-down"></i>
+            </a>
+            
+            <div class="collapse show bg-dark mx-2 mt-1 rounded pb-2" id="cbtMenu">
+                
+                <div class="px-3 py-1 text-muted small fw-bold mt-2" style="font-size: 0.7rem; letter-spacing: 1px;">SCHOOL EXAMS</div>
+                <a href="create_test" class="nav-link small py-1"><i class="fas fa-plus-circle me-2"></i> Create Exam</a>
+                <a href="question_bank" class="nav-link small py-1"><i class="fas fa-server me-2"></i> School Q-Bank</a>
+                <a href="manage_cbt" class="nav-link small py-1"><i class="fas fa-list me-2"></i> Manage Exams</a>
+                <a href="test_results" class="nav-link small py-1"><i class="fas fa-chart-bar me-2"></i> Result Manager</a>
+                
+                <div class="px-3 py-1 text-warning small fw-bold mt-3 border-top border-secondary pt-2" style="font-size: 0.7rem; letter-spacing: 1px;">REAL JAMB HUB</div>
+                <a href="teacher_bulk_upload" class="nav-link small py-1"><i class="fas fa-upload me-2"></i> JAMB Uploader</a>
+                <a href="jamb_question_bank" class="nav-link small py-1"><i class="fas fa-database me-2"></i> JAMB Q-Bank</a>
+            </div>
+
+            <a href="teacher_messages" class="nav-link mt-2">
+                <i class="fas fa-envelope"></i> Communications 
+                <span class="badge bg-danger ms-auto" id="sidebarBadge" style="display: none;">0</span>
+            </a>
+
+            <hr class="mx-3 my-4 border-secondary">
+            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Secure Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="fw-bold d-none d-md-block" style="color: var(--text-muted);"><i class="fas fa-chalkboard-teacher me-2"></i> Teacher Command Center</div>
+            </div>
+
+            <div class="d-flex align-items-center ms-auto">
+                <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                <div class="fw-bold d-flex align-items-center" style="color: var(--text-color);">
+                    <span id="navTeacherName">Loading...</span><i class="fas fa-user-circle ms-3 fs-4 text-success"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-banner">
+            <div>
+                <h2 id="welcomeText">Welcome back, Staff!</h2>
+                <p>Ready to manage your classes and exams today?</p>
+            </div>
+            <div class="d-none d-md-block">
+                <i class="fas fa-award fa-4x opacity-50"></i>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-users text-primary"></i></div>
+                    <div class="stat-info">
+                        <h6>Registered Students</h6>
+                        <h2 id="totalStudents">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-laptop-code text-danger"></i></div>
+                    <div class="stat-info">
+                        <h6>Active Exams</h6>
+                        <h2 id="totalExams">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-database text-warning"></i></div>
+                    <div class="stat-info">
+                        <h6>Banked Questions</h6>
+                        <h2 id="totalQuestions">0</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h4 class="quick-links-header">Quick Actions</h4>
+        <div class="row g-4">
+            
+            <div class="col-md-3 col-sm-6">
+                <a href="teacher_class_list" class="quick-link-card">
+                    <i class="fas fa-id-badge text-primary"></i>
+                    <h5>Student 360°</h5>
+                    <p>View behavioral notes, attendance, and analytics.</p>
+                </a>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <a href="teacher_eclassroom" class="quick-link-card">
+                    <i class="fas fa-video text-danger"></i>
+                    <h5>Live eClassroom</h5>
+                    <p>Start a virtual video class with your students.</p>
+                </a>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <a href="teacher_subjects" class="quick-link-card">
+                    <i class="fas fa-robot text-info"></i>
+                    <h5>AI Lesson Planner</h5>
+                    <p>Generate smart lesson plans and upload materials.</p>
+                </a>
+            </div>
+            
+            <div class="col-md-3 col-sm-6">
+                <a href="create_test" class="quick-link-card">
+                    <i class="fas fa-plus-circle text-success"></i>
+                    <h5>Create Exam</h5>
+                    <p>Setup a new CBT assessment for your class.</p>
+                </a>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <a href="teacher_bulk_upload" class="quick-link-card">
+                    <i class="fas fa-upload text-warning"></i>
+                    <h5>Bulk Uploader</h5>
+                    <p>Import real JAMB questions via CSV/Excel instantly.</p>
+                </a>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <a href="manage_cbt" class="quick-link-card">
+                    <i class="fas fa-tasks text-secondary"></i>
+                    <h5>Manage Exams</h5>
+                    <p>Edit, publish, or disable your active CBTs.</p>
+                </a>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <a href="test_results" class="quick-link-card">
+                    <i class="fas fa-chart-bar" style="color: #e67e22 !important;"></i>
+                    <h5>Results</h5>
+                    <p>Analyze student performance and grades.</p>
+                </a>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <a href="teacher_messages" class="quick-link-card">
+                    <div class="notification-badge" id="cardBadge">0 New</div>
+                    <i class="fas fa-envelope" style="color: #9b59b6 !important;"></i>
+                    <h5>Communications</h5>
+                    <p>Check your inbox and message students or admins.</p>
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        let currentTeacherId = null;
+
+        // === UI TOGGLES ===
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+            const overlay = document.getElementById('sidebarOverlay');
+            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+        };
+
+        window.toggleTheme = () => {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
+        };
+
+        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
+        }
+
+        // === DASHBOARD LOGIC ===
+        async function initializeDashboard() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = 'login';
+                currentTeacherId = session.user.id;
+
+                const { data: profile } = await supabase.from('users').select('name').eq('id', currentTeacherId).single();
+                if(profile) {
+                    const name = profile.name.split(' ')[0];
+                    document.getElementById('navTeacherName').innerText = profile.name;
+                    document.getElementById('welcomeText').innerText = `Welcome back, ${name}!`;
+                }
+
+                const { count: studentCount } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', true);
+                document.getElementById('totalStudents').innerText = studentCount || 0;
+
+                const { count: examCount } = await supabase.from('tests').select('*', { count: 'exact', head: true }).eq('teacher_id', currentTeacherId).eq('is_published', true);
+                document.getElementById('totalExams').innerText = examCount || 0;
+
+                const { count: questionCount } = await supabase.from('questions').select('*', { count: 'exact', head: true }).eq('teacher_id', currentTeacherId);
+                document.getElementById('totalQuestions').innerText = questionCount || 0;
+
+                const { count: unreadCount, error: msgErr } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('receiver_id', currentTeacherId).eq('is_read', false);
+                if (!msgErr && unreadCount > 0) {
+                    const sidebarBadge = document.getElementById('sidebarBadge');
+                    sidebarBadge.innerText = unreadCount;
+                    sidebarBadge.style.display = 'inline-block';
+
+                    const cardBadge = document.getElementById('cardBadge');
+                    cardBadge.innerText = `${unreadCount} New`;
+                    cardBadge.style.display = 'inline-block';
+                }
+
+                document.getElementById('loadingOverlay').style.display = 'none';
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = 'login';
+        });
+    </script>
+</body>
+</html>
