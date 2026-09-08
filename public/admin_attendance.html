@@ -132,7 +132,7 @@
         async function initialize() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
-                if (!session) return window.location.href = 'login';
+                if (!session) return window.location.href = '/';
 
                 const { data: classes } = await supabase.from('classes').select('*').order('name');
                 if (classes) {
@@ -244,7 +244,7 @@
         };
 
         document.addEventListener('DOMContentLoaded', initialize);
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login'; });
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/'; });
     </script>
 </body>
 </html>

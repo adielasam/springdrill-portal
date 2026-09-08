@@ -132,7 +132,7 @@
         async function initMail() {
             try {
                 const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-                if (sessionError || !session) return window.location.href = 'login';
+                if (sessionError || !session) return window.location.href = '/';
                 
                 currentId = session.user.id;
                 readModal = new bootstrap.Modal(document.getElementById('readModal'));
@@ -271,7 +271,7 @@
         document.getElementById('logoutBtn').addEventListener('click', async (e) => { 
             e.preventDefault(); 
             await supabase.auth.signOut(); 
-            window.location.href = 'login'; 
+            window.location.href = '/'; 
         });
     </script>
 </body>

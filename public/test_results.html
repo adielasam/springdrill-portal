@@ -184,7 +184,7 @@
         window.initializePage = async function() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
-                if (!session) return window.location.href = 'login';
+                if (!session) return window.location.href = '/';
                 currentUserId = session.user.id;
 
                 // Fetch tests created by this teacher
@@ -375,7 +375,7 @@
 
         // Logout
         document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login';
+            e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/';
         });
     </script>
 </body>

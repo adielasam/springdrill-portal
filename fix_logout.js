@@ -1,16 +1,18 @@
 const fs = require('fs');
-const glob = require('glob');
-const files = glob.sync('public/*.html');
+const path = require('path');
+const dir = path.join(__dirname, 'public');
+const files = fs.readdirSync(dir).filter(f => f.endsWith('.html'));
 
 files.forEach(file => {
-  let content = fs.readFileSync(file, 'utf8');
+  const filePath = path.join(dir, file);
+  let content = fs.readFileSync(filePath, 'utf8');
   const original = content;
   content = content.replace(/window\.location\.href\s*=\s*'login'/g, "window.location.href = '/'");
   content = content.replace(/window\.location\.href\s*=\s*"login"/g, "window.location.href = '/'");
   content = content.replace(/window\.location\.href\s*=\s*'\/login'/g, "window.location.href = '/'");
   content = content.replace(/window\.location\.href\s*=\s*"\/login"/g, "window.location.href = '/'");
   if (content !== original) {
-    fs.writeFileSync(file, content);
+    fs.writeFileSync(filePath, content);
   }
 });
 console.log('Done');

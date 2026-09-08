@@ -171,7 +171,7 @@
         async function initializePage() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
-                if (!session) return window.location.href = 'login';
+                if (!session) return window.location.href = '/';
 
                 // Load classes
                 const { data: classes } = await supabase.from('classes').select('id, name').order('id');
@@ -317,7 +317,7 @@
         document.getElementById('logoutBtn').addEventListener('click', async (e) => {
             e.preventDefault();
             await supabase.auth.signOut();
-            window.location.href = 'login';
+            window.location.href = '/';
         });
     </script>
 </body>

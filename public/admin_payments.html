@@ -574,7 +574,7 @@
 
         async function initialize() {
             const { data: { session } } = await supabase.auth.getSession();
-            if (!session) return window.location.href = 'login';
+            if (!session) return window.location.href = '/';
             
             // Set initial filter state and load data
             await updateFilterUI(); 
@@ -583,7 +583,7 @@
         }
         
         document.addEventListener('DOMContentLoaded', initialize);
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login'; });
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/'; });
     </script>
 </body>
 </html>

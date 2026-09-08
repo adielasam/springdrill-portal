@@ -155,7 +155,7 @@
 
         async function fetchAnalytics() {
             const { data: { session } } = await supabase.auth.getSession();
-            if (!session) return window.location.href = 'login';
+            if (!session) return window.location.href = '/';
 
             try {
                 // Fetch ONLY the exams taken on the "Real UTME Hub" (test_id: 998)
@@ -218,7 +218,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', fetchAnalytics);
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login'; });
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/'; });
     </script>
 </body>
 </html>

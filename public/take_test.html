@@ -156,7 +156,7 @@
         async function initializeExam() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
-                if (!session) return window.location.href = 'login';
+                if (!session) return window.location.href = '/';
                 studentSession = session;
 
                 const { data: stuData } = await supabase.from('students').select('surname, first_name, users(name)').eq('user_id', session.user.id).single();

@@ -150,7 +150,7 @@
         async function initSetup() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
-                if (!session) return window.location.href = 'login';
+                if (!session) return window.location.href = '/';
                 currentUserId = session.user.id;
 
                 const { data: profile } = await supabase.from('users').select('name').eq('id', currentUserId).single();
@@ -207,7 +207,7 @@
 
         window.addEventListener('beforeunload', async () => { if (activeRoomId) await supabase.from('live_classes').update({ is_active: false }).eq('id', activeRoomId); });
         document.addEventListener('DOMContentLoaded', initSetup);
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = 'login'; });
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/'; });
     </script>
 </body>
 </html>

@@ -104,7 +104,7 @@
             try {
                 // 1. Authenticate User
                 const { data: { session } } = await supabase.auth.getSession();
-                if (!session) return window.location.href = 'login';
+                if (!session) return window.location.href = '/';
 
                 // 2. Fetch past exams from Supabase
                 const { data: scores, error } = await supabase
@@ -203,7 +203,7 @@
         document.getElementById('logoutBtn')?.addEventListener('click', async (e) => { 
             e.preventDefault(); 
             await supabase.auth.signOut(); 
-            window.location.href = 'login'; 
+            window.location.href = '/'; 
         });
     </script>
 </body>
