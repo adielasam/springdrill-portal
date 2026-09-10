@@ -31,7 +31,7 @@ Output NOTHING but the raw JSON array. Do not wrap in markdown tags like \`\`\`j
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "model": "google/gemini-1.5-flash",
+        "model": "google/gemini-2.5-flash",
         "messages": [
           {"role": "user", "content": promptText}
         ]
