@@ -339,10 +339,17 @@
                 const { data: subj } = await supabase.from('subjects').select('name').eq('id', subjectId).single();
                 const subjectName = subj ? subj.name : 'General';
 
+                let insertErr;
                 if (type === 'scheme') {
-                    await supabase.from('schemes_of_work').insert([{ class_id: classId, subject_id: subjectId, title: `${title} (${term})`, file_url: fileUrl, teacher_id: currentTeacherId }]);
+                    const { error } = await supabase.from('schemes_of_work').insert([{ class_id: classId, subject_id: subjectId, title: `${title} (${term})`, file_url: fileUrl, teacher_id: currentTeacherId }]);
+                    insertErr = error;
                 } else {
-                    await supabase.from('lesson_notes').insert([{ class_id: classId, subject_name: subjectName, title: `${title} (${term})`, file_url: fileUrl, teacher_id: currentTeacherId }]);
+                    const { error } = await supabase.from('lesson_notes').insert([{ class_id: classId, subject_name: subjectName, title: `${title} (${term})`, file_url: fileUrl, teacher_id: currentTeacherId }]);
+                    insertErr = error;
+                }
+
+                if (insertErr) {
+                    throw new Error("Database error: " + insertErr.message);
                 }
 
                 showAlert("Material successfully uploaded and shared with students!");
@@ -360,8 +367,11 @@
         // === REPOSITORY LOADER ===
         async function loadRepository() {
             try {
-                const { data: schemes } = await supabase.from('schemes_of_work').select('id, title, file_url, classes(name), subjects(name)').eq('teacher_id', currentTeacherId);
-                const { data: notes } = await supabase.from('lesson_notes').select('id, title, file_url, classes(name), subject_name').eq('teacher_id', currentTeacherId);
+                const { data: schemes, error: schemesErr } = await supabase.from('schemes_of_work').select('id, title, file_url, classes(name), subjects(name)').eq('teacher_id', currentTeacherId);
+                const { data: notes, error: notesErr } = await supabase.from('lesson_notes').select('id, title, file_url, classes(name), subject_name').eq('teacher_id', currentTeacherId);
+
+                if (schemesErr) console.error("Schemes fetch error:", schemesErr);
+                if (notesErr) console.error("Notes fetch error:", notesErr);
 
                 let allMats = [];
                 if (schemes) schemes.forEach(s => allMats.push({ id: s.id, title: s.title, type: 'Scheme of Work', url: s.file_url, class_name: s.classes?.name, subject_name: s.subjects?.name, table: 'schemes_of_work' }));
