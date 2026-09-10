@@ -564,6 +564,8 @@
                 btn.innerHTML = '<i class="fas fa-robot me-2"></i> Generate Complete NERDC Plan & Content';
                 btn.disabled = false;
             }
+        });
+
         window.copyAiText = () => {
             const text = document.getElementById('aiTextContent').innerText;
             navigator.clipboard.writeText(text);
