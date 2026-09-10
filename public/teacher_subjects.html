@@ -167,11 +167,19 @@
                                     <label class="form-label">Document Title</label>
                                     <input type="text" id="materialTitle" class="form-control" placeholder="e.g. Week 1: Introduction to Algebra" required>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
+                                    <label class="form-label">Term</label>
+                                    <select id="termSelect" class="form-select" required>
+                                        <option value="First Term">First Term</option>
+                                        <option value="Second Term">Second Term</option>
+                                        <option value="Third Term">Third Term</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
                                     <label class="form-label">Target Class</label>
                                     <select id="classSelect" class="form-select" required><option value="">Loading...</option></select>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label class="form-label">Subject</label>
                                     <select id="subjectSelect" class="form-select" required><option value="">Loading...</option></select>
                                 </div>
@@ -313,6 +321,7 @@
 
             const type = document.getElementById('materialType').value;
             const title = document.getElementById('materialTitle').value;
+            const term = document.getElementById('termSelect').value;
             const classId = document.getElementById('classSelect').value;
             const subjectId = document.getElementById('subjectSelect').value;
             const file = document.getElementById('materialFile').files[0];
@@ -331,9 +340,9 @@
                 const subjectName = subj ? subj.name : 'General';
 
                 if (type === 'scheme') {
-                    await supabase.from('schemes_of_work').insert([{ class_id: classId, subject_id: subjectId, title: title, file_url: fileUrl, teacher_id: currentTeacherId }]);
+                    await supabase.from('schemes_of_work').insert([{ class_id: classId, subject_id: subjectId, title: title, file_url: fileUrl, teacher_id: currentTeacherId, term: term }]);
                 } else {
-                    await supabase.from('lesson_notes').insert([{ class_id: classId, subject_name: subjectName, title: title, file_url: fileUrl, teacher_id: currentTeacherId }]);
+                    await supabase.from('lesson_notes').insert([{ class_id: classId, subject_name: subjectName, title: title, file_url: fileUrl, teacher_id: currentTeacherId, term: term }]);
                 }
 
                 showAlert("Material successfully uploaded and shared with students!");
@@ -351,16 +360,16 @@
         // === REPOSITORY LOADER ===
         async function loadRepository() {
             try {
-                const { data: schemes } = await supabase.from('schemes_of_work').select('id, title, file_url, classes(name), subjects(name)').eq('teacher_id', currentTeacherId);
-                const { data: notes } = await supabase.from('lesson_notes').select('id, title, file_url, classes(name), subject_name').eq('teacher_id', currentTeacherId);
+                const { data: schemes } = await supabase.from('schemes_of_work').select('id, title, file_url, term, classes(name), subjects(name)').eq('teacher_id', currentTeacherId);
+                const { data: notes } = await supabase.from('lesson_notes').select('id, title, file_url, term, classes(name), subject_name').eq('teacher_id', currentTeacherId);
 
                 let allMats = [];
-                if (schemes) schemes.forEach(s => allMats.push({ id: s.id, title: s.title, type: 'Scheme of Work', url: s.file_url, class_name: s.classes?.name, subject_name: s.subjects?.name, table: 'schemes_of_work' }));
-                if (notes) notes.forEach(n => allMats.push({ id: n.id, title: n.title, type: 'Lesson Note', url: n.file_url, class_name: n.classes?.name, subject_name: n.subject_name, table: 'lesson_notes' }));
+                if (schemes) schemes.forEach(s => allMats.push({ id: s.id, title: s.title, type: 'Scheme of Work', url: s.file_url, term: s.term, class_name: s.classes?.name, subject_name: s.subjects?.name, table: 'schemes_of_work' }));
+                if (notes) notes.forEach(n => allMats.push({ id: n.id, title: n.title, type: 'Lesson Note', url: n.file_url, term: n.term, class_name: n.classes?.name, subject_name: n.subject_name, table: 'lesson_notes' }));
 
                 const tbody = document.getElementById('repoBody');
                 if (allMats.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5 text-muted">You haven't uploaded any materials yet.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-muted">You haven't uploaded any materials yet.</td></tr>`;
                     return;
                 }
 
@@ -369,8 +378,9 @@
                         <td class="ps-4 fw-bold" style="color: var(--text-color);"><a href="${m.url}" target="_blank" class="text-decoration-none">${m.title}</a></td>
                         <td><span class="badge ${m.type === 'Scheme of Work' ? 'bg-primary' : 'bg-success'}">${m.type}</span></td>
                         <td style="color: var(--text-muted);">${m.subject_name}</td>
-                        <td style="color: var(--text-muted);">${m.class_name}</td>
+                        <td style="color: var(--text-muted);">${m.class_name} <br> <small>${m.term || ''}</small></td>
                         <td class="text-center pe-4">
+                            <button onclick="editMaterial('${m.id}', '${m.table}', '${m.title.replace(/'/g, "\\'")}')" class="btn btn-sm btn-outline-primary me-1"><i class="fas fa-edit"></i></button>
                             <button onclick="deleteMaterial('${m.id}', '${m.table}')" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
@@ -383,6 +393,14 @@
             if (!confirm("Delete this material permanently?")) return;
             await supabase.from(table).delete().eq('id', id);
             await loadRepository();
+        };
+
+        window.editMaterial = async (id, table, title) => {
+            const newTitle = prompt("Update Title:", title);
+            if (newTitle !== null && newTitle.trim() !== '') {
+                await supabase.from(table).update({ title: newTitle }).eq('id', id);
+                await loadRepository();
+            }
         };
 
         // === BULLETPROOF AI EDGE FUNCTION CALL ===

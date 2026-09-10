@@ -130,12 +130,13 @@
                     <thead style="background-color: var(--input-bg);">
                         <tr>
                             <th width="10%" class="text-center">S/N</th>
-                            <th width="45%">Subject Title</th>
-                            <th width="45%" class="text-center">Scheme of Work</th>
+                            <th width="40%">Subject Title</th>
+                            <th width="25%" class="text-center">Scheme of Work</th>
+                            <th width="25%" class="text-center">Lesson Notes</th>
                         </tr>
                     </thead>
                     <tbody id="subjectsBody">
-                        <tr><td colspan="3" class="text-center py-5" style="color: var(--text-muted);">Fetching your subjects...</td></tr>
+                        <tr><td colspan="4" class="text-center py-5" style="color: var(--text-muted);">Fetching your subjects...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -210,12 +211,25 @@
 
                 const { data: subjects } = await supabase.from('subjects').select('*').order('name');
                 const { data: schemes } = await supabase.from('schemes_of_work').select('*').eq('class_id', classId);
+                const { data: notes } = await supabase.from('lesson_notes').select('*').eq('class_id', classId);
 
                 const schemeMap = {};
                 if (schemes) {
                     schemes.forEach(s => {
                         if (!schemeMap[s.subject_id] || new Date(s.created_at) > new Date(schemeMap[s.subject_id].created_at)) {
                             schemeMap[s.subject_id] = s;
+                        }
+                    });
+                }
+
+                const notesMap = {};
+                if (notes) {
+                    notes.forEach(n => {
+                        // Lesson notes save subject_name, we map by name
+                        const key = n.subject_name;
+                        if (key) {
+                            if (!notesMap[key]) notesMap[key] = [];
+                            notesMap[key].push(n);
                         }
                     });
                 }
@@ -233,16 +247,31 @@
                             `;
                         }
 
+                        const subjectNotes = notesMap[sub.name] || [];
+                        let notesHtml = `<span class="badge bg-secondary py-2 px-3">Pending Upload</span>`;
+                        if (subjectNotes.length > 0) {
+                            notesHtml = `
+                                <div class="d-flex flex-column gap-2 align-items-center">
+                                    ${subjectNotes.map(n => `
+                                        <a href="${n.file_url}" target="_blank" class="btn btn-sm btn-primary fw-bold shadow-sm w-100" style="max-width: 200px; white-space: normal; line-height: 1.2;">
+                                            <i class="fas fa-file-download me-1"></i> ${n.title} ${n.term ? '<br><small class="text-white-50">('+n.term+')</small>' : ''}
+                                        </a>
+                                    `).join('')}
+                                </div>
+                            `;
+                        }
+
                         return `
                             <tr style="border-bottom: 1px solid var(--border-color);">
                                 <td class="text-center fw-bold" style="color: var(--text-muted);">${index + 1}</td>
                                 <td class="fw-bold" style="color: var(--text-color);">${sub.name}</td>
                                 <td class="text-center">${actionHtml}</td>
+                                <td class="text-center">${notesHtml}</td>
                             </tr>
                         `;
                     }).join('');
                 } else {
-                    tbody.innerHTML = `<tr><td colspan="3" class="text-center py-5" style="color: var(--text-muted);">No subjects found in the database.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5" style="color: var(--text-muted);">No subjects found in the database.</td></tr>`;
                 }
 
                 document.getElementById('loadingOverlay').style.display = 'none';
