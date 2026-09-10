@@ -209,15 +209,34 @@
                                     <select id="aiSubject" class="form-select" required></select>
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label fw-bold text-primary">Lesson Topic</label>
-                                    <input type="text" id="aiTopic" class="form-control form-control-lg border-primary" placeholder="What are you teaching today? (e.g. Photosynthesis)" required>
-                                </div>
-                                <div class="col-12">
                                     <label class="form-label fw-bold text-muted small">Reference Scheme of Work (Optional)</label>
-                                    <select id="aiScheme" class="form-select border-primary bg-light">
+                                    <select id="aiScheme" class="form-select border-primary bg-light" onchange="toggleAiTopicMode()">
                                         <option value="">-- Do not use a scheme (General AI generated) --</option>
                                     </select>
                                     <small class="text-muted d-block mt-1">Select an uploaded Scheme of Work file to ground the AI lesson plan on your exact curriculum.</small>
+                                </div>
+                                <div class="col-12" id="topicInputContainer">
+                                    <label class="form-label fw-bold text-primary">Lesson Topic</label>
+                                    <input type="text" id="aiTopic" class="form-control form-control-lg border-primary" placeholder="What are you teaching today? (e.g. Photosynthesis)" required>
+                                </div>
+                                <div class="col-12" id="weekInputContainer" style="display: none;">
+                                    <label class="form-label fw-bold text-primary">Target Week</label>
+                                    <select id="aiWeek" class="form-select form-select-lg border-primary">
+                                        <option value="Week 1">Week 1</option>
+                                        <option value="Week 2">Week 2</option>
+                                        <option value="Week 3">Week 3</option>
+                                        <option value="Week 4">Week 4</option>
+                                        <option value="Week 5">Week 5</option>
+                                        <option value="Week 6">Week 6</option>
+                                        <option value="Week 7">Week 7</option>
+                                        <option value="Week 8">Week 8</option>
+                                        <option value="Week 9">Week 9</option>
+                                        <option value="Week 10">Week 10</option>
+                                        <option value="Week 11">Week 11</option>
+                                        <option value="Week 12">Week 12</option>
+                                        <option value="Week 13">Week 13</option>
+                                        <option value="Week 14">Week 14</option>
+                                    </select>
                                 </div>
                             </div>
                             <button type="submit" id="btnGenerate" class="btn btn-primary fw-bold w-100 py-3 shadow-sm" style="font-size: 1.1rem;">
@@ -434,6 +453,23 @@
             }
         };
 
+        window.toggleAiTopicMode = () => {
+            const schemeSelect = document.getElementById('aiScheme');
+            const topicContainer = document.getElementById('topicInputContainer');
+            const weekContainer = document.getElementById('weekInputContainer');
+            const aiTopic = document.getElementById('aiTopic');
+
+            if (schemeSelect.value) {
+                topicContainer.style.display = 'none';
+                weekContainer.style.display = 'block';
+                aiTopic.required = false;
+            } else {
+                topicContainer.style.display = 'block';
+                weekContainer.style.display = 'none';
+                aiTopic.required = true;
+            }
+        };
+
         // === BULLETPROOF AI EDGE FUNCTION CALL ===
         document.getElementById('aiForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -441,10 +477,17 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Analyzing Curriculum...';
             btn.disabled = true;
 
-            const topic = document.getElementById('aiTopic').value;
             const cls = document.getElementById('aiClass').options[document.getElementById('aiClass').selectedIndex].text;
             const sub = document.getElementById('aiSubject').options[document.getElementById('aiSubject').selectedIndex].text;
             const schemeUrl = document.getElementById('aiScheme').value;
+            
+            // Determine the topic based on whether a scheme is selected
+            let topic = '';
+            if (schemeUrl) {
+                topic = document.getElementById('aiWeek').value; // e.g. "Week 1"
+            } else {
+                topic = document.getElementById('aiTopic').value; // e.g. "Photosynthesis"
+            }
 
             const resBox = document.getElementById('aiResultArea');
             const txtBox = document.getElementById('aiTextContent');

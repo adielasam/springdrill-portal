@@ -36,7 +36,7 @@ export async function POST(req: Request) {
     let promptText = `Act as an expert Nigerian educator. Create a comprehensive lesson plan for ${targetClass} on the subject of ${subject}, focusing on the topic: ${topic}. ${extra || ''}`;
     
     if (fileContent) {
-      promptText += `\n\nCRITICAL INSTRUCTION: Base your lesson plan strictly on the following curriculum/scheme of work provided by the teacher. Do not invent unrelated topics.\n\n--- CURRICULUM TEXT ---\n${fileContent.substring(0, 15000)}\n--- END CURRICULUM ---`;
+      promptText = `Act as an expert Nigerian educator. You have been provided with a curriculum/scheme of work document below. Create a comprehensive lesson plan for ${targetClass} on the subject of ${subject} for ${topic}. \n\nCRITICAL INSTRUCTION: Read the provided curriculum text, strictly find the specific topic assigned to ${topic}, and base your entire lesson plan STRICTLY on that exact topic. Do not invent unrelated topics.\n\n--- CURRICULUM TEXT ---\n${fileContent.substring(0, 15000)}\n--- END CURRICULUM ---`;
     }
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
