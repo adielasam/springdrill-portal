@@ -62,8 +62,30 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: `OpenRouter Error: ${response.status} ${errorText}` }, { status: 500 });
     }
 
-    // Return the readable stream directly to the client
-    return new Response(response.body, {
+    // Next.js Node.js runtime requires wrapping the raw undici stream in a custom Web ReadableStream
+    const reader = response.body?.getReader();
+    const stream = new ReadableStream({
+      async start(controller) {
+        if (!reader) {
+          controller.close();
+          return;
+        }
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            controller.enqueue(value);
+          }
+        } catch (err) {
+          console.error("Stream reading error:", err);
+          controller.error(err);
+        } finally {
+          controller.close();
+        }
+      }
+    });
+
+    return new Response(stream, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
