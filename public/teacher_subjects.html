@@ -348,7 +348,7 @@
 
                 let insertErr;
                 if (type === 'scheme') {
-                    const { error } = await supabase.from('schemes_of_work').insert([{ class_id: classId, subject_id: subjectId, title: `${title} (${term})`, file_url: fileUrl, teacher_id: currentTeacherId }]);
+                    const { error } = await supabase.from('schemes_of_work').insert([{ class_id: classId, subject_id: subjectId, title: `${title} (${term})`, file_url: fileUrl, file_name: file.name, teacher_id: currentTeacherId }]);
                     insertErr = error;
                 } else {
                     const { error } = await supabase.from('lesson_notes').insert([{ class_id: classId, subject_name: subjectName, title: `${title} (${term})`, file_url: fileUrl, teacher_id: currentTeacherId }]);
