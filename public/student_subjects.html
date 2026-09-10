@@ -143,6 +143,21 @@
         </div>
     </div>
 
+    <!-- Notes Modal -->
+    <div class="modal fade" id="notesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold" id="notesModalLabel"><i class="fas fa-book-open me-2"></i> Lesson Notes</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="notesModalBody" style="max-height: 60vh; overflow-y: auto;">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
@@ -234,6 +249,59 @@
                     });
                 }
 
+                window.notesDataMap = notesMap;
+                window.downloadedNotes = JSON.parse(localStorage.getItem(`downloaded_notes_${currentUserId}`)) || [];
+
+                window.openNotesModal = (subjectName) => {
+                    const notes = window.notesDataMap[subjectName] || [];
+                    const body = document.getElementById('notesModalBody');
+                    document.getElementById('notesModalLabel').innerHTML = `<i class="fas fa-book-open me-2"></i> ${subjectName} Notes`;
+                    
+                    body.innerHTML = notes.map((n) => {
+                        const isDownloaded = window.downloadedNotes.includes(n.id);
+                        const btnClass = isDownloaded ? 'btn-success' : 'btn-primary';
+                        const btnText = isDownloaded ? '<i class="fas fa-check-circle me-1"></i> Downloaded' : '<i class="fas fa-file-download me-1"></i> Download';
+                        
+                        return `
+                            <div class="d-flex justify-content-between align-items-center p-3 mb-2 rounded shadow-sm" style="background-color: var(--input-bg); border: 1px solid var(--border-color);">
+                                <div class="fw-bold w-75" style="color: var(--text-color);">${n.title}</div>
+                                <a href="${n.file_url}" target="_blank" id="modalBtn_${n.id}" 
+                                   onclick="markNoteDownloaded('${n.id}', '${subjectName}')" 
+                                   class="btn btn-sm ${btnClass} fw-bold w-25 text-center">
+                                   ${btnText}
+                                </a>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    new bootstrap.Modal(document.getElementById('notesModal')).show();
+                };
+
+                window.markNoteDownloaded = (noteId, subjectName) => {
+                    if (!window.downloadedNotes.includes(noteId)) {
+                        window.downloadedNotes.push(noteId);
+                        localStorage.setItem(`downloaded_notes_${currentUserId}`, JSON.stringify(window.downloadedNotes));
+                    }
+                    
+                    // Update modal button
+                    const mBtn = document.getElementById(`modalBtn_${noteId}`);
+                    if (mBtn) {
+                        mBtn.innerHTML = '<i class="fas fa-check-circle me-1"></i> Downloaded';
+                        mBtn.classList.replace('btn-primary', 'btn-success');
+                    }
+
+                    // Update table row button if ALL notes are downloaded
+                    const notes = window.notesDataMap[subjectName] || [];
+                    const allDownloaded = notes.length > 0 && notes.every(n => window.downloadedNotes.includes(n.id));
+                    const safeId = subjectName.replace(/[^a-zA-Z0-9]/g, '');
+                    const tBtn = document.getElementById(`tableBtn_${safeId}`);
+                    
+                    if (tBtn && allDownloaded) {
+                        tBtn.innerHTML = '<i class="fas fa-check-circle me-1"></i> Downloaded';
+                        tBtn.classList.replace('btn-primary', 'btn-success');
+                    }
+                };
+
                 const tbody = document.getElementById('subjectsBody');
                 if (subjects && subjects.length > 0) {
                     tbody.innerHTML = subjects.map((sub, index) => {
@@ -250,14 +318,15 @@
                         const subjectNotes = notesMap[sub.name] || [];
                         let notesHtml = `<span class="badge bg-secondary py-2 px-3">Pending Upload</span>`;
                         if (subjectNotes.length > 0) {
+                            const allDownloaded = subjectNotes.every(n => window.downloadedNotes.includes(n.id));
+                            const btnClass = allDownloaded ? 'btn-success' : 'btn-primary';
+                            const btnText = allDownloaded ? '<i class="fas fa-check-circle me-1"></i> Downloaded' : '<i class="fas fa-book-open me-1"></i> View Notes';
+                            const safeId = sub.name.replace(/[^a-zA-Z0-9]/g, '');
+                            
                             notesHtml = `
-                                <div class="d-flex flex-column gap-2 align-items-center">
-                                    ${subjectNotes.map(n => `
-                                        <a href="${n.file_url}" target="_blank" class="btn btn-sm btn-primary fw-bold shadow-sm w-100" style="max-width: 200px; white-space: normal; line-height: 1.2;">
-                                            <i class="fas fa-file-download me-1"></i> ${n.title}
-                                        </a>
-                                    `).join('')}
-                                </div>
+                                <button id="tableBtn_${safeId}" onclick="openNotesModal('${sub.name.replace(/'/g, "\\'")}')" class="btn btn-sm ${btnClass} fw-bold shadow-sm w-100" style="max-width: 150px;">
+                                    ${btnText}
+                                </button>
                             `;
                         }
 
