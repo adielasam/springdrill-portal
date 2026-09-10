@@ -1,15 +1,42 @@
 import { NextResponse } from 'next/server';
+import pdfParse from 'pdf-parse';
+import mammoth from 'mammoth';
 
 export async function POST(req: Request) {
   try {
-    const { targetClass, subject, topic, extra } = await req.json();
+    const { targetClass, subject, topic, extra, fileUrl } = await req.json();
 
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
       return NextResponse.json({ error: 'OPENROUTER_API_KEY is not set' }, { status: 500 });
     }
 
-    const promptText = `Act as an expert Nigerian educator. Create a comprehensive lesson plan for ${targetClass} on the subject of ${subject}, focusing on the topic: ${topic}. ${extra || ''}`;
+    let fileContent = '';
+    if (fileUrl) {
+      try {
+        const fileRes = await fetch(fileUrl);
+        if (!fileRes.ok) throw new Error("Could not download file");
+        const arrayBuffer = await fileRes.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        
+        if (fileUrl.toLowerCase().endsWith('.pdf')) {
+          const pdfData = await pdfParse(buffer);
+          fileContent = pdfData.text;
+        } else if (fileUrl.toLowerCase().match(/\.(doc|docx)$/)) {
+          const docData = await mammoth.extractRawText({ buffer });
+          fileContent = docData.value;
+        }
+      } catch (e: any) {
+        console.error("Error parsing file:", e);
+        // Continue without file content if parsing fails
+      }
+    }
+
+    let promptText = `Act as an expert Nigerian educator. Create a comprehensive lesson plan for ${targetClass} on the subject of ${subject}, focusing on the topic: ${topic}. ${extra || ''}`;
+    
+    if (fileContent) {
+      promptText += `\n\nCRITICAL INSTRUCTION: Base your lesson plan strictly on the following curriculum/scheme of work provided by the teacher. Do not invent unrelated topics.\n\n--- CURRICULUM TEXT ---\n${fileContent.substring(0, 15000)}\n--- END CURRICULUM ---`;
+    }
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",

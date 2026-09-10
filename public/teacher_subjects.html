@@ -212,6 +212,13 @@
                                     <label class="form-label fw-bold text-primary">Lesson Topic</label>
                                     <input type="text" id="aiTopic" class="form-control form-control-lg border-primary" placeholder="What are you teaching today? (e.g. Photosynthesis)" required>
                                 </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-bold text-muted small">Reference Scheme of Work (Optional)</label>
+                                    <select id="aiScheme" class="form-select border-primary bg-light">
+                                        <option value="">-- Do not use a scheme (General AI generated) --</option>
+                                    </select>
+                                    <small class="text-muted d-block mt-1">Select an uploaded Scheme of Work file to ground the AI lesson plan on your exact curriculum.</small>
+                                </div>
                             </div>
                             <button type="submit" id="btnGenerate" class="btn btn-primary fw-bold w-100 py-3 shadow-sm" style="font-size: 1.1rem;">
                                 <i class="fas fa-robot me-2"></i> Generate Complete NERDC Plan & Content
@@ -374,7 +381,21 @@
                 if (notesErr) console.error("Notes fetch error:", notesErr);
 
                 let allMats = [];
-                if (schemes) schemes.forEach(s => allMats.push({ id: s.id, title: s.title, type: 'Scheme of Work', url: s.file_url, class_name: s.classes?.name, subject_name: s.subjects?.name, table: 'schemes_of_work' }));
+                if (schemes) {
+                    schemes.forEach(s => allMats.push({ id: s.id, title: s.title, type: 'Scheme of Work', url: s.file_url, class_name: s.classes?.name, subject_name: s.subjects?.name, table: 'schemes_of_work' }));
+                    
+                    // Populate AI Scheme Dropdown
+                    const aiSchemeDropdown = document.getElementById('aiScheme');
+                    const currentSchemeSelection = aiSchemeDropdown.value;
+                    aiSchemeDropdown.innerHTML = '<option value="">-- Do not use a scheme (General AI generated) --</option>';
+                    schemes.forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s.file_url;
+                        opt.textContent = `${s.classes?.name} - ${s.subjects?.name}: ${s.title}`;
+                        aiSchemeDropdown.appendChild(opt);
+                    });
+                    if (currentSchemeSelection) aiSchemeDropdown.value = currentSchemeSelection;
+                }
                 if (notes) notes.forEach(n => allMats.push({ id: n.id, title: n.title, type: 'Lesson Note', url: n.file_url, class_name: n.classes?.name, subject_name: n.subject_name, table: 'lesson_notes' }));
 
                 const tbody = document.getElementById('repoBody');
@@ -423,6 +444,7 @@
             const topic = document.getElementById('aiTopic').value;
             const cls = document.getElementById('aiClass').options[document.getElementById('aiClass').selectedIndex].text;
             const sub = document.getElementById('aiSubject').options[document.getElementById('aiSubject').selectedIndex].text;
+            const schemeUrl = document.getElementById('aiScheme').value;
 
             const resBox = document.getElementById('aiResultArea');
             const txtBox = document.getElementById('aiTextContent');
@@ -439,7 +461,8 @@
                         targetClass: cls, 
                         subject: sub,
                         topic: topic, 
-                        extra: "Generate the 5 standard NERDC sections clearly."
+                        extra: "Generate the 5 standard NERDC sections clearly.",
+                        fileUrl: schemeUrl
                     })
                 });
 
