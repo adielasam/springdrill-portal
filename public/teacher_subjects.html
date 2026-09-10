@@ -509,12 +509,21 @@
                     })
                 });
 
-                if (!res.ok) throw new Error("Failed to generate lesson from server.");
+                if (!res.ok) {
+                    let errMessage = "Failed to generate lesson from server.";
+                    try {
+                        const errData = await res.json();
+                        if (errData.error) errMessage = errData.error;
+                    } catch(e){}
+                    throw new Error(errMessage);
+                }
                 
                 const data = await res.json();
                 const error = data.error;
 
-                if (error) throw error;
+                if (error) {
+                    throw new Error(error);
+                }
                 
                 txtBox.innerHTML = ''; 
                 

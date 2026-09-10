@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { PDFParse } from 'pdf-parse';
 import mammoth from 'mammoth';
 
+export const maxDuration = 60;
+
 export async function POST(req: Request) {
   try {
     const { targetClass, subject, topic, extra, fileUrl } = await req.json();
@@ -56,7 +58,7 @@ export async function POST(req: Request) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("OpenRouter API Error:", errorText);
-      return NextResponse.json({ error: 'Failed to generate content' }, { status: 500 });
+      return NextResponse.json({ error: `OpenRouter Error: ${response.status} ${errorText}` }, { status: 500 });
     }
 
     const data = await response.json();
