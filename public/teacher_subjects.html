@@ -340,9 +340,9 @@
                 const subjectName = subj ? subj.name : 'General';
 
                 if (type === 'scheme') {
-                    await supabase.from('schemes_of_work').insert([{ class_id: classId, subject_id: subjectId, title: title, file_url: fileUrl, teacher_id: currentTeacherId, term: term }]);
+                    await supabase.from('schemes_of_work').insert([{ class_id: classId, subject_id: subjectId, title: `${title} (${term})`, file_url: fileUrl, teacher_id: currentTeacherId }]);
                 } else {
-                    await supabase.from('lesson_notes').insert([{ class_id: classId, subject_name: subjectName, title: title, file_url: fileUrl, teacher_id: currentTeacherId, term: term }]);
+                    await supabase.from('lesson_notes').insert([{ class_id: classId, subject_name: subjectName, title: `${title} (${term})`, file_url: fileUrl, teacher_id: currentTeacherId }]);
                 }
 
                 showAlert("Material successfully uploaded and shared with students!");
@@ -360,12 +360,12 @@
         // === REPOSITORY LOADER ===
         async function loadRepository() {
             try {
-                const { data: schemes } = await supabase.from('schemes_of_work').select('id, title, file_url, term, classes(name), subjects(name)').eq('teacher_id', currentTeacherId);
-                const { data: notes } = await supabase.from('lesson_notes').select('id, title, file_url, term, classes(name), subject_name').eq('teacher_id', currentTeacherId);
+                const { data: schemes } = await supabase.from('schemes_of_work').select('id, title, file_url, classes(name), subjects(name)').eq('teacher_id', currentTeacherId);
+                const { data: notes } = await supabase.from('lesson_notes').select('id, title, file_url, classes(name), subject_name').eq('teacher_id', currentTeacherId);
 
                 let allMats = [];
-                if (schemes) schemes.forEach(s => allMats.push({ id: s.id, title: s.title, type: 'Scheme of Work', url: s.file_url, term: s.term, class_name: s.classes?.name, subject_name: s.subjects?.name, table: 'schemes_of_work' }));
-                if (notes) notes.forEach(n => allMats.push({ id: n.id, title: n.title, type: 'Lesson Note', url: n.file_url, term: n.term, class_name: n.classes?.name, subject_name: n.subject_name, table: 'lesson_notes' }));
+                if (schemes) schemes.forEach(s => allMats.push({ id: s.id, title: s.title, type: 'Scheme of Work', url: s.file_url, class_name: s.classes?.name, subject_name: s.subjects?.name, table: 'schemes_of_work' }));
+                if (notes) notes.forEach(n => allMats.push({ id: n.id, title: n.title, type: 'Lesson Note', url: n.file_url, class_name: n.classes?.name, subject_name: n.subject_name, table: 'lesson_notes' }));
 
                 const tbody = document.getElementById('repoBody');
                 if (allMats.length === 0) {
@@ -378,7 +378,7 @@
                         <td class="ps-4 fw-bold" style="color: var(--text-color);"><a href="${m.url}" target="_blank" class="text-decoration-none">${m.title}</a></td>
                         <td><span class="badge ${m.type === 'Scheme of Work' ? 'bg-primary' : 'bg-success'}">${m.type}</span></td>
                         <td style="color: var(--text-muted);">${m.subject_name}</td>
-                        <td style="color: var(--text-muted);">${m.class_name} <br> <small>${m.term || ''}</small></td>
+                        <td style="color: var(--text-muted);">${m.class_name}</td>
                         <td class="text-center pe-4">
                             <button onclick="editMaterial('${m.id}', '${m.table}', '${m.title.replace(/'/g, "\\'")}')" class="btn btn-sm btn-outline-primary me-1"><i class="fas fa-edit"></i></button>
                             <button onclick="deleteMaterial('${m.id}', '${m.table}')" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
