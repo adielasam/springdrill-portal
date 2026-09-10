@@ -520,43 +520,37 @@
                     }
                     throw new Error(errMessage);
                 }
+                const data = await res.json();
+                const error = data.error;
+
+                if (error) {
+                    throw new Error(error);
+                }
                 
                 txtBox.innerHTML = ''; 
                 
-                // Read stream
-                const reader = res.body.getReader();
-                const decoder = new TextDecoder('utf-8');
-                let done = false;
-                let fullText = "";
-                
-                while (!done) {
-                    const { value, done: readerDone } = await reader.read();
-                    done = readerDone;
-                    if (value) {
-                        const chunk = decoder.decode(value, { stream: true });
-                        const lines = chunk.split('\n');
-                        for (const line of lines) {
-                            if (line.startsWith('data: ') && line !== 'data: [DONE]') {
-                                try {
-                                    const data = JSON.parse(line.slice(6));
-                                    const content = data.choices?.[0]?.delta?.content;
-                                    if (content) {
-                                        fullText += content;
-                                        
-                                        // Quick markdown to HTML display
-                                        txtBox.innerHTML = fullText
-                                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                                            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                                            .replace(/### (.*?)(\n|$)/g, '<h4 class="mt-4 text-primary">$1</h4>')
-                                            .replace(/## (.*?)(\n|$)/g, '<h3 class="mt-4 text-primary border-bottom pb-2">$1</h3>')
-                                            .replace(/# (.*?)(\n|$)/g, '<h2 class="mt-4 text-primary border-bottom pb-2">$1</h2>')
-                                            .replace(/\n/g, '<br>');
-                                    }
-                                } catch(e){}
-                            }
-                        }
+                let aiContent = "";
+                if (typeof data === 'string') {
+                    aiContent = data;
+                } else if (typeof data === 'object' && data !== null) {
+                    aiContent = data.reply || data.content || data.text || data.message || data.response || data.output || (data.choices && data.choices[0]?.message?.content);
+                    if (!aiContent || typeof aiContent !== 'string') {
+                        aiContent = "### Raw Backend Response Received\n```json\n" + JSON.stringify(data, null, 2) + "\n```";
                     }
+                } else {
+                    aiContent = "Error: Did not receive valid data from Server.";
                 }
+
+                // Super robust markdown parsing just for basic display
+                let htmlContent = aiContent
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')             // Italics
+                    .replace(/### (.*?)(\n|$)/g, '<h4 class="mt-4 text-primary">$1</h4>')
+                    .replace(/## (.*?)(\n|$)/g, '<h3 class="mt-4 text-primary border-bottom pb-2">$1</h3>')
+                    .replace(/# (.*?)(\n|$)/g, '<h2 class="mt-4 text-primary border-bottom pb-2">$1</h2>')
+                    .replace(/\n/g, '<br>');                          // Newlines
+
+                txtBox.innerHTML = htmlContent;
 
             } catch (err) {
                 txtBox.innerHTML = `<div class="text-danger p-4"><i class="fas fa-exclamation-triangle me-2"></i> Error generating content: ${err.message}</div>`;

@@ -49,7 +49,6 @@ export async function POST(req: Request) {
       },
       body: JSON.stringify({
         "model": "google/gemini-2.5-flash",
-        "stream": true,
         "messages": [
           {"role": "user", "content": promptText}
         ]
@@ -62,36 +61,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: `OpenRouter Error: ${response.status} ${errorText}` }, { status: 500 });
     }
 
-    // Next.js Node.js runtime requires wrapping the raw undici stream in a custom Web ReadableStream
-    const reader = response.body?.getReader();
-    const stream = new ReadableStream({
-      async start(controller) {
-        if (!reader) {
-          controller.close();
-          return;
-        }
-        try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            controller.enqueue(value);
-          }
-        } catch (err) {
-          console.error("Stream reading error:", err);
-          controller.error(err);
-        } finally {
-          controller.close();
-        }
-      }
-    });
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content || "No content generated.";
 
-    return new Response(stream, {
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-      },
-    });
+    return NextResponse.json({ reply });
   } catch (error: any) {
     console.error("Server Error:", error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
