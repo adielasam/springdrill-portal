@@ -49,6 +49,7 @@ export async function POST(req: Request) {
       },
       body: JSON.stringify({
         "model": "google/gemini-1.5-flash",
+        "stream": true,
         "messages": [
           {"role": "user", "content": promptText}
         ]
@@ -61,10 +62,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: `OpenRouter Error: ${response.status} ${errorText}` }, { status: 500 });
     }
 
-    const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || "No content generated.";
-
-    return NextResponse.json({ reply });
+    // Return the readable stream directly to the client
+    return new Response(response.body, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    });
   } catch (error: any) {
     console.error("Server Error:", error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
