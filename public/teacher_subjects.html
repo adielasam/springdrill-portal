@@ -541,16 +541,8 @@
                     aiContent = "Error: Did not receive valid data from Server.";
                 }
 
-                // Super robust markdown parsing just for basic display
-                let htmlContent = aiContent
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>')             // Italics
-                    .replace(/### (.*?)(\n|$)/g, '<h4 class="mt-4 text-primary">$1</h4>')
-                    .replace(/## (.*?)(\n|$)/g, '<h3 class="mt-4 text-primary border-bottom pb-2">$1</h3>')
-                    .replace(/# (.*?)(\n|$)/g, '<h2 class="mt-4 text-primary border-bottom pb-2">$1</h2>')
-                    .replace(/\n/g, '<br>');                          // Newlines
-
-                txtBox.innerHTML = htmlContent;
+                // Parse markdown perfectly using the 'marked' library already included in head
+                txtBox.innerHTML = marked.parse(aiContent);
 
             } catch (err) {
                 txtBox.innerHTML = `<div class="text-danger p-4"><i class="fas fa-exclamation-triangle me-2"></i> Error generating content: ${err.message}</div>`;
