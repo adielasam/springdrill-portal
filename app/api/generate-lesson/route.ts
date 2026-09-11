@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PDFParse } from 'pdf-parse';
+import { extractText } from 'unpdf';
 import mammoth from 'mammoth';
 
 export const maxDuration = 60;
@@ -22,9 +22,8 @@ export async function POST(req: Request) {
         const buffer = Buffer.from(arrayBuffer);
         
         if (fileUrl.toLowerCase().endsWith('.pdf')) {
-          const parser = new PDFParse({ data: buffer });
-          const pdfData = await parser.getText();
-          fileContent = pdfData.text;
+          const pdfData = await extractText(new Uint8Array(buffer));
+          fileContent = pdfData.text.join('\n');
         } else if (fileUrl.toLowerCase().match(/\.(doc|docx)$/)) {
           const docData = await mammoth.extractRawText({ buffer });
           fileContent = docData.value;
