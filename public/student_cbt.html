@@ -239,7 +239,7 @@
                 }
 
                 // 4. Fetch past attempts
-                const { data: pastAttempts } = await supabase.from('test_results').select('test_id, score').eq('student_id', userId);
+                const { data: pastAttempts } = await supabase.from('test_results').select('test_id, score, total_score').eq('student_id', userId);
                 const takenTestIds = pastAttempts ? pastAttempts.map(a => a.test_id) : [];
 
                 // 5. Render Table
@@ -248,11 +248,15 @@
                     tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5" style="color: var(--text-muted);">No exams available for your class at this time.</td></tr>`;
                 } else {
                     tbody.innerHTML = validTests.map((test, index) => {
-                        const hasTaken = takenTestIds.includes(test.id);
+                        const attempt = pastAttempts ? pastAttempts.find(a => a.test_id === test.id) : null;
+                        const hasTaken = !!attempt;
                         const tStats = stats[test.id] || { count: 0, marks: 0 };
                         
                         let actionBtn = hasTaken 
-                            ? `<button class="btn-completed" disabled><i class="fas fa-check"></i> COMPLETED</button>`
+                            ? `<div class="d-flex flex-column align-items-center gap-1">
+                                 <button class="btn-completed m-0" disabled style="padding: 4px 10px; font-size: 11px;"><i class="fas fa-check"></i> COMPLETED</button>
+                                 <span class="badge bg-success" style="font-size: 12px;">Score: ${attempt.score} / ${tStats.marks}</span>
+                               </div>`
                             : `<button class="btn-attempt" onclick="window.triggerStartModal(${test.id})">ATTEMPT</button>`;
 
                         return `
