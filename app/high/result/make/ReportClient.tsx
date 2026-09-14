@@ -17,13 +17,14 @@ export default function ReportClient() {
   const [initLoading, setInitLoading] = useState(true)
   const [globalError, setGlobalError] = useState<string | null>(null)
   
-  const [session, setSession] = useState<any>(null)
+  const [sessions, setSessions] = useState<any[]>([])
   const [terms, setTerms] = useState<any[]>([])
   const [subTerms, setSubTerms] = useState<any[]>([])
   const [classes, setClasses] = useState<any[]>([])
   const [subjectsByClass, setSubjectsByClass] = useState<Record<string, any[]>>({})
   const [userId, setUserId] = useState<string | null>(null)
 
+  const [selectedSession, setSelectedSession] = useState('')
   const [selectedTerm, setSelectedTerm] = useState('')
   const [selectedSubTerm, setSelectedSubTerm] = useState('')
   const [selectedClass, setSelectedClass] = useState('')
@@ -49,19 +50,19 @@ export default function ReportClient() {
       }
       setUserId(uid)
 
-      const { data: sessionData, error: sessionError } = await supabase.from('sessions').select('*').eq('is_active', true).single()
-      if (sessionError || !sessionData) {
-        setGlobalError('No active session found.')
+      const { data: sessionData, error: sessionError } = await supabase.from('sessions').select('*')
+      if (sessionError || !sessionData || sessionData.length === 0) {
+        setGlobalError('No sessions found in the database. Please create a session first.')
         setInitLoading(false)
         return
       }
-      setSession(sessionData)
+      setSessions(sessionData)
 
-      const { data: t } = await supabase.from('terms').select('*').eq('session_id', sessionData.id)
+      const { data: t } = await supabase.from('terms').select('*')
       const termArr = t || []
       setTerms(termArr)
 
-      const { data: st } = await supabase.from('sub_terms').select('*').in('term_id', termArr.map((x: any) => x.id))
+      const { data: st } = await supabase.from('sub_terms').select('*')
       setSubTerms(st || [])
 
       const { data: mappings } = await supabase.from('teacher_class_subjects').select(`
@@ -93,14 +94,15 @@ export default function ReportClient() {
   }
 
   // Selected object references for label lookups
+  const sessionObj = sessions.find((s: any) => String(s.id) === String(selectedSession))
+  const sessionLabel = sessionObj ? (sessionObj.label || sessionObj.name) : '...'
   const subTermObj = subTerms.find((s: any) => String(s.id) === String(selectedSubTerm))
   const subTermLabel = subTermObj ? subTermObj.label : ''
   const subjectObj = subjectsByClass[selectedClass]?.find((s: any) => String(s.id) === String(selectedSubject))
   const subjectLabel = subjectObj ? subjectObj.name : ''
-  const sessionLabel = session?.label || session?.name || 'Current'
 
   const visibleFields = subTermFieldsConfig[subTermLabel] || ['first_cat', 'second_cat', 'exam']
-  const isFormComplete = selectedTerm && selectedSubTerm && selectedClass && selectedSubject
+  const isFormComplete = selectedSession && selectedTerm && selectedSubTerm && selectedClass && selectedSubject
 
   useEffect(() => {
     if (isFormComplete) {
@@ -109,7 +111,7 @@ export default function ReportClient() {
       setResults([])
       setIsFinal(false)
     }
-  }, [selectedTerm, selectedSubTerm, selectedClass, selectedSubject])
+  }, [selectedSession, selectedTerm, selectedSubTerm, selectedClass, selectedSubject])
 
   async function loadGrid() {
     setIsLoading(true)
@@ -306,11 +308,21 @@ export default function ReportClient() {
         </div>
         <div className="card-body p-4 bg-white">
           <div className="row mb-3">
+            <div className="col-md-3 text-md-end text-muted fw-bold pt-2">Session</div>
+            <div className="col-md-6">
+              <select className="form-select" value={selectedSession} onChange={e => {setSelectedSession(e.target.value); setSelectedTerm(''); setSelectedSubTerm('')}}>
+                <option value="">Select Session...</option>
+                {sessions.map((s: any) => <option key={s.id} value={s.id}>{s.label || s.name}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="row mb-3">
             <div className="col-md-3 text-md-end text-muted fw-bold pt-2">Term</div>
             <div className="col-md-6">
-              <select className="form-select" value={selectedTerm} onChange={e => setSelectedTerm(e.target.value)}>
+              <select className="form-select" value={selectedTerm} onChange={e => {setSelectedTerm(e.target.value); setSelectedSubTerm('')}} disabled={!selectedSession}>
                 <option value="">Select Term...</option>
-                {terms.map((t: any) => <option key={t.id} value={t.id}>{t.label || t.name}</option>)}
+                {terms.filter((t: any) => String(t.session_id) === String(selectedSession)).map((t: any) => <option key={t.id} value={t.id}>{t.label || t.name}</option>)}
               </select>
             </div>
           </div>
