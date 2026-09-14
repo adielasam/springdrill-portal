@@ -35,6 +35,12 @@ export default function ReportClient() {
   const [isLoading, setIsLoading] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
 
+  // CBT Import Modal State
+  const [showImportModal, setShowImportModal] = useState(false)
+  const [availableTests, setAvailableTests] = useState<any[]>([])
+  const [selectedTestId, setSelectedTestId] = useState('')
+  const [importTargetCol, setImportTargetCol] = useState('first_cat')
+
   useEffect(() => {
     loadMetadata()
   }, [])
@@ -142,33 +148,38 @@ export default function ReportClient() {
     setIsLoading(false)
   }
 
-  async function handleImportCBT() {
+  async function openImportModal() {
     setIsLoading(true)
     try {
       const { data: cbtTests } = await supabase
         .from('tests')
-        .select('id, title')
+        .select('id, title, created_at')
         .eq('class_id', selectedClass)
         .eq('subject_id', selectedSubject)
         .order('created_at', { ascending: false })
-        .limit(1)
 
       if (!cbtTests || cbtTests.length === 0) {
         showToast('No CBT found for this class and subject')
-        setIsLoading(false)
-        return
+      } else {
+        setAvailableTests(cbtTests)
+        setSelectedTestId(cbtTests[0].id)
+        setImportTargetCol('first_cat')
+        setShowImportModal(true)
       }
+    } catch (err: any) {
+      showToast("Error loading CBTs: " + err.message)
+    }
+    setIsLoading(false)
+  }
 
-      const confirmImport = window.confirm(`Found CBT: "${cbtTests[0].title}". Import scores from this test into 1st CAT?`)
-      if (!confirmImport) {
-          setIsLoading(false)
-          return
-      }
-
+  async function executeImport() {
+    setShowImportModal(false)
+    setIsLoading(true)
+    try {
       const { data: cbtScores } = await supabase
         .from('test_results')
         .select('student_id, score')
-        .eq('test_id', cbtTests[0].id)
+        .eq('test_id', selectedTestId)
 
       const scores = cbtScores || []
       const updated = [...results]
@@ -176,7 +187,8 @@ export default function ReportClient() {
       updated.forEach(row => {
         const cbtRecord = scores.find((s: any) => String(s.student_id) === String(row.student_id))
         if (cbtRecord) {
-          row.first_cat = cbtRecord.score
+          // Dynamic assignment to the selected column
+          (row as any)[importTargetCol] = cbtRecord.score
           foundAny = true
         }
       })
@@ -346,7 +358,7 @@ export default function ReportClient() {
           <div className="card-header bg-success text-white py-3 fw-bold border-0 d-flex justify-content-between align-items-center">
             <span><i className="fas fa-list-ol me-2"></i> Enter the scores for {subjectLabel} below</span>
             {!isFinal && (
-               <button className="btn btn-sm btn-light text-success fw-bold px-3 shadow-sm rounded-pill" onClick={handleImportCBT} disabled={isLoading}>
+               <button className="btn btn-sm btn-light text-success fw-bold px-3 shadow-sm rounded-pill" onClick={openImportModal} disabled={isLoading}>
                  <i className="fas fa-download me-1"></i> Import From CBT
                </button>
             )}
@@ -421,6 +433,40 @@ export default function ReportClient() {
                 )}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* CBT IMPORT MODAL OVERLAY */}
+      {showImportModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1050, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="card shadow-lg border-0" style={{ width: '450px', borderRadius: '12px' }}>
+            <div className="card-header bg-success text-white py-3 fw-bold border-0 d-flex justify-content-between align-items-center">
+              <span><i className="fas fa-download me-2"></i> Import CBT Scores</span>
+              <button type="button" className="btn-close btn-close-white" onClick={() => setShowImportModal(false)}></button>
+            </div>
+            <div className="card-body p-4">
+               <label className="form-label fw-bold text-muted small text-uppercase">Select CBT Exam</label>
+               <select className="form-select mb-4 shadow-sm" value={selectedTestId} onChange={e => setSelectedTestId(e.target.value)}>
+                 {availableTests.map(t => (
+                   <option key={t.id} value={t.id}>{t.title} ({new Date(t.created_at).toLocaleDateString()})</option>
+                 ))}
+               </select>
+
+               <label className="form-label fw-bold text-muted small text-uppercase">Import Into Column</label>
+               <select className="form-select mb-4 shadow-sm" value={importTargetCol} onChange={e => setImportTargetCol(e.target.value)}>
+                 {visibleFields.includes('first_cat') && <option value="first_cat">1st CAT (20 Marks)</option>}
+                 {visibleFields.includes('second_cat') && <option value="second_cat">2nd CAT (20 Marks)</option>}
+                 {visibleFields.includes('exam') && <option value="exam">EXAM (60 Marks)</option>}
+               </select>
+
+               <div className="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                 <button className="btn btn-light fw-bold" onClick={() => setShowImportModal(false)}>Cancel</button>
+                 <button className="btn btn-success fw-bold shadow-sm" onClick={executeImport}>
+                   <i className="fas fa-check me-2"></i>Import Scores
+                 </button>
+               </div>
+            </div>
           </div>
         </div>
       )}
