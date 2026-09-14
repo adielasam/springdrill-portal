@@ -137,6 +137,7 @@
         let userAnswers = {}; 
         let timeRemaining = 0;
         let timerInterval;
+        let testData = null; // Global scope for testData
 
         // === UI TOGGLES ===
         window.toggleTheme = () => {
@@ -179,8 +180,9 @@
                 }
 
                 // Fetch Test Config
-                const { data: testData, error: tErr } = await supabase.from('tests').select('*, subjects(name)').eq('id', testId).single();
+                const { data: fetchedTest, error: tErr } = await supabase.from('tests').select('*, subjects(name)').eq('id', testId).single();
                 if (tErr) throw new Error("Test details not found.");
+                testData = fetchedTest;
 
                 document.getElementById('hdrTitle').innerText = testData.title;
                 document.getElementById('subjectBadge').innerText = testData.subjects?.name || 'Assessment';
