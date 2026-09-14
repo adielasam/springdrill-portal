@@ -146,31 +146,35 @@ export default function ReportClient() {
     setIsLoading(true)
     try {
       const { data: cbtTests } = await supabase
-        .from('cbt_tests')
-        .select('id')
+        .from('tests')
+        .select('id, title')
         .eq('class_id', selectedClass)
         .eq('subject_id', selectedSubject)
-        .eq('term', selectedTerm)
-        .eq('sub_term', selectedSubTerm)
         .order('created_at', { ascending: false })
         .limit(1)
 
       if (!cbtTests || cbtTests.length === 0) {
-        showToast('No CBT found for this class/subject/term')
+        showToast('No CBT found for this class and subject')
         setIsLoading(false)
         return
       }
 
+      const confirmImport = window.confirm(`Found CBT: "${cbtTests[0].title}". Import scores from this test into 1st CAT?`)
+      if (!confirmImport) {
+          setIsLoading(false)
+          return
+      }
+
       const { data: cbtScores } = await supabase
-        .from('cbt_scores')
+        .from('test_results')
         .select('student_id, score')
-        .eq('cbt_test_id', cbtTests[0].id)
+        .eq('test_id', cbtTests[0].id)
 
       const scores = cbtScores || []
       const updated = [...results]
       let foundAny = false
       updated.forEach(row => {
-        const cbtRecord = scores.find((s: any) => s.student_id === row.student_id)
+        const cbtRecord = scores.find((s: any) => String(s.student_id) === String(row.student_id))
         if (cbtRecord) {
           row.first_cat = cbtRecord.score
           foundAny = true

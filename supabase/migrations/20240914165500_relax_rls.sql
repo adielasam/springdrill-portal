@@ -11,7 +11,11 @@ ALTER TABLE public.term_results DROP COLUMN IF EXISTS sub_term_id CASCADE;
 ALTER TABLE public.term_results ADD COLUMN IF NOT EXISTS term TEXT;
 ALTER TABLE public.term_results ADD COLUMN IF NOT EXISTS sub_term TEXT;
 
+-- ALSO make student_id TEXT to accept both legacy UUIDs and new integer IDs safely
+ALTER TABLE public.term_results ALTER COLUMN student_id TYPE TEXT USING student_id::TEXT;
+
 ALTER TABLE public.term_results DROP CONSTRAINT IF EXISTS unique_term_result;
+-- Need to cast student_id to TEXT for the unique index since we altered the column type
 ALTER TABLE public.term_results ADD CONSTRAINT unique_term_result UNIQUE(student_id, class_id, subject_id, term, sub_term);
 
 CREATE INDEX IF NOT EXISTS idx_term_results_lookup_text ON public.term_results (class_id, subject_id, term, sub_term);
