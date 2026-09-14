@@ -142,15 +142,15 @@ export default function ReportClient() {
       if (resultsError) throw resultsError
 
       const merged = students?.map((student: any) => {
-        // Handle both possible ID fields depending on schema
-        const studId = student.id || student.user_id;
         // Construct full name from legacy columns
         const studName = student.name || `${student.surname || ''} ${student.first_name || ''}`.trim() || 'Unknown Student';
         
-        const existing = termResults?.find((r: any) => r.student_id === studId)
+        // Match existing term_results using the integer student.id
+        const existing = termResults?.find((r: any) => String(r.student_id) === String(student.id))
         
         return {
-          student_id: studId,
+          student_id: student.id,         // INTEGER for term_results
+          cbt_user_id: student.user_id,   // UUID for test_results (CBT import)
           student_name: studName,
           first_cat: existing?.first_cat ?? '',
           second_cat: existing?.second_cat ?? '',
@@ -204,7 +204,7 @@ export default function ReportClient() {
       const updated = [...results]
       let foundAny = false
       updated.forEach(row => {
-        const cbtRecord = scores.find((s: any) => String(s.student_id) === String(row.student_id))
+        const cbtRecord = scores.find((s: any) => String(s.student_id) === String(row.cbt_user_id))
         if (cbtRecord) {
           // Dynamic assignment to the selected column
           (row as any)[importTargetCol] = cbtRecord.score
