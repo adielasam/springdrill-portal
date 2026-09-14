@@ -102,7 +102,7 @@ export default function ReportClient() {
         .from('students')
         .select('*')
         .eq('class_id', selectedClass)
-        .order('name', { ascending: true })
+        .order('surname', { ascending: true })
 
       if (studentError) throw studentError
 
@@ -117,10 +117,16 @@ export default function ReportClient() {
       if (resultsError) throw resultsError
 
       const merged = students?.map((student: any) => {
-        const existing = termResults?.find((r: any) => r.student_id === student.id)
+        // Handle both possible ID fields depending on schema
+        const studId = student.id || student.user_id;
+        // Construct full name from legacy columns
+        const studName = student.name || `${student.surname || ''} ${student.first_name || ''}`.trim() || 'Unknown Student';
+        
+        const existing = termResults?.find((r: any) => r.student_id === studId)
+        
         return {
-          student_id: student.id,
-          student_name: student.name,
+          student_id: studId,
+          student_name: studName,
           first_cat: existing?.first_cat ?? '',
           second_cat: existing?.second_cat ?? '',
           exam: existing?.exam ?? '',
