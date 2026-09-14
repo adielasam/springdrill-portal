@@ -27,7 +27,7 @@ FOR SELECT USING (
 );
 
 -- =========================================================================
--- CREATE MISSING TABLES & ENABLE RLS
+-- 1. CREATE ALL TABLES FIRST (Resolves dependency ordering)
 -- =========================================================================
 
 -- Sessions
@@ -37,11 +37,6 @@ CREATE TABLE IF NOT EXISTS public.sessions (
     is_active BOOLEAN DEFAULT false,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-ALTER TABLE public.sessions ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Authenticated read sessions" ON public.sessions;
-CREATE POLICY "Authenticated read sessions" ON public.sessions FOR SELECT USING (auth.role() = 'authenticated');
-DROP POLICY IF EXISTS "Admin manage sessions" ON public.sessions;
-CREATE POLICY "Admin manage sessions" ON public.sessions FOR ALL USING (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')) WITH CHECK (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin'));
 
 -- Terms
 CREATE TABLE IF NOT EXISTS public.terms (
@@ -50,11 +45,6 @@ CREATE TABLE IF NOT EXISTS public.terms (
     label TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-ALTER TABLE public.terms ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Authenticated read terms" ON public.terms;
-CREATE POLICY "Authenticated read terms" ON public.terms FOR SELECT USING (auth.role() = 'authenticated');
-DROP POLICY IF EXISTS "Admin manage terms" ON public.terms;
-CREATE POLICY "Admin manage terms" ON public.terms FOR ALL USING (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')) WITH CHECK (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin'));
 
 -- Sub Terms
 CREATE TABLE IF NOT EXISTS public.sub_terms (
@@ -63,11 +53,6 @@ CREATE TABLE IF NOT EXISTS public.sub_terms (
     label TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-ALTER TABLE public.sub_terms ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Authenticated read sub_terms" ON public.sub_terms;
-CREATE POLICY "Authenticated read sub_terms" ON public.sub_terms FOR SELECT USING (auth.role() = 'authenticated');
-DROP POLICY IF EXISTS "Admin manage sub_terms" ON public.sub_terms;
-CREATE POLICY "Admin manage sub_terms" ON public.sub_terms FOR ALL USING (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')) WITH CHECK (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin'));
 
 -- Classes
 CREATE TABLE IF NOT EXISTS public.classes (
@@ -76,11 +61,6 @@ CREATE TABLE IF NOT EXISTS public.classes (
     session_id INTEGER REFERENCES public.sessions(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-ALTER TABLE public.classes ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Authenticated read classes" ON public.classes;
-CREATE POLICY "Authenticated read classes" ON public.classes FOR SELECT USING (auth.role() = 'authenticated');
-DROP POLICY IF EXISTS "Admin manage classes" ON public.classes;
-CREATE POLICY "Admin manage classes" ON public.classes FOR ALL USING (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')) WITH CHECK (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin'));
 
 -- Subjects
 CREATE TABLE IF NOT EXISTS public.subjects (
@@ -88,11 +68,6 @@ CREATE TABLE IF NOT EXISTS public.subjects (
     name TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-ALTER TABLE public.subjects ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Authenticated read subjects" ON public.subjects;
-CREATE POLICY "Authenticated read subjects" ON public.subjects FOR SELECT USING (auth.role() = 'authenticated');
-DROP POLICY IF EXISTS "Admin manage subjects" ON public.subjects;
-CREATE POLICY "Admin manage subjects" ON public.subjects FOR ALL USING (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')) WITH CHECK (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin'));
 
 -- Students
 CREATE TABLE IF NOT EXISTS public.students (
@@ -102,14 +77,6 @@ CREATE TABLE IF NOT EXISTS public.students (
     approved BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-ALTER TABLE public.students ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Teachers read mapped students" ON public.students;
-CREATE POLICY "Teachers read mapped students" ON public.students FOR SELECT USING (
-    EXISTS (SELECT 1 FROM public.teacher_class_subjects tcs WHERE tcs.teacher_id = auth.uid() AND tcs.class_id = students.class_id)
-    OR EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')
-);
-DROP POLICY IF EXISTS "Admin manage students" ON public.students;
-CREATE POLICY "Admin manage students" ON public.students FOR ALL USING (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')) WITH CHECK (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin'));
 
 -- Teacher Class Subjects
 CREATE TABLE IF NOT EXISTS public.teacher_class_subjects (
@@ -120,13 +87,6 @@ CREATE TABLE IF NOT EXISTS public.teacher_class_subjects (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     UNIQUE(teacher_id, class_id, subject_id)
 );
-ALTER TABLE public.teacher_class_subjects ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Teachers read own mappings" ON public.teacher_class_subjects;
-CREATE POLICY "Teachers read own mappings" ON public.teacher_class_subjects FOR SELECT USING (
-    teacher_id = auth.uid() OR EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')
-);
-DROP POLICY IF EXISTS "Admin manage teacher_class_subjects" ON public.teacher_class_subjects;
-CREATE POLICY "Admin manage teacher_class_subjects" ON public.teacher_class_subjects FOR ALL USING (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')) WITH CHECK (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin'));
 
 -- CBT Tests
 CREATE TABLE IF NOT EXISTS public.cbt_tests (
@@ -138,6 +98,76 @@ CREATE TABLE IF NOT EXISTS public.cbt_tests (
     sub_term_id INTEGER REFERENCES public.sub_terms(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- CBT Scores
+CREATE TABLE IF NOT EXISTS public.cbt_scores (
+    id SERIAL PRIMARY KEY,
+    cbt_test_id INTEGER REFERENCES public.cbt_tests(id),
+    student_id INTEGER REFERENCES public.students(id),
+    score NUMERIC NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(cbt_test_id, student_id)
+);
+
+-- =========================================================================
+-- 2. ENABLE RLS & DEFINE POLICIES
+-- =========================================================================
+
+-- Sessions
+ALTER TABLE public.sessions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Authenticated read sessions" ON public.sessions;
+CREATE POLICY "Authenticated read sessions" ON public.sessions FOR SELECT USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Admin manage sessions" ON public.sessions;
+CREATE POLICY "Admin manage sessions" ON public.sessions FOR ALL USING (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')) WITH CHECK (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin'));
+
+-- Terms
+ALTER TABLE public.terms ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Authenticated read terms" ON public.terms;
+CREATE POLICY "Authenticated read terms" ON public.terms FOR SELECT USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Admin manage terms" ON public.terms;
+CREATE POLICY "Admin manage terms" ON public.terms FOR ALL USING (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')) WITH CHECK (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin'));
+
+-- Sub Terms
+ALTER TABLE public.sub_terms ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Authenticated read sub_terms" ON public.sub_terms;
+CREATE POLICY "Authenticated read sub_terms" ON public.sub_terms FOR SELECT USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Admin manage sub_terms" ON public.sub_terms;
+CREATE POLICY "Admin manage sub_terms" ON public.sub_terms FOR ALL USING (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')) WITH CHECK (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin'));
+
+-- Classes
+ALTER TABLE public.classes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Authenticated read classes" ON public.classes;
+CREATE POLICY "Authenticated read classes" ON public.classes FOR SELECT USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Admin manage classes" ON public.classes;
+CREATE POLICY "Admin manage classes" ON public.classes FOR ALL USING (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')) WITH CHECK (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin'));
+
+-- Subjects
+ALTER TABLE public.subjects ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Authenticated read subjects" ON public.subjects;
+CREATE POLICY "Authenticated read subjects" ON public.subjects FOR SELECT USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Admin manage subjects" ON public.subjects;
+CREATE POLICY "Admin manage subjects" ON public.subjects FOR ALL USING (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')) WITH CHECK (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin'));
+
+-- Students
+ALTER TABLE public.students ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Teachers read mapped students" ON public.students;
+CREATE POLICY "Teachers read mapped students" ON public.students FOR SELECT USING (
+    EXISTS (SELECT 1 FROM public.teacher_class_subjects tcs WHERE tcs.teacher_id = auth.uid() AND tcs.class_id = students.class_id)
+    OR EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')
+);
+DROP POLICY IF EXISTS "Admin manage students" ON public.students;
+CREATE POLICY "Admin manage students" ON public.students FOR ALL USING (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')) WITH CHECK (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin'));
+
+-- Teacher Class Subjects
+ALTER TABLE public.teacher_class_subjects ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Teachers read own mappings" ON public.teacher_class_subjects;
+CREATE POLICY "Teachers read own mappings" ON public.teacher_class_subjects FOR SELECT USING (
+    teacher_id = auth.uid() OR EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')
+);
+DROP POLICY IF EXISTS "Admin manage teacher_class_subjects" ON public.teacher_class_subjects;
+CREATE POLICY "Admin manage teacher_class_subjects" ON public.teacher_class_subjects FOR ALL USING (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')) WITH CHECK (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin'));
+
+-- CBT Tests
 ALTER TABLE public.cbt_tests ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Teachers read mapped cbt_tests" ON public.cbt_tests;
 CREATE POLICY "Teachers read mapped cbt_tests" ON public.cbt_tests FOR SELECT USING (
@@ -156,14 +186,6 @@ CREATE POLICY "Teachers update mapped cbt_tests" ON public.cbt_tests FOR UPDATE 
 );
 
 -- CBT Scores
-CREATE TABLE IF NOT EXISTS public.cbt_scores (
-    id SERIAL PRIMARY KEY,
-    cbt_test_id INTEGER REFERENCES public.cbt_tests(id),
-    student_id INTEGER REFERENCES public.students(id),
-    score NUMERIC NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    UNIQUE(cbt_test_id, student_id)
-);
 ALTER TABLE public.cbt_scores ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Teachers read mapped cbt_scores" ON public.cbt_scores;
 CREATE POLICY "Teachers read mapped cbt_scores" ON public.cbt_scores FOR SELECT USING (
