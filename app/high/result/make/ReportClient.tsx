@@ -58,28 +58,20 @@ export default function ReportClient() {
       }
       setSessions(sessionData)
 
-      const { data: mappings } = await supabase.from('teacher_class_subjects').select(`
-        class_id,
-        classes (id, name),
-        subject_id,
-        subjects (id, name)
-      `).eq('teacher_id', uid)
+      // Fetch all classes directly
+      const { data: classData } = await supabase.from('classes').select('id, name').order('id', { ascending: true })
+      setClasses(classData || [])
 
-      const clsArr: any[] = []
+      // Fetch all subjects directly
+      const { data: subjectData } = await supabase.from('subjects').select('id, name').order('name', { ascending: true })
+      // For backwards compatibility with the UI state structure which expects subjectsByClass
+      // Since they are now global, we can just assign the same full list to every class
       const subMap: Record<string, any[]> = {}
-
-      mappings?.forEach((m: any) => {
-        if (!clsArr.find(c => c.id === m.class_id) && m.classes) {
-          clsArr.push(m.classes)
-        }
-        if (!subMap[m.class_id]) subMap[m.class_id] = []
-        if (!subMap[m.class_id].find(s => s.id === m.subject_id) && m.subjects) {
-            subMap[m.class_id].push(m.subjects)
-        }
+      classData?.forEach((c: any) => {
+        subMap[c.id] = subjectData || []
       })
-
-      setClasses(clsArr)
       setSubjectsByClass(subMap)
+
     } catch (err: any) {
       setGlobalError(err.message)
     }
