@@ -62,7 +62,26 @@ export default function ReportClient() {
         setInitLoading(false)
         return
       }
-      setSessions(sessionData)
+
+      // Deduplicate sessions by name/label, get the 3 most recent, and sort for display
+      const uniqueSessions: any[] = []
+      const seenNames = new Set()
+      
+      // First, sort all sessions descending by name (so newest years are first)
+      const sortedByDesc = [...sessionData].sort((a, b) => (b.label || b.name).localeCompare(a.label || a.name))
+      
+      for (const s of sortedByDesc) {
+        const name = s.label || s.name
+        if (!seenNames.has(name)) {
+          seenNames.add(name)
+          uniqueSessions.push(s)
+          if (uniqueSessions.length >= 3) break
+        }
+      }
+      
+      // Sort the final 3 ascending (oldest to newest) for a logical dropdown
+      uniqueSessions.sort((a, b) => (a.label || a.name).localeCompare(b.label || b.name))
+      setSessions(uniqueSessions)
 
       // Fetch all classes directly
       const { data: classData } = await supabase.from('classes').select('id, name').order('id', { ascending: true })
