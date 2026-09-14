@@ -318,11 +318,14 @@
                     if (userAnswers[q.id] === q.correct_option) score++;
                 });
 
+                const calculatedTotalScore = score * (testData.marks_per_question || 1);
+                
                 const { error } = await supabase.from('test_results').insert([{
                     student_id: studentSession.user.id,
                     test_id: testId,
                     score: score,
-                    total_questions: questions.length
+                    total_questions: questions.length,
+                    total_score: calculatedTotalScore
                 }]);
 
                 if (error) throw error;
