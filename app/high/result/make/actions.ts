@@ -121,10 +121,10 @@ export async function fetchCBTScores(classId: string, subjectId: string, termId:
 }
 
 export async function saveScores(
-    classId: string, 
-    subjectId: string, 
-    termId: string, 
-    subTermId: string, 
+    classId: string | number, 
+    subjectId: string | number, 
+    termId: string | number, 
+    subTermId: string | number, 
     results: any[], 
     isFinal: boolean
 ) {
@@ -134,9 +134,14 @@ export async function saveScores(
 
   if (!userId) throw new Error('Not authenticated')
 
-  const status = isFinal ? 'final' : 'draft'
-  const submittedAt = isFinal ? new Date().toISOString() : null
+  // SERVER-SIDE VALIDATION
+  for (const r of results) {
+    if (r.first_cat !== '' && (Number(r.first_cat) < 0 || Number(r.first_cat) > 20)) throw new Error(`Invalid 1st CAT for ${r.student_name}`)
+    if (r.second_cat !== '' && (Number(r.second_cat) < 0 || Number(r.second_cat) > 20)) throw new Error(`Invalid 2nd CAT for ${r.student_name}`)
+    if (r.exam !== '' && (Number(r.exam) < 0 || Number(r.exam) > 60)) throw new Error(`Invalid Exam score for ${r.student_name}`)
+  }
 
+  // 1. Save Drafts first using upsert (RLS ensures status='draft' if not admin)
   const upsertData = results.map(r => ({
     student_id: r.student_id,
     class_id: classId,
@@ -146,9 +151,7 @@ export async function saveScores(
     first_cat: r.first_cat === '' ? null : Number(r.first_cat),
     second_cat: r.second_cat === '' ? null : Number(r.second_cat),
     exam: r.exam === '' ? null : Number(r.exam),
-    status,
-    submitted_by: isFinal ? userId : null,
-    submitted_at: submittedAt,
+    status: 'draft', // Always draft during upsert
     created_by: userId
   }))
 
@@ -161,6 +164,21 @@ export async function saveScores(
   if (error) {
     console.error(error)
     return { error: error.message }
+  }
+
+  // 2. If it's a final submission, lock via RPC
+  if (isFinal) {
+    const { error: rpcError } = await supabase.rpc('submit_final_term_results', {
+      p_class_id: Number(classId),
+      p_subject_id: Number(subjectId),
+      p_term_id: Number(termId),
+      p_sub_term_id: Number(subTermId)
+    })
+
+    if (rpcError) {
+      console.error(rpcError)
+      return { error: rpcError.message }
+    }
   }
 
   return { success: true }
