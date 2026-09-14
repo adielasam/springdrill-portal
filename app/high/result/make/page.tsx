@@ -1,17 +1,8 @@
-import { fetchMetadata } from './actions'
+'use client'
+
 import ReportClient from './ReportClient'
-import { redirect } from 'next/navigation'
 
-export default async function MakeReportPage() {
-  const metadata = await fetchMetadata()
-
-  if (metadata.error) {
-    if (metadata.error === 'Not authenticated') {
-      redirect('/')
-    }
-    return <div className="p-4 alert alert-danger m-4">{metadata.error}</div>
-  }
-
+export default function MakeReportPage() {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: `
@@ -70,7 +61,7 @@ export default async function MakeReportPage() {
           </div>
           
           <nav className="nav flex-column mt-3">
-              <a href="/teacher_dashboard" className="nav-link"><i className="fas fa-home"></i> Dashboard</a>
+              <a href="/teacher_dashboard.html" className="nav-link"><i className="fas fa-home"></i> Dashboard</a>
               
               <div className="px-3 py-1 text-warning small fw-bold mt-2" style={{fontSize: '0.7rem', letterSpacing: '1px'}}>HIGH SCHOOL REPORT</div>
               <a href="/high/result/make" className="nav-link active" style={{background: 'rgba(255,255,255,0.15)', color: 'white', fontWeight: 'bold', borderLeft: '4px solid #f1c40f'}}>
@@ -92,7 +83,7 @@ export default async function MakeReportPage() {
               </div>
           </div>
 
-          <ReportClient metadata={metadata as any} />
+          <ReportClient />
       </div>
     </>
   )

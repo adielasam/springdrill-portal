@@ -1,7 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { fetchRosterAndScores, fetchCBTScores, saveScores } from './actions'
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jmxyopohngslqvzknjnt.supabase.co'
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_yGvqUxGlwiJuSkFN4VOpWw_nKYmo-vl'
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Configuration for sub-term visible fields based on business logic assumptions
 const subTermFieldsConfig: Record<string, string[]> = {
@@ -9,8 +13,16 @@ const subTermFieldsConfig: Record<string, string[]> = {
   'Full Term': ['first_cat', 'second_cat', 'exam']
 }
 
-export default function ReportClient({ metadata }: { metadata: any }) {
-  const { session, terms, subTerms, classes, subjectsByClass } = metadata
+export default function ReportClient() {
+  const [initLoading, setInitLoading] = useState(true)
+  const [globalError, setGlobalError] = useState<string | null>(null)
+  
+  const [session, setSession] = useState<any>(null)
+  const [terms, setTerms] = useState<any[]>([])
+  const [subTerms, setSubTerms] = useState<any[]>([])
+  const [classes, setClasses] = useState<any[]>([])
+  const [subjectsByClass, setSubjectsByClass] = useState<Record<string, any[]>>({})
+  const [userId, setUserId] = useState<string | null>(null)
 
   const [selectedTerm, setSelectedTerm] = useState('')
   const [selectedSubTerm, setSelectedSubTerm] = useState('')
@@ -22,12 +34,70 @@ export default function ReportClient({ metadata }: { metadata: any }) {
   const [isLoading, setIsLoading] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
 
+  useEffect(() => {
+    loadMetadata()
+  }, [])
+
+  async function loadMetadata() {
+    try {
+      const { data: authData } = await supabase.auth.getUser()
+      const uid = authData?.user?.id
+      if (!uid) {
+        setGlobalError('Not authenticated. Please log in.')
+        setInitLoading(false)
+        return
+      }
+      setUserId(uid)
+
+      const { data: sessionData, error: sessionError } = await supabase.from('sessions').select('*').eq('is_active', true).single()
+      if (sessionError || !sessionData) {
+        setGlobalError('No active session found.')
+        setInitLoading(false)
+        return
+      }
+      setSession(sessionData)
+
+      const { data: t } = await supabase.from('terms').select('*').eq('session_id', sessionData.id)
+      const termArr = t || []
+      setTerms(termArr)
+
+      const { data: st } = await supabase.from('sub_terms').select('*').in('term_id', termArr.map((x: any) => x.id))
+      setSubTerms(st || [])
+
+      const { data: mappings } = await supabase.from('teacher_class_subjects').select(`
+        class_id,
+        classes (id, name),
+        subject_id,
+        subjects (id, name)
+      `).eq('teacher_id', uid)
+
+      const clsArr: any[] = []
+      const subMap: Record<string, any[]> = {}
+
+      mappings?.forEach((m: any) => {
+        if (!clsArr.find(c => c.id === m.class_id) && m.classes) {
+          clsArr.push(m.classes)
+        }
+        if (!subMap[m.class_id]) subMap[m.class_id] = []
+        if (!subMap[m.class_id].find(s => s.id === m.subject_id) && m.subjects) {
+            subMap[m.class_id].push(m.subjects)
+        }
+      })
+
+      setClasses(clsArr)
+      setSubjectsByClass(subMap)
+    } catch (err: any) {
+      setGlobalError(err.message)
+    }
+    setInitLoading(false)
+  }
+
   // Selected object references for label lookups
-  const subTermObj = subTerms.find((s: any) => s.id === selectedSubTerm)
+  const subTermObj = subTerms.find((s: any) => String(s.id) === String(selectedSubTerm))
   const subTermLabel = subTermObj ? subTermObj.label : ''
-  const subjectObj = subjectsByClass[selectedClass]?.find((s: any) => s.id === selectedSubject)
+  const subjectObj = subjectsByClass[selectedClass]?.find((s: any) => String(s.id) === String(selectedSubject))
   const subjectLabel = subjectObj ? subjectObj.name : ''
-  const sessionLabel = session?.label || 'Current'
+  const sessionLabel = session?.label || session?.name || 'Current'
 
   const visibleFields = subTermFieldsConfig[subTermLabel] || ['first_cat', 'second_cat', 'exam']
   const isFormComplete = selectedTerm && selectedSubTerm && selectedClass && selectedSubject
@@ -44,9 +114,41 @@ export default function ReportClient({ metadata }: { metadata: any }) {
   async function loadGrid() {
     setIsLoading(true)
     try {
-      const res = await fetchRosterAndScores(selectedClass, selectedSubject, selectedTerm, selectedSubTerm)
-      setResults(res.roster)
-      setIsFinal(res.isFinal)
+      // 1. Get all students in the class
+      const { data: students, error: studentError } = await supabase
+        .from('students')
+        .select('*')
+        .eq('class_id', selectedClass)
+        .order('name', { ascending: true })
+
+      if (studentError) throw studentError
+
+      // 2. Get existing results if any
+      const { data: termResults, error: resultsError } = await supabase
+        .from('term_results')
+        .select('*')
+        .eq('class_id', selectedClass)
+        .eq('subject_id', selectedSubject)
+        .eq('term_id', selectedTerm)
+        .eq('sub_term_id', selectedSubTerm)
+
+      if (resultsError) throw resultsError
+
+      // Combine
+      const merged = students?.map((student: any) => {
+        const existing = termResults?.find((r: any) => r.student_id === student.id)
+        return {
+          student_id: student.id,
+          student_name: student.name,
+          first_cat: existing?.first_cat ?? '',
+          second_cat: existing?.second_cat ?? '',
+          exam: existing?.exam ?? '',
+          status: existing?.status ?? 'draft'
+        }
+      }) || []
+
+      setResults(merged)
+      setIsFinal(termResults?.some((r: any) => r.status === 'final') ?? false)
     } catch (err: any) {
       alert("Error loading roster: " + err.message)
     }
@@ -56,27 +158,42 @@ export default function ReportClient({ metadata }: { metadata: any }) {
   async function handleImportCBT() {
     setIsLoading(true)
     try {
-      const res = await fetchCBTScores(selectedClass, selectedSubject, selectedTerm, selectedSubTerm)
-      if (res.error) {
-        showToast(res.error)
-      } else {
-        const scores = res.scores
-        const updated = [...results]
-        let foundAny = false
-        updated.forEach(row => {
-          const cbtRecord = scores.find((s: any) => s.student_id === row.student_id)
-          if (cbtRecord) {
-            // Assume CBT score goes to 1st CAT (or 2nd if 1st is full, but standardizing to 1st CAT here)
-            row.first_cat = cbtRecord.score
-            foundAny = true
-          }
-        })
-        if (foundAny) {
-          setResults(updated)
-          showToast('Imported CBT scores successfully.')
-        } else {
-          showToast('No matching student scores found in CBT records.')
+      const { data: cbtTests } = await supabase
+        .from('cbt_tests')
+        .select('id')
+        .eq('class_id', selectedClass)
+        .eq('subject_id', selectedSubject)
+        .eq('term_id', selectedTerm)
+        .eq('sub_term_id', selectedSubTerm)
+        .order('created_at', { ascending: false })
+        .limit(1)
+
+      if (!cbtTests || cbtTests.length === 0) {
+        showToast('No CBT found for this class/subject/term')
+        setIsLoading(false)
+        return
+      }
+
+      const { data: cbtScores } = await supabase
+        .from('cbt_scores')
+        .select('student_id, score')
+        .eq('cbt_test_id', cbtTests[0].id)
+
+      const scores = cbtScores || []
+      const updated = [...results]
+      let foundAny = false
+      updated.forEach(row => {
+        const cbtRecord = scores.find((s: any) => s.student_id === row.student_id)
+        if (cbtRecord) {
+          row.first_cat = cbtRecord.score
+          foundAny = true
         }
+      })
+      if (foundAny) {
+        setResults(updated)
+        showToast('Imported CBT scores successfully.')
+      } else {
+        showToast('No matching student scores found in CBT records.')
       }
     } catch (err: any) {
       showToast("Error importing CBT: " + err.message)
@@ -114,7 +231,6 @@ export default function ReportClient({ metadata }: { metadata: any }) {
     }
 
     if (submitFinal) {
-      // Validate all required fields are filled
       for (const r of results) {
         if (visibleFields.includes('first_cat') && r.first_cat === '') return alert(`Missing 1st CAT score for ${r.student_name}`)
         if (visibleFields.includes('second_cat') && r.second_cat === '') return alert(`Missing 2nd CAT score for ${r.student_name}`)
@@ -127,13 +243,40 @@ export default function ReportClient({ metadata }: { metadata: any }) {
 
     setIsLoading(true)
     try {
-      const res = await saveScores(selectedClass, selectedSubject, selectedTerm, selectedSubTerm, results, submitFinal)
-      if (res.error) {
-        alert("Error saving: " + res.error)
-      } else {
-        showToast(submitFinal ? 'Final Results Submitted!' : 'Draft Saved Successfully.')
-        if (submitFinal) setIsFinal(true)
+      const upsertData = results.map(r => ({
+        student_id: r.student_id,
+        class_id: Number(selectedClass),
+        subject_id: Number(selectedSubject),
+        term_id: Number(selectedTerm),
+        sub_term_id: Number(selectedSubTerm),
+        first_cat: r.first_cat === '' ? null : Number(r.first_cat),
+        second_cat: r.second_cat === '' ? null : Number(r.second_cat),
+        exam: r.exam === '' ? null : Number(r.exam),
+        status: 'draft',
+        created_by: userId
+      }))
+
+      const { error } = await supabase
+        .from('term_results')
+        .upsert(upsertData, { 
+          onConflict: 'student_id, class_id, subject_id, term_id, sub_term_id'
+        })
+
+      if (error) throw error
+
+      if (submitFinal) {
+        const { error: rpcError } = await supabase.rpc('submit_final_term_results', {
+          p_class_id: Number(selectedClass),
+          p_subject_id: Number(selectedSubject),
+          p_term_id: Number(selectedTerm),
+          p_sub_term_id: Number(selectedSubTerm)
+        })
+
+        if (rpcError) throw rpcError
+        setIsFinal(true)
       }
+
+      showToast(submitFinal ? 'Final Results Submitted!' : 'Draft Saved Successfully.')
     } catch (err: any) {
       alert("System Error: " + err.message)
     }
@@ -143,6 +286,14 @@ export default function ReportClient({ metadata }: { metadata: any }) {
   function showToast(msg: string) {
     setToastMessage(msg)
     setTimeout(() => setToastMessage(''), 4000)
+  }
+
+  if (initLoading) {
+    return <div className="p-5 text-center"><i className="fas fa-spinner fa-spin fa-2x text-muted"></i></div>
+  }
+
+  if (globalError) {
+    return <div className="alert alert-danger m-4">{globalError}</div>
   }
 
   return (
@@ -159,7 +310,7 @@ export default function ReportClient({ metadata }: { metadata: any }) {
             <div className="col-md-6">
               <select className="form-select" value={selectedTerm} onChange={e => setSelectedTerm(e.target.value)}>
                 <option value="">Select Term...</option>
-                {terms.map((t: any) => <option key={t.id} value={t.id}>{t.label}</option>)}
+                {terms.map((t: any) => <option key={t.id} value={t.id}>{t.label || t.name}</option>)}
               </select>
             </div>
           </div>
@@ -169,7 +320,7 @@ export default function ReportClient({ metadata }: { metadata: any }) {
             <div className="col-md-6">
               <select className="form-select" value={selectedSubTerm} onChange={e => setSelectedSubTerm(e.target.value)} disabled={!selectedTerm}>
                 <option value="">Select Sub-Term...</option>
-                {subTerms.filter((s: any) => s.term_id === selectedTerm).map((s: any) => <option key={s.id} value={s.id}>{s.label}</option>)}
+                {subTerms.filter((s: any) => String(s.term_id) === String(selectedTerm)).map((s: any) => <option key={s.id} value={s.id}>{s.label || s.name}</option>)}
               </select>
             </div>
           </div>
