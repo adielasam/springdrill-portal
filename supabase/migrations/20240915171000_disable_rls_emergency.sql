@@ -1,8 +1,6 @@
 -- URGENT: Disable Row-Level Security on all tables to restore data access immediately.
 ALTER TABLE public.term_results_audit DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sessions DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.terms DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.sub_terms DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.classes DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.subjects DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.students DISABLE ROW LEVEL SECURITY;
