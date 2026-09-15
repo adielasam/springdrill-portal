@@ -261,7 +261,7 @@
                         <div class="staff-id" id="viewStaffCode">RIS-0000</div>
                     </div>
                     <ul class="profile-menu">
-                        <li><a onclick="alert('Login as Teacher requires Impersonation API (Coming Soon)')"><i data-lucide="log-in"></i> Login As Teacher</a></li>
+                        <li><a onclick="impersonateTeacher()"><i data-lucide="log-in"></i> Login As Teacher</a></li>
                         <li><a onclick="alert('Access Pin: 2308')"><i data-lucide="key"></i> Access Pin</a></li>
                         <li><a onclick="openEditModal()"><i data-lucide="edit-3"></i> Edit Info</a></li>
                         <li><a onclick="alert('Messaging system coming soon.')"><i data-lucide="message-square"></i> Message</a></li>
@@ -627,6 +627,35 @@
             }
             lucide.createIcons();
         };
+
+        window.impersonateTeacher = async function() {
+            if (!currentTeacher || !currentTeacher.email) {
+                alert('Teacher must have an email address to log in.');
+                return;
+            }
+            if (confirm('Are you sure you want to log in as ' + currentTeacher.full_name + '? You will be logged out of your Admin account.')) {
+                try {
+                    const res = await fetch('/api/admin/impersonate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: currentTeacher.email })
+                    });
+                    const data = await res.json();
+                    if (!res.ok) {
+                        alert('Impersonation failed: ' + (data.error || 'Unknown error'));
+                    } else if (data.action_link) {
+                        window.location.href = data.action_link;
+                    }
+                } catch (e) {
+                    alert('Error reaching API. Ensure SUPABASE_SERVICE_ROLE_KEY is set in Vercel.');
+                    console.error(e);
+                }
+            }
+        };
+
+        window.closeViewModal = function() {
+            document.getElementById('viewModalOverlay').classList.remove('active');
+        }
 
         window.closeEditModal = function() {
             document.getElementById('editModalOverlay').classList.remove('active');
