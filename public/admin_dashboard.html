@@ -237,7 +237,29 @@
                 <div class="premium-card stat-card" onclick="window.location.href='class_list.html'" style="cursor:pointer;" title="View all classes and students">
                     <div class="stat-header">
                         <span class="stat-label">Total Students</span>
-                        <div class="icon-3d icon-3d-blue"><i data-lucide="users"></i></div>
+                        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="vol-grad-${colorKey}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="${hexStart}" />
+                <stop offset="100%" stop-color="${hexEnd}" />
+            </linearGradient>
+            <filter id="vol-shadow-${colorKey}" x="-20%" y="-20%" width="140%" height="140%">
+                <!-- Base drop shadow -->
+                <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="${hexEnd}" flood-opacity="0.4" />
+            </filter>
+            <filter id="vol-inner-${colorKey}">
+                <!-- Inner top highlight to create 3D bevel -->
+                <feDropShadow dx="0" dy="-2" stdDeviation="2" flood-color="#ffffff" flood-opacity="0.4" />
+            </filter>
+        </defs>
+        <!-- The rounded 3D squircle -->
+        <rect x="4" y="4" width="40" height="40" rx="14" ry="14" fill="url(#vol-grad-${colorKey})" filter="url(#vol-shadow-${colorKey})" />
+        <rect x="4" y="4" width="40" height="40" rx="14" ry="14" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.3" />
+        <!-- The icon -->
+        <g transform="translate(12, 12)" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="drop-shadow(0px 2px 2px rgba(0,0,0,0.2))">
+            ${path}
+        </g>
+    </svg>
                     </div>
                     <div class="stat-value" id="statActiveStudents">-</div>
                 </div>
@@ -246,7 +268,29 @@
                 <div class="premium-card stat-card" onclick="window.location.href='class_list.html'" style="cursor:pointer;" title="View all students">
                     <div class="stat-header">
                         <span class="stat-label">Male</span>
-                        <div class="icon-3d icon-3d-teal"><i data-lucide="user"></i></div>
+                        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="vol-grad-${colorKey}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="${hexStart}" />
+                <stop offset="100%" stop-color="${hexEnd}" />
+            </linearGradient>
+            <filter id="vol-shadow-${colorKey}" x="-20%" y="-20%" width="140%" height="140%">
+                <!-- Base drop shadow -->
+                <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="${hexEnd}" flood-opacity="0.4" />
+            </filter>
+            <filter id="vol-inner-${colorKey}">
+                <!-- Inner top highlight to create 3D bevel -->
+                <feDropShadow dx="0" dy="-2" stdDeviation="2" flood-color="#ffffff" flood-opacity="0.4" />
+            </filter>
+        </defs>
+        <!-- The rounded 3D squircle -->
+        <rect x="4" y="4" width="40" height="40" rx="14" ry="14" fill="url(#vol-grad-${colorKey})" filter="url(#vol-shadow-${colorKey})" />
+        <rect x="4" y="4" width="40" height="40" rx="14" ry="14" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.3" />
+        <!-- The icon -->
+        <g transform="translate(12, 12)" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="drop-shadow(0px 2px 2px rgba(0,0,0,0.2))">
+            ${path}
+        </g>
+    </svg>
                     </div>
                     <div class="stat-value" id="statMale">-</div>
                 </div>
@@ -255,7 +299,29 @@
                 <div class="premium-card stat-card" onclick="window.location.href='class_list.html'" style="cursor:pointer;" title="View all students">
                     <div class="stat-header">
                         <span class="stat-label">Female</span>
-                        <div class="icon-3d icon-3d-coral"><i data-lucide="user"></i></div>
+                        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="vol-grad-${colorKey}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="${hexStart}" />
+                <stop offset="100%" stop-color="${hexEnd}" />
+            </linearGradient>
+            <filter id="vol-shadow-${colorKey}" x="-20%" y="-20%" width="140%" height="140%">
+                <!-- Base drop shadow -->
+                <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="${hexEnd}" flood-opacity="0.4" />
+            </filter>
+            <filter id="vol-inner-${colorKey}">
+                <!-- Inner top highlight to create 3D bevel -->
+                <feDropShadow dx="0" dy="-2" stdDeviation="2" flood-color="#ffffff" flood-opacity="0.4" />
+            </filter>
+        </defs>
+        <!-- The rounded 3D squircle -->
+        <rect x="4" y="4" width="40" height="40" rx="14" ry="14" fill="url(#vol-grad-${colorKey})" filter="url(#vol-shadow-${colorKey})" />
+        <rect x="4" y="4" width="40" height="40" rx="14" ry="14" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.3" />
+        <!-- The icon -->
+        <g transform="translate(12, 12)" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="drop-shadow(0px 2px 2px rgba(0,0,0,0.2))">
+            ${path}
+        </g>
+    </svg>
                     </div>
                     <div class="stat-value" id="statFemale">-</div>
                 </div>
@@ -264,7 +330,29 @@
                 <div class="premium-card stat-card" onclick="window.location.href='class_list.html'" style="cursor:pointer;" title="Manage classes">
                     <div class="stat-header">
                         <span class="stat-label">Classes</span>
-                        <div class="icon-3d icon-3d-violet"><i data-lucide="library"></i></div>
+                        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="vol-grad-${colorKey}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="${hexStart}" />
+                <stop offset="100%" stop-color="${hexEnd}" />
+            </linearGradient>
+            <filter id="vol-shadow-${colorKey}" x="-20%" y="-20%" width="140%" height="140%">
+                <!-- Base drop shadow -->
+                <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="${hexEnd}" flood-opacity="0.4" />
+            </filter>
+            <filter id="vol-inner-${colorKey}">
+                <!-- Inner top highlight to create 3D bevel -->
+                <feDropShadow dx="0" dy="-2" stdDeviation="2" flood-color="#ffffff" flood-opacity="0.4" />
+            </filter>
+        </defs>
+        <!-- The rounded 3D squircle -->
+        <rect x="4" y="4" width="40" height="40" rx="14" ry="14" fill="url(#vol-grad-${colorKey})" filter="url(#vol-shadow-${colorKey})" />
+        <rect x="4" y="4" width="40" height="40" rx="14" ry="14" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.3" />
+        <!-- The icon -->
+        <g transform="translate(12, 12)" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="drop-shadow(0px 2px 2px rgba(0,0,0,0.2))">
+            ${path}
+        </g>
+    </svg>
                     </div>
                     <div class="stat-value" id="statClasses">-</div>
                 </div>
@@ -273,7 +361,29 @@
                 <div class="premium-card stat-card" onclick="window.location.href='teacher_list'" style="cursor:pointer;" title="View all teachers">
                     <div class="stat-header">
                         <span class="stat-label">Staff</span>
-                        <div class="icon-3d icon-3d-green"><i data-lucide="briefcase"></i></div>
+                        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="vol-grad-${colorKey}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="${hexStart}" />
+                <stop offset="100%" stop-color="${hexEnd}" />
+            </linearGradient>
+            <filter id="vol-shadow-${colorKey}" x="-20%" y="-20%" width="140%" height="140%">
+                <!-- Base drop shadow -->
+                <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="${hexEnd}" flood-opacity="0.4" />
+            </filter>
+            <filter id="vol-inner-${colorKey}">
+                <!-- Inner top highlight to create 3D bevel -->
+                <feDropShadow dx="0" dy="-2" stdDeviation="2" flood-color="#ffffff" flood-opacity="0.4" />
+            </filter>
+        </defs>
+        <!-- The rounded 3D squircle -->
+        <rect x="4" y="4" width="40" height="40" rx="14" ry="14" fill="url(#vol-grad-${colorKey})" filter="url(#vol-shadow-${colorKey})" />
+        <rect x="4" y="4" width="40" height="40" rx="14" ry="14" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.3" />
+        <!-- The icon -->
+        <g transform="translate(12, 12)" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="drop-shadow(0px 2px 2px rgba(0,0,0,0.2))">
+            ${path}
+        </g>
+    </svg>
                     </div>
                     <div class="stat-value" id="statTeachers">-</div>
                 </div>
@@ -282,7 +392,29 @@
                 <div class="premium-card stat-card" onclick="window.location.href='manage_users.html'" style="cursor:pointer;" title="View pending approvals">
                     <div class="stat-header">
                         <span class="stat-label">Pending</span>
-                        <div class="icon-3d icon-3d-amber"><i data-lucide="clock"></i></div>
+                        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="vol-grad-${colorKey}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="${hexStart}" />
+                <stop offset="100%" stop-color="${hexEnd}" />
+            </linearGradient>
+            <filter id="vol-shadow-${colorKey}" x="-20%" y="-20%" width="140%" height="140%">
+                <!-- Base drop shadow -->
+                <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="${hexEnd}" flood-opacity="0.4" />
+            </filter>
+            <filter id="vol-inner-${colorKey}">
+                <!-- Inner top highlight to create 3D bevel -->
+                <feDropShadow dx="0" dy="-2" stdDeviation="2" flood-color="#ffffff" flood-opacity="0.4" />
+            </filter>
+        </defs>
+        <!-- The rounded 3D squircle -->
+        <rect x="4" y="4" width="40" height="40" rx="14" ry="14" fill="url(#vol-grad-${colorKey})" filter="url(#vol-shadow-${colorKey})" />
+        <rect x="4" y="4" width="40" height="40" rx="14" ry="14" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.3" />
+        <!-- The icon -->
+        <g transform="translate(12, 12)" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="drop-shadow(0px 2px 2px rgba(0,0,0,0.2))">
+            ${path}
+        </g>
+    </svg>
                     </div>
                     <div class="stat-value" id="statPending">-</div>
                 </div>
@@ -294,7 +426,29 @@
         <div class="row g-4 mb-5">
             <div class="col-12 col-sm-6 col-xl-4">
                 <a href="admin_create_user" class="quick-action-btn qa-blue">
-                    <div class="icon-3d icon-3d-blue"><i data-lucide="user-plus"></i></div>
+                    <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="vol-grad-${colorKey}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="${hexStart}" />
+                <stop offset="100%" stop-color="${hexEnd}" />
+            </linearGradient>
+            <filter id="vol-shadow-${colorKey}" x="-20%" y="-20%" width="140%" height="140%">
+                <!-- Base drop shadow -->
+                <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="${hexEnd}" flood-opacity="0.4" />
+            </filter>
+            <filter id="vol-inner-${colorKey}">
+                <!-- Inner top highlight to create 3D bevel -->
+                <feDropShadow dx="0" dy="-2" stdDeviation="2" flood-color="#ffffff" flood-opacity="0.4" />
+            </filter>
+        </defs>
+        <!-- The rounded 3D squircle -->
+        <rect x="4" y="4" width="40" height="40" rx="14" ry="14" fill="url(#vol-grad-${colorKey})" filter="url(#vol-shadow-${colorKey})" />
+        <rect x="4" y="4" width="40" height="40" rx="14" ry="14" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.3" />
+        <!-- The icon -->
+        <g transform="translate(12, 12)" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="drop-shadow(0px 2px 2px rgba(0,0,0,0.2))">
+            ${path}
+        </g>
+    </svg>
                     <span>Create Account</span>
                 </a>
             </div>
@@ -306,7 +460,29 @@
             </div>
             <div class="col-12 col-sm-6 col-xl-4">
                 <a href="admin_attendance" class="quick-action-btn qa-amber">
-                    <div class="icon-3d icon-3d-amber"><i data-lucide="calendar-check"></i></div>
+                    <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="vol-grad-${colorKey}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="${hexStart}" />
+                <stop offset="100%" stop-color="${hexEnd}" />
+            </linearGradient>
+            <filter id="vol-shadow-${colorKey}" x="-20%" y="-20%" width="140%" height="140%">
+                <!-- Base drop shadow -->
+                <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="${hexEnd}" flood-opacity="0.4" />
+            </filter>
+            <filter id="vol-inner-${colorKey}">
+                <!-- Inner top highlight to create 3D bevel -->
+                <feDropShadow dx="0" dy="-2" stdDeviation="2" flood-color="#ffffff" flood-opacity="0.4" />
+            </filter>
+        </defs>
+        <!-- The rounded 3D squircle -->
+        <rect x="4" y="4" width="40" height="40" rx="14" ry="14" fill="url(#vol-grad-${colorKey})" filter="url(#vol-shadow-${colorKey})" />
+        <rect x="4" y="4" width="40" height="40" rx="14" ry="14" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.3" />
+        <!-- The icon -->
+        <g transform="translate(12, 12)" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="drop-shadow(0px 2px 2px rgba(0,0,0,0.2))">
+            ${path}
+        </g>
+    </svg>
                     <span>Log Attendance</span>
                 </a>
             </div>
@@ -415,7 +591,7 @@
                 document.getElementById('statPending').innerText = pendingCount || 0;
                 document.getElementById('statMale').innerText = maleCount || 0;
                 document.getElementById('statFemale').innerText = femaleCount || 0;
-                document.getElementById('statClasses').innerText = classCount || 0;
+                // statClasses is now set by renderClassChart()
                 document.getElementById('statTeachers').innerText = teacherCount || 0;
 
                 document.getElementById('loadingOverlay').style.opacity = '0';
@@ -445,12 +621,33 @@
                     });
                 }
                 const labels = Object.keys(classCounts);
+                document.getElementById('statClasses').innerText = labels.length;
                 const data = Object.values(classCounts);
                 
                 // Brand-derived colors (shades of teal/emerald)
-                const bgColors = ['#2563eb', '#0d9488', '#f43f5e', '#7c3aed', '#059669', '#f59e0b', '#3b82f6', '#14b8a6', '#e11d48', '#8b5cf6', '#10b981', '#d97706'];
-
+                
                 const ctx = document.getElementById('classDistributionChart').getContext('2d');
+                function makeGrad(c1, c2) {
+                    const g = ctx.createLinearGradient(0, 0, 0, 300);
+                    g.addColorStop(0, c1);
+                    g.addColorStop(1, c2);
+                    return g;
+                }
+                const bgColors = [
+                    makeGrad('#3b82f6', '#2563eb'), // Blue
+                    makeGrad('#14b8a6', '#0d9488'), // Teal
+                    makeGrad('#f43f5e', '#e11d48'), // Coral
+                    makeGrad('#8b5cf6', '#7c3aed'), // Violet
+                    makeGrad('#10b981', '#059669'), // Green
+                    makeGrad('#f59e0b', '#d97706')  // Amber
+                ];
+                // Loop the colors if more than 6 classes
+                const finalBgColors = [];
+                for(let i = 0; i < labels.length; i++) {
+                    finalBgColors.push(bgColors[i % 6]);
+                }
+
+
                 new Chart(ctx, {
                     type: 'bar',
                     data: { 
@@ -458,7 +655,7 @@
                         datasets: [{ 
                             label: 'Students', 
                             data: data, 
-                            backgroundColor: bgColors.slice(0, labels.length), 
+                            backgroundColor: finalBgColors, 
                             borderRadius: 6,
                             borderSkipped: false
                         }] 
