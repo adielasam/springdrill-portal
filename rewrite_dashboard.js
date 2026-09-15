@@ -1,0 +1,627 @@
+const fs = require('fs');
+const path = require('path');
+
+const newHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPRINGDRILL - Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root { 
+            --brand-50: #ecfdf5;
+            --brand-100: #d1fae5;
+            --brand-500: #10b981;
+            --brand-600: #059669;
+            
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            --bg-color: var(--gray-50); 
+            --card-bg: #ffffff; 
+            --text-main: var(--gray-900); 
+            --text-muted: var(--gray-500); 
+            --border-color: var(--gray-200); 
+            --input-bg: var(--gray-100); 
+            
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+
+            --radius: 12px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        body.dark-mode { 
+            --bg-color: #030712; 
+            --card-bg: #111827; 
+            --text-main: #f9fafb; 
+            --text-muted: #9ca3af; 
+            --border-color: #1f2937; 
+            --input-bg: #1f2937; 
+        }
+        
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            font-family: 'Inter', sans-serif; 
+            overflow-x: hidden; 
+            transition: background-color 0.3s, color 0.3s;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 3D ICON COMPONENT */
+        .icon-3d {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--brand-500) 0%, var(--brand-600) 100%);
+            box-shadow: 0 2px 4px rgba(5, 150, 105, 0.3), inset 0 1px 1px rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+        .icon-3d-warning { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); box-shadow: 0 2px 4px rgba(217, 119, 6, 0.3), inset 0 1px 1px rgba(255,255,255,0.3); }
+        .icon-3d-info { background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%); box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3), inset 0 1px 1px rgba(255,255,255,0.3); }
+        .icon-3d-danger { background: linear-gradient(135deg, #f87171 0%, #dc2626 100%); box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3), inset 0 1px 1px rgba(255,255,255,0.3); }
+        .icon-3d-neutral { background: linear-gradient(135deg, var(--gray-400) 0%, var(--gray-600) 100%); box-shadow: 0 2px 4px rgba(75, 85, 99, 0.3), inset 0 1px 1px rgba(255,255,255,0.3); }
+        
+        .icon-3d svg { width: 16px; height: 16px; stroke-width: 2.5; }
+        
+        /* SIDEBAR */
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); padding: 32px 16px; z-index: 1050; transition: transform 0.3s ease; overflow-y: auto;}
+        .sidebar-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 12px; }
+        .sidebar-brand h4 { font-weight: 800; margin: 0; font-size: 20px; letter-spacing: -0.5px; }
+        
+        .sidebar-heading { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 16px 12px 8px; margin-top: 8px; }
+        
+        .nav-link { color: var(--text-muted); padding: 10px 12px; margin: 2px 0; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; }
+        .nav-link svg { width: 18px; height: 18px; stroke-width: 2; }
+        .nav-link:hover { background: var(--input-bg); color: var(--text-main); }
+        .nav-link.active { background: var(--brand-600); color: white; font-weight: 600; box-shadow: var(--shadow-sm); }
+        
+        /* TOP NAVBAR */
+        .main-content { margin-left: 280px; padding: 32px 48px; min-height: 100vh; }
+        .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .breadcrumb { margin: 0; font-size: 14px; font-weight: 500; color: var(--text-muted); }
+        .breadcrumb span { color: var(--text-main); font-weight: 600; }
+        
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--brand-100); color: var(--brand-600); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+        .topbar-profile { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 4px 8px; border-radius: 8px; transition: 0.2s; }
+        .topbar-profile:hover { background: var(--input-bg); }
+        .topbar-profile .info { text-align: right; }
+        .topbar-profile .info .name { font-weight: 600; font-size: 14px; color: var(--text-main); }
+        .topbar-profile .info .role { font-size: 12px; color: var(--text-muted); }
+
+        /* HEADER */
+        .page-header { margin-bottom: 32px; }
+        .page-header h1 { font-size: 24px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; letter-spacing: -0.5px; }
+        .page-header p { font-size: 14px; color: var(--text-muted); margin: 0; }
+
+        /* CARDS */
+        .premium-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: var(--shadow-sm); }
+        
+        /* STAT CARDS */
+        .stat-card { padding: 24px; display: flex; flex-direction: column; height: 100%; transition: box-shadow 0.2s; }
+        .stat-card:hover { box-shadow: var(--shadow-md); }
+        .stat-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+        .stat-label { font-size: 14px; font-weight: 500; color: var(--text-muted); }
+        .stat-value { font-size: 32px; font-weight: 700; color: var(--text-main); line-height: 1; letter-spacing: -1px; }
+
+        /* PANELS */
+        .panel-header { padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+        .panel-title { font-size: 16px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px; margin: 0; }
+        .panel-title svg { width: 18px; height: 18px; color: var(--text-muted); }
+        .panel-body { padding: 24px; }
+        
+        /* QUICK ACTIONS */
+        .quick-action-btn { display: flex; align-items: center; gap: 16px; padding: 20px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); text-decoration: none; color: var(--text-main); transition: all 0.2s; box-shadow: var(--shadow-sm); height: 100%; }
+        .quick-action-btn:hover { border-color: var(--brand-500); transform: translateY(-2px); box-shadow: var(--shadow-md); color: var(--text-main); }
+        .quick-action-btn span { font-weight: 600; font-size: 14px; }
+
+        /* TABLES */
+        .table-premium { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .table-premium th { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 24px; border-bottom: 1px solid var(--border-color); text-align: left; }
+        .table-premium td { padding: 16px 24px; font-size: 14px; font-weight: 500; color: var(--text-main); border-bottom: 1px solid var(--border-color); }
+        .table-premium tr:last-child td { border-bottom: none; }
+        .table-premium tr:hover td { background: var(--bg-color); }
+        .table-premium th.numeric, .table-premium td.numeric { text-align: right; }
+
+        .rank-badge { width: 28px; height: 28px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; }
+        .rank-1 { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); }
+        .rank-2 { background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%); }
+        .rank-3 { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); }
+        .rank-other { background: var(--input-bg); color: var(--text-muted); }
+        
+        .badge-soft-success { background: var(--brand-50); color: var(--brand-600); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+        .badge-soft-danger { background: #fef2f2; color: var(--danger); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+
+        /* ATTENDANCE LIST */
+        .att-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border-color); }
+        .att-item:last-child { border-bottom: none; padding-bottom: 0; }
+        
+        .btn-link-action { font-size: 13px; font-weight: 500; color: var(--brand-600); text-decoration: none; }
+        .btn-link-action:hover { text-decoration: underline; }
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay">
+        <i data-lucide="loader-2" class="lucide-spin" style="width: 48px; height: 48px; color: var(--brand-500); margin-bottom: 16px;"></i>
+        <h5 style="font-weight: 600; color: var(--text-muted); font-size: 16px;">Syncing Workspace...</h5>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="icon-3d"><i data-lucide="layers"></i></div>
+            <h4>SpringDrill</h4>
+        </div>
+        
+        <nav class="nav flex-column">
+            <div class="sidebar-heading">Overview</div>
+            <a href="admin_dashboard" class="nav-link active"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+            
+            <div class="sidebar-heading">Academics</div>
+            <a href="class_list" class="nav-link"><i data-lucide="users"></i> Classes & Students</a>
+            <a href="admin_attendance" class="nav-link"><i data-lucide="calendar-check"></i> Attendance</a>
+            <a href="admin_league_table" class="nav-link"><i data-lucide="trophy"></i> League Table</a>
+
+            <div class="sidebar-heading">Operations</div>
+            <a href="admin_admissions" class="nav-link"><i data-lucide="graduation-cap"></i> Admissions</a>
+            <a href="admin_fees" class="nav-link"><i data-lucide="wallet"></i> Fees</a>
+            <a href="admin_payments" class="nav-link"><i data-lucide="credit-card"></i> Payments</a>
+            <a href="admin_invoices" class="nav-link"><i data-lucide="file-text"></i> Invoices</a>
+            
+            <div class="sidebar-heading">Administration</div>
+            <a href="admin_create_user" class="nav-link"><i data-lucide="user-plus"></i> Accounts</a>
+            <a href="manage_users" class="nav-link"><i data-lucide="user-check"></i> Approvals</a>
+            <a href="admin_messages" class="nav-link"><i data-lucide="mail"></i> Messages</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <!-- TOPBAR -->
+        <div class="top-navbar">
+            <div class="breadcrumb">
+                SpringDrill / <span>Dashboard</span>
+            </div>
+            
+            <div class="topbar-profile" onclick="document.getElementById('logoutBtn').click()">
+                <div class="info">
+                    <div class="name" id="navAdminName">Admin</div>
+                    <div class="role">Workspace Owner</div>
+                </div>
+                <div class="avatar">
+                    <i data-lucide="user" style="width:20px; height:20px;"></i>
+                </div>
+            </div>
+            <button id="logoutBtn" style="display: none;"></button>
+        </div>
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <h1>Welcome back</h1>
+            <p>Here is what's happening across your workspace today.</p>
+        </div>
+
+        <!-- STAT CARDS -->
+        <div class="row g-4 mb-5">
+            <div class="col-12 col-md-4 col-xl-2">
+                <div class="premium-card stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Total Students</span>
+                        <div class="icon-3d icon-3d-info"><i data-lucide="users"></i></div>
+                    </div>
+                    <div class="stat-value" id="statActiveStudents">-</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4 col-xl-2">
+                <div class="premium-card stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Male</span>
+                        <div class="icon-3d icon-3d-neutral"><i data-lucide="user"></i></div>
+                    </div>
+                    <div class="stat-value" id="statMale">-</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4 col-xl-2">
+                <div class="premium-card stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Female</span>
+                        <div class="icon-3d icon-3d-neutral"><i data-lucide="user"></i></div>
+                    </div>
+                    <div class="stat-value" id="statFemale">-</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4 col-xl-2">
+                <div class="premium-card stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Classes</span>
+                        <div class="icon-3d icon-3d-warning"><i data-lucide="library"></i></div>
+                    </div>
+                    <div class="stat-value" id="statClasses">-</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4 col-xl-2">
+                <div class="premium-card stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Staff</span>
+                        <div class="icon-3d icon-3d-info"><i data-lucide="briefcase"></i></div>
+                    </div>
+                    <div class="stat-value" id="statTeachers">-</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4 col-xl-2">
+                <div class="premium-card stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Pending</span>
+                        <div class="icon-3d icon-3d-danger"><i data-lucide="clock"></i></div>
+                    </div>
+                    <div class="stat-value" id="statPending">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <h5 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Quick Actions</h5>
+        <div class="row g-4 mb-5">
+            <div class="col-12 col-sm-6 col-xl-4">
+                <a href="admin_create_user" class="quick-action-btn">
+                    <div class="icon-3d"><i data-lucide="user-plus"></i></div>
+                    <span>Create Account</span>
+                </a>
+            </div>
+            <div class="col-12 col-sm-6 col-xl-4">
+                <a href="class_list" class="quick-action-btn">
+                    <div class="icon-3d icon-3d-info"><i data-lucide="clipboard-list"></i></div>
+                    <span>Manage Classes</span>
+                </a>
+            </div>
+            <div class="col-12 col-sm-6 col-xl-4">
+                <a href="admin_attendance" class="quick-action-btn">
+                    <div class="icon-3d icon-3d-warning"><i data-lucide="calendar-check"></i></div>
+                    <span>Log Attendance</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- CHARTS AND PANELS -->
+        <div class="row g-4 mb-5">
+            <div class="col-xl-8">
+                <div class="premium-card h-100">
+                    <div class="panel-header">
+                        <h2 class="panel-title"><i data-lucide="bar-chart-2"></i> Class Distribution</h2>
+                    </div>
+                    <div class="panel-body">
+                        <canvas id="classDistributionChart" height="90"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4">
+                <div class="premium-card h-100 d-flex flex-column">
+                    <div class="panel-header">
+                        <h2 class="panel-title"><i data-lucide="users"></i> Daily Attendance</h2>
+                        <a href="admin_attendance" class="btn-link-action">View All</a>
+                    </div>
+                    <div class="panel-body flex-grow-1" id="attendanceListWidget" style="max-height: 320px; overflow-y: auto;">
+                        <div class="text-center text-muted py-5">
+                            <i data-lucide="loader-2" class="lucide-spin mx-auto mb-2"></i>
+                            <div style="font-size: 13px;">Syncing records...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLES -->
+        <div class="row g-4 mb-5">
+            <div class="col-xl-8">
+                <div class="premium-card">
+                    <div class="panel-header">
+                        <h2 class="panel-title"><i data-lucide="award"></i> Global Top Performers</h2>
+                        <a href="admin_league_table" class="btn-link-action">Full Table</a>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="table-premium">
+                            <thead>
+                                <tr>
+                                    <th width="15%">Rank</th>
+                                    <th width="65%">Student Name</th>
+                                    <th class="numeric" width="20%">Points</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leagueWidgetBody">
+                                <tr><td colspan="3" class="text-center py-5 text-muted" style="font-size: 13px;">Calculating leaderboard...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4">
+                <div class="premium-card">
+                    <div class="panel-header">
+                        <h2 class="panel-title"><i data-lucide="gift"></i> Birthdays</h2>
+                    </div>
+                    <div class="panel-body" id="birthdayWidgetBody">
+                        <div class="text-center text-muted py-5" style="font-size: 13px;">
+                            <i data-lucide="loader-2" class="lucide-spin mx-auto mb-2"></i>
+                            Checking records...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        // Initialize Lucide Icons immediately
+        lucide.createIcons();
+    </script>
+    
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        async function initializeDashboard() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = '/';
+
+                supabase.from('users').select('name').eq('id', session.user.id).single().then(({data: profile}) => {
+                    if(profile) document.getElementById('navAdminName').innerText = profile.name;
+                });
+
+                const [
+                    { count: activeStudents }, { count: pendingCount },
+                    { count: maleCount }, { count: femaleCount },
+                    { count: classCount }, { count: teacherCount }
+                ] = await Promise.all([
+                    supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', true),
+                    supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', false),
+                    supabase.from('students').select('*', { count: 'exact', head: true }).eq('gender', 'Male').eq('approved', true),
+                    supabase.from('students').select('*', { count: 'exact', head: true }).eq('gender', 'Female').eq('approved', true),
+                    supabase.from('classes').select('*', { count: 'exact', head: true }),
+                    supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'teacher')
+                ]);
+
+                document.getElementById('statActiveStudents').innerText = activeStudents || 0;
+                document.getElementById('statPending').innerText = pendingCount || 0;
+                document.getElementById('statMale').innerText = maleCount || 0;
+                document.getElementById('statFemale').innerText = femaleCount || 0;
+                document.getElementById('statClasses').innerText = classCount || 0;
+                document.getElementById('statTeachers').innerText = teacherCount || 0;
+
+                document.getElementById('loadingOverlay').style.opacity = '0';
+                setTimeout(() => document.getElementById('loadingOverlay').style.display = 'none', 300);
+
+                Promise.all([
+                    renderClassChart(),
+                    fetchRecentAttendance(),
+                    populateLeagueWidget(),
+                    fetchBirthdays()
+                ]).catch(console.error);
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        }
+
+        async function renderClassChart() {
+            try {
+                const { data: students } = await supabase.from('students').select('classes(name)').eq('approved', true);
+                const classCounts = {};
+                if (students) {
+                    students.forEach(s => {
+                        const cName = s.classes?.name || 'Unassigned';
+                        classCounts[cName] = (classCounts[cName] || 0) + 1;
+                    });
+                }
+                const labels = Object.keys(classCounts);
+                const data = Object.values(classCounts);
+                
+                // Brand-derived colors (shades of teal/emerald)
+                const bgColors = ['#059669', '#10b981', '#34d399', '#6ee7b7', '#0d9488', '#14b8a6', '#2dd4bf'];
+
+                const ctx = document.getElementById('classDistributionChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: { 
+                        labels: labels, 
+                        datasets: [{ 
+                            label: 'Students', 
+                            data: data, 
+                            backgroundColor: bgColors.slice(0, labels.length), 
+                            borderRadius: 6,
+                            borderSkipped: false
+                        }] 
+                    },
+                    options: { 
+                        responsive: true, 
+                        plugins: { legend: { display: false } }, 
+                        scales: { 
+                            y: { 
+                                beginAtZero: true, 
+                                grid: { color: '#f3f4f6' },
+                                border: { display: false }
+                            }, 
+                            x: { 
+                                grid: { display: false },
+                                border: { display: false }
+                            } 
+                        } 
+                    }
+                });
+            } catch(e) { console.error("Chart Error:", e); }
+        }
+
+        async function fetchRecentAttendance() {
+            try {
+                const attContainer = document.getElementById('attendanceListWidget');
+                const [rawAtt, allStudents, allClasses] = await Promise.all([
+                    supabase.from('attendance').select('*').order('created_at', { ascending: false }),
+                    supabase.from('students').select('*'),
+                    supabase.from('classes').select('*')
+                ]);
+
+                if (rawAtt.error || !rawAtt.data || rawAtt.data.length === 0) {
+                    attContainer.innerHTML = '<div class="text-center text-muted py-5" style="font-size:13px;">No records found.</div>';
+                    return;
+                }
+
+                const classMap = {};
+                if (allClasses.data) allClasses.data.forEach(c => classMap[c.id] = c.name);
+
+                const studentMap = {};
+                if (allStudents.data) {
+                    allStudents.data.forEach(s => {
+                        if (s.id) studentMap[String(s.id).trim().toLowerCase()] = s;
+                        if (s.user_id) studentMap[String(s.user_id).trim().toLowerCase()] = s;
+                        if (s.reg_number) studentMap[String(s.reg_number).trim().toLowerCase()] = s; 
+                    });
+                }
+
+                let targetDateString = "";
+                if (rawAtt.data.length > 0) {
+                    targetDateString = rawAtt.data[0].created_at ? rawAtt.data[0].created_at.split('T')[0] : (rawAtt.data[0].date ? rawAtt.data[0].date.split('T')[0] : "");
+                }
+
+                let classCounts = {};
+                rawAtt.data.forEach(record => {
+                    const dbDateString = record.created_at ? record.created_at.split('T')[0] : (record.date ? record.date.split('T')[0] : "");
+                    if (dbDateString === targetDateString) {
+                        const rawId = record.student_id || record.user_id || record.studentId || record.reg_number || "";
+                        const cleanId = String(rawId).trim().toLowerCase();
+                        const stu = studentMap[cleanId];
+                        
+                        let cName = 'Unknown';
+                        if (stu && classMap[stu.class_id]) cName = classMap[stu.class_id];
+                        else if (classMap[record.class_id]) cName = classMap[record.class_id];
+                        else if (record.class_id) cName = record.class_id; 
+                        else if (record.className) cName = record.className;
+                        
+                        if (!classCounts[cName]) classCounts[cName] = { present: 0, absent: 0 };
+                        const stat = String(record.status).toLowerCase();
+                        if (stat.includes('present') || stat.includes('late')) classCounts[cName].present++;
+                        else classCounts[cName].absent++;
+                    }
+                });
+
+                attContainer.innerHTML = Object.entries(classCounts).map(([className, counts]) => \`
+                    <div class="att-item">
+                        <div>
+                            <div style="font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 4px;">\${className}</div>
+                            <div style="font-size: 12px; color: var(--text-muted);">\${targetDateString}</div>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <span class="badge-soft-success">\${counts.present} Present</span>
+                            <span class="badge-soft-danger">\${counts.absent} Absent</span>
+                        </div>
+                    </div>
+                \`).join('');
+
+            } catch (err) {
+                console.error("Attendance Widget Error:", err);
+                document.getElementById('attendanceListWidget').innerHTML = '<div class="text-center text-danger py-4" style="font-size:13px;">Failed to load attendance.</div>';
+            }
+        }
+
+        async function populateLeagueWidget() {
+            try {
+                const { data: students } = await supabase.from('students').select('user_id, first_name, surname, classes(name)').eq('approved', true);
+                const { data: results } = await supabase.from('test_results').select('student_id, score');
+                const pointsMap = {};
+                if (results) {
+                    results.forEach(r => {
+                        if (!pointsMap[r.student_id]) pointsMap[r.student_id] = 0;
+                        pointsMap[r.student_id] += r.score;
+                    });
+                }
+                let rankings = students.map(s => ({
+                    name: \`\${s.first_name} \${s.surname || ''}\`,
+                    class_name: s.classes?.name || 'Unassigned',
+                    points: pointsMap[s.user_id] || 0
+                })).filter(s => s.points > 0).sort((a, b) => b.points - a.points).slice(0, 5);
+
+                const tbody = document.getElementById('leagueWidgetBody');
+                if (rankings.length === 0) {
+                    tbody.innerHTML = \`<tr><td colspan="3" class="text-center py-5 text-muted" style="font-size: 13px;">No points recorded yet.</td></tr>\`;
+                    return;
+                }
+                tbody.innerHTML = rankings.map((s, index) => {
+                    const rank = index + 1;
+                    let rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+                    return \`<tr>
+                        <td><div class="rank-badge \${rankClass}">\${rank}</div></td>
+                        <td>
+                            <div style="font-weight: 600;">\${s.name}</div>
+                            <div style="font-size: 12px; color: var(--text-muted);">\${s.class_name}</div>
+                        </td>
+                        <td class="numeric" style="font-weight: 700; color: var(--brand-600);">\${s.points} Pts</td>
+                    </tr>\`;
+                }).join('');
+            } catch(e) { console.error("League Error:", e); }
+        }
+
+        async function fetchBirthdays() {
+            try {
+                const currentMonth = new Date().getMonth();
+                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                const { data: students } = await supabase.from('students').select('first_name, surname, dob').not('dob', 'is', null);
+                const bdayContainer = document.getElementById('birthdayWidgetBody');
+
+                if (!students || students.length === 0) { bdayContainer.innerHTML = '<div class="text-center text-muted py-5" style="font-size:13px;">No birthdays recorded.</div>'; return; }
+
+                const birthdaysThisMonth = students.filter(s => new Date(s.dob).getMonth() === currentMonth).sort((a, b) => new Date(a.dob).getDate() - new Date(b.dob).getDate());
+
+                if (birthdaysThisMonth.length === 0) {
+                    bdayContainer.innerHTML = '<div class="text-center text-muted py-5" style="font-size:13px;">No birthdays this month.</div>';
+                } else {
+                    bdayContainer.innerHTML = birthdaysThisMonth.map(s => {
+                        const bDate = new Date(s.dob);
+                        return \`<div class="att-item" style="border: none; padding: 12px 0;">
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <div style="background: var(--input-bg); border-radius: 8px; padding: 8px; text-align: center; min-width: 48px;">
+                                    <div style="font-weight: 700; color: var(--text-main); font-size: 16px; line-height: 1;">\${bDate.getDate()}</div>
+                                    <div style="font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-top: 2px;">\${monthNames[bDate.getMonth()]}</div>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; font-size: 14px; color: var(--text-main);">\${s.first_name} \${s.surname || ''}</div>
+                                    <div style="font-size: 12px; color: var(--text-muted);">Student</div>
+                                </div>
+                            </div>
+                        </div>\`;
+                    }).join('');
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/'; });
+    </script>
+</body>
+</html>`;
+
+fs.writeFileSync(path.join(__dirname, 'public/admin_dashboard.html'), newHtml);
+console.log('Successfully updated admin_dashboard.html');

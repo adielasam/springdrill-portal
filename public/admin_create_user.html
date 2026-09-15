@@ -258,8 +258,22 @@
         // === LOGIC ===
         async function loadInitialData() {
             try {
+                
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = '/';
+
+                const SUPER_ADMIN_EMAILS = ['microsoftportharcourt@gmail.com', 'admin@springdrill.edu'];
+                if (!SUPER_ADMIN_EMAILS.includes(session.user.email)) {
+                    const roleSelect = document.getElementById('roleSelect');
+                    if (roleSelect) {
+                        Array.from(roleSelect.options).forEach(opt => {
+                            if (opt.value === 'admin') {
+                                opt.remove();
+                            }
+                        });
+                    }
+                }
+
                 
                 const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
                 if(profile) document.getElementById('adminName').innerText = profile.name;
