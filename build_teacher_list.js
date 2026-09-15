@@ -1,0 +1,326 @@
+const fs = require('fs');
+
+const teacherHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPRINGDRILL - Teacher Directory</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root { 
+            --brand-50: #ecfdf5; --brand-100: #d1fae5; --brand-500: #10b981; --brand-600: #059669;
+            --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-300: #d1d5db; 
+            --gray-400: #9ca3af; --gray-500: #6b7280; --gray-600: #4b5563; --gray-800: #1f2937; --gray-900: #111827;
+            
+            --bg-color: var(--gray-50); --card-bg: #ffffff; --text-main: var(--gray-900); 
+            --text-muted: var(--gray-500); --border-color: var(--gray-200); --input-bg: var(--gray-100); 
+            
+            --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6;
+
+            --radius: 12px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        body { 
+            background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased;
+        }
+
+        .icon-3d {
+            width: 32px; height: 32px; border-radius: 8px;
+            background: linear-gradient(135deg, var(--brand-500) 0%, var(--brand-600) 100%);
+            box-shadow: 0 2px 4px rgba(5, 150, 105, 0.3), inset 0 1px 1px rgba(255,255,255,0.3);
+            display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0;
+        }
+        .icon-3d svg { width: 16px; height: 16px; stroke-width: 2.5; }
+        
+        /* SIDEBAR */
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); padding: 32px 16px; z-index: 1050; overflow-y: auto;}
+        .sidebar-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 12px; }
+        .sidebar-brand h4 { font-weight: 800; margin: 0; font-size: 20px; letter-spacing: -0.5px; }
+        .sidebar-heading { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 16px 12px 8px; margin-top: 8px; }
+        .nav-link { color: var(--text-muted); padding: 10px 12px; margin: 2px 0; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; text-decoration: none; }
+        .nav-link svg { width: 18px; height: 18px; stroke-width: 2; }
+        .nav-link:hover { background: var(--input-bg); color: var(--text-main); }
+        .nav-link.active { background: var(--brand-600); color: white; font-weight: 600; box-shadow: var(--shadow-sm); }
+        
+        /* MAIN CONTENT */
+        .main-content { margin-left: 280px; padding: 32px 48px; min-height: 100vh; }
+        .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .breadcrumb { margin: 0; font-size: 14px; font-weight: 500; color: var(--text-muted); }
+        .breadcrumb span { color: var(--text-main); font-weight: 600; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--brand-100); color: var(--brand-600); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+        .topbar-profile { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 4px 8px; border-radius: 8px; transition: 0.2s; }
+        .topbar-profile:hover { background: var(--input-bg); }
+        .topbar-profile .info { text-align: right; }
+        .topbar-profile .info .name { font-weight: 600; font-size: 14px; color: var(--text-main); }
+        .topbar-profile .info .role { font-size: 12px; color: var(--text-muted); }
+
+        .page-header { margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .page-header h1 { font-size: 24px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; letter-spacing: -0.5px; }
+        .page-header p { font-size: 14px; color: var(--text-muted); margin: 0; }
+        
+        .btn-brand { background: var(--brand-600); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; text-decoration: none;}
+        .btn-brand:hover { background: var(--brand-500); color: white; transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+        
+        .premium-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
+        .panel-header { padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; background: var(--card-bg); }
+        
+        /* DATA TABLE */
+        .table-premium { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .table-premium th { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 16px 24px; border-bottom: 1px solid var(--border-color); text-align: left; background: var(--gray-50); }
+        .table-premium td { padding: 16px 24px; font-size: 14px; font-weight: 500; color: var(--text-main); border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        .table-premium tr:last-child td { border-bottom: none; }
+        .table-premium tr:hover td { background: var(--bg-color); }
+        
+        .user-cell { display: flex; align-items: center; gap: 12px; }
+        .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--input-bg); color: var(--text-muted); display: flex; align-items: center; justify-content: center; overflow: hidden;}
+        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .user-name { font-weight: 600; color: var(--text-main); line-height: 1.2; }
+        .user-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        
+        .badge-soft-success { background: var(--brand-50); color: var(--brand-600); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+        
+        .action-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; transition: 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+        .action-btn:hover { background: var(--input-bg); color: var(--text-main); }
+        .action-btn-danger:hover { background: #fef2f2; color: var(--danger); border-color: #fca5a5; }
+
+        .search-box { position: relative; width: 300px; }
+        .search-box input { width: 100%; padding: 10px 16px 10px 40px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; background: var(--card-bg); outline: none; transition: 0.2s; }
+        .search-box input:focus { border-color: var(--brand-500); box-shadow: 0 0 0 3px var(--brand-50); }
+        .search-box i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 16px; height: 16px; }
+
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay">
+        <i data-lucide="loader-2" class="lucide-spin" style="width: 48px; height: 48px; color: var(--brand-500); margin-bottom: 16px;"></i>
+        <h5 style="font-weight: 600; color: var(--text-muted); font-size: 16px;">Loading Directory...</h5>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="icon-3d"><i data-lucide="layers"></i></div>
+            <h4>SpringDrill</h4>
+        </div>
+        
+        <nav class="nav flex-column">
+            <div class="sidebar-heading">Overview</div>
+            <a href="admin_dashboard" class="nav-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+            
+            <div class="sidebar-heading">Academics</div>
+            <a href="class_list" class="nav-link"><i data-lucide="users"></i> Classes & Students</a>
+            <a href="teacher_list" class="nav-link active"><i data-lucide="graduation-cap"></i> Teachers</a>
+            <a href="admin_attendance" class="nav-link"><i data-lucide="calendar-check"></i> Attendance</a>
+            <a href="admin_league_table" class="nav-link"><i data-lucide="trophy"></i> League Table</a>
+
+            <div class="sidebar-heading">Operations</div>
+            <a href="admin_admissions" class="nav-link"><i data-lucide="user-plus"></i> Admissions</a>
+            <a href="admin_fees" class="nav-link"><i data-lucide="wallet"></i> Fees</a>
+            <a href="admin_payments" class="nav-link"><i data-lucide="credit-card"></i> Payments</a>
+            
+            <div class="sidebar-heading">Administration</div>
+            <a href="admin_create_user" class="nav-link"><i data-lucide="user-plus"></i> Accounts</a>
+            <a href="manage_users" class="nav-link"><i data-lucide="user-check"></i> Approvals</a>
+            <a href="admin_messages" class="nav-link"><i data-lucide="mail"></i> Messages</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <!-- TOPBAR -->
+        <div class="top-navbar">
+            <div class="breadcrumb">
+                SpringDrill / <span>Teachers</span>
+            </div>
+            
+            <div class="topbar-profile" onclick="document.getElementById('logoutBtn').click()">
+                <div class="info">
+                    <div class="name" id="navAdminName">Admin</div>
+                    <div class="role">Workspace Owner</div>
+                </div>
+                <div class="avatar">
+                    <i data-lucide="user" style="width:20px; height:20px;"></i>
+                </div>
+            </div>
+            <button id="logoutBtn" style="display: none;"></button>
+        </div>
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div>
+                <h1>Teacher Directory</h1>
+                <p>Manage all teaching staff, their assignments, and profiles.</p>
+            </div>
+            <a href="admin_create_user" class="btn-brand">
+                <i data-lucide="plus"></i> Add Teacher
+            </a>
+        </div>
+
+        <!-- TABLE SECTION -->
+        <div class="premium-card">
+            <div class="panel-header">
+                <div class="search-box">
+                    <i data-lucide="search"></i>
+                    <input type="text" id="searchInput" placeholder="Search by name or email...">
+                </div>
+                <div>
+                    <span style="font-size: 14px; font-weight: 500; color: var(--text-muted);" id="totalCount">0 records</span>
+                </div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="table-premium">
+                    <thead>
+                        <tr>
+                            <th width="5%">ID</th>
+                            <th width="35%">Teacher Info</th>
+                            <th width="20%">Gender</th>
+                            <th width="15%">Status</th>
+                            <th width="25%" class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teachersTableBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+    
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+        let allTeachers = [];
+
+        async function init() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = '/';
+
+                const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
+                if(profile) document.getElementById('navAdminName').innerText = profile.name;
+
+                // Fetch all teachers
+                const { data: teachers, error } = await supabase.from('users')
+                    .select('*')
+                    .eq('role', 'teacher')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+                allTeachers = teachers || [];
+                renderTable(allTeachers);
+
+                document.getElementById('loadingOverlay').style.opacity = '0';
+                setTimeout(() => document.getElementById('loadingOverlay').style.display = 'none', 300);
+
+            } catch (err) {
+                console.error("Error loading teachers:", err);
+                alert("Failed to load teacher directory.");
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('teachersTableBody');
+            document.getElementById('totalCount').innerText = \`\${data.length} records\`;
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-muted">No teachers found in the directory.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map((t, index) => {
+                const gender = t.gender || 'Not Specified';
+                const avatarInitials = t.name ? t.name.substring(0, 2).toUpperCase() : 'T';
+                
+                return \`
+                    <tr>
+                        <td style="color: var(--text-muted);">#\${(index + 1).toString().padStart(3, '0')}</td>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar">\${avatarInitials}</div>
+                                <div>
+                                    <div class="user-name">\${t.name}</div>
+                                    <div class="user-sub">\${t.email}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>\${gender}</td>
+                        <td>
+                            <span class="badge-soft-success">
+                                <i data-lucide="check-circle" style="width:12px; height:12px;"></i> Active
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                                <button class="action-btn" onclick="alert('Profile view coming soon.')">
+                                    <i data-lucide="eye" style="width:14px; height:14px;"></i> Details
+                                </button>
+                                <button class="action-btn action-btn-danger" onclick="deleteTeacher('\${t.id}', '\${t.name}')">
+                                    <i data-lucide="trash-2" style="width:14px; height:14px;"></i> Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                \`;
+            }).join('');
+            
+            // Re-initialize lucide icons for new DOM elements
+            lucide.createIcons();
+        }
+
+        window.deleteTeacher = async function(id, name) {
+            if (!confirm(\`Are you sure you want to delete teacher \${name}?\`)) return;
+            
+            try {
+                document.getElementById('loadingOverlay').style.display = 'flex';
+                document.getElementById('loadingOverlay').style.opacity = '1';
+                
+                // Note: Ensure RLS allows this, otherwise it will fail
+                await supabase.from('users').delete().eq('id', id);
+                
+                // Refresh list
+                allTeachers = allTeachers.filter(t => t.id !== id);
+                renderTable(allTeachers);
+                
+                document.getElementById('loadingOverlay').style.opacity = '0';
+                setTimeout(() => document.getElementById('loadingOverlay').style.display = 'none', 300);
+            } catch (err) {
+                console.error(err);
+                alert("Failed to delete teacher.");
+                document.getElementById('loadingOverlay').style.opacity = '0';
+                setTimeout(() => document.getElementById('loadingOverlay').style.display = 'none', 300);
+            }
+        };
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = allTeachers.filter(t => 
+                (t.name && t.name.toLowerCase().includes(query)) || 
+                (t.email && t.email.toLowerCase().includes(query))
+            );
+            renderTable(filtered);
+        });
+
+        document.addEventListener('DOMContentLoaded', init);
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => { 
+            e.preventDefault(); 
+            await supabase.auth.signOut(); 
+            window.location.href = '/'; 
+        });
+    </script>
+</body>
+</html>`;
+
+fs.writeFileSync('public/teacher_list.html', teacherHtml);
+console.log('Successfully created teacher_list.html');
