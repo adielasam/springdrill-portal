@@ -260,64 +260,40 @@
         </div>
 
         <!-- STAT CARDS -->
-        <div class="row g-4 mb-5">
-            <div class="col-12 col-md-4 col-xl-2">
-                <div class="premium-card stat-card" onclick="window.location.href='class_list.html'" style="cursor:pointer;" title="View all classes and students">
-                    <div class="stat-header">
-                        <span class="stat-label">Total Students</span>
-                        <div class="icon-3d icon-3d-blue"><i data-lucide="users"></i></div>
-                    </div>
-                    <div class="stat-value" id="statActiveStudents">-</div>
-                </div>
-            </div>
-            <div class="col-12 col-md-4 col-xl-2">
-                <div class="premium-card stat-card" onclick="window.location.href='class_list.html'" style="cursor:pointer;" title="View all students">
-                    <div class="stat-header">
-                        <span class="stat-label">Male</span>
-                        <div class="icon-3d icon-3d-teal"><i data-lucide="user"></i></div>
-                    </div>
-                    <div class="stat-value" id="statMale">-</div>
-                </div>
-            </div>
-            <div class="col-12 col-md-4 col-xl-2">
-                <div class="premium-card stat-card" onclick="window.location.href='class_list.html'" style="cursor:pointer;" title="View all students">
-                    <div class="stat-header">
-                        <span class="stat-label">Female</span>
-                        <div class="icon-3d icon-3d-coral"><i data-lucide="user"></i></div>
-                    </div>
-                    <div class="stat-value" id="statFemale">-</div>
-                </div>
-            </div>
-            <div class="col-12 col-md-4 col-xl-2">
-                <div class="premium-card stat-card" onclick="window.location.href='class_list.html'" style="cursor:pointer;" title="Manage classes">
-                    <div class="stat-header">
-                        <span class="stat-label">Classes</span>
-                        <div class="icon-3d icon-3d-violet"><i data-lucide="library"></i></div>
-                    </div>
-                    <div class="stat-value" id="statClasses">-</div>
-                </div>
-            </div>
-            <div class="col-12 col-md-4 col-xl-2">
-                <div class="premium-card stat-card" onclick="window.location.href='teacher_list'" style="cursor:pointer;" title="View all teachers">
-                    <div class="stat-header">
-                        <span class="stat-label">Staff</span>
-                        <div class="icon-3d icon-3d-green"><i data-lucide="briefcase"></i></div>
-                    </div>
-                    <div class="stat-value" id="statTeachers">-</div>
-                </div>
-            </div>
-            <div class="col-12 col-md-4 col-xl-2">
-                <div class="premium-card stat-card" onclick="window.location.href='manage_users.html'" style="cursor:pointer;" title="View pending approvals">
-                    <div class="stat-header">
-                        <span class="stat-label">Pending</span>
-                        <div class="icon-3d icon-3d-amber"><i data-lucide="clock"></i></div>
-                    </div>
-                    <div class="stat-value" id="statPending">-</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- QUICK ACTIONS -->
+          <div class="row g-3 mb-5 justify-content-center">
+              <div class="col-6 col-md-4 col-xl">
+                  <div class="stat-block bg-blue" onclick="window.location.href='class_list.html'" title="View all students">
+                      <div class="stat-val" id="statActiveStudents">0</div>
+                      <div class="stat-text">Active Students</div>
+                  </div>
+              </div>
+              <div class="col-6 col-md-4 col-xl">
+                  <div class="stat-block bg-teal" onclick="window.location.href='class_list.html'">
+                      <div class="stat-val" id="statMale">0</div>
+                      <div class="stat-text">Male Students</div>
+                  </div>
+              </div>
+              <div class="col-6 col-md-4 col-xl">
+                  <div class="stat-block bg-yellow" onclick="window.location.href='class_list.html'">
+                      <div class="stat-val" id="statFemale">0</div>
+                      <div class="stat-text">Female Students</div>
+                  </div>
+              </div>
+              <div class="col-6 col-md-6 col-xl">
+                  <div class="stat-block bg-coral" onclick="window.location.href='class_list.html'">
+                      <div class="stat-val" id="statClasses">0</div>
+                      <div class="stat-text">Classes</div>
+                  </div>
+              </div>
+              <div class="col-6 col-md-6 col-xl">
+                  <div class="stat-block bg-purple" onclick="window.location.href='teacher_list'">
+                      <div class="stat-val" id="statTeachers">0</div>
+                      <div class="stat-text">Teachers</div>
+                  </div>
+              </div>
+          </div>
+  
+          <!-- QUICK ACTIONS -->
         <h5 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Quick Actions</h5>
         <div class="row g-4 mb-5">
             <div class="col-12 col-sm-6 col-xl-4">
