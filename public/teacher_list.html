@@ -651,7 +651,22 @@
                 }
                 
                 if (newPass && newPass.length >= 6) {
-                    alert("Note: Password updates require Supabase Admin API. For security, only users can reset their own passwords.");
+                    try {
+                        const res = await fetch('/api/admin/update-password', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ userId: currentTeacher.id, newPassword: newPass })
+                        });
+                        const data = await res.json();
+                        if (!res.ok) {
+                            alert('Failed to update password: ' + (data.error || 'Unknown error'));
+                        } else {
+                            alert('Password updated successfully!');
+                        }
+                    } catch (e) {
+                        alert('Error updating password. Please ensure SUPABASE_SERVICE_ROLE_KEY is configured.');
+                        console.error(e);
+                    }
                 }
                 
                 closeEditModal();
