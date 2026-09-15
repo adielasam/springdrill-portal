@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+const fs = require('fs');
+
+const teacherHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -448,7 +450,7 @@
 
         function renderTable(data) {
             const tbody = document.getElementById('teachersTableBody');
-            document.getElementById('totalCount').innerText = `${data.length} records`;
+            document.getElementById('totalCount').innerText = \`\${data.length} records\`;
 
             if (data.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-muted">No teachers found in the directory.</td></tr>';
@@ -461,35 +463,35 @@
                 const isActive = t.is_active !== false;
                 
                 const statusHtml = isActive 
-                    ? `<span class="badge-soft-success"><i data-lucide="check-circle" style="width:12px; height:12px;"></i> Active</span>`
-                    : `<span class="badge-soft-danger"><i data-lucide="power" style="width:12px; height:12px;"></i> Inactive</span>`;
+                    ? \`<span class="badge-soft-success"><i data-lucide="check-circle" style="width:12px; height:12px;"></i> Active</span>\`
+                    : \`<span class="badge-soft-danger"><i data-lucide="power" style="width:12px; height:12px;"></i> Inactive</span>\`;
                 
-                return `
+                return \`
                     <tr>
-                        <td style="color: var(--text-muted);">#${(index + 1).toString().padStart(3, '0')}</td>
+                        <td style="color: var(--text-muted);">#\${(index + 1).toString().padStart(3, '0')}</td>
                         <td>
                             <div class="user-cell">
-                                <div class="user-avatar">${avatarInitials}</div>
+                                <div class="user-avatar">\${avatarInitials}</div>
                                 <div>
-                                    <div class="user-name">${t.name}</div>
-                                    <div class="user-sub">${t.email}</div>
+                                    <div class="user-name">\${t.name}</div>
+                                    <div class="user-sub">\${t.email}</div>
                                 </div>
                             </div>
                         </td>
-                        <td>${gender}</td>
-                        <td>${statusHtml}</td>
+                        <td>\${gender}</td>
+                        <td>\${statusHtml}</td>
                         <td class="text-end">
                             <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                                <button class="action-btn" onclick="openProfile('${t.id}')">
+                                <button class="action-btn" onclick="openProfile('\${t.id}')">
                                     <i data-lucide="eye" style="width:14px; height:14px;"></i> Details
                                 </button>
-                                <button class="action-btn action-btn-danger" onclick="openProfile('${t.id}')">
+                                <button class="action-btn action-btn-danger" onclick="openProfile('\${t.id}')">
                                     <i data-lucide="edit" style="width:14px; height:14px;"></i> Edit
                                 </button>
                             </div>
                         </td>
                     </tr>
-                `;
+                \`;
             }).join('');
             
             lucide.createIcons();
@@ -504,7 +506,7 @@
             const initials = currentTeacher.name ? currentTeacher.name.substring(0, 2).toUpperCase() : 'T';
             document.getElementById('viewAvatar').innerText = initials;
             document.getElementById('viewBannerName').innerText = currentTeacher.name || 'Unknown';
-            document.getElementById('viewStaffCode').innerText = currentTeacher.staff_code || `SD-${currentTeacher.id.substring(0,5).toUpperCase()}`;
+            document.getElementById('viewStaffCode').innerText = currentTeacher.staff_code || \`SD-\${currentTeacher.id.substring(0,5).toUpperCase()}\`;
             
             document.getElementById('viewEmail').innerText = currentTeacher.email || '-';
             document.getElementById('viewPhone').innerText = currentTeacher.phone || 'Not Provided';
@@ -522,7 +524,7 @@
             // Classes
             let classHtml = '';
             if(currentTeacher.assigned_classes && currentTeacher.assigned_classes.length > 0) {
-                classHtml = currentTeacher.assigned_classes.map(c => `<span class="badge-soft-success">${c}</span>`).join('');
+                classHtml = currentTeacher.assigned_classes.map(c => \`<span class="badge-soft-success">\${c}</span>\`).join('');
             } else {
                 classHtml = '<span class="text-muted" style="font-size:13px;">No classes assigned</span>';
             }
@@ -545,7 +547,7 @@
             if(!currentTeacher) return;
             const willBeActive = currentTeacher.is_active === false ? true : false;
             const action = willBeActive ? "activate" : "deactivate";
-            if(!confirm(`Are you sure you want to ${action} this teacher's account?`)) return;
+            if(!confirm(\`Are you sure you want to \${action} this teacher's account?\`)) return;
             
             try {
                 // If the column doesn't exist yet, this will fail safely, so we wrap it
@@ -563,7 +565,7 @@
 
         window.deleteCurrentTeacher = async function() {
             if(!currentTeacher) return;
-            if(!confirm(`Are you sure you want to delete teacher ${currentTeacher.name}?`)) return;
+            if(!confirm(\`Are you sure you want to delete teacher \${currentTeacher.name}?\`)) return;
             try {
                 await supabase.from('users').delete().eq('id', currentTeacher.id);
                 allTeachers = allTeachers.filter(t => t.id !== currentTeacher.id);
@@ -654,4 +656,7 @@
         document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/'; });
     </script>
 </body>
-</html>
+</html>`;
+
+fs.writeFileSync('public/teacher_list.html', teacherHtml);
+console.log('Successfully updated teacher_list.html with full features');
