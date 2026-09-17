@@ -97,7 +97,7 @@ function LoginForm() {
               border: '4px solid #f3f3f3', borderTop: '4px solid #004d34', borderBottom: '4px solid #004d34',
               borderRadius: '50%', animation: 'preloader-spin 1s linear infinite', zIndex: 1
             }}></div>
-            <img src="/logo.png" alt="Logo" style={{width: 60, height: 60, zIndex: 2}} onError={(e) => {
+            <img src="/dorvas-logo.png" alt="Logo" style={{width: 60, height: 60, zIndex: 2}} onError={(e) => {
               (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=SD&background=004d34&color=fff&rounded=true'
             }}/>
           </div>
@@ -110,8 +110,8 @@ function LoginForm() {
 
       <div className="login-wrapper">
         <div className="login-left">
-          <i className="fas fa-graduation-cap"></i>
-          <h2>SPRINGDRILL</h2>
+          <img src="/dorvas-logo.png" alt="Dorvas Logo" style={{maxHeight: "80px", marginBottom: "15px"}} />
+            <h2 style={{color: "white"}}>SPRINGDRILL</h2>
           <p>The ultimate digital infrastructure for modern schools. Manage CBT, Results, eClassrooms, and Administration all in one secure place.</p>
         </div>
 
