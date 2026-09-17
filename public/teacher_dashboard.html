@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* GLOBAL DARK MODE ENGINE */
+        /* SPRINGDRILL COLORS */
         :root { 
             --bg-color: #f4f7fa; 
             --card-bg: #ffffff; 
@@ -15,265 +15,230 @@
             --text-muted: #6c757d; 
             --border-color: #e9ecef; 
             --input-bg: #f8f9fa; 
-            --stat-icon-bg: #e8f5e9;
-        }
-        body.dark-mode { 
-            --bg-color: #121212; 
-            --card-bg: #1e1e1e; 
-            --text-color: #e0e0e0; 
-            --text-muted: #a0a0a0; 
-            --border-color: #333333; 
-            --input-bg: #2c2c2c; 
-            --stat-icon-bg: #1a2e21;
+            --springdrill-green: #004d34;
+            --springdrill-green-light: #007a4d;
         }
 
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
         
-        /* Sidebar Styling */
-        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; background: #004d34; color: white; padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.1);}
-        .sidebar::-webkit-scrollbar { width: 10px; }
-        .sidebar::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
-        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.4); border-radius: 10px; }
-        .sidebar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.6); }
+        /* Sidebar Styling (Matching Spring Valley exactly in structure, but SpringDrill colors) */
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; background: var(--springdrill-green); color: white; padding-top: 15px; z-index: 1050; box-shadow: 4px 0 15px rgba(0,0,0,0.1);}
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
         
-        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; display: flex; align-items: center; font-size: 0.95rem; text-decoration: none;}
-        .nav-link i { width: 25px; }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
+        .sidebar-brand { display: flex; align-items: center; justify-content: center; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; background: white;}
+        .sidebar-brand img { max-width: 180px; }
+        .sidebar-brand span { color: var(--springdrill-green); font-weight: 800; font-size: 1.2rem; }
 
-        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        .nav-link { color: rgba(255,255,255,0.85); padding: 10px 20px; margin: 1px 0; transition: all 0.2s; display: flex; align-items: center; font-size: 0.85rem; text-decoration: none; border-left: 4px solid transparent; }
+        .nav-link i { width: 22px; font-size: 0.9rem; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; border-left: 4px solid #f1c40f; }
+
+        /* Nested Menus */
+        .collapse .nav-link { padding-left: 45px; font-size: 0.8rem; }
+        .collapse { background: rgba(0,0,0,0.15); }
+
+        .main-content { margin-left: 260px; padding: 0; min-height: 100vh; }
         
         /* Top Navbar */
-        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #007a4d; transition: all 0.3s; }
-        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
-        .dark-toggle-btn:hover { transform: scale(1.1); }
+        .top-navbar { background: var(--card-bg); padding: 10px 30px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Quick Links Circles */
+        .quick-links-container { padding: 30px; display: flex; justify-content: space-evenly; background: white; border-bottom: 1px solid var(--border-color); }
+        .quick-link-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: var(--text-color); cursor: pointer; transition: transform 0.2s; }
+        .quick-link-item:hover { transform: scale(1.05); }
+        .circle-icon { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin-bottom: 10px; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        .circle-red { background: #e74c3c; }
+        .circle-green { background: #2ecc71; }
+        .circle-blue { background: #3498db; }
 
-        /* Profile Banner */
-        .profile-banner { background: linear-gradient(135deg, #007a4d 0%, #004d34 100%); border-radius: 12px; padding: 30px; color: white; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 20px rgba(0, 122, 77, 0.2);}
-        .profile-banner h2 { font-weight: 800; margin-bottom: 5px; }
-        .profile-banner p { margin-bottom: 0; opacity: 0.9; font-size: 1.1rem; }
+        .quick-link-text { font-size: 0.85rem; font-weight: 600; }
 
-        /* Stat Cards */
-        .stat-card { background: var(--card-bg); border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 20px; transition: all 0.3s; height: 100%;}
-        .stat-card:hover { transform: translateY(-5px); border-color: #007a4d; }
-        .stat-icon { width: 65px; height: 65px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: var(--input-bg); color: #007a4d;}
-        .stat-info h6 { font-weight: bold; color: var(--text-muted); margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;}
-        .stat-info h2 { font-weight: 900; color: var(--text-color); margin-bottom: 0; }
+        /* Tabs */
+        .dashboard-tabs { background: white; padding: 0 30px; border-bottom: 1px solid var(--border-color); display: flex; gap: 20px; }
+        .tab-item { padding: 12px 10px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; }
+        .tab-item.active { color: var(--springdrill-green-light); border-bottom-color: var(--springdrill-green-light); }
 
-        /* Quick Links Grid */
-        .quick-links-header { font-weight: 800; color: var(--text-color); margin-bottom: 20px; margin-top: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;}
-        .quick-link-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); padding: 25px; text-align: center; transition: all 0.3s; text-decoration: none; color: var(--text-color); display: block; box-shadow: 0 4px 15px rgba(0,0,0,0.02); position: relative;}
-        .quick-link-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-color: #007a4d; color: var(--text-color); }
-        .quick-link-card i { font-size: 2.5rem; color: #3498db; margin-bottom: 15px; }
-        .quick-link-card h5 { font-weight: 700; margin-bottom: 10px; }
-        .quick-link-card p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0; }
+        /* Layout Grid */
+        .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; padding: 20px 30px; }
+        
+        .panel { background: white; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; margin-bottom: 20px; }
+        .panel-header { padding: 12px 15px; font-size: 0.85rem; font-weight: 700; color: var(--springdrill-green); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; }
+        .panel-header i { margin-right: 8px; }
+        .panel-body { padding: 15px; }
 
-        /* Notification Badge for Inbox */
-        .notification-badge { position: absolute; top: 15px; right: 15px; background: #e74c3c; color: white; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 20px; display: none; border: 2px solid var(--card-bg); box-shadow: 0 2px 5px rgba(231, 76, 60, 0.4);}
-
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
-
-        @media (max-width: 992px) {
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.mobile-open { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 15px; }
-            .mobile-menu-toggle { display: inline-block !important; }
-            .top-navbar { padding: 15px; flex-direction: column; gap: 10px; }
-            .profile-banner { flex-direction: column; text-align: center; gap: 15px; }
-        }
-        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
-        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
+        .list-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--border-color); font-size: 0.8rem; }
+        .list-item:last-child { border-bottom: none; }
+        .list-icon { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1rem; margin-right: 15px; }
+        
     </style>
 </head>
 <body>
 
-    <div id="loadingOverlay">
-        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
-        <h4 class="fw-bold" style="color: var(--text-muted);">Loading Dashboard...</h4>
-    </div>
-
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
+    <!-- Sidebar exactly modeling the Spring Valley structure -->
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
-            <h5 class="text-white fw-bold m-0"><i class="fas fa-chalkboard-teacher text-warning me-2"></i> STAFF PORTAL</h5>
-            <button class="btn btn-sm btn-link text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        <div class="sidebar-brand">
+            <span><i class="fas fa-layer-group"></i> SPRINGDRILL</span>
         </div>
         
-        <nav class="nav flex-column mt-3">
+        <nav class="d-flex flex-column mb-5">
             <a href="teacher_dashboard" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="#" class="nav-link"><i class="fas fa-user-tie"></i> My HRM Info</a>
+            <a href="#" class="nav-link"><i class="fas fa-hands-helping"></i> Pastoral</a>
             
-            <a href="teacher_class_list" class="nav-link"><i class="fas fa-users"></i> Class Roster & 360°</a>
-
-            <a href="teacher_attendance" class="nav-link"><i class="fas fa-calendar-check"></i> Attendance Tracker</a>
-
-            <a href="teacher_eclassroom" class="nav-link"><i class="fas fa-video text-danger"></i> eClassroom</a>
-
-            <a href="teacher_subjects" class="nav-link"><i class="fas fa-book"></i> Materials & AI Planner</a>
-
-            <a href="#cbtMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
-                <span><i class="fas fa-laptop-code me-2"></i> CBT Console</span>
-                <i class="fas fa-caret-down"></i>
+            <a href="#highSchoolReportMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-file-alt"></i> High School Report</span>
+                <i class="fas fa-caret-down me-2"></i>
             </a>
-            
-            <div class="collapse show bg-dark mx-2 mt-1 rounded pb-2" id="cbtMenu">
-                
-                <div class="px-3 py-1 text-muted small fw-bold mt-2" style="font-size: 0.7rem; letter-spacing: 1px;">SCHOOL EXAMS</div>
-                <a href="create_test" class="nav-link small py-1"><i class="fas fa-plus-circle me-2"></i> Create Exam</a>
-                <a href="question_bank" class="nav-link small py-1"><i class="fas fa-server me-2"></i> School Q-Bank</a>
-                <a href="manage_cbt" class="nav-link small py-1"><i class="fas fa-list me-2"></i> Manage Exams</a>
-                <a href="test_results" class="nav-link small py-1"><i class="fas fa-chart-bar me-2"></i> Result Manager</a>
-                
-                <div class="px-3 py-1 text-warning small fw-bold mt-3 border-top border-secondary pt-2" style="font-size: 0.7rem; letter-spacing: 1px;">REAL JAMB HUB</div>
-                <a href="teacher_bulk_upload" class="nav-link small py-1"><i class="fas fa-upload me-2"></i> JAMB Uploader</a>
-                <a href="jamb_question_bank" class="nav-link small py-1"><i class="fas fa-database me-2"></i> JAMB Q-Bank</a>
+            <div class="collapse" id="highSchoolReportMenu">
+                <a href="/high/result/make" class="nav-link"><i class="fas fa-edit"></i> Make Report</a>
+                <a href="#" class="nav-link"><i class="fas fa-eye"></i> Teacher Reports</a>
+                <a href="#" class="nav-link"><i class="fas fa-comment-dots"></i> Teacher Comments</a>
             </div>
 
-            <a href="#reportMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
-                <span><i class="fas fa-file-alt me-2"></i> High School Report</span>
-                <i class="fas fa-caret-down"></i>
+            <a href="#" class="nav-link"><i class="fas fa-laptop-house"></i> eClassroom</a>
+            <a href="#" class="nav-link"><i class="fas fa-comments"></i> Feedback</a>
+            <a href="#" class="nav-link"><i class="fas fa-book"></i> Subjects</a>
+            <a href="#" class="nav-link"><i class="fas fa-chalkboard"></i> Lesson Planner</a>
+
+            <a href="#cbtMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-desktop"></i> CBT</span>
+                <i class="fas fa-caret-down me-2"></i>
             </a>
-            
-            <div class="collapse bg-dark mx-2 mt-1 rounded pb-2" id="reportMenu">
-                <a href="/high/result/make" class="nav-link small py-1"><i class="fas fa-edit me-2"></i> Make Report</a>
-                <a href="#" class="nav-link small py-1 text-muted"><i class="fas fa-eye me-2"></i> Teacher Reports</a>
+            <div class="collapse" id="cbtMenu">
+                <a href="#" class="nav-link"><i class="fas fa-database"></i> Question Bank</a>
+                <a href="#" class="nav-link"><i class="fas fa-cog"></i> Manage CBT</a>
+                <a href="#" class="nav-link"><i class="fas fa-chart-line"></i> Result Manager</a>
             </div>
 
-            <a href="teacher_messages" class="nav-link mt-2">
-                <i class="fas fa-envelope"></i> Communications 
-                <span class="badge bg-danger ms-auto" id="sidebarBadge" style="display: none;">0</span>
-            </a>
-
-            <hr class="mx-3 my-4 border-secondary">
-            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Secure Logout</a>
+            <a href="#" class="nav-link"><i class="fas fa-user-check"></i> BehaviourTracker</a>
+            <a href="#" class="nav-link"><i class="fas fa-calendar-alt"></i> TimeTable</a>
+            <a href="#" class="nav-link"><i class="fas fa-calendar-day"></i> Calendar</a>
+            <a href="class_list" class="nav-link"><i class="fas fa-clipboard-list"></i> Class Attendance</a>
+            <a href="#" class="nav-link"><i class="fas fa-camera"></i> Photo Journals</a>
+            <a href="#" class="nav-link"><i class="fas fa-pen-nib"></i> Weekly Remarks</a>
         </nav>
     </div>
 
     <div class="main-content">
         <div class="top-navbar">
-            <div class="d-flex align-items-center">
-                <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-                <div class="fw-bold d-none d-md-block" style="color: var(--text-muted);"><i class="fas fa-chalkboard-teacher me-2"></i> Teacher Command Center</div>
-            </div>
-
-            <div class="d-flex align-items-center ms-auto">
-                <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
-                    <i class="fas fa-moon" id="themeIcon"></i>
-                </button>
-                <div class="fw-bold d-flex align-items-center" style="color: var(--text-color);">
-                    <span id="navTeacherName">Loading...</span><i class="fas fa-user-circle ms-3 fs-4 text-success"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="profile-banner">
+            <div class="text-muted fw-bold small">Welcome <span id="navTeacherName">Staff</span></div>
             <div>
-                <h2 id="welcomeText">Welcome back, Staff!</h2>
-                <p>Ready to manage your classes and exams today?</p>
-            </div>
-            <div class="d-none d-md-block">
-                <i class="fas fa-award fa-4x opacity-50"></i>
+                <i class="fas fa-bell text-muted me-3"></i>
+                <i class="fas fa-user-circle text-muted fs-4"></i>
             </div>
         </div>
 
-        <div class="row g-4 mb-5">
-            <div class="col-md-4">
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-users text-primary"></i></div>
-                    <div class="stat-info">
-                        <h6>Registered Students</h6>
-                        <h2 id="totalStudents">0</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-laptop-code text-danger"></i></div>
-                    <div class="stat-info">
-                        <h6>Active Exams</h6>
-                        <h2 id="totalExams">0</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-database text-warning"></i></div>
-                    <div class="stat-info">
-                        <h6>Banked Questions</h6>
-                        <h2 id="totalQuestions">0</h2>
-                    </div>
-                </div>
-            </div>
+        <div class="quick-links-container">
+            <a href="#" class="quick-link-item">
+                <div class="circle-icon circle-red"><i class="fas fa-play"></i></div>
+                <div class="quick-link-text">eClassroom</div>
+            </a>
+            <a href="#" class="quick-link-item">
+                <div class="circle-icon circle-green"><i class="fas fa-edit"></i></div>
+                <div class="quick-link-text">Assignments</div>
+            </a>
+            <a href="#" class="quick-link-item">
+                <div class="circle-icon circle-red"><i class="fas fa-award"></i></div>
+                <div class="quick-link-text">CBT</div>
+            </a>
+            <a href="#" class="quick-link-item">
+                <div class="circle-icon circle-green"><i class="fas fa-calendar-check"></i></div>
+                <div class="quick-link-text">Check Schedules</div>
+            </a>
         </div>
 
-        <h4 class="quick-links-header">Quick Actions</h4>
-        <div class="row g-4">
-            
-            <div class="col-md-3 col-sm-6">
-                <a href="teacher_class_list" class="quick-link-card">
-                    <i class="fas fa-id-badge text-primary"></i>
-                    <h5>Student 360°</h5>
-                    <p>View behavioral notes, attendance, and analytics.</p>
-                </a>
+        <div class="dashboard-tabs">
+            <div class="tab-item active">Overview</div>
+            <div class="tab-item">My Subjects</div>
+            <div class="tab-item">Weekly Reflection</div>
+            <div class="tab-item">My Students</div>
+        </div>
+
+        <div class="content-grid">
+            <!-- Left Area -->
+            <div>
+                <div class="panel">
+                    <div class="panel-body" style="min-height: 250px;">
+                        <textarea class="form-control mb-3" rows="3" placeholder="Share something with your students..."></textarea>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-muted">
+                                <i class="fas fa-image me-2 cursor-pointer"></i>
+                                <i class="fas fa-video me-2 cursor-pointer"></i>
+                                <i class="fas fa-file-alt cursor-pointer"></i>
+                            </div>
+                            <button class="btn btn-success btn-sm px-4 fw-bold shadow-sm">Publish</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel border-0 shadow-sm">
+                    <div class="panel-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-user-circle fs-4 me-2 text-muted"></i>
+                            <div>
+                                <div class="fw-bold text-dark" style="font-size: 0.85rem;" id="postAuthor">System Admin</div>
+                                <div class="text-muted" style="font-size: 0.7rem;">May 28, 2026 8:43AM</div>
+                            </div>
+                        </div>
+                        <h6 class="fw-bold" style="font-size: 0.85rem;">YEAR 8 MIDTERM HOLIDAY PROJECT</h6>
+                        <p class="text-muted mb-2" style="font-size: 0.8rem;">Solar System Model Using Cardboard and Carton</p>
+                        <p class="text-muted mb-3" style="font-size: 0.8rem;">As part of the Midterm Holiday Project, Year 8 students are to create a creative model of the Solar System using cardboard and carton materials.</p>
+                        <h6 class="fw-bold" style="font-size: 0.8rem;">Materials Needed:</h6>
+                        <ul class="text-muted" style="font-size: 0.8rem; padding-left: 20px;">
+                            <li>Carton box or thick cardboard</li>
+                            <li>Colored cardboard paper</li>
+                            <li>Glue or gum</li>
+                            <li>Scissors</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
 
-            <div class="col-md-3 col-sm-6">
-                <a href="teacher_eclassroom" class="quick-link-card">
-                    <i class="fas fa-video text-danger"></i>
-                    <h5>Live eClassroom</h5>
-                    <p>Start a virtual video class with your students.</p>
-                </a>
-            </div>
+            <!-- Right Area -->
+            <div>
+                <div class="panel">
+                    <div class="panel-header"><i class="fas fa-chalkboard-teacher"></i> Upcoming Lessons</div>
+                    <div class="panel-body">
+                        <div class="text-muted text-center" style="font-size: 0.8rem; padding: 20px 0;">No Lessons</div>
+                    </div>
+                </div>
 
-            <div class="col-md-3 col-sm-6">
-                <a href="teacher_subjects" class="quick-link-card">
-                    <i class="fas fa-robot text-info"></i>
-                    <h5>AI Lesson Planner</h5>
-                    <p>Generate smart lesson plans and upload materials.</p>
-                </a>
-            </div>
-            
-            <div class="col-md-3 col-sm-6">
-                <a href="create_test" class="quick-link-card">
-                    <i class="fas fa-plus-circle text-success"></i>
-                    <h5>Create Exam</h5>
-                    <p>Setup a new CBT assessment for your class.</p>
-                </a>
-            </div>
+                <div class="panel">
+                    <div class="panel-header"><i class="fas fa-birthday-cake"></i> Upcoming Birthdays</div>
+                    <div class="panel-body p-0">
+                        <div class="px-3 py-2 text-muted" style="font-size: 0.75rem; font-style: italic; border-bottom: 1px solid #eee;">Upcoming birthdays for this month</div>
+                        
+                        <div class="list-item px-3">
+                            <div class="list-icon bg-danger"><i class="fas fa-birthday-cake"></i></div>
+                            <div class="flex-grow-1">
+                                <div class="fw-bold" style="font-size: 0.75rem;">JOHN SAM - <span class="text-muted">Student</span></div>
+                            </div>
+                            <div class="text-muted" style="font-size: 0.65rem;">Birthday is on Fri Sep 18, 2026</div>
+                        </div>
 
-            <div class="col-md-3 col-sm-6">
-                <a href="teacher_bulk_upload" class="quick-link-card">
-                    <i class="fas fa-upload text-warning"></i>
-                    <h5>Bulk Uploader</h5>
-                    <p>Import real JAMB questions via CSV/Excel instantly.</p>
-                </a>
-            </div>
+                        <div class="list-item px-3">
+                            <div class="list-icon bg-danger"><i class="fas fa-birthday-cake"></i></div>
+                            <div class="flex-grow-1">
+                                <div class="fw-bold" style="font-size: 0.75rem;">AMOO PRAISE - <span class="text-muted">Student</span></div>
+                            </div>
+                            <div class="text-muted" style="font-size: 0.65rem;">Birthday is on Mon Sep 21, 2026</div>
+                        </div>
+                        
+                        <div class="p-2">
+                            <button class="btn btn-success w-100 btn-sm fw-bold">Load More</button>
+                        </div>
+                    </div>
+                </div>
 
-            <div class="col-md-3 col-sm-6">
-                <a href="manage_cbt" class="quick-link-card">
-                    <i class="fas fa-tasks text-secondary"></i>
-                    <h5>Manage Exams</h5>
-                    <p>Edit, publish, or disable your active CBTs.</p>
-                </a>
+                <div class="panel">
+                    <div class="panel-header"><i class="fas fa-calendar-alt"></i> Upcoming Events</div>
+                    <div class="panel-body">
+                        <div class="text-muted text-center" style="font-size: 0.8rem; padding: 20px 0;">No Events</div>
+                    </div>
+                </div>
             </div>
-
-            <div class="col-md-3 col-sm-6">
-                <a href="test_results" class="quick-link-card">
-                    <i class="fas fa-chart-bar" style="color: #e67e22 !important;"></i>
-                    <h5>Results</h5>
-                    <p>Analyze student performance and grades.</p>
-                </a>
-            </div>
-
-            <div class="col-md-3 col-sm-6">
-                <a href="teacher_messages" class="quick-link-card">
-                    <div class="notification-badge" id="cardBadge">0 New</div>
-                    <i class="fas fa-envelope" style="color: #9b59b6 !important;"></i>
-                    <h5>Communications</h5>
-                    <p>Check your inbox and message students or admins.</p>
-                </a>
-            </div>
-
         </div>
 
     </div>
@@ -281,78 +246,21 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
-
-        let currentTeacherId = null;
-
-        // === UI TOGGLES ===
-        window.toggleSidebar = () => {
-            document.getElementById('sidebar').classList.toggle('mobile-open');
-            const overlay = document.getElementById('sidebarOverlay');
-            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
-        };
-
-        window.toggleTheme = () => {
-            const body = document.body;
-            body.classList.toggle('dark-mode');
-            const isDark = body.classList.contains('dark-mode');
-            localStorage.setItem('SPRINGDRILL_THEME', isDark ? 'dark' : 'light');
-            document.getElementById('themeIcon').className = isDark ? 'fas fa-sun text-warning' : 'fas fa-moon';
-        };
-
-        if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') {
-            document.body.classList.add('dark-mode');
-            document.getElementById('themeIcon').className = 'fas fa-sun text-warning';
-        }
-
-        // === DASHBOARD LOGIC ===
+        
         async function initializeDashboard() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = '/';
-                currentTeacherId = session.user.id;
-
-                const { data: profile } = await supabase.from('users').select('name').eq('id', currentTeacherId).single();
+                
+                const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
                 if(profile) {
-                    const name = profile.name.split(' ')[0];
                     document.getElementById('navTeacherName').innerText = profile.name;
-                    document.getElementById('welcomeText').innerText = `Welcome back, ${name}!`;
+                    document.getElementById('postAuthor').innerText = profile.name;
                 }
-
-                const { count: studentCount } = await supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', true);
-                document.getElementById('totalStudents').innerText = studentCount || 0;
-
-                const { count: examCount } = await supabase.from('tests').select('*', { count: 'exact', head: true }).eq('teacher_id', currentTeacherId).eq('is_published', true);
-                document.getElementById('totalExams').innerText = examCount || 0;
-
-                const { count: questionCount } = await supabase.from('questions').select('*', { count: 'exact', head: true }).eq('teacher_id', currentTeacherId);
-                document.getElementById('totalQuestions').innerText = questionCount || 0;
-
-                const { count: unreadCount, error: msgErr } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('receiver_id', currentTeacherId).eq('is_read', false);
-                if (!msgErr && unreadCount > 0) {
-                    const sidebarBadge = document.getElementById('sidebarBadge');
-                    sidebarBadge.innerText = unreadCount;
-                    sidebarBadge.style.display = 'inline-block';
-
-                    const cardBadge = document.getElementById('cardBadge');
-                    cardBadge.innerText = `${unreadCount} New`;
-                    cardBadge.style.display = 'inline-block';
-                }
-
-                document.getElementById('loadingOverlay').style.display = 'none';
-
-            } catch (err) {
-                console.error(err);
-                document.getElementById('loadingOverlay').style.display = 'none';
-            }
+            } catch(e) { console.error(e); }
         }
-
+        
         document.addEventListener('DOMContentLoaded', initializeDashboard);
-
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            await supabase.auth.signOut();
-            window.location.href = '/';
-        });
     </script>
 </body>
 </html>

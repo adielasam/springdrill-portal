@@ -204,7 +204,7 @@ export default function ReportClient() {
       const updated = [...results]
       let foundAny = false
       updated.forEach(row => {
-        const cbtRecord = scores.find((s: any) => String(s.student_id) === String(row.cbt_user_id))
+        const cbtRecord = scores.find((s: any) => String(s.student_id) === String(row.cbt_user_id) || String(s.student_id) === String(row.student_id))
         if (cbtRecord) {
           // Dynamic assignment to the selected column
           (row as any)[importTargetCol] = cbtRecord.score
