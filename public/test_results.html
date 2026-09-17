@@ -85,18 +85,56 @@
 
         <div class="edu-card">
             <div class="edu-header">
-                <span><i class="fas fa-filter me-2"></i> Select Exam to View Results</span>
+                <span><i class="fas fa-cog me-2"></i> Test/Assignment/Examination Result Manager</span>
             </div>
             <div class="edu-body py-4">
-                <div class="row align-items-end">
-                    <div class="col-md-9">
-                        <label class="form-label">Available Exams</label>
-                        <select class="form-select border-primary" id="testSelect">
-                            <option value="">Loading your exams...</option>
-                        </select>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="row mb-3 align-items-center">
+                            <label class="col-sm-4 col-form-label fw-bold text-end">Session</label>
+                            <div class="col-sm-8">
+                                <select class="form-select" id="filterSession">
+                                    <option value="">Loading sessions...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3 align-items-center">
+                            <label class="col-sm-4 col-form-label fw-bold text-end">Class</label>
+                            <div class="col-sm-8">
+                                <select class="form-select" id="filterClass" onchange="window.onClassChange()">
+                                    <option value="">-- All Classes --</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3 align-items-center">
+                            <label class="col-sm-4 col-form-label fw-bold text-end">Subject</label>
+                            <div class="col-sm-8">
+                                <select class="form-select" id="filterSubject">
+                                    <option value="">-- All Subjects --</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3 align-items-center">
+                            <label class="col-sm-4 col-form-label fw-bold text-end">Exam</label>
+                            <div class="col-sm-8">
+                                <select class="form-select border-primary" id="testSelect">
+                                    <option value="">-- Select an Exam --</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3 align-items-center">
+                            <label class="col-sm-4 col-form-label fw-bold text-end">Selection Type</label>
+                            <div class="col-sm-8">
+                                <select class="form-select" id="filterType">
+                                    <option value="all">All</option>
+                                    <option value="passed">Passed Only</option>
+                                    <option value="failed">Failed Only</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        <button class="btn btn-primary w-100 fw-bold py-2" onclick="window.fetchResults()">
+                    <div class="col-md-6 d-flex align-items-end justify-content-center pb-3">
+                        <button class="btn btn-primary fw-bold py-2 px-5 rounded-pill shadow" onclick="window.fetchResults()">
                             <i class="fas fa-search me-2"></i> Fetch Results
                         </button>
                     </div>
@@ -179,30 +217,45 @@
 
         let currentUserId = null;
         let currentResultsData = []; // Store globally for CSV export
+        let allTests = [];
 
-        // 1. Initialize Page and Load Tests
+        // 1. Initialize Page and Load Filter Data
         window.initializePage = async function() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = '/';
                 currentUserId = session.user.id;
 
-                // Fetch tests created by this teacher
-                const { data: tests, error } = await supabase
-                    .from('tests')
-                    .select('id, title, code, classes(name)')
-                    .eq('teacher_id', currentUserId)
-                    .order('created_at', { ascending: false });
+                // Load all data in parallel
+                const [sessRes, clsRes, subRes, testRes] = await Promise.all([
+                    supabase.from('academic_sessions').select('*').order('name', { ascending: false }),
+                    supabase.from('classes').select('*').order('name'),
+                    supabase.from('subjects').select('*').order('name'),
+                    supabase.from('tests').select('id, title, code, class_id, subject_id, classes(name), subjects(name)').eq('teacher_id', currentUserId).order('created_at', { ascending: false })
+                ]);
 
-                if (error) throw error;
+                // Populate Sessions
+                const sessionSelect = document.getElementById('filterSession');
+                const sessions = sessRes.data || [];
+                sessionSelect.innerHTML = sessions.length > 0
+                    ? sessions.map((s, i) => `<option value="${s.id}" ${i === 0 ? 'selected' : ''}>${s.name}</option>`).join('')
+                    : '<option value="">No sessions found</option>';
 
-                const testSelect = document.getElementById('testSelect');
-                if (tests && tests.length > 0) {
-                    testSelect.innerHTML = `<option value="" disabled selected>-- Select an Exam --</option>` + 
-                        tests.map(t => `<option value="${t.id}">[${t.classes?.name || 'Gen'}] ${t.code} - ${t.title}</option>`).join('');
-                } else {
-                    testSelect.innerHTML = `<option value="">No exams found. Create one first.</option>`;
-                }
+                // Populate Classes
+                const classSelect = document.getElementById('filterClass');
+                const classes = clsRes.data || [];
+                classSelect.innerHTML = '<option value="">-- All Classes --</option>' +
+                    classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+                // Populate Subjects
+                const subjectSelect = document.getElementById('filterSubject');
+                const subs = subRes.data || [];
+                subjectSelect.innerHTML = '<option value="">-- All Subjects --</option>' +
+                    subs.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+
+                // Store all tests
+                allTests = testRes.data || [];
+                populateExams();
 
                 document.getElementById('loadingOverlay').style.display = 'none';
 
@@ -213,8 +266,31 @@
             }
         };
 
-        // Run on load
-        document.addEventListener('DOMContentLoaded', window.initializePage);
+        // Populate the Exam dropdown based on selected Class and Subject filters
+        function populateExams() {
+            const classId = document.getElementById('filterClass').value;
+            const subjectId = document.getElementById('filterSubject').value;
+            
+            let filtered = allTests;
+            if (classId) filtered = filtered.filter(t => String(t.class_id) === classId);
+            if (subjectId) filtered = filtered.filter(t => String(t.subject_id) === subjectId);
+
+            const testSelect = document.getElementById('testSelect');
+            if (filtered.length > 0) {
+                testSelect.innerHTML = '<option value="" disabled selected>-- Select an Exam --</option>' +
+                    filtered.map(t => `<option value="${t.id}">[${t.classes?.name || 'Gen'}] ${t.code} - ${t.title}</option>`).join('');
+            } else {
+                testSelect.innerHTML = '<option value="">No exams found for this filter.</option>';
+            }
+        }
+
+        // When class or subject changes, re-filter exams
+        window.onClassChange = function() { populateExams(); };
+        document.addEventListener('DOMContentLoaded', () => {
+            window.initializePage();
+            // Also re-filter when subject changes
+            document.getElementById('filterSubject')?.addEventListener('change', populateExams);
+        });
 
         // 2. Fetch Results Logic
         window.fetchResults = async function() {
@@ -283,6 +359,15 @@
 
                 // Sort by Percentage Highest to Lowest
                 processedResults.sort((a, b) => b.percentage - a.percentage);
+
+                // Apply Selection Type filter
+                const filterType = document.getElementById('filterType').value;
+                if (filterType === 'passed') {
+                    processedResults = processedResults.filter(r => r.passed);
+                } else if (filterType === 'failed') {
+                    processedResults = processedResults.filter(r => !r.passed);
+                }
+
                 currentResultsData = processedResults; // Save for CSV
 
                 // D. Calculate Stats
