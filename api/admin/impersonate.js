@@ -27,12 +27,14 @@ export default async function handler(req, res) {
             }
         });
 
+        const redirectToUrl = req.body.redirectTo || `${process.env.NEXT_PUBLIC_SITE_URL || 'https://springdrill-portal.vercel.app'}/teacher_dashboard.html`;
+
         // Generate a magic link for the user
         const { data, error } = await supabaseAdmin.auth.admin.generateLink({
             type: 'magiclink',
             email: email,
             options: {
-                redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://springdrill-portal.vercel.app'}/teacher_dashboard.html`
+                redirectTo: redirectToUrl
             }
         });
 
