@@ -728,10 +728,13 @@
                                 <tr>
                                     <th style="width: 50px;">S/N</th>
                                     <th class="text-start position-sticky start-0 bg-light" style="min-width: 250px; z-index: 2; border-right: 2px solid #dee2e6;">Teacher</th>
+                                    <th style="width: 80px; vertical-align: top; padding-top: 15px;">
+                                        <div class="mb-2 text-uppercase fw-bold text-muted" style="font-size: 10px;">Assign All</div>
+                                    </th>
                                     ${cols.map(c => `
                                         <th style="min-width: 120px; width: 120px; vertical-align: top; padding-top: 15px;">
                                             <div class="mb-2 text-uppercase fw-bold text-muted" style="white-space: normal; height: 40px; overflow: hidden; font-size: 10px;">${c.name}</div>
-                                            <div><i class="fas fa-check-square text-success opacity-50"></i></div>
+                                            <div><input type="checkbox" class="form-check-input" onchange="toggleMatrixColumn(this, ${c.id})"></div>
                                         </th>
                                     `).join('')}
                                 </tr>
@@ -743,7 +746,7 @@
                     const rowHtml = cols.map(c => {
                         const isAssigned = matrixAssignments.some(a => a.teacher_id === t.id && a.subject_id === c.id);
                         const bgClass = isAssigned ? 'bg-success bg-opacity-10' : '';
-                        return `<td class="${bgClass} p-1"><input type="checkbox" class="form-check-input matrix-cb" data-teacher="${t.id}" data-class="${class_id}" data-subject="${c.id}" ${isAssigned ? 'checked':''} onchange="this.parentElement.className = this.checked ? 'bg-success bg-opacity-10 p-1' : 'p-1'"></td>`;
+                        return `<td class="${bgClass} p-1"><input type="checkbox" class="form-check-input matrix-cb cb-col-${c.id} cb-row-${t.id}" data-teacher="${t.id}" data-class="${class_id}" data-subject="${c.id}" ${isAssigned ? 'checked':''} onchange="this.parentElement.className = this.checked ? 'bg-success bg-opacity-10 p-1' : 'p-1'"></td>`;
                     }).join('');
                     
                     html += `
@@ -753,6 +756,7 @@
                                 <i class="fas fa-user-circle me-2 text-muted" style="font-size: 24px; vertical-align: middle;"></i> 
                                 ${t.name}
                             </td>
+                            <td><input type="checkbox" class="form-check-input" onchange="toggleMatrixRow(this, '${t.id}')"></td>
                             ${rowHtml}
                         </tr>
                     `;
@@ -890,6 +894,23 @@
             }, 2000);
             renderMatrix();
         };
+        window.toggleMatrixColumn = (el, subjectId) => {
+            const isChecked = el.checked;
+            document.querySelectorAll(`.cb-col-${subjectId}`).forEach(cb => {
+                cb.checked = isChecked;
+                // Dispatch change event to update the parent td background color
+                cb.dispatchEvent(new Event('change'));
+            });
+        };
+
+        window.toggleMatrixRow = (el, teacherId) => {
+            const isChecked = el.checked;
+            document.querySelectorAll(`.cb-row-${teacherId}`).forEach(cb => {
+                cb.checked = isChecked;
+                cb.dispatchEvent(new Event('change'));
+            });
+        };
+
         async function assignSubjectHead() {
             const subject_id = document.getElementById('hSubject').value;
             const head_teacher_id = document.getElementById('hTeacher').value;

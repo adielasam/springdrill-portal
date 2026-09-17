@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS class_subjects (
 -- 8. Assign Teachers to Class Subjects
 CREATE TABLE IF NOT EXISTS teacher_class_subjects (
     id SERIAL PRIMARY KEY,
-    teacher_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    teacher_id UUID REFERENCES users(id) ON DELETE CASCADE,
     class_id INTEGER REFERENCES classes(id) ON DELETE CASCADE,
     subject_id INTEGER REFERENCES subjects(id) ON DELETE CASCADE,
     session_id INTEGER REFERENCES academic_sessions(id) ON DELETE CASCADE,
@@ -82,6 +82,13 @@ DO $$
 BEGIN 
     BEGIN ALTER TABLE teacher_class_subjects ADD COLUMN session_id INTEGER REFERENCES academic_sessions(id) ON DELETE CASCADE; EXCEPTION WHEN duplicate_column THEN END;
 END $$;
+
+-- Fix constraint if it references auth.users instead of users
+DO $$ 
+BEGIN 
+    ALTER TABLE teacher_class_subjects DROP CONSTRAINT IF EXISTS teacher_class_subjects_teacher_id_fkey;
+    ALTER TABLE teacher_class_subjects ADD CONSTRAINT teacher_class_subjects_teacher_id_fkey FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE CASCADE;
+EXCEPTION WHEN others THEN END $$;
 
 -- 9. Subject Heads
 CREATE TABLE IF NOT EXISTS subject_heads (
