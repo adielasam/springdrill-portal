@@ -739,6 +739,16 @@
             } catch (err) { console.error(err); }
         }
 
+        
+        const logoutBtn = document.getElementById('logoutBtn');
+        if(logoutBtn) {
+            logoutBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                await supabase.auth.signOut();
+                window.location.href = '/';
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', initializeDashboard);
         document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/'; });
     </script>

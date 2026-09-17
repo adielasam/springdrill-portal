@@ -1,18 +1,27 @@
 const fs = require('fs');
-const path = require('path');
-const dir = path.join(__dirname, 'public');
-const files = fs.readdirSync(dir).filter(f => f.endsWith('.html'));
 
-files.forEach(file => {
-  const filePath = path.join(dir, file);
-  let content = fs.readFileSync(filePath, 'utf8');
-  const original = content;
-  content = content.replace(/window\.location\.href\s*=\s*'login'/g, "window.location.href = '/'");
-  content = content.replace(/window\.location\.href\s*=\s*"login"/g, "window.location.href = '/'");
-  content = content.replace(/window\.location\.href\s*=\s*'\/login'/g, "window.location.href = '/'");
-  content = content.replace(/window\.location\.href\s*=\s*"\/login"/g, "window.location.href = '/'");
-  if (content !== original) {
-    fs.writeFileSync(filePath, content);
-  }
-});
-console.log('Done');
+const logoutLogic = `
+        const logoutBtn = document.getElementById('logoutBtn');
+        if(logoutBtn) {
+            logoutBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                await supabase.auth.signOut();
+                window.location.href = '/';
+            });
+        }
+`;
+
+function addLogout(file) {
+    try {
+        let content = fs.readFileSync(file, 'utf8');
+        if (!content.includes('logoutBtn.addEventListener')) {
+            content = content.replace("document.addEventListener('DOMContentLoaded', initializeDashboard);", logoutLogic + "\n        document.addEventListener('DOMContentLoaded', initializeDashboard);");
+            fs.writeFileSync(file, content);
+            console.log('Fixed logout in ' + file);
+        }
+    } catch(e) {}
+}
+
+addLogout('public/teacher_dashboard.html');
+addLogout('public/admin_dashboard.html');
+addLogout('public/student_dashboard.html');

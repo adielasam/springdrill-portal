@@ -13,6 +13,12 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDark, setIsDark] = useState(false);
+  const [showPreloader, setShowPreloader] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowPreloader(false), 800);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     const err = searchParams.get('error');
@@ -75,6 +81,29 @@ function LoginForm() {
 
   return (
     <>
+      <style>{`
+        @keyframes preloader-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+      `}</style>
+      
+      {showPreloader && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', 
+          background: '#ffffff', zIndex: 99999, display: 'flex', alignItems: 'center', 
+          justifyContent: 'center', transition: 'opacity 0.5s ease-out'
+        }}>
+          <div style={{position: 'relative', width: 100, height: 100, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+            <div style={{
+              position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+              border: '4px solid #f3f3f3', borderTop: '4px solid #004d34', borderBottom: '4px solid #004d34',
+              borderRadius: '50%', animation: 'preloader-spin 1s linear infinite', zIndex: 1
+            }}></div>
+            <img src="/logo.png" alt="Logo" style={{width: 60, height: 60, zIndex: 2}} onError={(e) => {
+              (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=SD&background=004d34&color=fff&rounded=true'
+            }}/>
+          </div>
+        </div>
+      )}
+
       <button className="dark-toggle-btn" onClick={toggleTheme} title="Toggle Dark Mode">
         <i className={isDark ? 'fas fa-sun text-warning' : 'fas fa-moon'} id="themeIcon"></i>
       </button>

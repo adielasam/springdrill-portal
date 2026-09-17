@@ -182,7 +182,7 @@
             </a>
             <div class="collapse" id="attendanceMenu">
                 <a href="teacher_attendance.html" class="nav-link ps-4"><i class="fas fa-plus me-2"></i> Add Attendance</a>
-                <a href="#" class="nav-link ps-4"><i class="fas fa-list me-2"></i> View Attendance</a>
+                <a href="teacher_view_attendance.html" class="nav-link ps-4"><i class="fas fa-list me-2"></i> View Attendance</a>
             </div>
             <a href="#" class="nav-link" onclick="alert('Photo Journals coming soon')"><i class="fas fa-camera"></i> Photo Journals</a>
             <a href="#" class="nav-link text-danger mt-3 border-top border-secondary pt-3" id="logoutBtn"><i class="fas fa-power-off"></i> Secure Logout</a>
@@ -328,6 +328,16 @@
             } catch(e) { console.error(e); }
         }
         
+        
+        const logoutBtn = document.getElementById('logoutBtn');
+        if(logoutBtn) {
+            logoutBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                await supabase.auth.signOut();
+                window.location.href = '/';
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', initializeDashboard);
     </script>
 </body>
