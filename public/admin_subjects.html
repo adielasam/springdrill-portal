@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Subjects | Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #004d34;
+            --secondary-color: #007a4d;
+            --sidebar-width: 280px;
+            --bg-color: #f4f6f9;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        
+        .sidebar { width: var(--sidebar-width); background: white; border-right: 1px solid #e0e0e0; height: 100vh; overflow-y: auto; flex-shrink: 0; padding-top: 20px;}
+        .sidebar-brand { display: flex; align-items: center; justify-content: center; margin-bottom: 30px; }
+        .sidebar-brand img { max-height: 50px; }
+        .nav-link { color: #555; padding: 12px 20px; font-weight: 500; display: flex; align-items: center; text-decoration: none; border-left: 4px solid transparent; }
+        .nav-link i { width: 24px; font-size: 1.1rem; }
+        .nav-link:hover, .nav-link.active { background: #f8f9fa; color: var(--primary-color); border-left-color: var(--primary-color); }
+        
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .topbar { background: white; padding: 15px 30px; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+        .content-area { padding: 30px; flex-grow: 1; overflow-y: auto; }
+        
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .card-header { background: white; border-bottom: 1px solid #eee; padding: 20px 25px; border-radius: 12px 12px 0 0 !important; font-weight: bold; color: var(--primary-color); display: flex; justify-content: space-between; align-items: center; }
+        
+        .nav-tabs .nav-link { color: #555; border: none; padding: 10px 20px; font-weight: 600; border-bottom: 3px solid transparent; border-radius: 0; margin-bottom: -1px; }
+        .nav-tabs .nav-link.active { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); background: transparent; }
+        .nav-tabs { border-bottom: 1px solid #dee2e6; margin-bottom: 25px; }
+
+        .table th { background-color: #f8f9fa; color: #555; font-weight: 600; }
+        .btn-primary { background-color: var(--primary-color); border-color: var(--primary-color); }
+        .btn-primary:hover { background-color: var(--secondary-color); border-color: var(--secondary-color); }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <img src="dorvas-logo.png" alt="Dorvas" style="max-height: 50px;">
+        </div>
+        <nav class="d-flex flex-column">
+            <a href="admin_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="admin_subjects.html" class="nav-link active"><i class="fas fa-book"></i> Subject Management</a>
+            <a href="javascript:history.back()" class="nav-link"><i class="fas fa-arrow-left"></i> Go Back</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div class="fw-bold fs-5 text-muted">Academic Setup</div>
+            <div><i class="fas fa-user-circle fs-3 text-muted"></i></div>
+        </div>
+
+        <div class="content-area">
+            <h3 class="fw-bold mb-4" style="color: var(--primary-color);">Manage Subjects</h3>
+            
+            <ul class="nav nav-tabs" id="subjectTabs">
+                <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#categoriesTab">Categories</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#subjectsTab">Subjects</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#classesTab">Assign to Classes</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#teachersTab">Assign to Teachers</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#headsTab">Subject Heads</a></li>
+            </ul>
+
+            <div class="tab-content">
+                
+                <!-- Categories -->
+                <div class="tab-pane fade show active" id="categoriesTab">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">Add Category</div>
+                                <div class="card-body">
+                                    <form id="catForm">
+                                        <div class="mb-3">
+                                            <label class="form-label">Category Name</label>
+                                            <input type="text" id="catName" class="form-control" required placeholder="e.g. Science, Arts">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary w-100">Save Category</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">Existing Categories</div>
+                                <div class="card-body p-0">
+                                    <table class="table table-hover mb-0">
+                                        <thead><tr><th>ID</th><th>Name</th><th>Actions</th></tr></thead>
+                                        <tbody id="catTable"><tr><td colspan="3" class="text-center">Loading...</td></tr></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subjects -->
+                <div class="tab-pane fade" id="subjectsTab">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">Add Subject</div>
+                                <div class="card-body">
+                                    <form id="subForm">
+                                        <div class="mb-3">
+                                            <label class="form-label">Subject Name</label>
+                                            <input type="text" id="subName" class="form-control" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Category</label>
+                                            <select id="subCat" class="form-select cat-dropdown">
+                                                <option value="">No Category</option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary w-100">Save Subject</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">Existing Subjects</div>
+                                <div class="card-body p-0">
+                                    <table class="table table-hover mb-0">
+                                        <thead><tr><th>Name</th><th>Category</th><th>Actions</th></tr></thead>
+                                        <tbody id="subTable"><tr><td colspan="3" class="text-center">Loading...</td></tr></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assign to Classes -->
+                <div class="tab-pane fade" id="classesTab">
+                    <div class="card">
+                        <div class="card-header">Assign Subjects to Classes</div>
+                        <div class="card-body">
+                            <form id="classSubForm" class="row align-items-end mb-4">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Class</label>
+                                    <select id="csClass" class="form-select class-dropdown" required></select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Subject</label>
+                                    <select id="csSubject" class="form-select sub-dropdown" required></select>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <button type="submit" class="btn btn-primary w-100">Assign</button>
+                                </div>
+                            </form>
+                            <hr>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <select id="filterClassSub" class="form-select class-dropdown">
+                                        <option value="">Select a class to view subjects...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <table class="table table-bordered">
+                                <thead><tr><th>Class</th><th>Subject</th><th>Actions</th></tr></thead>
+                                <tbody id="classSubTable"><tr><td colspan="3" class="text-center text-muted">Select a class to view mappings</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assign to Teachers -->
+                <div class="tab-pane fade" id="teachersTab">
+                    <div class="card">
+                        <div class="card-header">Assign Teacher to Class Subject</div>
+                        <div class="card-body">
+                            <form id="teacherSubForm" class="row align-items-end mb-4">
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Teacher</label>
+                                    <select id="tsTeacher" class="form-select teacher-dropdown" required></select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Class</label>
+                                    <select id="tsClass" class="form-select class-dropdown" required></select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Subject</label>
+                                    <select id="tsSubject" class="form-select sub-dropdown" required></select>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <button type="submit" class="btn btn-primary w-100">Assign</button>
+                                </div>
+                            </form>
+                            <hr>
+                            <table class="table table-bordered">
+                                <thead><tr><th>Teacher</th><th>Class</th><th>Subject</th><th>Actions</th></tr></thead>
+                                <tbody id="teacherSubTable"><tr><td colspan="4" class="text-center">Loading...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subject Heads -->
+                <div class="tab-pane fade" id="headsTab">
+                    <div class="card">
+                        <div class="card-header">Assign Subject Heads (HODs)</div>
+                        <div class="card-body">
+                            <form id="headForm" class="row align-items-end mb-4">
+                                <div class="col-md-5 mb-3">
+                                    <label class="form-label">Subject</label>
+                                    <select id="hSubject" class="form-select sub-dropdown" required></select>
+                                </div>
+                                <div class="col-md-5 mb-3">
+                                    <label class="form-label">Head Teacher</label>
+                                    <select id="hTeacher" class="form-select teacher-dropdown" required></select>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <button type="submit" class="btn btn-primary w-100">Set HOD</button>
+                                </div>
+                            </form>
+                            <hr>
+                            <table class="table table-bordered">
+                                <thead><tr><th>Subject</th><th>Head Teacher</th><th>Actions</th></tr></thead>
+                                <tbody id="headTable"><tr><td colspan="3" class="text-center">Loading...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+        
+        let categories = [];
+        let subjects = [];
+        let classes = [];
+        let teachers = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const hash = window.location.hash;
+            if(hash) {
+                const trigger = document.querySelector(`a[href="${hash}Tab"]`);
+                if(trigger) new bootstrap.Tab(trigger).show();
+            }
+
+            await loadBaseData();
+            
+            // Initial renders
+            renderCategories();
+            renderSubjects();
+            renderTeacherSubjects();
+            renderSubjectHeads();
+
+            // Event Listeners
+            document.getElementById('catForm').addEventListener('submit', async(e) => { e.preventDefault(); await addCategory(); });
+            document.getElementById('subForm').addEventListener('submit', async(e) => { e.preventDefault(); await addSubject(); });
+            document.getElementById('classSubForm').addEventListener('submit', async(e) => { e.preventDefault(); await assignClassSubject(); });
+            document.getElementById('teacherSubForm').addEventListener('submit', async(e) => { e.preventDefault(); await assignTeacherSubject(); });
+            document.getElementById('headForm').addEventListener('submit', async(e) => { e.preventDefault(); await assignSubjectHead(); });
+            
+            document.getElementById('filterClassSub').addEventListener('change', (e) => {
+                if(e.target.value) renderClassSubjects(e.target.value);
+            });
+        });
+
+        async function loadBaseData() {
+            try {
+                const [catRes, subRes, classRes, teachRes] = await Promise.all([
+                    supabase.from('subject_categories').select('*').order('name'),
+                    supabase.from('subjects').select(`*, subject_categories(name)`).order('name'),
+                    supabase.from('classes').select('*').order('name'),
+                    supabase.rpc('get_users_by_role', { role_name: 'teacher' })
+                ]);
+                
+                if(!catRes.error) categories = catRes.data || [];
+                if(!subRes.error) subjects = subRes.data || [];
+                if(!classRes.error) classes = classRes.data || [];
+                if(!teachRes.error) teachers = teachRes.data || [];
+
+                populateDropdowns();
+            } catch(e) { console.error('Error loading data', e); }
+        }
+
+        function populateDropdowns() {
+            // Categories
+            const catOpts = '<option value="">No Category</option>' + categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            document.querySelectorAll('.cat-dropdown').forEach(el => el.innerHTML = catOpts);
+
+            // Subjects
+            const subOpts = '<option value="">Select Subject</option>' + subjects.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+            document.querySelectorAll('.sub-dropdown').forEach(el => el.innerHTML = subOpts);
+
+            // Classes
+            const classOpts = '<option value="">Select Class</option>' + classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            document.querySelectorAll('.class-dropdown').forEach(el => el.innerHTML = classOpts);
+
+            // Teachers
+            const teachOpts = '<option value="">Select Teacher</option>' + teachers.map(t => `<option value="${t.id}">${t.first_name} ${t.last_name || t.surname || ''}</option>`).join('');
+            document.querySelectorAll('.teacher-dropdown').forEach(el => el.innerHTML = teachOpts);
+        }
+
+        // --- Categories ---
+        async function addCategory() {
+            const name = document.getElementById('catName').value;
+            const { error } = await supabase.from('subject_categories').insert([{ name }]);
+            if(error) return alert(error.message);
+            document.getElementById('catName').value = '';
+            await loadBaseData(); renderCategories();
+        }
+        window.deleteCategory = async (id) => {
+            if(!confirm('Delete this category?')) return;
+            const { error } = await supabase.from('subject_categories').delete().eq('id', id);
+            if(error) alert(error.message);
+            await loadBaseData(); renderCategories();
+        }
+        function renderCategories() {
+            document.getElementById('catTable').innerHTML = categories.map(c => `
+                <tr><td>${c.id}</td><td>${c.name}</td><td><button class="btn btn-sm btn-danger" onclick="deleteCategory(${c.id})"><i class="fas fa-trash"></i></button></td></tr>
+            `).join('') || '<tr><td colspan="3" class="text-center">No categories found</td></tr>';
+        }
+
+        // --- Subjects ---
+        async function addSubject() {
+            const name = document.getElementById('subName').value;
+            const cat_id = document.getElementById('subCat').value || null;
+            const { error } = await supabase.from('subjects').insert([{ name, category_id: cat_id }]);
+            if(error) return alert(error.message);
+            document.getElementById('subName').value = '';
+            await loadBaseData(); renderSubjects();
+        }
+        window.deleteSubject = async (id) => {
+            if(!confirm('Delete this subject?')) return;
+            const { error } = await supabase.from('subjects').delete().eq('id', id);
+            if(error) alert(error.message);
+            await loadBaseData(); renderSubjects();
+        }
+        function renderSubjects() {
+            document.getElementById('subTable').innerHTML = subjects.map(s => `
+                <tr>
+                    <td class="fw-bold">${s.name}</td>
+                    <td>${s.subject_categories?.name || '-'}</td>
+                    <td><button class="btn btn-sm btn-danger" onclick="deleteSubject(${s.id})"><i class="fas fa-trash"></i></button></td>
+                </tr>
+            `).join('') || '<tr><td colspan="3" class="text-center">No subjects found</td></tr>';
+        }
+
+        // --- Assign to Classes ---
+        async function assignClassSubject() {
+            const class_id = document.getElementById('csClass').value;
+            const subject_id = document.getElementById('csSubject').value;
+            const { error } = await supabase.from('class_subjects').insert([{ class_id, subject_id }]);
+            if(error) alert(error.message);
+            else renderClassSubjects(class_id);
+        }
+        window.deleteClassSubject = async (id, class_id) => {
+            if(!confirm('Remove this subject from class?')) return;
+            await supabase.from('class_subjects').delete().eq('id', id);
+            renderClassSubjects(class_id);
+        }
+        async function renderClassSubjects(class_id) {
+            const { data, error } = await supabase.from('class_subjects').select(`id, class_id, subjects(name)`).eq('class_id', class_id);
+            if(error || !data.length) {
+                document.getElementById('classSubTable').innerHTML = '<tr><td colspan="3" class="text-center">No subjects assigned</td></tr>';
+                return;
+            }
+            const className = classes.find(c => c.id == class_id)?.name || 'Unknown';
+            document.getElementById('classSubTable').innerHTML = data.map(d => `
+                <tr>
+                    <td>${className}</td>
+                    <td class="fw-bold">${d.subjects?.name}</td>
+                    <td><button class="btn btn-sm btn-danger" onclick="deleteClassSubject(${d.id}, ${class_id})"><i class="fas fa-trash"></i></button></td>
+                </tr>
+            `).join('');
+        }
+
+        // --- Assign to Teachers ---
+        async function assignTeacherSubject() {
+            const teacher_id = document.getElementById('tsTeacher').value;
+            const class_id = document.getElementById('tsClass').value;
+            const subject_id = document.getElementById('tsSubject').value;
+            const { error } = await supabase.from('teacher_class_subjects').insert([{ teacher_id, class_id, subject_id }]);
+            if(error) alert(error.message);
+            else renderTeacherSubjects();
+        }
+        window.deleteTeacherSubject = async (id) => {
+            if(!confirm('Remove this assignment?')) return;
+            await supabase.from('teacher_class_subjects').delete().eq('id', id);
+            renderTeacherSubjects();
+        }
+        async function renderTeacherSubjects() {
+            const { data, error } = await supabase.from('teacher_class_subjects').select(`id, teacher_id, classes(name), subjects(name)`);
+            if(error || !data || !data.length) {
+                document.getElementById('teacherSubTable').innerHTML = '<tr><td colspan="4" class="text-center">No assignments found</td></tr>';
+                return;
+            }
+            document.getElementById('teacherSubTable').innerHTML = data.map(d => {
+                const t = teachers.find(x => x.id === d.teacher_id);
+                const tName = t ? `${t.first_name} ${t.last_name || t.surname || ''}` : 'Unknown';
+                return `
+                <tr>
+                    <td class="fw-bold text-primary">${tName}</td>
+                    <td>${d.classes?.name}</td>
+                    <td>${d.subjects?.name}</td>
+                    <td><button class="btn btn-sm btn-danger" onclick="deleteTeacherSubject(${d.id})"><i class="fas fa-trash"></i></button></td>
+                </tr>`;
+            }).join('');
+        }
+
+        // --- Subject Heads ---
+        async function assignSubjectHead() {
+            const subject_id = document.getElementById('hSubject').value;
+            const head_teacher_id = document.getElementById('hTeacher').value;
+            const { error } = await supabase.from('subject_heads').insert([{ subject_id, head_teacher_id }]);
+            if(error) alert(error.message);
+            else renderSubjectHeads();
+        }
+        window.deleteSubjectHead = async (id) => {
+            if(!confirm('Remove this HOD?')) return;
+            await supabase.from('subject_heads').delete().eq('id', id);
+            renderSubjectHeads();
+        }
+        async function renderSubjectHeads() {
+            const { data, error } = await supabase.from('subject_heads').select(`id, head_teacher_id, subjects(name)`);
+            if(error || !data || !data.length) {
+                document.getElementById('headTable').innerHTML = '<tr><td colspan="3" class="text-center">No subject heads assigned</td></tr>';
+                return;
+            }
+            document.getElementById('headTable').innerHTML = data.map(d => {
+                const t = teachers.find(x => x.id === d.head_teacher_id);
+                const tName = t ? `${t.first_name} ${t.last_name || t.surname || ''}` : 'Unknown';
+                return `
+                <tr>
+                    <td class="fw-bold">${d.subjects?.name}</td>
+                    <td class="text-success fw-bold">${tName}</td>
+                    <td><button class="btn btn-sm btn-danger" onclick="deleteSubjectHead(${d.id})"><i class="fas fa-trash"></i></button></td>
+                </tr>`;
+            }).join('');
+        }
+
+    </script>
+</body>
+</html>
