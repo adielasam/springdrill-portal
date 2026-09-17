@@ -217,17 +217,6 @@
             }
         };
 
-                
-                // Set default state to 'Present'
-                students.forEach(s => attendanceState[s.id] = 'Present');
-
-                renderTable();
-
-            } catch (err) {
-                document.getElementById('rosterBody').innerHTML = `<tr><td colspan="4" class="text-center py-5 text-danger">Error: ${err.message}</td></tr>`;
-            }
-        };
-
         function renderTable() {
             const tbody = document.getElementById('rosterBody');
             tbody.innerHTML = rosterData.map((s, index) => {
@@ -266,8 +255,6 @@
         
 
         // 🚨 BULLETPROOF SAVE FUNCTION 🚨
-        
-
         document.addEventListener('DOMContentLoaded', initialize);
         document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/'; });
     </script>
