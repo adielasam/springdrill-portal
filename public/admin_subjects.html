@@ -64,6 +64,7 @@
                 <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#categoriesTab">Categories</a></li>
                 <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#subjectsTab">Subjects</a></li>
                 <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#classesTab">Assign to Classes</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#creditsTab">Manage Credit Units</a></li>
                 <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#teachersTab">Assign to Teachers</a></li>
                 <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#headsTab">Subject Heads</a></li>
             </ul>
@@ -172,6 +173,33 @@
                     </div>
                 </div>
 
+                <!-- Manage Credit Units -->
+                <div class="tab-pane fade" id="creditsTab">
+                    <div class="card">
+                        <div class="card-header">Manage Subject Credit Units</div>
+                        <div class="card-body">
+                            <form id="creditForm" class="row align-items-end mb-4">
+                                <div class="col-md-7 mb-3">
+                                    <label class="form-label">Subject</label>
+                                    <select id="crSubject" class="form-select sub-dropdown" required></select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Credit Unit</label>
+                                    <input type="number" id="crUnit" class="form-control" min="1" max="10" required placeholder="e.g. 3">
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <button type="submit" class="btn btn-primary w-100">Update</button>
+                                </div>
+                            </form>
+                            <hr>
+                            <table class="table table-bordered">
+                                <thead><tr><th>Subject</th><th>Credit Unit</th></tr></thead>
+                                <tbody id="creditTable"><tr><td colspan="2" class="text-center">Loading...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Assign to Teachers -->
                 <div class="tab-pane fade" id="teachersTab">
                     <div class="card">
@@ -264,6 +292,7 @@
             document.getElementById('classSubForm').addEventListener('submit', async(e) => { e.preventDefault(); await assignClassSubject(); });
             document.getElementById('teacherSubForm').addEventListener('submit', async(e) => { e.preventDefault(); await assignTeacherSubject(); });
             document.getElementById('headForm').addEventListener('submit', async(e) => { e.preventDefault(); await assignSubjectHead(); });
+            document.getElementById('creditForm').addEventListener('submit', async(e) => { e.preventDefault(); await updateCreditUnit(); });
             
             document.getElementById('filterClassSub').addEventListener('change', (e) => {
                 if(e.target.value) renderClassSubjects(e.target.value);
@@ -349,6 +378,26 @@
                     <td><button class="btn btn-sm btn-danger" onclick="deleteSubject(${s.id})"><i class="fas fa-trash"></i></button></td>
                 </tr>
             `).join('') || '<tr><td colspan="3" class="text-center">No subjects found</td></tr>';
+            renderCreditUnits();
+        }
+
+        // --- Credit Units ---
+        async function updateCreditUnit() {
+            const subject_id = document.getElementById('crSubject').value;
+            const credit_unit = document.getElementById('crUnit').value;
+            const { error } = await supabase.from('subjects').update({ credit_unit }).eq('id', subject_id);
+            if(error) return alert(error.message);
+            document.getElementById('crUnit').value = '';
+            await loadBaseData(); 
+            renderSubjects();
+        }
+        function renderCreditUnits() {
+            document.getElementById('creditTable').innerHTML = subjects.map(s => `
+                <tr>
+                    <td class="fw-bold">${s.name}</td>
+                    <td><span class="badge bg-secondary">${s.credit_unit || 1} Unit(s)</span></td>
+                </tr>
+            `).join('') || '<tr><td colspan="2" class="text-center">No subjects found</td></tr>';
         }
 
         // --- Assign to Classes ---

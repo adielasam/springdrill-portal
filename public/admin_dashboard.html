@@ -281,7 +281,21 @@
             <a href="admin_dashboard" class="nav-link active"><i data-lucide="layout-dashboard"></i> Dashboard</a>
             
             <div class="sidebar-heading">Academics</div>
-            <a href="admin_subjects.html" class="nav-link"><i data-lucide="book-open"></i> Subjects</a>
+            <a class="nav-link" data-bs-toggle="collapse" href="#subjectsMenu" role="button" aria-expanded="false" aria-controls="subjectsMenu">
+                <i data-lucide="book-open"></i> Subjects
+                <i class="fas fa-chevron-down ms-auto" style="font-size: 10px;"></i>
+            </a>
+            <div class="collapse" id="subjectsMenu">
+                <nav class="nav flex-column ms-4 mb-2" style="border-left: 2px solid var(--brand-100);">
+                    <a href="admin_subjects.html#subjectsTab" class="nav-link py-1" style="font-size: 13px;">Create Subjects</a>
+                    <a href="admin_subjects.html#subjectsTab" class="nav-link py-1" style="font-size: 13px;">Manage Subjects</a>
+                    <a href="admin_subjects.html#classesTab" class="nav-link py-1" style="font-size: 13px;">Assign to Classes</a>
+                    <a href="admin_subjects.html#creditsTab" class="nav-link py-1" style="font-size: 13px;">Manage Credit Units</a>
+                    <a href="admin_subjects.html#categoriesTab" class="nav-link py-1" style="font-size: 13px;">Manage Subject Categories</a>
+                    <a href="admin_subjects.html#teachersTab" class="nav-link py-1" style="font-size: 13px;">Assign to Teachers</a>
+                    <a href="admin_subjects.html#headsTab" class="nav-link py-1" style="font-size: 13px;">Assign to Subject Heads</a>
+                </nav>
+            </div>
             <a href="class_list" class="nav-link"><i data-lucide="users"></i> Classes & Students</a>
             <a href="admin_attendance" class="nav-link"><i data-lucide="calendar-check"></i> Attendance</a>
             <a href="admin_league_table" class="nav-link"><i data-lucide="trophy"></i> League Table</a>

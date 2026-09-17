@@ -5,11 +5,12 @@ CREATE TABLE IF NOT EXISTS subject_categories (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Ensure Subjects table exists and has category_id
+-- Ensure Subjects table exists and has category_id and credit_unit
 CREATE TABLE IF NOT EXISTS subjects (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
     category_id INTEGER REFERENCES subject_categories(id) ON DELETE SET NULL,
+    credit_unit INTEGER DEFAULT 1,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -38,13 +39,19 @@ CREATE TABLE IF NOT EXISTS subject_heads (
     UNIQUE(subject_id, head_teacher_id)
 );
 
--- Add missing foreign key constraints to subjects if they don't exist yet
+-- Add missing columns to subjects if they don't exist yet
 DO $$ 
 BEGIN 
     BEGIN
         ALTER TABLE subjects ADD COLUMN category_id INTEGER REFERENCES subject_categories(id) ON DELETE SET NULL;
     EXCEPTION
         WHEN duplicate_column THEN RAISE NOTICE 'column category_id already exists in subjects.';
+    END;
+
+    BEGIN
+        ALTER TABLE subjects ADD COLUMN credit_unit INTEGER DEFAULT 1;
+    EXCEPTION
+        WHEN duplicate_column THEN RAISE NOTICE 'column credit_unit already exists in subjects.';
     END;
 END $$;
 
