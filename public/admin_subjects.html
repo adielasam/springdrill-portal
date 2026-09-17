@@ -539,7 +539,7 @@
         window.renderSubjects = () => {
             const school_id = document.getElementById('subSchool').value;
             let filtered = subjects;
-            if(school_id) filtered = subjects.filter(s => s.school_id == school_id);
+            if(school_id) filtered = subjects.filter(s => s.school_id == school_id || !s.school_id);
             
             document.getElementById('subTable').innerHTML = filtered.map(s => `
                 <tr>
@@ -567,7 +567,7 @@
             const { data } = await supabase.from('class_subjects').select('subject_id').eq('class_id', class_id);
             const assignedIds = data ? data.map(d => d.subject_id) : [];
             
-            const available = subjects.filter(s => s.school_id == school_id && !assignedIds.includes(s.id));
+            const available = subjects.filter(s => (s.school_id == school_id || !s.school_id) && !assignedIds.includes(s.id));
             const assigned = subjects.filter(s => assignedIds.includes(s.id));
 
             renderListbox('dlbAvailable', available, 'moveRight');
