@@ -722,14 +722,14 @@
                 matrixAssignments = assignments || [];
 
                 let html = `
-                    <div class="table-responsive" style="max-height: 650px;">
-                        <table class="table table-bordered table-hover text-center align-middle" style="min-width: 1000px; font-size: 13px;">
+                    <div class="table-responsive" style="max-height: 650px; overflow-x: auto; overflow-y: auto;">
+                        <table class="table table-bordered table-hover text-center align-middle mb-0" style="min-width: max-content; font-size: 13px;">
                             <thead class="bg-light sticky-top" style="z-index: 1;">
                                 <tr>
                                     <th style="width: 50px;">S/N</th>
-                                    <th class="text-start" style="min-width: 250px;">Teacher</th>
+                                    <th class="text-start position-sticky start-0 bg-light" style="min-width: 250px; z-index: 2; border-right: 2px solid #dee2e6;">Teacher</th>
                                     ${cols.map(c => `
-                                        <th style="width: 100px; vertical-align: top; padding-top: 15px;">
+                                        <th style="min-width: 120px; width: 120px; vertical-align: top; padding-top: 15px;">
                                             <div class="mb-2 text-uppercase fw-bold text-muted" style="white-space: normal; height: 40px; overflow: hidden; font-size: 10px;">${c.name}</div>
                                             <div><i class="fas fa-check-square text-success opacity-50"></i></div>
                                         </th>
@@ -749,7 +749,7 @@
                     html += `
                         <tr>
                             <td>${idx+1}</td>
-                            <td class="text-start fw-bold" style="white-space: nowrap;">
+                            <td class="text-start fw-bold position-sticky start-0 bg-white" style="white-space: nowrap; border-right: 2px solid #dee2e6; z-index: 1;">
                                 <i class="fas fa-user-circle me-2 text-muted" style="font-size: 24px; vertical-align: middle;"></i> 
                                 ${t.name}
                             </td>
