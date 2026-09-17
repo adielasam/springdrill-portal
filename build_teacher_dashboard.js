@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+const fs = require('fs');
+
+const htmlContent = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -76,57 +78,6 @@
 </head>
 <body>
 
-    <style>
-        #preloader {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #ffffff;
-            z-index: 99999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s ease-out;
-        }
-        .preloader-logo-wrap {
-            position: relative;
-            width: 100px; height: 100px;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .preloader-logo-wrap img {
-            width: 60px; height: 60px;
-            z-index: 2;
-        }
-        .preloader-spinner {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #004d34;
-            border-bottom: 4px solid #004d34;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            z-index: 1;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
-    <div id="preloader">
-        <div class="preloader-logo-wrap">
-            <div class="preloader-spinner"></div>
-            <img src="/logo.png" alt="Logo" onerror="this.src='https://ui-avatars.com/api/?name=SD&background=004d34&color=fff&rounded=true'">
-        </div>
-    </div>
-    <script>
-        window.addEventListener('load', () => {
-            const loader = document.getElementById('preloader');
-            if(loader) {
-                setTimeout(() => {
-                    loader.style.opacity = '0';
-                    setTimeout(() => loader.remove(), 500);
-                }, 800);
-            }
-        });
-    </script>
-
-
     <!-- Sidebar exactly modeling the Spring Valley structure -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
@@ -134,9 +85,9 @@
         </div>
         
         <nav class="d-flex flex-column mb-5">
-            <a href="teacher_dashboard.html" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
-            <a href="#" class="nav-link" onclick="alert('My HRM Info coming soon')"><i class="fas fa-user-tie"></i> My HRM Info</a>
-            <a href="#" class="nav-link" onclick="alert('Pastoral coming soon')"><i class="fas fa-hands-helping"></i> Pastoral</a>
+            <a href="teacher_dashboard" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="#" class="nav-link"><i class="fas fa-user-tie"></i> My HRM Info</a>
+            <a href="#" class="nav-link"><i class="fas fa-hands-helping"></i> Pastoral</a>
             
             <a href="#highSchoolReportMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center">
                 <span><i class="fas fa-file-alt"></i> High School Report</span>
@@ -144,48 +95,31 @@
             </a>
             <div class="collapse" id="highSchoolReportMenu">
                 <a href="/high/result/make" class="nav-link"><i class="fas fa-edit"></i> Make Report</a>
-                <a href="#" class="nav-link" onclick="alert('Teacher Reports coming soon')"><i class="fas fa-eye"></i> Teacher Reports</a>
-                <a href="#" class="nav-link" onclick="alert('Teacher Comments coming soon')"><i class="fas fa-comment-dots"></i> Teacher Comments</a>
+                <a href="#" class="nav-link"><i class="fas fa-eye"></i> Teacher Reports</a>
+                <a href="#" class="nav-link"><i class="fas fa-comment-dots"></i> Teacher Comments</a>
             </div>
 
-            <a href="teacher_eclassroom.html" class="nav-link"><i class="fas fa-laptop-house"></i> eClassroom</a>
-            <a href="teacher_messages.html" class="nav-link"><i class="fas fa-comments"></i> Feedback / Messages</a>
-            
-            <a href="#subjectsMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-book"></i> Subjects</span>
-                <i class="fas fa-caret-down me-2"></i>
-            </a>
-            <div class="collapse" id="subjectsMenu">
-                <a href="teacher_subjects.html" class="nav-link"><i class="fas fa-edit"></i> Subjects Overview</a>
-                <a href="teacher_subject_enrollment.html" class="nav-link"><i class="fas fa-users"></i> Subjects Enrollment</a>
-            </div>
-
-            <a href="#" class="nav-link" onclick="alert('Lesson Planner coming soon')"><i class="fas fa-chalkboard"></i> Lesson Planner</a>
+            <a href="#" class="nav-link"><i class="fas fa-laptop-house"></i> eClassroom</a>
+            <a href="#" class="nav-link"><i class="fas fa-comments"></i> Feedback</a>
+            <a href="#" class="nav-link"><i class="fas fa-book"></i> Subjects</a>
+            <a href="#" class="nav-link"><i class="fas fa-chalkboard"></i> Lesson Planner</a>
 
             <a href="#cbtMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center">
                 <span><i class="fas fa-desktop"></i> CBT</span>
                 <i class="fas fa-caret-down me-2"></i>
             </a>
             <div class="collapse" id="cbtMenu">
-                <a href="question_bank.html" class="nav-link"><i class="fas fa-database"></i> Question Bank</a>
-                <a href="manage_cbt.html" class="nav-link"><i class="fas fa-cog"></i> Manage CBT</a>
-                <a href="test_results.html" class="nav-link"><i class="fas fa-chart-line"></i> Result Manager</a>
-                <a href="teacher_bulk_upload.html" class="nav-link"><i class="fas fa-upload"></i> JAMB Uploader</a>
+                <a href="#" class="nav-link"><i class="fas fa-database"></i> Question Bank</a>
+                <a href="#" class="nav-link"><i class="fas fa-cog"></i> Manage CBT</a>
+                <a href="#" class="nav-link"><i class="fas fa-chart-line"></i> Result Manager</a>
             </div>
 
-            <a href="#" class="nav-link" onclick="alert('BehaviourTracker coming soon')"><i class="fas fa-user-check"></i> BehaviourTracker</a>
-            <a href="#" class="nav-link" onclick="alert('TimeTable coming soon')"><i class="fas fa-calendar-alt"></i> TimeTable</a>
-            <a href="#" class="nav-link" onclick="alert('Calendar coming soon')"><i class="fas fa-calendar-day"></i> Calendar</a>
-            <a href="#attendanceMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-clipboard-list"></i> Attendance</span>
-                <i class="fas fa-caret-down me-2"></i>
-            </a>
-            <div class="collapse" id="attendanceMenu">
-                <a href="teacher_attendance.html" class="nav-link ps-4"><i class="fas fa-plus me-2"></i> Add Attendance</a>
-                <a href="#" class="nav-link ps-4"><i class="fas fa-list me-2"></i> View Attendance</a>
-            </div>
-            <a href="#" class="nav-link" onclick="alert('Photo Journals coming soon')"><i class="fas fa-camera"></i> Photo Journals</a>
-            <a href="#" class="nav-link text-danger mt-3 border-top border-secondary pt-3" id="logoutBtn"><i class="fas fa-power-off"></i> Secure Logout</a>
+            <a href="#" class="nav-link"><i class="fas fa-user-check"></i> BehaviourTracker</a>
+            <a href="#" class="nav-link"><i class="fas fa-calendar-alt"></i> TimeTable</a>
+            <a href="#" class="nav-link"><i class="fas fa-calendar-day"></i> Calendar</a>
+            <a href="class_list" class="nav-link"><i class="fas fa-clipboard-list"></i> Class Attendance</a>
+            <a href="#" class="nav-link"><i class="fas fa-camera"></i> Photo Journals</a>
+            <a href="#" class="nav-link"><i class="fas fa-pen-nib"></i> Weekly Remarks</a>
         </nav>
     </div>
 
@@ -199,29 +133,29 @@
         </div>
 
         <div class="quick-links-container">
-            <a href="teacher_eclassroom.html" class="quick-link-item">
+            <a href="#" class="quick-link-item">
                 <div class="circle-icon circle-red"><i class="fas fa-play"></i></div>
                 <div class="quick-link-text">eClassroom</div>
             </a>
-            <a href="teacher_assignments.html" class="quick-link-item">
+            <a href="#" class="quick-link-item">
                 <div class="circle-icon circle-green"><i class="fas fa-edit"></i></div>
                 <div class="quick-link-text">Assignments</div>
             </a>
-            <a href="manage_cbt.html" class="quick-link-item">
+            <a href="#" class="quick-link-item">
                 <div class="circle-icon circle-red"><i class="fas fa-award"></i></div>
                 <div class="quick-link-text">CBT</div>
             </a>
-            <a href="#" class="quick-link-item" onclick="alert('Check Schedules coming soon')">
+            <a href="#" class="quick-link-item">
                 <div class="circle-icon circle-green"><i class="fas fa-calendar-check"></i></div>
                 <div class="quick-link-text">Check Schedules</div>
             </a>
         </div>
 
         <div class="dashboard-tabs">
-            <a href="teacher_dashboard.html" style="text-decoration:none;"><div class="tab-item active">Overview</div></a>
-            <a href="teacher_subjects.html" style="text-decoration:none;"><div class="tab-item">My Subjects</div></a>
-            <a href="#" style="text-decoration:none;" onclick="alert('Weekly Reflection coming soon')"><div class="tab-item">Weekly Reflection</div></a>
-            <a href="teacher_my_students.html" style="text-decoration:none;"><div class="tab-item">My Students</div></a>
+            <div class="tab-item active">Overview</div>
+            <div class="tab-item">My Subjects</div>
+            <div class="tab-item">Weekly Reflection</div>
+            <div class="tab-item">My Students</div>
         </div>
 
         <div class="content-grid">
@@ -331,4 +265,7 @@
         document.addEventListener('DOMContentLoaded', initializeDashboard);
     </script>
 </body>
-</html>
+</html>`;
+
+fs.writeFileSync('public/teacher_dashboard.html', htmlContent);
+console.log('Re-wrote teacher_dashboard.html to model Spring Valley dashboard layout');

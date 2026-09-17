@@ -1,0 +1,314 @@
+const fs = require('fs');
+
+const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPRINGDRILL - Manage Active Students</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root { 
+            --brand-50: #ecfdf5; --brand-100: #d1fae5; --brand-500: #10b981; --brand-600: #059669;
+            --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-300: #d1d5db; 
+            --gray-400: #9ca3af; --gray-500: #6b7280; --gray-600: #4b5563; --gray-800: #1f2937; --gray-900: #111827;
+            
+            --bg-color: var(--gray-50); --card-bg: #ffffff; --text-main: var(--gray-900); 
+            --text-muted: var(--gray-500); --border-color: var(--gray-200); --input-bg: var(--gray-100); 
+            
+            --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6;
+
+            --radius: 8px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+        .icon-3d {
+            width: 32px; height: 32px; border-radius: 8px;
+            background: linear-gradient(135deg, var(--brand-500) 0%, var(--brand-600) 100%);
+            box-shadow: 0 2px 4px rgba(5, 150, 105, 0.3), inset 0 1px 1px rgba(255,255,255,0.3);
+            display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0;
+        }
+        .icon-3d svg { width: 16px; height: 16px; stroke-width: 2.5; }
+        
+        /* SIDEBAR */
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); padding: 32px 16px; z-index: 1050; overflow-y: auto;}
+        .sidebar-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 12px; }
+        .sidebar-brand h4 { font-weight: 800; margin: 0; font-size: 20px; letter-spacing: -0.5px; }
+        .sidebar-heading { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 16px 12px 8px; margin-top: 8px; }
+        .nav-link { color: var(--text-muted); padding: 10px 12px; margin: 2px 0; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; text-decoration: none; }
+        .nav-link svg { width: 18px; height: 18px; stroke-width: 2; }
+        .nav-link:hover { background: var(--input-bg); color: var(--text-main); }
+        .nav-link.active { background: var(--brand-600); color: white; font-weight: 600; box-shadow: var(--shadow-sm); }
+        
+        /* MAIN CONTENT */
+        .main-content { margin-left: 280px; padding: 32px 48px; min-height: 100vh; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+        .breadcrumb-text { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+        .breadcrumb-text span { color: var(--text-main); font-weight: 600; }
+        
+        /* GREEN SECTION HEADERS (Matching Reference) */
+        .section-panel { background: white; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; margin-bottom: 24px; box-shadow: var(--shadow-sm); }
+        .section-header { background: #059669; color: white; padding: 12px 20px; font-weight: 600; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .section-body { padding: 24px; }
+        
+        .filter-row { display: flex; align-items: center; margin-bottom: 16px; font-size: 14px; }
+        .filter-label { width: 140px; font-weight: 600; color: var(--gray-600); text-align: right; margin-right: 16px; }
+        .filter-input { flex: 1; max-width: 600px; padding: 8px 12px; border: 1px solid var(--gray-300); border-radius: 4px; background: white; font-size: 14px; }
+        .filter-input:focus { outline: none; border-color: var(--brand-500); }
+        .filter-value-display { flex: 1; max-width: 600px; font-weight: 600; font-size: 15px; }
+
+        /* TABLE */
+        .table-responsive { overflow-x: auto; }
+        .table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 0; }
+        .table th { background: var(--gray-50); color: var(--gray-600); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; padding: 16px; border-bottom: 1px solid var(--gray-200); white-space: nowrap; }
+        .table td { padding: 16px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; color: var(--text-main); }
+        .table tr:hover { background-color: var(--gray-50); }
+        
+        .passport-img { width: 48px; height: 48px; border-radius: 4px; object-fit: cover; background: var(--gray-200); border: 1px solid var(--gray-300); }
+        
+        .btn-action { padding: 4px 8px; font-size: 11px; font-weight: 600; border-radius: 4px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; color: white; margin-right: 4px; text-decoration: none; }
+        .btn-details { background: #06b6d4; }
+        .btn-edit { background: #3b82f6; }
+        .btn-delete { background: #ef4444; }
+        .btn-report { background: #8b5cf6; }
+
+        @media (max-width: 991px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="icon-3d"><i data-lucide="layers"></i></div>
+            <h4>SpringDrill</h4>
+        </div>
+
+        <div class="sidebar-heading">Overview</div>
+        <a href="admin_dashboard" class="nav-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+        
+        <div class="sidebar-heading">Academics</div>
+        <a href="class_list" class="nav-link active"><i data-lucide="users"></i> Classes & Students</a>
+        <a href="#" class="nav-link"><i data-lucide="calendar-check"></i> Attendance</a>
+        <a href="#" class="nav-link"><i data-lucide="trophy"></i> League Table</a>
+
+        <div class="sidebar-heading">Operations</div>
+        <a href="teacher_list" class="nav-link"><i data-lucide="briefcase"></i> Teachers</a>
+        <a href="manage_users.html" class="nav-link"><i data-lucide="user-check"></i> Approvals</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="topbar">
+            <div class="breadcrumb-text">Home > Students > <span>Manage Active Students</span></div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div class="text-end">
+                    <div style="font-size: 13px; font-weight: 600;">Super Admin</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Workspace Owner</div>
+                </div>
+                <div style="width: 40px; height: 40px; border-radius: 20px; background: var(--brand-100); display: flex; align-items: center; justify-content: center; color: var(--brand-600);">
+                    <i data-lucide="user"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILTER SECTION -->
+        <div class="section-panel">
+            <div class="section-header">
+                <div>Select School to View Students</div>
+            </div>
+            <div class="section-body">
+                <div class="filter-row">
+                    <div class="filter-label">Select School</div>
+                    <select class="filter-input" disabled>
+                        <option>Spring Valley High School</option>
+                    </select>
+                </div>
+                <div class="filter-row">
+                    <div class="filter-label">Select Year Group</div>
+                    <select class="filter-input" id="filterYearGroup" onchange="fetchStudents()">
+                        <option value="all">All</option>
+                    </select>
+                </div>
+                <div class="filter-row">
+                    <div class="filter-label">Class</div>
+                    <select class="filter-input" id="filterClass" onchange="fetchStudents()">
+                        <option value="all">All</option>
+                    </select>
+                </div>
+                <div class="filter-row">
+                    <div class="filter-label">Gender</div>
+                    <select class="filter-input" id="filterGender" onchange="fetchStudents()">
+                        <option value="all">All</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div class="filter-row" style="margin-top: 24px;">
+                    <div class="filter-label">No of Male(s)</div>
+                    <div class="filter-value-display" id="maleCount">0</div>
+                </div>
+                <div class="filter-row">
+                    <div class="filter-label">No of Female(s)</div>
+                    <div class="filter-value-display" id="femaleCount">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLE SECTION -->
+        <div class="section-panel">
+            <div class="section-header">
+                <div id="tableHeaderTitle">Student Information Section For Spring Valley High School</div>
+                <div>
+                    <button class="btn btn-sm btn-light" style="font-weight: 600; font-size: 12px;" onclick="alert('Add student modal coming soon')">
+                        <i data-lucide="plus" style="width: 14px; height: 14px;"></i> Add a Student
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Profile Data</th>
+                            <th>Surname</th>
+                            <th>First Name</th>
+                            <th>Other Name</th>
+                            <th>Parent/Guardian Name</th>
+                            <th>Class</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentListBody">
+                        <tr>
+                            <td colspan="8" class="text-center py-5">
+                                <i data-lucide="loader-2" class="spin" style="animation: spin 1s linear infinite;"></i> Loading...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+        lucide.createIcons();
+
+        let allStudents = [];
+        let classesMap = {};
+
+        async function init() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return window.location.href = '/';
+
+            // Fetch classes
+            const { data: classes } = await supabase.from('classes').select('id, name').order('name');
+            if (classes) {
+                const classSelect = document.getElementById('filterClass');
+                classes.forEach(c => {
+                    classesMap[c.id] = c.name;
+                    classSelect.innerHTML += \`<option value="\${c.id}">\${c.name}</option>\`;
+                });
+            }
+
+            // Fetch students
+            const { data: students, error } = await supabase.from('students')
+                .select('*')
+                .eq('approved', true)
+                .order('surname');
+                
+            if (students) {
+                allStudents = students;
+                renderStudents(allStudents);
+            }
+        }
+
+        window.fetchStudents = function() {
+            const classFilter = document.getElementById('filterClass').value;
+            const genderFilter = document.getElementById('filterGender').value;
+            
+            let filtered = allStudents;
+            if (classFilter !== 'all') {
+                filtered = filtered.filter(s => s.class_id == classFilter);
+            }
+            if (genderFilter !== 'all') {
+                filtered = filtered.filter(s => s.gender === genderFilter);
+            }
+            
+            renderStudents(filtered);
+        }
+
+        function renderStudents(students) {
+            const tbody = document.getElementById('studentListBody');
+            
+            // Calculate counts
+            const maleCount = students.filter(s => s.gender === 'Male').length;
+            const femaleCount = students.filter(s => s.gender === 'Female').length;
+            document.getElementById('maleCount').innerText = maleCount;
+            document.getElementById('femaleCount').innerText = femaleCount;
+
+            if (students.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">No students found matching the selected filters.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = students.map((s, index) => {
+                const className = classesMap[s.class_id] || 'N/A';
+                const parentName = s.parent_guardian_name || s.parent_name || 'N/A';
+                const address = s.address || 'N/A';
+                const phone = s.phone_number || 'N/A';
+                const passport = s.passport_url || 'https://via.placeholder.com/48?text=No+Img';
+                
+                return \`
+                    <tr>
+                        <td class="text-muted fw-bold">\${index + 1}</td>
+                        <td>
+                            <div class="d-flex flex-column align-items-start">
+                                <img src="\${passport}" class="passport-img mb-1" onerror="this.src='https://via.placeholder.com/48?text=No+Img'">
+                                <span style="font-size: 11px; color: var(--text-muted);">\${phone}</span>
+                            </div>
+                        </td>
+                        <td class="fw-bold">\${s.surname || ''}</td>
+                        <td>\${s.first_name || ''}</td>
+                        <td>\${s.other_name || ''}</td>
+                        <td>
+                            <div class="fw-bold">\${parentName}</div>
+                            <div style="font-size: 11px; color: var(--text-muted); max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="\${address}">\${address}</div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">\${className}</span></td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-1">
+                                <a href="teacher_student_profile.html?student_id=\${s.user_id}" class="btn-action btn-details"><i data-lucide="eye"></i> Details</a>
+                                <a href="admin_student_report.html?student_id=\${s.user_id}" class="btn-action btn-report"><i data-lucide="file-text"></i> Report</a>
+                                <button class="btn-action btn-edit" onclick="alert('Edit coming soon')"><i data-lucide="edit"></i> Edit</button>
+                                <button class="btn-action btn-delete" onclick="alert('Delete coming soon')"><i data-lucide="trash-2"></i> Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                \`;
+            }).join('');
+            
+            lucide.createIcons();
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>`;
+
+fs.writeFileSync('public/class_list.html', htmlContent);
+console.log('class_list.html completely rebuilt');

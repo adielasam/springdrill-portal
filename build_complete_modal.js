@@ -1,0 +1,662 @@
+const fs = require('fs');
+
+// First, regenerate the base HTML to ensure clean slate
+const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPRINGDRILL - Student Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root { 
+            --brand-50: #ecfdf5; --brand-100: #d1fae5; --brand-500: #10b981; --brand-600: #059669;
+            --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-300: #d1d5db; 
+            --gray-400: #9ca3af; --gray-500: #6b7280; --gray-600: #4b5563; --gray-800: #1f2937; --gray-900: #111827;
+            
+            --bg-color: var(--gray-50); --card-bg: #ffffff; --text-main: var(--gray-900); 
+            --text-muted: var(--gray-500); --border-color: var(--gray-200); --input-bg: var(--gray-100); 
+        }
+        
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+        /* SIDEBAR (Matching reference) */
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); padding: 32px 16px; z-index: 1050; overflow-y: auto;}
+        .sidebar-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 12px; }
+        .sidebar-brand h4 { font-weight: 800; margin: 0; font-size: 20px; letter-spacing: -0.5px; }
+        .nav-link { color: var(--text-muted); padding: 10px 12px; margin: 2px 0; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; text-decoration: none; }
+        .nav-link svg { width: 18px; height: 18px; stroke-width: 2; }
+        .nav-link:hover { background: var(--input-bg); color: var(--text-main); }
+        .nav-link.active { background: var(--brand-600); color: white; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+        .icon-3d { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--brand-500) 0%, var(--brand-600) 100%); color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .icon-3d svg { width: 16px; height: 16px; stroke-width: 2.5; }
+        
+        /* MAIN CONTENT */
+        .main-content { margin-left: 280px; padding: 32px 48px; min-height: 100vh; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+        .breadcrumb-text { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+        .breadcrumb-text span { color: var(--text-main); font-weight: 600; }
+
+        /* DETAILS LAYOUT */
+        .details-grid { display: grid; grid-template-columns: 280px 1fr; gap: 32px; align-items: start; }
+        
+        /* LEFT COLUMN */
+        .profile-photo-card { background: white; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; margin-bottom: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .profile-photo { width: 100%; aspect-ratio: 4/5; object-fit: cover; background: var(--gray-200); }
+        .profile-id-bar { background: #059669; color: white; text-align: center; padding: 8px; font-weight: 600; font-size: 14px; }
+        
+        .action-menu { background: white; border: 1px solid var(--border-color); border-radius: 4px; padding: 12px 0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .action-menu-title { padding: 0 20px 8px; font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px; }
+        .action-item { display: flex; align-items: center; gap: 12px; padding: 10px 20px; color: var(--text-main); text-decoration: none; font-size: 13px; font-weight: 500; transition: 0.2s; border-left: 3px solid transparent; cursor: pointer; background: transparent; border-top: none; border-right: none; border-bottom: none; width: 100%; text-align: left; }
+        .action-item:hover { background: var(--gray-50); color: #059669; border-left-color: #059669; }
+        .action-item.text-danger:hover { color: #dc3545; border-left-color: #dc3545; }
+        .action-item svg { width: 16px; height: 16px; color: var(--gray-500); }
+        .action-item:hover svg { color: inherit; }
+
+        /* RIGHT COLUMN */
+        .info-card { background: white; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); margin-bottom: 32px; }
+        .info-header { background: #059669; color: white; padding: 12px 20px; font-weight: 700; font-size: 16px; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
+        .info-body { padding: 32px; display: grid; grid-template-columns: 2fr 1fr; gap: 48px; }
+        
+        .info-field { display: flex; margin-bottom: 16px; font-size: 13px; }
+        .info-label { width: 160px; font-weight: 600; color: var(--gray-600); }
+        .info-value { flex: 1; font-weight: 500; color: var(--text-main); }
+        
+        .status-field { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 13px; font-weight: 600; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .status-dot.active { background: #10b981; }
+        .status-dot.inactive { background: #ef4444; }
+
+        .attendance-card { background: white; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .attendance-header { background: var(--gray-50); border-bottom: 1px solid var(--border-color); padding: 12px 20px; font-weight: 600; font-size: 14px; color: var(--text-main); }
+        .attendance-body { padding: 32px; }
+        
+        .attendance-bar-container { display: flex; height: 60px; width: 100%; border-radius: 4px; overflow: hidden; margin-top: 24px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+        .att-segment { display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; font-size: 12px; font-weight: 600; transition: width 0.5s; }
+        .att-present { background: #10b981; }
+        .att-late { background: #3b82f6; }
+        .att-absent { background: #f97316; }
+
+        @media (max-width: 991px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; padding: 20px; }
+            .details-grid { grid-template-columns: 1fr; }
+            .info-body { grid-template-columns: 1fr; gap: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="icon-3d"><i data-lucide="layers"></i></div>
+            <h4>SpringDrill</h4>
+        </div>
+        
+        <a href="admin_dashboard" class="nav-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+        <a href="class_list" class="nav-link active"><i data-lucide="users"></i> Classes & Students</a>
+        <a href="teacher_list" class="nav-link"><i data-lucide="briefcase"></i> Teachers</a>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div class="breadcrumb-text">Home > Students > <span>Student Details</span></div>
+        </div>
+
+        <div class="details-grid">
+            <!-- LEFT COLUMN -->
+            <div>
+                <div class="profile-photo-card">
+                    <img id="profileImg" src="https://via.placeholder.com/300x400?text=Loading" class="profile-photo" alt="Student Photo">
+                    <div class="profile-id-bar" id="regNumberBar">LOADING...</div>
+                </div>
+
+                <div class="action-menu">
+                    <div class="action-menu-title">Actions</div>
+                    <button class="action-item" onclick="openEditModal()"><i data-lucide="edit-3"></i> Edit Info</button>
+                    <button class="action-item text-danger" onclick="deleteStudent()"><i data-lucide="trash-2"></i> Delete Student</button>
+                    <button class="action-item" onclick="loginAsStudent()"><i data-lucide="log-in"></i> Login As Student</button>
+                    <button class="action-item text-danger" onclick="deactivateStudent()"><i data-lucide="power"></i> Deactivate Account?</button>
+                    <button class="action-item" onclick="alert('Messaging system coming in future update.')"><i data-lucide="message-square"></i> Message</button>
+                    <button class="action-item text-danger" onclick="alert('Promotion history feature coming soon.')"><i data-lucide="x-circle"></i> Delete Promotion</button>
+                    <button class="action-item" onclick="alert('ID Card generation feature coming soon.')"><i data-lucide="credit-card"></i> ID CARD</button>
+                    <button class="action-item" onclick="alert('Signature upload feature coming soon.')"><i data-lucide="upload"></i> Upload Signature</button>
+                    <button class="action-item" onclick="alert('Export feature coming soon.')"><i data-lucide="download"></i> Export Data</button>
+                    <a href="class_list.html" class="action-item"><i data-lucide="arrow-left"></i> Go Back</a>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div>
+                <div class="info-card">
+                    <div class="info-header" id="studentNameHeader">LOADING STUDENT...</div>
+                    <div class="info-body">
+                        <div>
+                            <div class="info-field">
+                                <div class="info-label">Class</div>
+                                <div class="info-value" id="fClass">-</div>
+                            </div>
+                            <div class="info-field">
+                                <div class="info-label">Student Reg Number</div>
+                                <div class="info-value" id="fRegNumber">-</div>
+                            </div>
+                            <div class="info-field">
+                                <div class="info-label">Email</div>
+                                <div class="info-value" id="fEmail">-</div>
+                            </div>
+                            <div class="info-field">
+                                <div class="info-label">Phone Number</div>
+                                <div class="info-value" id="fPhone">-</div>
+                            </div>
+                            <div class="info-field">
+                                <div class="info-label">Date of Birth</div>
+                                <div class="info-value" id="fDob">-</div>
+                            </div>
+                            <div class="info-field">
+                                <div class="info-label">Sex</div>
+                                <div class="info-value" id="fSex">-</div>
+                            </div>
+                            <div class="info-field">
+                                <div class="info-label">Personal Address</div>
+                                <div class="info-value" id="fAddress">-</div>
+                            </div>
+                            <div class="info-field">
+                                <div class="info-label">Parent Name</div>
+                                <div class="info-value" id="fParentName">-</div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="status-field">
+                                <div class="status-dot active"></div> Account Active
+                            </div>
+                            <div class="status-field">
+                                <div class="status-dot active"></div> Outstanding Debt: N0.00
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="attendance-card">
+                    <div class="attendance-header">
+                        <i data-lucide="calendar" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: text-bottom;"></i>
+                        <span id="attTitleName">STUDENT</span>'s Attendance Summary
+                    </div>
+                    <div class="attendance-body">
+                        <div style="display: flex; gap: 24px; font-size: 12px; font-weight: 600; justify-content: flex-end;">
+                            <div style="display: flex; align-items: center; gap: 8px;"><div style="width:12px; height:12px; background:#10b981;"></div> Present</div>
+                            <div style="display: flex; align-items: center; gap: 8px;"><div style="width:12px; height:12px; background:#3b82f6;"></div> Late</div>
+                            <div style="display: flex; align-items: center; gap: 8px;"><div style="width:12px; height:12px; background:#f97316;"></div> Absent</div>
+                        </div>
+                        
+                        <div class="attendance-bar-container" id="attBarContainer">
+                            <div class="att-segment att-present" style="width: 100%;">
+                                <div>Present</div>
+                                <div>100%</div>
+                            </div>
+                            <div class="att-segment att-late" style="width: 0%;"></div>
+                            <div class="att-segment att-absent" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT STUDENT MODAL (SCROLLABLE) -->
+    <div class="modal fade" id="editStudentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background: #004d34; color: white;">
+                    <h5 class="modal-title">Edit Student's Information</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4" id="editFormBody">
+                    
+                    <!-- STEP 1 -->
+                    <div id="editStep1" class="edit-step">
+                        <h6 class="mb-4 text-success border-bottom pb-2">School & Registration</h6>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-danger">*Parent / Guardian</label>
+                            <input type="text" class="form-control" id="edit_parent_guardian_name">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-danger">*Admission Year</label>
+                            <input type="text" class="form-control" id="edit_admission_year" placeholder="e.g. 2013">
+                            <div class="form-text">Student's year of admission</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-danger">*Reg. Number</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="edit_reg_number">
+                                <button class="btn btn-outline-secondary" type="button" onclick="document.getElementById('edit_reg_number').value = '2026/00' + Math.floor(Math.random()*999)">Generate</button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Customer ID (Sage)</label>
+                            <input type="text" class="form-control" id="edit_sage_customer_id">
+                            <div class="form-text">Student's Customer ID on Sage 50 app</div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2 -->
+                    <div id="editStep2" class="edit-step" style="display:none;">
+                        <h6 class="mb-4 text-success border-bottom pb-2">Personal Details</h6>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-danger">*Surname</label>
+                            <input type="text" class="form-control" id="edit_surname">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-danger">*First Name</label>
+                            <input type="text" class="form-control" id="edit_first_name">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-danger">*Middle Name</label>
+                            <input type="text" class="form-control" id="edit_other_name">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-danger">*Gender</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="edit_gender" id="gMale" value="Male">
+                                    <label class="form-check-label" for="gMale">Male</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="edit_gender" id="gFemale" value="Female">
+                                    <label class="form-check-label" for="gFemale">Female</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label fw-bold">Imply PTA</label>
+                                <div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="edit_pta" id="ptaNo" value="false">
+                                        <label class="form-check-label" for="ptaNo">No</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="edit_pta" id="ptaYes" value="true">
+                                        <label class="form-check-label" for="ptaYes">Yes</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label fw-bold">Is Last Child</label>
+                                <div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="edit_lastchild" id="lcNo" value="false">
+                                        <label class="form-check-label" for="lcNo">No</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="edit_lastchild" id="lcYes" value="true">
+                                        <label class="form-check-label" for="lcYes">Yes</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3 -->
+                    <div id="editStep3" class="edit-step" style="display:none;">
+                        <h6 class="mb-4 text-success border-bottom pb-2">Origin & Address</h6>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-danger">*Date Of Birth</label>
+                            <input type="date" class="form-control" id="edit_dob">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-danger">*Nationality</label>
+                            <input type="text" class="form-control" id="edit_nationality" value="Nigeria">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">State of Origin</label>
+                            <input type="text" class="form-control" id="edit_state_of_origin">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Local Govt Area</label>
+                            <input type="text" class="form-control" id="edit_lga">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Present Address</label>
+                            <textarea class="form-control" id="edit_address" rows="2"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Permanent Address</label>
+                            <textarea class="form-control" id="edit_permanent_address" rows="2"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4 -->
+                    <div id="editStep4" class="edit-step" style="display:none;">
+                        <h6 class="mb-4 text-success border-bottom pb-2">Academic & Photo</h6>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Boarding</label>
+                            <select class="form-select" id="edit_boarding_status">
+                                <option value="Day">Day</option>
+                                <option value="Boarding">Boarding</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Level / Grade</label>
+                            <select class="form-select" id="edit_grade_level">
+                                <option value="YEAR 7">YEAR 7</option>
+                                <option value="YEAR 8">YEAR 8</option>
+                                <option value="YEAR 9">YEAR 9</option>
+                                <option value="YEAR 10">YEAR 10</option>
+                                <option value="YEAR 11">YEAR 11</option>
+                                <option value="YEAR 12">YEAR 12</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Class</label>
+                            <select class="form-select" id="edit_class_id">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Student's Photo</label>
+                            <input type="file" class="form-control" id="edit_photo" accept="image/*">
+                            <div class="form-text text-danger">NOTE: Image must not be more than 500px in size.</div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 5 -->
+                    <div id="editStep5" class="edit-step" style="display:none;">
+                        <h6 class="mb-4 text-success border-bottom pb-2">Contact & Credentials</h6>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Height</label>
+                            <input type="text" class="form-control" id="edit_height" placeholder="5ft">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Weight</label>
+                            <input type="text" class="form-control" id="edit_weight" placeholder="45kg">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Phone Number</label>
+                            <input type="text" class="form-control" id="edit_phone_number" placeholder="e.g +234806...">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-danger">*Email</label>
+                            <input type="email" class="form-control" id="edit_student_email">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Password</label>
+                            <input type="password" class="form-control" id="edit_password" placeholder="(Leave blank to keep unchanged)">
+                        </div>
+                    </div>
+
+                    <!-- STEP 6 -->
+                    <div id="editStep6" class="edit-step" style="display:none;">
+                        <h6 class="mb-4 text-success border-bottom pb-2">History & Medical</h6>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Previous School</label>
+                            <input type="text" class="form-control" id="edit_previous_school">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Reason for Leaving</label>
+                            <input type="text" class="form-control" id="edit_reason_for_leaving">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Allergies</label>
+                            <div class="row">
+                                <div class="col-4"><div class="form-check"><input class="form-check-input allergy-cb" type="checkbox" value="Balsam of Peru" id="a1"><label class="form-check-label" for="a1">Balsam of Peru</label></div></div>
+                                <div class="col-4"><div class="form-check"><input class="form-check-input allergy-cb" type="checkbox" value="Buckwheat" id="a2"><label class="form-check-label" for="a2">Buckwheat</label></div></div>
+                                <div class="col-4"><div class="form-check"><input class="form-check-input allergy-cb" type="checkbox" value="Cat" id="a3"><label class="form-check-label" for="a3">Cat</label></div></div>
+                                <div class="col-4"><div class="form-check"><input class="form-check-input allergy-cb" type="checkbox" value="Celery" id="a4"><label class="form-check-label" for="a4">Celery</label></div></div>
+                                <div class="col-4"><div class="form-check"><input class="form-check-input allergy-cb" type="checkbox" value="Cold stimuli" id="a5"><label class="form-check-label" for="a5">Cold stimuli</label></div></div>
+                                <div class="col-4"><div class="form-check"><input class="form-check-input allergy-cb" type="checkbox" value="Cosmetics" id="a6"><label class="form-check-label" for="a6">Cosmetics</label></div></div>
+                                <div class="col-4"><div class="form-check"><input class="form-check-input allergy-cb" type="checkbox" value="Dog" id="a7"><label class="form-check-label" for="a7">Dog</label></div></div>
+                                <div class="col-4"><div class="form-check"><input class="form-check-input allergy-cb" type="checkbox" value="Egg" id="a8"><label class="form-check-label" for="a8">Egg</label></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-danger rounded-pill px-4" id="btnModalBack" style="display:none;" onclick="changeStep(-1)">Back</button>
+                    <button type="button" class="btn btn-danger rounded-pill px-4" id="btnModalNext" onclick="changeStep(1)">Next</button>
+                    <button type="button" class="btn btn-success rounded-pill px-4" id="btnModalSave" style="display:none;" onclick="saveStudentData()">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- IMPERSONATE OVERLAY -->
+    <div id="impersonateOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; flex-direction:column; align-items:center; justify-content:center;">
+        <i data-lucide="loader-2" class="spin mb-3" style="animation: spin 1s linear infinite; width:48px; height:48px; color: #059669;"></i>
+        <h4 style="color: #059669; font-weight:700;">Logging in as student...</h4>
+    </div>
+    
+    <style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+        lucide.createIcons();
+
+        let currentStudentData = null;
+        let currentStep = 1;
+        const totalSteps = 6;
+        let classesMap = {};
+
+        async function init() {
+            const params = new URLSearchParams(window.location.search);
+            const studentId = params.get('student_id');
+            if (!studentId) return alert('No student ID provided.');
+
+            const { data: classes } = await supabase.from('classes').select('id, name');
+            if(classes) {
+                const classSelect = document.getElementById('edit_class_id');
+                classes.forEach(c => {
+                    classesMap[c.id] = c.name;
+                    classSelect.innerHTML += \`<option value="\${c.id}">\${c.name}</option>\`;
+                });
+            }
+
+            const { data: student, error } = await supabase.from('students').select('*, classes(name)').eq('user_id', studentId).single();
+            if (error || !student) return alert('Student not found.');
+            
+            currentStudentData = student;
+
+            const fullName = \`\${student.surname || ''} \${student.first_name || ''} \${student.other_name || ''}\`.trim();
+            document.getElementById('studentNameHeader').innerText = fullName;
+            document.getElementById('attTitleName').innerText = student.first_name || 'STUDENT';
+            document.getElementById('regNumberBar').innerText = student.reg_number || 'N/A';
+            document.getElementById('profileImg').src = student.passport_url || \`https://ui-avatars.com/api/?name=\${student.first_name}+\${student.surname}&background=059669&color=fff&size=400\`;
+
+            document.getElementById('fClass').innerText = student.classes?.name || 'N/A';
+            document.getElementById('fRegNumber').innerText = student.reg_number || 'N/A';
+            document.getElementById('fEmail').innerText = student.student_email || 'N/A';
+            document.getElementById('fPhone').innerText = student.phone_number || 'N/A';
+            document.getElementById('fDob').innerText = student.dob ? new Date(student.dob).toLocaleDateString() : 'N/A';
+            document.getElementById('fSex').innerText = student.gender || 'N/A';
+            document.getElementById('fAddress').innerText = student.address || 'N/A';
+            document.getElementById('fParentName').innerText = student.parent_guardian_name || student.parent_name || 'N/A';
+        }
+
+        window.openEditModal = function() {
+            if(!currentStudentData) return;
+            
+            // Step 1
+            document.getElementById('edit_parent_guardian_name').value = currentStudentData.parent_guardian_name || currentStudentData.parent_name || '';
+            document.getElementById('edit_admission_year').value = currentStudentData.admission_year || '';
+            document.getElementById('edit_reg_number').value = currentStudentData.reg_number || '';
+            document.getElementById('edit_sage_customer_id').value = currentStudentData.sage_customer_id || '';
+            
+            // Step 2
+            document.getElementById('edit_surname').value = currentStudentData.surname || '';
+            document.getElementById('edit_first_name').value = currentStudentData.first_name || '';
+            document.getElementById('edit_other_name').value = currentStudentData.other_name || '';
+            if(currentStudentData.gender === 'Female') document.getElementById('gFemale').checked = true; else document.getElementById('gMale').checked = true;
+            if(currentStudentData.imply_pta) document.getElementById('ptaYes').checked = true; else document.getElementById('ptaNo').checked = true;
+            if(currentStudentData.is_last_child) document.getElementById('lcYes').checked = true; else document.getElementById('lcNo').checked = true;
+
+            // Step 3
+            document.getElementById('edit_dob').value = currentStudentData.dob || '';
+            document.getElementById('edit_nationality').value = currentStudentData.nationality || 'Nigeria';
+            document.getElementById('edit_state_of_origin').value = currentStudentData.state_of_origin || '';
+            document.getElementById('edit_lga').value = currentStudentData.lga || '';
+            document.getElementById('edit_address').value = currentStudentData.address || '';
+            document.getElementById('edit_permanent_address').value = currentStudentData.permanent_address || '';
+            
+            // Step 4
+            document.getElementById('edit_boarding_status').value = currentStudentData.boarding_status || 'Day';
+            document.getElementById('edit_grade_level').value = currentStudentData.grade_level || 'YEAR 7';
+            if(currentStudentData.class_id) document.getElementById('edit_class_id').value = currentStudentData.class_id;
+
+            // Step 5
+            document.getElementById('edit_height').value = currentStudentData.height || '';
+            document.getElementById('edit_weight').value = currentStudentData.weight || '';
+            document.getElementById('edit_phone_number').value = currentStudentData.phone_number || '';
+            document.getElementById('edit_student_email').value = currentStudentData.student_email || '';
+
+            // Step 6
+            document.getElementById('edit_previous_school').value = currentStudentData.previous_school || '';
+            document.getElementById('edit_reason_for_leaving').value = currentStudentData.reason_for_leaving || '';
+            const allergies = currentStudentData.allergies || [];
+            document.querySelectorAll('.allergy-cb').forEach(cb => {
+                cb.checked = allergies.includes(cb.value);
+            });
+
+            currentStep = 1;
+            updateModalUI();
+            new bootstrap.Modal(document.getElementById('editStudentModal')).show();
+        };
+
+        window.changeStep = function(dir) {
+            currentStep += dir;
+            if(currentStep < 1) currentStep = 1;
+            if(currentStep > totalSteps) currentStep = totalSteps;
+            updateModalUI();
+        };
+
+        window.updateModalUI = function() {
+            for(let i=1; i<=totalSteps; i++) {
+                document.getElementById('editStep'+i).style.display = (i === currentStep) ? 'block' : 'none';
+            }
+            document.getElementById('btnModalBack').style.display = (currentStep > 1) ? 'block' : 'none';
+            document.getElementById('btnModalNext').style.display = (currentStep < totalSteps) ? 'block' : 'none';
+            document.getElementById('btnModalSave').style.display = (currentStep === totalSteps) ? 'block' : 'none';
+        };
+
+        window.saveStudentData = async function() {
+            const btn = document.getElementById('btnModalSave');
+            btn.innerHTML = 'Saving...';
+            btn.disabled = true;
+
+            const selectedAllergies = [];
+            document.querySelectorAll('.allergy-cb:checked').forEach(cb => selectedAllergies.push(cb.value));
+
+            const updates = {
+                parent_guardian_name: document.getElementById('edit_parent_guardian_name').value,
+                admission_year: document.getElementById('edit_admission_year').value,
+                reg_number: document.getElementById('edit_reg_number').value,
+                sage_customer_id: document.getElementById('edit_sage_customer_id').value,
+                surname: document.getElementById('edit_surname').value,
+                first_name: document.getElementById('edit_first_name').value,
+                other_name: document.getElementById('edit_other_name').value,
+                gender: document.getElementById('gFemale').checked ? 'Female' : 'Male',
+                imply_pta: document.getElementById('ptaYes').checked,
+                is_last_child: document.getElementById('lcYes').checked,
+                dob: document.getElementById('edit_dob').value || null,
+                nationality: document.getElementById('edit_nationality').value,
+                state_of_origin: document.getElementById('edit_state_of_origin').value,
+                lga: document.getElementById('edit_lga').value,
+                address: document.getElementById('edit_address').value,
+                permanent_address: document.getElementById('edit_permanent_address').value,
+                boarding_status: document.getElementById('edit_boarding_status').value,
+                grade_level: document.getElementById('edit_grade_level').value,
+                class_id: document.getElementById('edit_class_id').value,
+                height: document.getElementById('edit_height').value,
+                weight: document.getElementById('edit_weight').value,
+                phone_number: document.getElementById('edit_phone_number').value,
+                student_email: document.getElementById('edit_student_email').value,
+                previous_school: document.getElementById('edit_previous_school').value,
+                reason_for_leaving: document.getElementById('edit_reason_for_leaving').value,
+                allergies: selectedAllergies
+            };
+
+            // Remove empty dob to avoid postgres parsing error
+            if(!updates.dob) delete updates.dob;
+
+            try {
+                const { error } = await supabase.from('students').update(updates).eq('user_id', currentStudentData.user_id);
+                if (error) throw error;
+                
+                const pwd = document.getElementById('edit_password').value;
+                if (pwd) {
+                    // Update auth password if provided (requires admin API, we'll alert for now since we don't have the API built specifically for this)
+                    alert('Student info saved. Password update feature requires admin endpoint.');
+                }
+                
+                alert('Student information updated successfully!');
+                window.location.reload();
+            } catch (err) {
+                alert('Error saving data: ' + err.message);
+                btn.innerHTML = 'Save changes';
+                btn.disabled = false;
+            }
+        };
+
+        window.deleteStudent = async function() {
+            if(!currentStudentData) return;
+            if(!confirm('Are you ABSOLUTELY sure you want to delete ' + currentStudentData.first_name + '? This action cannot be undone!')) return;
+            try {
+                const { error } = await supabase.from('students').delete().eq('user_id', currentStudentData.user_id);
+                if(error) throw error;
+                alert('Student deleted.');
+                window.location.href = 'class_list.html';
+            } catch (err) { alert('Failed to delete student: ' + err.message); }
+        };
+
+        window.deactivateStudent = async function() {
+            if(!currentStudentData) return;
+            if(!confirm('Deactivate this account?')) return;
+            try {
+                const { error } = await supabase.from('students').update({ approved: false }).eq('user_id', currentStudentData.user_id);
+                if(error) throw error;
+                alert('Account deactivated.');
+                window.location.reload();
+            } catch (err) { alert('Failed to deactivate: ' + err.message); }
+        };
+
+        window.loginAsStudent = async function() {
+            if(!currentStudentData) return;
+            const email = currentStudentData.student_email;
+            if(!email) {
+                alert('This student does not have an email address set. Please Edit Info and set an Email first to impersonate.');
+                return;
+            }
+            
+            document.getElementById('impersonateOverlay').style.display = 'flex';
+            
+            try {
+                const response = await fetch('/api/admin/impersonate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, redirectTo: window.location.origin + '/student_dashboard.html' })
+                });
+                
+                const data = await response.json();
+                if (data.success && data.action_link) {
+                    window.location.href = data.action_link;
+                } else {
+                    throw new Error(data.error || 'Failed to generate link');
+                }
+            } catch (error) {
+                document.getElementById('impersonateOverlay').style.display = 'none';
+                alert('Error impersonating student: ' + error.message);
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>`;
+
+fs.writeFileSync('public/teacher_student_profile.html', htmlContent);
+console.log('Re-wrote teacher_student_profile.html with complete scrollable modal');

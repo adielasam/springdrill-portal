@@ -279,7 +279,7 @@
         
         <nav class="nav flex-column">
             <div class="sidebar-heading">Overview</div>
-            <a href="admin_dashboard" class="nav-link active"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+            <a href="admin_dashboard" class="nav-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
             
             <div class="sidebar-heading">Academics</div>
             <a href="class_list" class="nav-link"><i data-lucide="users"></i> Classes & Students</a>
@@ -297,7 +297,7 @@
                 <nav class="nav flex-column ms-3 mb-2" style="border-left: 2px solid var(--brand-100);">
                     <a href="#" class="nav-link py-1" style="font-size: 13px;">Report Setup</a>
                     <a href="#" class="nav-link py-1" style="font-size: 13px;">Reports View</a>
-                    <a href="admin_approve_reports.html" class="nav-link py-1" style="font-size: 13px;">Approve Reports</a>
+                    <a href="admin_approve_reports.html" class="nav-link py-1 active text-success fw-bold" style="font-size: 13px;">Approve Reports</a>
                     <a href="#" class="nav-link py-1" style="font-size: 13px;">Promotion Manager</a>
                     <a href="#" class="nav-link py-1" style="font-size: 13px;">Transfer Manager</a>
                     <a href="#" class="nav-link py-1" style="font-size: 13px;">Process Reports</a>
@@ -337,7 +337,7 @@
         <!-- TOPBAR -->
         <div class="top-navbar">
             <div class="breadcrumb">
-                SpringDrill / <span>Dashboard</span>
+                SpringDrill / Reports / <span>Approve Reports</span>
             </div>
             
             <div class="topbar-profile" onclick="document.getElementById('logoutBtn').click()">
@@ -359,148 +359,60 @@
         </div>
 
         <!-- STAT CARDS -->
-          <div class="row g-3 mb-5 justify-content-center">
-              <div class="col-12 col-md-4 col-xl-2">
-                  <div class="stat-block bg-blue" onclick="window.location.href='class_list.html'" title="View all students">
-                      <i data-lucide="users" class="stat-bg-icon"></i>
-                      <div class="stat-val" id="statActiveStudents">0</div>
-                      <div class="stat-text">Active Students</div>
-                  </div>
-              </div>
-              <div class="col-12 col-md-4 col-xl-2">
-                  <div class="stat-block bg-teal" onclick="window.location.href='class_list.html'">
-                      <i data-lucide="user" class="stat-bg-icon"></i>
-                      <div class="stat-val" id="statMale">0</div>
-                      <div class="stat-text">Male Students</div>
-                  </div>
-              </div>
-              <div class="col-12 col-md-4 col-xl-2">
-                  <div class="stat-block bg-yellow" onclick="window.location.href='class_list.html'">
-                      <i data-lucide="user" class="stat-bg-icon"></i>
-                      <div class="stat-val" id="statFemale">0</div>
-                      <div class="stat-text">Female Students</div>
-                  </div>
-              </div>
-              <div class="col-12 col-md-4 col-xl-2">
-                  <div class="stat-block bg-coral" onclick="window.location.href='class_list.html'">
-                      <i data-lucide="monitor" class="stat-bg-icon"></i>
-                      <div class="stat-val" id="statClasses">0</div>
-                      <div class="stat-text">Classes</div>
-                  </div>
-              </div>
-              <div class="col-12 col-md-4 col-xl-2">
-                  <div class="stat-block bg-purple" onclick="window.location.href='teacher_list'">
-                      <i data-lucide="globe" class="stat-bg-icon"></i>
-                      <div class="stat-val" id="statTeachers">0</div>
-                      <div class="stat-text">Teachers</div>
-                  </div>
-              </div>
-              <div class="col-12 col-md-4 col-xl-2">
-                  <div class="stat-block bg-cyan" onclick="window.location.href='class_list.html'">
-                      <i data-lucide="calendar" class="stat-bg-icon"></i>
-                      <div class="stat-val" id="statAttendance">0</div>
-                      <div class="stat-text">Total Attendance</div>
-                  </div>
-              </div>
-          </div>
-  
-          <!-- QUICK ACTIONS -->
-        <h5 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Quick Actions</h5>
-        <div class="row g-4 mb-5">
-            <div class="col-12 col-sm-6 col-xl-4">
-                <a href="admin_create_user" class="quick-action-btn qa-blue">
-                    <div class="icon-3d icon-3d-blue"><i data-lucide="user-plus"></i></div>
-                    <span>Create Account</span>
-                </a>
+          
+        <div class="page-header mt-4">
+            <h1>Approve Reports</h1>
+            <p>Review submitted term results and teacher comments before publishing.</p>
+        </div>
+
+        <div class="premium-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold m-0"><i data-lucide="check-circle" class="text-success me-2"></i> Submitted Reports Pending Review</h5>
+                <div class="d-flex gap-2">
+                    <select id="filterClass" class="form-select w-auto">
+                        <option value="">All Classes</option>
+                    </select>
+                    <select id="filterTerm" class="form-select w-auto">
+                        <option value="">All Terms</option>
+                        <option value="1">First Term</option>
+                        <option value="2">Second Term</option>
+                        <option value="3">Third Term</option>
+                    </select>
+                    <button class="btn btn-success" id="loadReportsBtn">Load Reports</button>
+                </div>
             </div>
-            <div class="col-12 col-sm-6 col-xl-4">
-                <a href="class_list" class="quick-action-btn qa-violet">
-                    <div class="icon-3d icon-3d-violet"><i data-lucide="clipboard-list"></i></div>
-                    <span>Manage Classes</span>
-                </a>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Student</th>
+                            <th>Class</th>
+                            <th>Subject</th>
+                            <th>Term / Sub-Term</th>
+                            <th>1st CAT</th>
+                            <th>2nd CAT</th>
+                            <th>Exam</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportsTableBody">
+                        <tr>
+                            <td colspan="10" class="text-center py-4 text-muted">Select filters and click Load Reports</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            <div class="col-12 col-sm-6 col-xl-4">
-                <a href="admin_attendance" class="quick-action-btn qa-amber">
-                    <div class="icon-3d icon-3d-amber"><i data-lucide="calendar-check"></i></div>
-                    <span>Log Attendance</span>
-                </a>
+            
+            <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                <button class="btn btn-outline-danger me-2"><i data-lucide="x-circle" class="me-2"></i>Reject Selected</button>
+                <button class="btn btn-success"><i data-lucide="check-check" class="me-2"></i>Publish Approved Reports</button>
             </div>
         </div>
 
-        <!-- CHARTS AND PANELS -->
-        <div class="row g-4 mb-5">
-            <div class="col-xl-8">
-                <div class="premium-card h-100">
-                    <div class="panel-header">
-                        <h2 class="panel-title"><i data-lucide="bar-chart-2"></i> Class Distribution</h2>
-                    </div>
-                    <div class="panel-body">
-                        <canvas id="classDistributionChart" height="90"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-4">
-                <div class="premium-card h-100 d-flex flex-column">
-                    <div class="panel-header">
-                        <h2 class="panel-title"><i data-lucide="users"></i> Daily Attendance</h2>
-                        <a href="admin_attendance" class="btn-link-action">View All</a>
-                    </div>
-                    <div class="panel-body flex-grow-1" id="attendanceListWidget" style="max-height: 320px; overflow-y: auto;">
-                        <div class="text-center text-muted py-5">
-                            <i data-lucide="loader-2" class="lucide-spin mx-auto mb-2"></i>
-                            <div style="font-size: 13px;">Syncing records...</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TABLES -->
-        <div class="row g-4 mb-5">
-            <div class="col-xl-8">
-                <div class="premium-card">
-                    <div class="panel-header">
-                        <h2 class="panel-title"><i data-lucide="award"></i> Global Top Performers</h2>
-                        <a href="admin_league_table" class="btn-link-action">Full Table</a>
-                    </div>
-                    <div style="overflow-x: auto;">
-                        <table class="table-premium">
-                            <thead>
-                                <tr>
-                                    <th width="15%">Rank</th>
-                                    <th width="65%">Student Name</th>
-                                    <th class="numeric" width="20%">Points</th>
-                                </tr>
-                            </thead>
-                            <tbody id="leagueWidgetBody">
-                                <tr><td colspan="3" class="text-center py-5 text-muted" style="font-size: 13px;">Calculating leaderboard...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-4">
-                <div class="premium-card">
-                    <div class="panel-header">
-                        <h2 class="panel-title"><i data-lucide="gift"></i> Birthdays</h2>
-                    </div>
-                    <div class="panel-body" id="birthdayWidgetBody">
-                        <div class="text-center text-muted py-5" style="font-size: 13px;">
-                            <i data-lucide="loader-2" class="lucide-spin mx-auto mb-2"></i>
-                            Checking records...
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
-
-    <!-- SCRIPTS -->
-    <script>
-        // Initialize Lucide Icons immediately
-        lucide.createIcons();
-    </script>
-    
     <script type="module">
         import { supabase } from './supabaseClient.js';
 

@@ -1,0 +1,245 @@
+const fs = require('fs');
+
+const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPRINGDRILL - Student Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root { 
+            --brand-50: #ecfdf5; --brand-100: #d1fae5; --brand-500: #10b981; --brand-600: #059669;
+            --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-300: #d1d5db; 
+            --gray-400: #9ca3af; --gray-500: #6b7280; --gray-600: #4b5563; --gray-800: #1f2937; --gray-900: #111827;
+            
+            --bg-color: var(--gray-50); --card-bg: #ffffff; --text-main: var(--gray-900); 
+            --text-muted: var(--gray-500); --border-color: var(--gray-200); --input-bg: var(--gray-100); 
+        }
+        
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+        /* SIDEBAR (Matching reference) */
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); padding: 32px 16px; z-index: 1050; overflow-y: auto;}
+        .sidebar-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 12px; }
+        .sidebar-brand h4 { font-weight: 800; margin: 0; font-size: 20px; letter-spacing: -0.5px; }
+        .nav-link { color: var(--text-muted); padding: 10px 12px; margin: 2px 0; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; text-decoration: none; }
+        .nav-link svg { width: 18px; height: 18px; stroke-width: 2; }
+        .nav-link:hover { background: var(--input-bg); color: var(--text-main); }
+        .nav-link.active { background: var(--brand-600); color: white; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+        .icon-3d { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--brand-500) 0%, var(--brand-600) 100%); color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .icon-3d svg { width: 16px; height: 16px; stroke-width: 2.5; }
+        
+        /* MAIN CONTENT */
+        .main-content { margin-left: 280px; padding: 32px 48px; min-height: 100vh; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+        .breadcrumb-text { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+        .breadcrumb-text span { color: var(--text-main); font-weight: 600; }
+
+        /* DETAILS LAYOUT */
+        .details-grid { display: grid; grid-template-columns: 280px 1fr; gap: 32px; align-items: start; }
+        
+        /* LEFT COLUMN */
+        .profile-photo-card { background: white; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; margin-bottom: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .profile-photo { width: 100%; aspect-ratio: 4/5; object-fit: cover; background: var(--gray-200); }
+        .profile-id-bar { background: #059669; color: white; text-align: center; padding: 8px; font-weight: 600; font-size: 14px; }
+        
+        .action-menu { background: white; border: 1px solid var(--border-color); border-radius: 4px; padding: 12px 0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .action-menu-title { padding: 0 20px 8px; font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px; }
+        .action-item { display: flex; align-items: center; gap: 12px; padding: 10px 20px; color: var(--text-main); text-decoration: none; font-size: 13px; font-weight: 500; transition: 0.2s; border-left: 3px solid transparent; cursor: pointer; background: transparent; border-top: none; border-right: none; border-bottom: none; width: 100%; text-align: left; }
+        .action-item:hover { background: var(--gray-50); color: #059669; border-left-color: #059669; }
+        .action-item.text-danger:hover { color: #dc3545; border-left-color: #dc3545; }
+        .action-item svg { width: 16px; height: 16px; color: var(--gray-500); }
+        .action-item:hover svg { color: inherit; }
+
+        /* RIGHT COLUMN */
+        .info-card { background: white; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); margin-bottom: 32px; }
+        .info-header { background: #059669; color: white; padding: 12px 20px; font-weight: 700; font-size: 16px; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
+        .info-body { padding: 32px; display: grid; grid-template-columns: 2fr 1fr; gap: 48px; }
+        
+        .info-field { display: flex; margin-bottom: 16px; font-size: 13px; }
+        .info-label { width: 160px; font-weight: 600; color: var(--gray-600); }
+        .info-value { flex: 1; font-weight: 500; color: var(--text-main); }
+        
+        .status-field { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 13px; font-weight: 600; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .status-dot.active { background: #10b981; }
+        .status-dot.inactive { background: #ef4444; }
+
+        .attendance-card { background: white; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .attendance-header { background: var(--gray-50); border-bottom: 1px solid var(--border-color); padding: 12px 20px; font-weight: 600; font-size: 14px; color: var(--text-main); }
+        .attendance-body { padding: 32px; }
+        
+        .attendance-bar-container { display: flex; height: 60px; width: 100%; border-radius: 4px; overflow: hidden; margin-top: 24px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+        .att-segment { display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; font-size: 12px; font-weight: 600; transition: width 0.5s; }
+        .att-present { background: #10b981; }
+        .att-late { background: #3b82f6; }
+        .att-absent { background: #f97316; }
+
+        @media (max-width: 991px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; padding: 20px; }
+            .details-grid { grid-template-columns: 1fr; }
+            .info-body { grid-template-columns: 1fr; gap: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="icon-3d"><i data-lucide="layers"></i></div>
+            <h4>SpringDrill</h4>
+        </div>
+        
+        <a href="admin_dashboard" class="nav-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+        <a href="class_list" class="nav-link active"><i data-lucide="users"></i> Classes & Students</a>
+        <a href="teacher_list" class="nav-link"><i data-lucide="briefcase"></i> Teachers</a>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div class="breadcrumb-text">Home > Students > <span>Student Details</span></div>
+        </div>
+
+        <div class="details-grid">
+            <!-- LEFT COLUMN -->
+            <div>
+                <div class="profile-photo-card">
+                    <img id="profileImg" src="https://via.placeholder.com/300x400?text=Loading" class="profile-photo" alt="Student Photo">
+                    <div class="profile-id-bar" id="regNumberBar">LOADING...</div>
+                </div>
+
+                <div class="action-menu">
+                    <div class="action-menu-title">Actions</div>
+                    <button class="action-item" onclick="alert('Edit Info clicked')"><i data-lucide="edit-3"></i> Edit Info</button>
+                    <button class="action-item text-danger" onclick="alert('Delete Student clicked')"><i data-lucide="trash-2"></i> Delete Student</button>
+                    <button class="action-item" onclick="alert('Login As Student clicked')"><i data-lucide="log-in"></i> Login As Student</button>
+                    <button class="action-item text-danger" onclick="alert('Deactivate Account clicked')"><i data-lucide="power"></i> Deactivate Account?</button>
+                    <button class="action-item" onclick="alert('Message clicked')"><i data-lucide="message-square"></i> Message</button>
+                    <button class="action-item text-danger" onclick="alert('Delete Promotion clicked')"><i data-lucide="x-circle"></i> Delete Promotion</button>
+                    <button class="action-item" onclick="alert('ID Card clicked')"><i data-lucide="credit-card"></i> ID CARD</button>
+                    <button class="action-item" onclick="alert('Upload Signature clicked')"><i data-lucide="upload"></i> Upload Signature</button>
+                    <button class="action-item" onclick="alert('Export Data clicked')"><i data-lucide="download"></i> Export Data</button>
+                    <a href="class_list.html" class="action-item"><i data-lucide="arrow-left"></i> Go Back</a>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div>
+                <div class="info-card">
+                    <div class="info-header" id="studentNameHeader">LOADING STUDENT...</div>
+                    <div class="info-body">
+                        <div>
+                            <div class="info-field">
+                                <div class="info-label">Class</div>
+                                <div class="info-value" id="fClass">-</div>
+                            </div>
+                            <div class="info-field">
+                                <div class="info-label">Student Reg Number</div>
+                                <div class="info-value" id="fRegNumber">-</div>
+                            </div>
+                            <div class="info-field">
+                                <div class="info-label">Email</div>
+                                <div class="info-value" id="fEmail">-</div>
+                            </div>
+                            <div class="info-field">
+                                <div class="info-label">Phone Number</div>
+                                <div class="info-value" id="fPhone">-</div>
+                            </div>
+                            <div class="info-field">
+                                <div class="info-label">Date of Birth</div>
+                                <div class="info-value" id="fDob">-</div>
+                            </div>
+                            <div class="info-field">
+                                <div class="info-label">Sex</div>
+                                <div class="info-value" id="fSex">-</div>
+                            </div>
+                            <div class="info-field">
+                                <div class="info-label">Personal Address</div>
+                                <div class="info-value" id="fAddress">-</div>
+                            </div>
+                            <div class="info-field">
+                                <div class="info-label">Parent Name</div>
+                                <div class="info-value" id="fParentName">-</div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="status-field">
+                                <div class="status-dot active"></div> Account Active
+                            </div>
+                            <div class="status-field">
+                                <div class="status-dot active"></div> Outstanding Debt: N0.00
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="attendance-card">
+                    <div class="attendance-header">
+                        <i data-lucide="calendar" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: text-bottom;"></i>
+                        <span id="attTitleName">STUDENT</span>'s Attendance Summary
+                    </div>
+                    <div class="attendance-body">
+                        <div style="display: flex; gap: 24px; font-size: 12px; font-weight: 600; justify-content: flex-end;">
+                            <div style="display: flex; align-items: center; gap: 8px;"><div style="width:12px; height:12px; background:#10b981;"></div> Present</div>
+                            <div style="display: flex; align-items: center; gap: 8px;"><div style="width:12px; height:12px; background:#3b82f6;"></div> Late</div>
+                            <div style="display: flex; align-items: center; gap: 8px;"><div style="width:12px; height:12px; background:#f97316;"></div> Absent</div>
+                        </div>
+                        
+                        <div class="attendance-bar-container" id="attBarContainer">
+                            <div class="att-segment att-present" style="width: 100%;">
+                                <div>Present</div>
+                                <div>100%</div>
+                            </div>
+                            <div class="att-segment att-late" style="width: 0%;"></div>
+                            <div class="att-segment att-absent" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+        lucide.createIcons();
+
+        async function init() {
+            const params = new URLSearchParams(window.location.search);
+            const studentId = params.get('student_id');
+            if (!studentId) return alert('No student ID provided.');
+
+            const { data: student, error } = await supabase.from('students').select('*, classes(name)').eq('user_id', studentId).single();
+            if (error || !student) return alert('Student not found.');
+
+            const fullName = \`\${student.surname || ''} \${student.first_name || ''} \${student.other_name || ''}\`.trim();
+            
+            document.getElementById('studentNameHeader').innerText = fullName;
+            document.getElementById('attTitleName').innerText = student.first_name || 'STUDENT';
+            document.getElementById('regNumberBar').innerText = student.reg_number || 'N/A';
+            
+            document.getElementById('profileImg').src = student.passport_url || \`https://ui-avatars.com/api/?name=\${student.first_name}+\${student.surname}&background=059669&color=fff&size=400\`;
+
+            document.getElementById('fClass').innerText = student.classes?.name || 'N/A';
+            document.getElementById('fRegNumber').innerText = student.reg_number || 'N/A';
+            document.getElementById('fEmail').innerText = 'N/A';
+            document.getElementById('fPhone').innerText = student.phone_number || 'N/A';
+            document.getElementById('fDob').innerText = student.dob ? new Date(student.dob).toLocaleDateString() : 'N/A';
+            document.getElementById('fSex').innerText = student.gender || 'N/A';
+            document.getElementById('fAddress').innerText = student.address || 'N/A';
+            document.getElementById('fParentName').innerText = student.parent_guardian_name || student.parent_name || 'N/A';
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>`;
+
+fs.writeFileSync('public/teacher_student_profile.html', htmlContent);
+console.log('teacher_student_profile.html rewritten to match reference layout');
