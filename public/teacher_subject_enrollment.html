@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRINGDRILL - Staff Dashboard</title>
+    <title>SPRINGDRILL - Subject Enrollment</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -166,94 +166,84 @@
             <a href="teacher_my_students.html" style="text-decoration:none;"><div class="tab-item">My Students</div></a>
         </div>
 
-        <div class="content-grid">
-            <!-- Left Area -->
-            <div>
-                <div class="panel">
-                    <div class="panel-body" style="min-height: 250px;">
-                        <textarea class="form-control mb-3" rows="3" placeholder="Share something with your students..."></textarea>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="text-muted">
-                                <i class="fas fa-image me-2 cursor-pointer"></i>
-                                <i class="fas fa-video me-2 cursor-pointer"></i>
-                                <i class="fas fa-file-alt cursor-pointer"></i>
-                            </div>
-                            <button class="btn btn-success btn-sm px-4 fw-bold shadow-sm">Publish</button>
+        
+        <div class="p-4 bg-white" style="min-height: 80vh;">
+            <div class="panel border-0 shadow-sm mb-4">
+                <div class="panel-header bg-success text-white"><i class="fas fa-filter"></i> Select Teaching Group</div>
+                <div class="panel-body bg-light border border-success border-top-0 border-opacity-25 rounded-bottom">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small fw-bold text-uppercase">Class</label>
+                            <select class="form-select border-success border-opacity-50" id="enrollClassFilter">
+                                <option value="">-- Select Class --</option>
+                            </select>
                         </div>
-                    </div>
-                </div>
-
-                <div class="panel border-0 shadow-sm">
-                    <div class="panel-body">
-                        <div class="d-flex align-items-center mb-3">
-                            <i class="fas fa-user-circle fs-4 me-2 text-muted"></i>
-                            <div>
-                                <div class="fw-bold text-dark" style="font-size: 0.85rem;" id="postAuthor">System Admin</div>
-                                <div class="text-muted" style="font-size: 0.7rem;">May 28, 2026 8:43AM</div>
-                            </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small fw-bold text-uppercase">Subject</label>
+                            <select class="form-select border-success border-opacity-50" id="enrollSubjectFilter" disabled>
+                                <option value="">-- Select Subject --</option>
+                            </select>
                         </div>
-                        <h6 class="fw-bold" style="font-size: 0.85rem;">YEAR 8 MIDTERM HOLIDAY PROJECT</h6>
-                        <p class="text-muted mb-2" style="font-size: 0.8rem;">Solar System Model Using Cardboard and Carton</p>
-                        <p class="text-muted mb-3" style="font-size: 0.8rem;">As part of the Midterm Holiday Project, Year 8 students are to create a creative model of the Solar System using cardboard and carton materials.</p>
-                        <h6 class="fw-bold" style="font-size: 0.8rem;">Materials Needed:</h6>
-                        <ul class="text-muted" style="font-size: 0.8rem; padding-left: 20px;">
-                            <li>Carton box or thick cardboard</li>
-                            <li>Colored cardboard paper</li>
-                            <li>Glue or gum</li>
-                            <li>Scissors</li>
-                        </ul>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Area -->
-            <div>
-                <div class="panel">
-                    <div class="panel-header"><i class="fas fa-chalkboard-teacher"></i> Upcoming Lessons</div>
-                    <div class="panel-body">
-                        <div class="text-muted text-center" style="font-size: 0.8rem; padding: 20px 0;">No Lessons</div>
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="panel border-0 shadow-sm text-center py-3">
+                        <h6 class="text-muted small text-uppercase fw-bold">Class Students</h6>
+                        <h2 id="statClassStudents">0</h2>
                     </div>
                 </div>
-
-                <div class="panel">
-                    <div class="panel-header"><i class="fas fa-birthday-cake"></i> Upcoming Birthdays</div>
-                    <div class="panel-body p-0">
-                        <div class="px-3 py-2 text-muted" style="font-size: 0.75rem; font-style: italic; border-bottom: 1px solid #eee;">Upcoming birthdays for this month</div>
-                        
-                        <div class="list-item px-3">
-                            <div class="list-icon bg-danger"><i class="fas fa-birthday-cake"></i></div>
-                            <div class="flex-grow-1">
-                                <div class="fw-bold" style="font-size: 0.75rem;">JOHN SAM - <span class="text-muted">Student</span></div>
-                            </div>
-                            <div class="text-muted" style="font-size: 0.65rem;">Birthday is on Fri Sep 18, 2026</div>
-                        </div>
-
-                        <div class="list-item px-3">
-                            <div class="list-icon bg-danger"><i class="fas fa-birthday-cake"></i></div>
-                            <div class="flex-grow-1">
-                                <div class="fw-bold" style="font-size: 0.75rem;">AMOO PRAISE - <span class="text-muted">Student</span></div>
-                            </div>
-                            <div class="text-muted" style="font-size: 0.65rem;">Birthday is on Mon Sep 21, 2026</div>
-                        </div>
-                        
-                        <div class="p-2">
-                            <button class="btn btn-success w-100 btn-sm fw-bold">Load More</button>
-                        </div>
+                <div class="col-md-3">
+                    <div class="panel border-0 shadow-sm text-center py-3">
+                        <h6 class="text-muted small text-uppercase fw-bold">Assigned To This Teacher</h6>
+                        <h2 id="statAssignedHere" class="text-success">0</h2>
                     </div>
                 </div>
-
-                <div class="panel">
-                    <div class="panel-header"><i class="fas fa-calendar-alt"></i> Upcoming Events</div>
-                    <div class="panel-body">
-                        <div class="text-muted text-center" style="font-size: 0.8rem; padding: 20px 0;">No Events</div>
+                <div class="col-md-3">
+                    <div class="panel border-0 shadow-sm text-center py-3">
+                        <h6 class="text-muted small text-uppercase fw-bold">Assigned Elsewhere</h6>
+                        <h2 id="statAssignedElsewhere" class="text-warning">0</h2>
                     </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="panel border-0 shadow-sm text-center py-3">
+                        <h6 class="text-muted small text-uppercase fw-bold">Pending Changes</h6>
+                        <h2 id="statPending" class="text-danger">0</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel border-0 shadow-sm">
+                <div class="panel-header bg-light text-dark fw-bold">
+                    <i class="fas fa-users me-2"></i> <span id="lblListTitle">Class List</span>
+                </div>
+                <div class="panel-body p-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="text-muted small text-uppercase table-light">
+                            <tr>
+                                <th width="50">
+                                    <input type="checkbox" id="checkAll" class="form-check-input">
+                                </th>
+                                <th>Student Name</th>
+                                <th>Reg Number</th>
+                                <th>Enrollment Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="enrollTableBody">
+                            <tr><td colspan="4" class="text-center py-5 text-muted">Select a class and subject to view students</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="panel-footer bg-light p-3 text-end" id="actionFooter" style="display: none;">
+                    <button class="btn btn-success fw-bold px-4 shadow-sm" id="btnSaveEnr" onclick="saveEnrollments()"><i class="fas fa-save me-2"></i> Save Enrollments</button>
                 </div>
             </div>
         </div>
 
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
         
@@ -271,6 +261,153 @@
         }
         
         document.addEventListener('DOMContentLoaded', initializeDashboard);
-    </script>
+    
+        let currentStudents = [];
+        let currentEnrollments = [];
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return;
+            
+            // Load unique classes from teacher's subjects
+            const { data: subjects } = await supabase.from('subjects').select('id, name, class_id, classes(name)').eq('teacher_id', session.user.id);
+            if (subjects) {
+                const classSelect = document.getElementById('enrollClassFilter');
+                const uniqueClasses = {};
+                subjects.forEach(sub => {
+                    if (sub.classes) uniqueClasses[sub.class_id] = sub.classes.name;
+                });
+                
+                Object.keys(uniqueClasses).forEach(cid => {
+                    classSelect.innerHTML += `<option value="${cid}">${uniqueClasses[cid]}</option>`;
+                });
+
+                classSelect.addEventListener('change', (e) => {
+                    const cid = e.target.value;
+                    const subSelect = document.getElementById('enrollSubjectFilter');
+                    subSelect.innerHTML = '<option value="">-- Select Subject --</option>';
+                    if (!cid) {
+                        subSelect.disabled = true;
+                        return;
+                    }
+                    subSelect.disabled = false;
+                    subjects.filter(s => s.class_id === cid).forEach(sub => {
+                        subSelect.innerHTML += `<option value="${sub.id}">${sub.name}</option>`;
+                    });
+                });
+                
+                document.getElementById('enrollSubjectFilter').addEventListener('change', window.loadStudentsForEnrollment);
+                
+                document.getElementById('checkAll').addEventListener('change', (e) => {
+                    document.querySelectorAll('.stu-checkbox').forEach(cb => cb.checked = e.target.checked);
+                });
+            }
+        });
+
+        window.loadStudentsForEnrollment = async function() {
+            const cid = document.getElementById('enrollClassFilter').value;
+            const sid = document.getElementById('enrollSubjectFilter').value;
+            const tbody = document.getElementById('enrollTableBody');
+            const actionFooter = document.getElementById('actionFooter');
+            
+            if (!cid || !sid) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted">Select a class and subject to view students</td></tr>';
+                actionFooter.style.display = 'none';
+                return;
+            }
+            
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5"><i class="fas fa-spinner fa-spin text-success fa-2x"></i></td></tr>';
+            
+            try {
+                // Fetch all students in the class
+                const { data: students } = await supabase.from('students').select('user_id, first_name, surname, reg_number').eq('class_id', cid).order('surname', {ascending: true});
+                currentStudents = students || [];
+                
+                // Fetch enrollments for this subject
+                const { data: enrolls } = await supabase.from('student_subjects').select('*').eq('subject_id', sid);
+                currentEnrollments = enrolls || [];
+                
+                let html = '';
+                let assignedHere = 0;
+                
+                currentStudents.forEach(st => {
+                    const enr = currentEnrollments.find(e => e.student_id === st.user_id);
+                    const isChecked = enr && enr.status === 'approved' ? 'checked' : '';
+                    let statusBadge = '<span class="badge bg-secondary">Not Enrolled</span>';
+                    
+                    if (enr) {
+                        if (enr.status === 'approved') {
+                            assignedHere++;
+                            statusBadge = '<span class="badge bg-success">Enrolled</span>';
+                        } else if (enr.status === 'pending') {
+                            statusBadge = '<span class="badge bg-warning text-dark">Pending Approval</span>';
+                        }
+                    }
+                    
+                    html += `
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="form-check-input stu-checkbox" value="${st.user_id}" ${isChecked}>
+                            </td>
+                            <td class="fw-bold">${st.surname} ${st.first_name}</td>
+                            <td class="text-muted">${st.reg_number || 'N/A'}</td>
+                            <td>${statusBadge}</td>
+                        </tr>
+                    `;
+                });
+                
+                if (currentStudents.length === 0) {
+                    html = '<tr><td colspan="4" class="text-center py-5 text-muted">No students found in this class.</td></tr>';
+                    actionFooter.style.display = 'none';
+                } else {
+                    actionFooter.style.display = 'block';
+                }
+                
+                tbody.innerHTML = html;
+                
+                document.getElementById('statClassStudents').innerText = currentStudents.length;
+                document.getElementById('statAssignedHere').innerText = assignedHere;
+                
+                const selSubject = document.getElementById('enrollSubjectFilter');
+                document.getElementById('lblListTitle').innerText = selSubject.options[selSubject.selectedIndex].text + ' Class List';
+                
+            } catch(e) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-danger">${e.message}</td></tr>`;
+            }
+        };
+
+        window.saveEnrollments = async function() {
+            const btn = document.getElementById('btnSaveEnr');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Saving...';
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                const sid = document.getElementById('enrollSubjectFilter').value;
+                
+                const selectedStudentIds = Array.from(document.querySelectorAll('.stu-checkbox:checked')).map(cb => cb.value);
+                
+                // Delete existing enrollments for this subject
+                await supabase.from('student_subjects').delete().eq('subject_id', sid);
+                
+                // Insert new enrollments
+                if (selectedStudentIds.length > 0) {
+                    const inserts = selectedStudentIds.map(stId => ({
+                        student_id: stId,
+                        subject_id: sid,
+                        teacher_id: session.user.id,
+                        status: 'approved'
+                    }));
+                    await supabase.from('student_subjects').insert(inserts);
+                }
+                
+                alert('Enrollments saved successfully!');
+                window.loadStudentsForEnrollment();
+            } catch(e) { alert(e.message); } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save me-2"></i> Save Enrollments';
+            }
+        };
+
+</script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRINGDRILL - Staff Dashboard</title>
+    <title>SPRINGDRILL - My Students</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -160,100 +160,56 @@
         </div>
 
         <div class="dashboard-tabs">
-            <a href="teacher_dashboard.html" style="text-decoration:none;"><div class="tab-item active">Overview</div></a>
+            <a href="teacher_dashboard.html" style="text-decoration:none;"><div class="tab-item">Overview</div></a>
             <a href="teacher_subjects.html" style="text-decoration:none;"><div class="tab-item">My Subjects</div></a>
             <a href="#" style="text-decoration:none;" onclick="alert('Weekly Reflection coming soon')"><div class="tab-item">Weekly Reflection</div></a>
-            <a href="teacher_my_students.html" style="text-decoration:none;"><div class="tab-item">My Students</div></a>
+            <a href="class_list.html" style="text-decoration:none;"><div class="tab-item">My Students</div></a>
         </div>
 
-        <div class="content-grid">
-            <!-- Left Area -->
-            <div>
-                <div class="panel">
-                    <div class="panel-body" style="min-height: 250px;">
-                        <textarea class="form-control mb-3" rows="3" placeholder="Share something with your students..."></textarea>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="text-muted">
-                                <i class="fas fa-image me-2 cursor-pointer"></i>
-                                <i class="fas fa-video me-2 cursor-pointer"></i>
-                                <i class="fas fa-file-alt cursor-pointer"></i>
-                            </div>
-                            <button class="btn btn-success btn-sm px-4 fw-bold shadow-sm">Publish</button>
+        
+        <div class="p-4">
+            <div class="panel border-0 shadow-sm mb-4">
+                <div class="panel-header bg-success text-white"><i class="fas fa-filter"></i> Select Filter</div>
+                <div class="panel-body bg-white">
+                    <div class="row align-items-center mb-3">
+                        <div class="col-md-2 text-end fw-bold text-muted small">Student form:</div>
+                        <div class="col-md-8">
+                            <select class="form-select" id="formFilter">
+                                <option value="Subject Students">Subject Students</option>
+                            </select>
                         </div>
                     </div>
-                </div>
-
-                <div class="panel border-0 shadow-sm">
-                    <div class="panel-body">
-                        <div class="d-flex align-items-center mb-3">
-                            <i class="fas fa-user-circle fs-4 me-2 text-muted"></i>
-                            <div>
-                                <div class="fw-bold text-dark" style="font-size: 0.85rem;" id="postAuthor">System Admin</div>
-                                <div class="text-muted" style="font-size: 0.7rem;">May 28, 2026 8:43AM</div>
-                            </div>
+                    <div class="row align-items-center">
+                        <div class="col-md-2 text-end fw-bold text-muted small">Subject:</div>
+                        <div class="col-md-8">
+                            <select class="form-select" id="subjectFilter">
+                                <option value="">Loading your subjects...</option>
+                            </select>
                         </div>
-                        <h6 class="fw-bold" style="font-size: 0.85rem;">YEAR 8 MIDTERM HOLIDAY PROJECT</h6>
-                        <p class="text-muted mb-2" style="font-size: 0.8rem;">Solar System Model Using Cardboard and Carton</p>
-                        <p class="text-muted mb-3" style="font-size: 0.8rem;">As part of the Midterm Holiday Project, Year 8 students are to create a creative model of the Solar System using cardboard and carton materials.</p>
-                        <h6 class="fw-bold" style="font-size: 0.8rem;">Materials Needed:</h6>
-                        <ul class="text-muted" style="font-size: 0.8rem; padding-left: 20px;">
-                            <li>Carton box or thick cardboard</li>
-                            <li>Colored cardboard paper</li>
-                            <li>Glue or gum</li>
-                            <li>Scissors</li>
-                        </ul>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Area -->
-            <div>
-                <div class="panel">
-                    <div class="panel-header"><i class="fas fa-chalkboard-teacher"></i> Upcoming Lessons</div>
-                    <div class="panel-body">
-                        <div class="text-muted text-center" style="font-size: 0.8rem; padding: 20px 0;">No Lessons</div>
-                    </div>
-                </div>
-
-                <div class="panel">
-                    <div class="panel-header"><i class="fas fa-birthday-cake"></i> Upcoming Birthdays</div>
-                    <div class="panel-body p-0">
-                        <div class="px-3 py-2 text-muted" style="font-size: 0.75rem; font-style: italic; border-bottom: 1px solid #eee;">Upcoming birthdays for this month</div>
-                        
-                        <div class="list-item px-3">
-                            <div class="list-icon bg-danger"><i class="fas fa-birthday-cake"></i></div>
-                            <div class="flex-grow-1">
-                                <div class="fw-bold" style="font-size: 0.75rem;">JOHN SAM - <span class="text-muted">Student</span></div>
-                            </div>
-                            <div class="text-muted" style="font-size: 0.65rem;">Birthday is on Fri Sep 18, 2026</div>
-                        </div>
-
-                        <div class="list-item px-3">
-                            <div class="list-icon bg-danger"><i class="fas fa-birthday-cake"></i></div>
-                            <div class="flex-grow-1">
-                                <div class="fw-bold" style="font-size: 0.75rem;">AMOO PRAISE - <span class="text-muted">Student</span></div>
-                            </div>
-                            <div class="text-muted" style="font-size: 0.65rem;">Birthday is on Mon Sep 21, 2026</div>
-                        </div>
-                        
-                        <div class="p-2">
-                            <button class="btn btn-success w-100 btn-sm fw-bold">Load More</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="panel">
-                    <div class="panel-header"><i class="fas fa-calendar-alt"></i> Upcoming Events</div>
-                    <div class="panel-body">
-                        <div class="text-muted text-center" style="font-size: 0.8rem; padding: 20px 0;">No Events</div>
-                    </div>
+            <div class="panel border-0 shadow-sm">
+                <div class="panel-body p-0">
+                    <table class="table table-hover table-striped mb-0 align-middle">
+                        <thead class="table-light text-muted small">
+                            <tr>
+                                <th width="50">#</th>
+                                <th>Full Name</th>
+                                <th>Reg No</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTableBody">
+                            <tr><td colspan="3" class="text-center py-4 text-muted">Select a subject to view enrolled students</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
         
@@ -271,6 +227,65 @@
         }
         
         document.addEventListener('DOMContentLoaded', initializeDashboard);
-    </script>
+    
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return;
+            
+            // Load subjects assigned to this teacher
+            const { data: subjects } = await supabase.from('subjects').select('id, name, class_id, classes(name)').eq('teacher_id', session.user.id);
+            const subjectSelect = document.getElementById('subjectFilter');
+            if (subjects && subjects.length > 0) {
+                subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>';
+                subjects.forEach(sub => {
+                    subjectSelect.innerHTML += `<option value="${sub.id}">${sub.name} (${sub.classes?.name || 'Unknown Class'})</option>`;
+                });
+            } else {
+                subjectSelect.innerHTML = '<option value="">No subjects assigned to you yet</option>';
+            }
+
+            subjectSelect.addEventListener('change', async (e) => {
+                const subjId = e.target.value;
+                const tbody = document.getElementById('studentsTableBody');
+                if (!subjId) {
+                    tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-muted">Select a subject to view enrolled students</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4"><i class="fas fa-spinner fa-spin text-success fa-2x"></i></td></tr>';
+                
+                // Fetch approved enrollments
+                const { data: enrollments, error } = await supabase
+                    .from('student_subjects')
+                    .select('students(user_id, first_name, surname, reg_number)')
+                    .eq('subject_id', subjId)
+                    .eq('status', 'approved');
+                    
+                if (error) {
+                    tbody.innerHTML = `<tr><td colspan="3" class="text-danger py-4 text-center">${error.message}</td></tr>`;
+                    return;
+                }
+                
+                if (!enrollments || enrollments.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-muted">No students are currently approved/enrolled for this subject.</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = '';
+                enrollments.forEach((enrol, idx) => {
+                    const st = enrol.students;
+                    if(!st) return;
+                    tbody.innerHTML += `
+                        <tr>
+                            <td class="fw-bold text-muted">${idx + 1}</td>
+                            <td class="fw-bold">${st.surname} ${st.first_name}</td>
+                            <td class="text-muted">${st.reg_number || 'N/A'}</td>
+                        </tr>
+                    `;
+                });
+            });
+        });
+
+</script>
 </body>
 </html>
