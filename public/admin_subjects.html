@@ -455,7 +455,7 @@
                     supabase.from('subject_categories').select('*').order('name'),
                     supabase.from('subjects').select(`*, subject_groups(name), subject_departments(name), subject_categories(name), schools(name)`).order('name'),
                     supabase.from('classes').select('*').order('name'),
-                    supabase.rpc('get_users_by_role', { role_name: 'teacher' }),
+                    supabase.from('users').select('*').eq('role', 'teacher'),
                     supabase.from('academic_sessions').select('*').order('name', {ascending: false})
                 ]);
                 
@@ -491,7 +491,7 @@
             const clsOpts = '<option value="">Select Class</option>' + classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
             document.querySelectorAll('.class-dropdown').forEach(el => el.innerHTML = clsOpts);
 
-            const tchOpts = '<option value="">Select Teacher</option>' + teachers.map(t => `<option value="${t.id}">${t.first_name} ${t.last_name || ''}</option>`).join('');
+            const tchOpts = '<option value="">Select Teacher</option>' + teachers.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
             document.querySelectorAll('.teacher-dropdown').forEach(el => el.innerHTML = tchOpts);
         }
 
@@ -732,7 +732,7 @@
                         const isAssigned = matrixAssignments.some(a => a.teacher_id === t.id && a.subject_id === c.id);
                         return `<td><input type="checkbox" class="form-check-input matrix-cb" data-teacher="${t.id}" data-class="${class_id}" data-subject="${c.id}" ${isAssigned ? 'checked':''}></td>`;
                     }).join('');
-                    return `<tr><td>${idx+1}</td><td class="text-start fw-bold"><i class="fas fa-user-circle me-2 text-muted"></i>${t.first_name} ${t.last_name || ''}</td>${rowHtml}</tr>`;
+                    return `<tr><td>${idx+1}</td><td class="text-start fw-bold"><i class="fas fa-user-circle me-2 text-muted"></i>${t.name}</td>${rowHtml}</tr>`;
                 }).join('');
 
             } else {
@@ -820,7 +820,7 @@
             const { data } = await supabase.from('subject_heads').select(`id, head_teacher_id, subjects(name)`);
             document.getElementById('headTable').innerHTML = (data||[]).map(d => {
                 const t = teachers.find(x => x.id === d.head_teacher_id);
-                return `<tr><td class="fw-bold">${d.subjects?.name}</td><td class="text-success fw-bold">${t ? t.first_name : 'Unknown'}</td><td><button class="btn btn-sm btn-danger" onclick="deleteSubjectHead(${d.id})"><i class="fas fa-trash"></i></button></td></tr>`;
+                return `<tr><td class="fw-bold">${d.subjects?.name}</td><td class="text-success fw-bold">${t ? t.name : 'Unknown'}</td><td><button class="btn btn-sm btn-danger" onclick="deleteSubjectHead(${d.id})"><i class="fas fa-trash"></i></button></td></tr>`;
             }).join('') || '<tr><td colspan="3" class="text-center">No subject heads assigned</td></tr>';
         }
 
