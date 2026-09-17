@@ -844,13 +844,13 @@
             }
         };
 
-        window.saveMatrixAssignments = async () => {
+        window.saveMatrixAssignments = async (e) => {
             const session_id = document.getElementById('matrixSession').value;
             const method = document.querySelector('input[name="assignMethod"]:checked').value;
             
             if(!session_id) return alert('Select a session!');
             
-            const btn = event.currentTarget;
+            const btn = e ? e.currentTarget : document.querySelector('[onclick*="saveMatrixAssignments"]');
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Saving...';
             btn.disabled = true;
@@ -869,6 +869,7 @@
                 }
             });
 
+            // Delete old assignments for the current view
             if(method === 'class') {
                 const class_id = document.getElementById('matrixClass').value;
                 await supabase.from('teacher_class_subjects').delete().match({ session_id, class_id });
@@ -877,21 +878,28 @@
                 await supabase.from('teacher_class_subjects').delete().match({ session_id, teacher_id });
             }
 
-            if(newAssignments.length > 0) {
-                const { error } = await supabase.from('teacher_class_subjects').insert(newAssignments);
+            // Insert assignments one by one to skip FK errors
+            let saved = 0, skipped = 0;
+            for(const assignment of newAssignments) {
+                const { error } = await supabase.from('teacher_class_subjects').insert(assignment);
                 if(error) {
-                    alert('Error saving: ' + error.message);
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                    return;
+                    console.warn('Skipped assignment (FK issue):', assignment.teacher_id, error.message);
+                    skipped++;
+                } else {
+                    saved++;
                 }
             }
             
-            btn.innerHTML = '<i class="fas fa-check me-2"></i> Saved!';
+            if(skipped > 0) {
+                btn.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i> ${saved} saved, ${skipped} skipped`;
+                console.warn(`${skipped} assignments skipped due to FK constraint. Run the SQL fix in Supabase SQL Editor.`);
+            } else {
+                btn.innerHTML = '<i class="fas fa-check me-2"></i> Saved!';
+            }
             setTimeout(() => {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
-            }, 2000);
+            }, 3000);
             renderMatrix();
         };
         window.toggleMatrixColumn = (el, subjectId) => {
