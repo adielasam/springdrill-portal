@@ -412,11 +412,14 @@
                         </div>
                     </div>
 
+                    <div class="d-flex justify-content-center mt-4 gap-4 pb-2">
+                        <button type="button" class="btn btn-outline-danger rounded-pill px-4" id="btnModalBack" style="display:none; font-weight:500;" onclick="changeStep(-1)">Back</button>
+                        <button type="button" class="btn btn-outline-danger rounded-pill px-4" id="btnModalNext" style="font-weight:500;" onclick="changeStep(1)">Next</button>
+                    </div>
                 </div>
-                <div class="modal-footer d-flex justify-content-between">
-                    <button type="button" class="btn btn-outline-danger rounded-pill px-4" id="btnModalBack" style="display:none;" onclick="changeStep(-1)">Back</button>
-                    <button type="button" class="btn btn-danger rounded-pill px-4" id="btnModalNext" onclick="changeStep(1)">Next</button>
-                    <button type="button" class="btn btn-success rounded-pill px-4" id="btnModalSave" style="display:none;" onclick="saveStudentData()">Save changes</button>
+                <div class="modal-footer d-flex justify-content-end bg-light" style="border-top: 1px solid #dee2e6;">
+                    <button type="button" class="btn btn-success px-4" id="btnModalSave" onclick="saveStudentData()" style="background-color: #5cb85c; border-color: #4cae4c; font-weight:600;">Save changes</button>
+                    <button type="button" class="btn btn-secondary px-4 text-dark" data-bs-dismiss="modal" style="background-color: #f0f0f0; border-color: #e0e0e0; font-weight:600;">Close</button>
                 </div>
             </div>
         </div>
@@ -537,7 +540,6 @@
             }
             document.getElementById('btnModalBack').style.display = (currentStep > 1) ? 'block' : 'none';
             document.getElementById('btnModalNext').style.display = (currentStep < totalSteps) ? 'block' : 'none';
-            document.getElementById('btnModalSave').style.display = (currentStep === totalSteps) ? 'block' : 'none';
         };
 
         window.saveStudentData = async function() {
