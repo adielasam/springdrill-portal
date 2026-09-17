@@ -598,12 +598,12 @@
         window.loadStudents = async () => {
             const class_id = document.getElementById('ssClass').value;
             if(!class_id) return;
-            const { data } = await supabase.rpc('get_users_by_role', { role_name: 'student' });
-            const { data: profiles } = await supabase.from('student_profiles').select('id, class_id').eq('class_id', class_id);
-            const classStudentIds = profiles ? profiles.map(p => p.id) : [];
             
-            students = (data || []).filter(s => classStudentIds.includes(s.id));
-            const opts = '<option value="">Select Student</option>' + students.map(s => `<option value="${s.id}">${s.first_name} ${s.last_name || ''}</option>`).join('');
+            const { data: stds, error } = await supabase.from('students').select('user_id, surname, first_name').eq('class_id', class_id);
+            if(error) console.error(error);
+            
+            students = stds || [];
+            const opts = '<option value="">Select Student</option>' + students.map(s => `<option value="${s.user_id}">${s.first_name} ${s.surname || ''}</option>`).join('');
             document.getElementById('ssStudent').innerHTML = opts;
             document.getElementById('studentAssignmentCard').style.display = 'none';
         }
