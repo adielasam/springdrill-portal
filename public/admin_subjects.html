@@ -335,16 +335,16 @@
                         </div>
                     </div>
 
-                    <div class="card">
-                        <div class="card-header bg-success"><i class="fas fa-th me-2"></i> Subject Assignment Matrix</div>
-                        <div class="card-body p-0 table-responsive" style="max-height: 600px; overflow-y: auto;">
-                            <table class="table table-bordered table-hover text-center align-middle mb-0" style="min-width: 1000px;" id="assignmentMatrixTable">
-                                <thead id="matrixHead"><tr><th>Loading...</th></tr></thead>
-                                <tbody id="matrixBody"><tr><td>Loading...</td></tr></tbody>
-                            </table>
+                    <div class="card" style="min-height: 400px;">
+                        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                            <div><i class="fas fa-list me-2"></i> Subject Assignments</div>
+                            <button type="button" class="btn btn-sm btn-light text-success fw-bold rounded-pill shadow-sm" onclick="saveMatrixAssignments(event)"><i class="fas fa-save me-2"></i> Save assignments</button>
                         </div>
-                        <div class="card-footer bg-white text-end">
-                            <button type="button" class="btn btn-success px-4 rounded-pill fw-bold" onclick="saveMatrixAssignments()"><i class="fas fa-save me-2"></i> Save assignments</button>
+                        <div class="card-body bg-light p-4" id="matrixContainer">
+                            <div class="text-center text-muted py-5">Please select School and Method details above...</div>
+                        </div>
+                        <div class="card-footer bg-white text-end py-3">
+                            <button type="button" class="btn btn-success px-4 rounded-pill fw-bold shadow-sm" onclick="saveMatrixAssignments(event)"><i class="fas fa-save me-2"></i> Save assignments</button>
                         </div>
                     </div>
                 </div>
@@ -693,47 +693,84 @@
         window.renderMatrix = async () => {
             const session_id = document.getElementById('matrixSession').value;
             const method = document.querySelector('input[name="assignMethod"]:checked').value;
-            const thead = document.getElementById('matrixHead');
-            const tbody = document.getElementById('matrixBody');
+            const container = document.getElementById('matrixContainer');
 
             if(!session_id) {
-                thead.innerHTML = '<tr><th>Please select a Session</th></tr>';
-                tbody.innerHTML = '<tr><td>...</td></tr>';
+                container.innerHTML = '<div class="text-center text-muted py-5">Please select a Session</div>';
                 return;
             }
 
             if(method === 'class') {
                 const class_id = document.getElementById('matrixClass').value;
                 if(!class_id) {
-                    thead.innerHTML = '<tr><th>Please select a Class</th></tr>';
-                    tbody.innerHTML = '<tr><td>...</td></tr>';
+                    container.innerHTML = '<div class="text-center text-muted py-5">Please select a Class</div>';
                     return;
                 }
                 
-                // Columns are subjects assigned to this class
+                const clsInfo = classes.find(c => c.id == class_id);
+                
+                // Get subjects for this class
                 const { data: cSubs } = await supabase.from('class_subjects').select('subject_id').eq('class_id', class_id);
                 const classSubIds = cSubs ? cSubs.map(c => c.subject_id) : [];
                 const cols = subjects.filter(s => classSubIds.includes(s.id));
 
                 if(cols.length === 0) {
-                    thead.innerHTML = '<tr><th>No subjects assigned to this class yet.</th></tr>';
-                    tbody.innerHTML = '<tr><td>Assign subjects to this class first.</td></tr>';
+                    container.innerHTML = '<div class="text-center text-muted py-5">No subjects assigned to this class yet. Assign subjects first.</div>';
                     return;
                 }
 
-                // Get current assignments for this session and class
+                // Get assignments for this class in this session
                 const { data: assignments } = await supabase.from('teacher_class_subjects').select('*').eq('session_id', session_id).eq('class_id', class_id);
                 matrixAssignments = assignments || [];
 
-                thead.innerHTML = `<tr><th>S/N</th><th class="text-start">Teacher</th>${cols.map(c => `<th style="width: 120px; font-size: 0.8rem;">${c.name}</th>`).join('')}</tr>`;
+                let html = `
+                    <div class="card mb-4 border-success shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="fw-bold mb-1"><i class="fas fa-users text-success me-2"></i> ${clsInfo.name}</h5>
+                            <span class="badge bg-success rounded-pill">${matrixAssignments.length} total assignments</span>
+                        </div>
+                    </div>
+                    <div class="accordion" id="assignAccordion">
+                `;
+
+                cols.forEach((sub, sIdx) => {
+                    const assignedToThisSub = matrixAssignments.filter(a => a.subject_id === sub.id).length;
+                    
+                    let checkboxesHtml = `<div class="row g-2 p-3">`;
+                    teachers.forEach(t => {
+                        const isAssigned = matrixAssignments.some(a => a.teacher_id === t.id && a.subject_id === sub.id);
+                        checkboxesHtml += `
+                            <div class="col-md-4 col-sm-6">
+                                <label class="d-flex align-items-center border p-2 rounded bg-white w-100" style="cursor:pointer; transition: 0.2s;" onmouseover="this.classList.add('border-success')" onmouseout="this.classList.remove('border-success')">
+                                    <input type="checkbox" class="form-check-input me-3 matrix-cb" data-teacher="${t.id}" data-class="${class_id}" data-subject="${sub.id}" ${isAssigned ? 'checked':''}>
+                                    <div style="font-size: 13px;">
+                                        <strong>${t.name}</strong>
+                                    </div>
+                                </label>
+                            </div>
+                        `;
+                    });
+                    checkboxesHtml += `</div>`;
+
+                    html += `
+                        <div class="accordion-item mb-2 border rounded">
+                            <h2 class="accordion-header" id="heading${sIdx}">
+                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${sIdx}" style="font-size: 14px; background: white;">
+                                    ${sub.name} 
+                                    <span class="badge ${assignedToThisSub > 0 ? 'bg-success' : 'bg-secondary'} ms-auto me-2 rounded-pill">${assignedToThisSub}/${teachers.length}</span>
+                                </button>
+                            </h2>
+                            <div id="collapse${sIdx}" class="accordion-collapse collapse" data-bs-parent="#assignAccordion">
+                                <div class="accordion-body bg-light p-0 border-top">
+                                    ${checkboxesHtml}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
                 
-                tbody.innerHTML = teachers.map((t, idx) => {
-                    const rowHtml = cols.map(c => {
-                        const isAssigned = matrixAssignments.some(a => a.teacher_id === t.id && a.subject_id === c.id);
-                        return `<td><input type="checkbox" class="form-check-input matrix-cb" data-teacher="${t.id}" data-class="${class_id}" data-subject="${c.id}" ${isAssigned ? 'checked':''}></td>`;
-                    }).join('');
-                    return `<tr><td>${idx+1}</td><td class="text-start fw-bold"><i class="fas fa-user-circle me-2 text-muted"></i>${t.name}</td>${rowHtml}</tr>`;
-                }).join('');
+                html += `</div>`;
+                container.innerHTML = html;
 
             } else {
                 // Teacher Method
@@ -741,31 +778,72 @@
                 const school_id = document.getElementById('matrixSchool').value;
                 
                 if(!teacher_id || !school_id) {
-                    thead.innerHTML = '<tr><th>Please select School and Teacher</th></tr>';
-                    tbody.innerHTML = '<tr><td>...</td></tr>';
+                    container.innerHTML = '<div class="text-center text-muted py-5">Please select School and Teacher</div>';
                     return;
                 }
 
-                // Rows are Classes, Columns are Subjects in the school
-                const cols = subjects.filter(s => s.school_id == school_id);
+                const tInfo = teachers.find(t => t.id == teacher_id);
+                const sInfo = schools.find(s => s.id == school_id);
+                
+                const cols = subjects.filter(s => s.school_id == school_id || !s.school_id);
                 if(cols.length === 0) {
-                    thead.innerHTML = '<tr><th>No subjects found in this school.</th></tr>';
-                    tbody.innerHTML = '<tr><td>...</td></tr>';
+                    container.innerHTML = '<div class="text-center text-muted py-5">No subjects found in this school.</div>';
                     return;
                 }
 
                 const { data: assignments } = await supabase.from('teacher_class_subjects').select('*').eq('session_id', session_id).eq('teacher_id', teacher_id);
                 matrixAssignments = assignments || [];
 
-                thead.innerHTML = `<tr><th>S/N</th><th class="text-start">Class</th>${cols.map(c => `<th style="width: 120px; font-size: 0.8rem;">${c.name}</th>`).join('')}</tr>`;
-                
-                tbody.innerHTML = classes.map((cls, idx) => {
-                    const rowHtml = cols.map(c => {
-                        const isAssigned = matrixAssignments.some(a => a.class_id === cls.id && a.subject_id === c.id);
-                        return `<td><input type="checkbox" class="form-check-input matrix-cb" data-teacher="${teacher_id}" data-class="${cls.id}" data-subject="${c.id}" ${isAssigned ? 'checked':''}></td>`;
-                    }).join('');
-                    return `<tr><td>${idx+1}</td><td class="text-start fw-bold">${cls.name}</td>${rowHtml}</tr>`;
-                }).join('');
+                let html = `
+                    <div class="card mb-4 border-success shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="mb-2"><i class="fas fa-user-circle text-muted" style="font-size: 40px;"></i></div>
+                            <h5 class="fw-bold mb-1">${tInfo.name}</h5>
+                            <p class="text-muted mb-2 small"><i class="fas fa-school me-1"></i> ${sInfo.name}</p>
+                            <span class="badge bg-success rounded-pill"><i class="fas fa-check-circle me-1"></i> ${matrixAssignments.length} assignments</span>
+                        </div>
+                    </div>
+                    <div class="accordion" id="assignAccordion">
+                `;
+
+                cols.forEach((sub, sIdx) => {
+                    const assignedToThisSub = matrixAssignments.filter(a => a.subject_id === sub.id).length;
+                    
+                    let checkboxesHtml = `<div class="row g-2 p-3">`;
+                    classes.forEach(cls => {
+                        const isAssigned = matrixAssignments.some(a => a.class_id === cls.id && a.subject_id === sub.id);
+                        checkboxesHtml += `
+                            <div class="col-md-3 col-sm-4">
+                                <label class="d-flex align-items-center border p-2 rounded bg-white w-100" style="cursor:pointer; transition: 0.2s;" onmouseover="this.classList.add('border-success')" onmouseout="this.classList.remove('border-success')">
+                                    <input type="checkbox" class="form-check-input me-3 matrix-cb" data-teacher="${teacher_id}" data-class="${cls.id}" data-subject="${sub.id}" ${isAssigned ? 'checked':''}>
+                                    <div style="font-size: 12px; line-height:1.2;">
+                                        <strong>${cls.name}</strong>
+                                    </div>
+                                </label>
+                            </div>
+                        `;
+                    });
+                    checkboxesHtml += `</div>`;
+
+                    html += `
+                        <div class="accordion-item mb-2 border rounded">
+                            <h2 class="accordion-header" id="heading${sIdx}">
+                                <button class="accordion-button collapsed py-2 px-3 fw-bold text-dark text-uppercase" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${sIdx}" style="font-size: 12px; background: white;">
+                                    ${sub.name}
+                                    <span class="badge ${assignedToThisSub > 0 ? 'bg-success' : 'bg-secondary'} ms-auto me-2 rounded-pill">${assignedToThisSub}/${classes.length}</span>
+                                </button>
+                            </h2>
+                            <div id="collapse${sIdx}" class="accordion-collapse collapse" data-bs-parent="#assignAccordion">
+                                <div class="accordion-body bg-light p-0 border-top">
+                                    ${checkboxesHtml}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                container.innerHTML = html;
             }
         };
 
@@ -774,6 +852,11 @@
             const method = document.querySelector('input[name="assignMethod"]:checked').value;
             
             if(!session_id) return alert('Select a session!');
+            
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Saving...';
+            btn.disabled = true;
             
             const checkboxes = document.querySelectorAll('.matrix-cb');
             const newAssignments = [];
@@ -789,7 +872,6 @@
                 }
             });
 
-            // We need to delete old assignments for the CURRENT view, then insert new ones.
             if(method === 'class') {
                 const class_id = document.getElementById('matrixClass').value;
                 await supabase.from('teacher_class_subjects').delete().match({ session_id, class_id });
@@ -800,10 +882,19 @@
 
             if(newAssignments.length > 0) {
                 const { error } = await supabase.from('teacher_class_subjects').insert(newAssignments);
-                if(error) return alert(error.message);
+                if(error) {
+                    alert('Error saving: ' + error.message);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    return;
+                }
             }
             
-            alert('Assignments saved successfully!');
+            btn.innerHTML = '<i class="fas fa-check me-2"></i> Saved!';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 2000);
             renderMatrix();
         };
         async function assignSubjectHead() {
