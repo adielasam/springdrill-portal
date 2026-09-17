@@ -547,49 +547,80 @@
             btn.innerHTML = 'Saving...';
             btn.disabled = true;
 
-            const selectedAllergies = [];
-            document.querySelectorAll('.allergy-cb:checked').forEach(cb => selectedAllergies.push(cb.value));
-
-            const updates = {
-                parent_guardian_name: document.getElementById('edit_parent_guardian_name').value,
-                admission_year: document.getElementById('edit_admission_year').value,
-                reg_number: document.getElementById('edit_reg_number').value,
-                sage_customer_id: document.getElementById('edit_sage_customer_id').value,
-                surname: document.getElementById('edit_surname').value,
-                first_name: document.getElementById('edit_first_name').value,
-                other_name: document.getElementById('edit_other_name').value,
-                gender: document.getElementById('gFemale').checked ? 'Female' : 'Male',
-                imply_pta: document.getElementById('ptaYes').checked,
-                is_last_child: document.getElementById('lcYes').checked,
-                dob: document.getElementById('edit_dob').value || null,
-                nationality: document.getElementById('edit_nationality').value,
-                state_of_origin: document.getElementById('edit_state_of_origin').value,
-                lga: document.getElementById('edit_lga').value,
-                address: document.getElementById('edit_address').value,
-                permanent_address: document.getElementById('edit_permanent_address').value,
-                boarding_status: document.getElementById('edit_boarding_status').value,
-                grade_level: document.getElementById('edit_grade_level').value,
-                class_id: document.getElementById('edit_class_id').value,
-                height: document.getElementById('edit_height').value,
-                weight: document.getElementById('edit_weight').value,
-                phone_number: document.getElementById('edit_phone_number').value,
-                student_email: document.getElementById('edit_student_email').value,
-                previous_school: document.getElementById('edit_previous_school').value,
-                reason_for_leaving: document.getElementById('edit_reason_for_leaving').value,
-                allergies: selectedAllergies
-            };
-
-            // Remove empty dob to avoid postgres parsing error
-            if(!updates.dob) delete updates.dob;
-
             try {
-                const { error } = await supabase.from('students').update(updates).eq('user_id', currentStudentData.user_id);
-                if (error) throw error;
+                // 1. Upload photo if selected
+                const photoInput = document.getElementById('edit_photo');
+                let passportUrl = currentStudentData.passport_url; // keep existing by default
                 
+                if (photoInput.files && photoInput.files[0]) {
+                    const file = photoInput.files[0];
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `student_${currentStudentData.user_id}_${Date.now()}.${fileExt}`;
+                    
+                    const { data: uploadData, error: uploadError } = await supabase.storage
+                        .from('passports')
+                        .upload(fileName, file, { upsert: true });
+                        
+                    if (uploadError) {
+                        console.error('Upload error:', uploadError);
+                        alert('Could not upload photo. Does the "passports" storage bucket exist and allow public uploads? Error: ' + uploadError.message);
+                    } else {
+                        const { data: publicUrlData } = supabase.storage.from('passports').getPublicUrl(fileName);
+                        passportUrl = publicUrlData.publicUrl;
+                    }
+                }
+
+                // 2. Prepare data updates
+                const selectedAllergies = [];
+                document.querySelectorAll('.allergy-cb:checked').forEach(cb => selectedAllergies.push(cb.value));
+
+                const updates = {
+                    parent_guardian_name: document.getElementById('edit_parent_guardian_name').value,
+                    admission_year: document.getElementById('edit_admission_year').value,
+                    reg_number: document.getElementById('edit_reg_number').value,
+                    sage_customer_id: document.getElementById('edit_sage_customer_id').value,
+                    surname: document.getElementById('edit_surname').value,
+                    first_name: document.getElementById('edit_first_name').value,
+                    other_name: document.getElementById('edit_other_name').value,
+                    gender: document.getElementById('gFemale').checked ? 'Female' : 'Male',
+                    imply_pta: document.getElementById('ptaYes').checked,
+                    is_last_child: document.getElementById('lcYes').checked,
+                    dob: document.getElementById('edit_dob').value || null,
+                    nationality: document.getElementById('edit_nationality').value,
+                    state_of_origin: document.getElementById('edit_state_of_origin').value,
+                    lga: document.getElementById('edit_lga').value,
+                    address: document.getElementById('edit_address').value,
+                    permanent_address: document.getElementById('edit_permanent_address').value,
+                    boarding_status: document.getElementById('edit_boarding_status').value,
+                    grade_level: document.getElementById('edit_grade_level').value,
+                    class_id: document.getElementById('edit_class_id').value,
+                    height: document.getElementById('edit_height').value,
+                    weight: document.getElementById('edit_weight').value,
+                    phone_number: document.getElementById('edit_phone_number').value,
+                    student_email: document.getElementById('edit_student_email').value,
+                    previous_school: document.getElementById('edit_previous_school').value,
+                    reason_for_leaving: document.getElementById('edit_reason_for_leaving').value,
+                    allergies: selectedAllergies,
+                    passport_url: passportUrl
+                };
+
+                // Remove empty dob to avoid postgres parsing error
+                if(!updates.dob) delete updates.dob;
+
+                // 3. Update database
+                const { error: dbError } = await supabase.from('students').update(updates).eq('user_id', currentStudentData.user_id);
+                if (dbError) throw dbError;
+                
+                // 4. Update password if provided
                 const pwd = document.getElementById('edit_password').value;
                 if (pwd) {
-                    // Update auth password if provided (requires admin API, we'll alert for now since we don't have the API built specifically for this)
-                    alert('Student info saved. Password update feature requires admin endpoint.');
+                    const pwdRes = await fetch('/api/admin/update-password', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: currentStudentData.user_id, newPassword: pwd })
+                    });
+                    const pwdData = await pwdRes.json();
+                    if(!pwdRes.ok) throw new Error(pwdData.error || 'Failed to update password');
                 }
                 
                 alert('Student information updated successfully!');
