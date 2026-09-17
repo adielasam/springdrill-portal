@@ -51,7 +51,15 @@ BEGIN
     BEGIN ALTER TABLE subjects ADD COLUMN credit_unit INTEGER DEFAULT 1; EXCEPTION WHEN duplicate_column THEN END;
 END $$;
 
--- 6. Assign Subjects to Classes
+-- 6. Academic Sessions
+CREATE TABLE IF NOT EXISTS academic_sessions (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+    is_active BOOLEAN DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 7. Assign Subjects to Classes
 CREATE TABLE IF NOT EXISTS class_subjects (
     id SERIAL PRIMARY KEY,
     class_id INTEGER REFERENCES classes(id) ON DELETE CASCADE,
@@ -59,16 +67,23 @@ CREATE TABLE IF NOT EXISTS class_subjects (
     UNIQUE(class_id, subject_id)
 );
 
--- 7. Assign Teachers to Class Subjects
+-- 8. Assign Teachers to Class Subjects
 CREATE TABLE IF NOT EXISTS teacher_class_subjects (
     id SERIAL PRIMARY KEY,
     teacher_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
     class_id INTEGER REFERENCES classes(id) ON DELETE CASCADE,
     subject_id INTEGER REFERENCES subjects(id) ON DELETE CASCADE,
-    UNIQUE(teacher_id, class_id, subject_id)
+    session_id INTEGER REFERENCES academic_sessions(id) ON DELETE CASCADE,
+    UNIQUE(teacher_id, class_id, subject_id, session_id)
 );
 
--- 8. Subject Heads
+-- Safely add missing columns to teacher_class_subjects
+DO $$ 
+BEGIN 
+    BEGIN ALTER TABLE teacher_class_subjects ADD COLUMN session_id INTEGER REFERENCES academic_sessions(id) ON DELETE CASCADE; EXCEPTION WHEN duplicate_column THEN END;
+END $$;
+
+-- 9. Subject Heads
 CREATE TABLE IF NOT EXISTS subject_heads (
     id SERIAL PRIMARY KEY,
     subject_id INTEGER REFERENCES subjects(id) ON DELETE CASCADE,
@@ -90,6 +105,7 @@ ALTER TABLE subject_groups ENABLE ROW LEVEL SECURITY;
 ALTER TABLE subject_departments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE subject_categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE subjects ENABLE ROW LEVEL SECURITY;
+ALTER TABLE academic_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE class_subjects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE teacher_class_subjects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE subject_heads ENABLE ROW LEVEL SECURITY;
@@ -101,6 +117,7 @@ CREATE POLICY "Enable all for authenticated users" ON subject_groups FOR ALL USI
 CREATE POLICY "Enable all for authenticated users" ON subject_departments FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "Enable all for authenticated users" ON subject_categories FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "Enable all for authenticated users" ON subjects FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Enable all for authenticated users" ON academic_sessions FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "Enable all for authenticated users" ON class_subjects FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "Enable all for authenticated users" ON teacher_class_subjects FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "Enable all for authenticated users" ON subject_heads FOR ALL USING (auth.role() = 'authenticated');
@@ -108,5 +125,8 @@ CREATE POLICY "Enable all for authenticated users" ON student_subjects FOR ALL U
 
 -- Insert default schools if empty
 INSERT INTO schools (name) VALUES ('SpringDrill Nursery School'), ('SpringDrill Primary School'), ('SpringDrill High School') ON CONFLICT DO NOTHING;
+
+-- Insert default sessions
+INSERT INTO academic_sessions (name, is_active) VALUES ('2023/2024', false), ('2024/2025', false), ('2025/2026', false), ('2026/2027', true) ON CONFLICT DO NOTHING;
 
 NOTIFY pgrst, 'reload schema';

@@ -286,33 +286,65 @@
                     </div>
                 </div>
 
-                <!-- Assign to Teachers -->
+                <!-- Assign to Teachers (Matrix) -->
                 <div class="tab-pane fade" id="teachersTab">
+                    <div class="card mb-4">
+                        <div class="card-header"><i class="fas fa-filter me-2"></i> Select School and Session</div>
+                        <div class="card-body bg-white py-4">
+                            <div class="row justify-content-center gap-4">
+                                <div class="col-md-5">
+                                    <label class="fw-bold">Session:</label>
+                                    <select id="matrixSession" class="form-select session-dropdown" onchange="renderMatrix()"></select>
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="fw-bold">School:</label>
+                                    <select id="matrixSchool" class="form-select school-dropdown" onchange="renderMatrix()"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header"><i class="fas fa-cogs me-2"></i> Assignment Method</div>
+                        <div class="card-body bg-white py-4">
+                            <div class="row align-items-center">
+                                <div class="col-md-4">
+                                    <div class="btn-group w-100" role="group">
+                                        <input type="radio" class="btn-check" name="assignMethod" id="methodClass" value="class" checked onchange="toggleMatrixMethod()">
+                                        <label class="btn btn-outline-success" for="methodClass">
+                                            <div class="fw-bold">Class</div>
+                                            <small style="font-size:10px;">Assign multiple teachers to one class</small>
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="assignMethod" id="methodTeacher" value="teacher" onchange="toggleMatrixMethod()">
+                                        <label class="btn btn-outline-success" for="methodTeacher">
+                                            <div class="fw-bold">Teacher</div>
+                                            <small style="font-size:10px;">Assign one teacher across all classes</small>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" id="matrixClassSelectDiv">
+                                    <label class="fw-bold">Class / Year Group:</label>
+                                    <select id="matrixClass" class="form-select class-dropdown" onchange="renderMatrix()"></select>
+                                </div>
+                                <div class="col-md-4" id="matrixTeacherSelectDiv" style="display:none;">
+                                    <label class="fw-bold">Teacher:</label>
+                                    <select id="matrixTeacher" class="form-select teacher-dropdown" onchange="renderMatrix()"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="card">
-                        <div class="card-header"><i class="fas fa-chalkboard-teacher me-2"></i> Assign Teacher to Class Subject</div>
-                        <div class="card-body">
-                            <form id="teacherSubForm" class="row align-items-end mb-4">
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Teacher</label>
-                                    <select id="tsTeacher" class="form-select teacher-dropdown" required></select>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Class</label>
-                                    <select id="tsClass" class="form-select class-dropdown" required></select>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Subject</label>
-                                    <select id="tsSubject" class="form-select sub-dropdown" required></select>
-                                </div>
-                                <div class="col-md-2 mb-3">
-                                    <button type="submit" class="btn btn-primary w-100">Assign</button>
-                                </div>
-                            </form>
-                            <hr>
-                            <table class="table table-bordered text-center">
-                                <thead><tr><th>Teacher</th><th>Class</th><th>Subject</th><th>Actions</th></tr></thead>
-                                <tbody id="teacherSubTable"><tr><td colspan="4">Loading...</td></tr></tbody>
+                        <div class="card-header bg-success"><i class="fas fa-th me-2"></i> Subject Assignment Matrix</div>
+                        <div class="card-body p-0 table-responsive" style="max-height: 600px; overflow-y: auto;">
+                            <table class="table table-bordered table-hover text-center align-middle mb-0" style="min-width: 1000px;" id="assignmentMatrixTable">
+                                <thead id="matrixHead"><tr><th>Loading...</th></tr></thead>
+                                <tbody id="matrixBody"><tr><td>Loading...</td></tr></tbody>
                             </table>
+                        </div>
+                        <div class="card-footer bg-white text-end">
+                            <button type="button" class="btn btn-success px-4 rounded-pill fw-bold" onclick="saveMatrixAssignments()"><i class="fas fa-save me-2"></i> Save assignments</button>
                         </div>
                     </div>
                 </div>
@@ -387,9 +419,9 @@
     <script type="module">
         import { supabase } from './supabaseClient.js';
         
-        let schools = [], groups = [], departments = [], categories = [];
+        let schools = [], groups = [], departments = [], categories = [], sessions = [];
         let subjects = [], classes = [], teachers = [], students = [];
-        let currentClassSubjects = [], currentStudentSubjects = [];
+        let matrixAssignments = []; // to store initial state
 
         document.addEventListener('DOMContentLoaded', async () => {
             const hash = window.location.hash;
@@ -403,28 +435,28 @@
             // Initial renders
             renderCategories();
             renderSubjects();
-            renderTeacherSubjects();
             renderSubjectHeads();
             renderCreditUnits();
+            renderMatrix();
 
             // Event Listeners
             document.getElementById('catForm').addEventListener('submit', async(e) => { e.preventDefault(); await addCategory(); });
             document.getElementById('subForm').addEventListener('submit', async(e) => { e.preventDefault(); await addSubject(); });
-            document.getElementById('teacherSubForm').addEventListener('submit', async(e) => { e.preventDefault(); await assignTeacherSubject(); });
             document.getElementById('headForm').addEventListener('submit', async(e) => { e.preventDefault(); await assignSubjectHead(); });
             document.getElementById('creditForm').addEventListener('submit', async(e) => { e.preventDefault(); await updateCreditUnit(); });
         });
 
         async function loadBaseData() {
             try {
-                const [sch, grp, dep, cat, sub, cls, tch] = await Promise.all([
+                const [sch, grp, dep, cat, sub, cls, tch, sess] = await Promise.all([
                     supabase.from('schools').select('*').order('name'),
                     supabase.from('subject_groups').select('*').order('name'),
                     supabase.from('subject_departments').select('*').order('name'),
                     supabase.from('subject_categories').select('*').order('name'),
                     supabase.from('subjects').select(`*, subject_groups(name), subject_departments(name), subject_categories(name), schools(name)`).order('name'),
                     supabase.from('classes').select('*').order('name'),
-                    supabase.rpc('get_users_by_role', { role_name: 'teacher' })
+                    supabase.rpc('get_users_by_role', { role_name: 'teacher' }),
+                    supabase.from('academic_sessions').select('*').order('name', {ascending: false})
                 ]);
                 
                 schools = sch.data || [];
@@ -434,12 +466,16 @@
                 subjects = sub.data || [];
                 classes = cls.data || [];
                 teachers = tch.data || [];
+                sessions = sess.data || [];
 
                 populateDropdowns();
             } catch(e) { console.error('Error loading data', e); }
         }
 
         function populateDropdowns() {
+            const sessOpts = '<option value="">Select Session</option>' + sessions.map(s => `<option value="${s.id}" ${s.is_active?'selected':''}>${s.name}</option>`).join('');
+            document.querySelectorAll('.session-dropdown').forEach(el => el.innerHTML = sessOpts);
+
             const schOpts = '<option value="">Select School</option>' + schools.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
             document.querySelectorAll('.school-dropdown').forEach(el => el.innerHTML = schOpts);
 
@@ -641,24 +677,135 @@
                 <tr><td>${c.id}</td><td>${c.name}</td><td><button class="btn btn-sm btn-danger" onclick="deleteCategory(${c.id})"><i class="fas fa-trash"></i></button></td></tr>
             `).join('') || '<tr><td colspan="3" class="text-center">No categories found</td></tr>';
         }
-        async function assignTeacherSubject() {
-            const teacher_id = document.getElementById('tsTeacher').value;
-            const class_id = document.getElementById('tsClass').value;
-            const subject_id = document.getElementById('tsSubject').value;
-            await supabase.from('teacher_class_subjects').insert([{ teacher_id, class_id, subject_id }]);
-            renderTeacherSubjects();
-        }
-        window.deleteTeacherSubject = async (id) => {
-            await supabase.from('teacher_class_subjects').delete().eq('id', id);
-            renderTeacherSubjects();
-        }
-        async function renderTeacherSubjects() {
-            const { data } = await supabase.from('teacher_class_subjects').select(`id, teacher_id, classes(name), subjects(name)`);
-            document.getElementById('teacherSubTable').innerHTML = (data||[]).map(d => {
-                const t = teachers.find(x => x.id === d.teacher_id);
-                return `<tr><td class="fw-bold">${t ? t.first_name : 'Unknown'}</td><td>${d.classes?.name}</td><td>${d.subjects?.name}</td><td><button class="btn btn-sm btn-danger" onclick="deleteTeacherSubject(${d.id})"><i class="fas fa-trash"></i></button></td></tr>`;
-            }).join('') || '<tr><td colspan="4" class="text-center">No assignments found</td></tr>';
-        }
+        // --- Assign to Teachers (Matrix) ---
+        window.toggleMatrixMethod = () => {
+            const method = document.querySelector('input[name="assignMethod"]:checked').value;
+            if(method === 'class') {
+                document.getElementById('matrixClassSelectDiv').style.display = 'block';
+                document.getElementById('matrixTeacherSelectDiv').style.display = 'none';
+            } else {
+                document.getElementById('matrixClassSelectDiv').style.display = 'none';
+                document.getElementById('matrixTeacherSelectDiv').style.display = 'block';
+            }
+            renderMatrix();
+        };
+
+        window.renderMatrix = async () => {
+            const session_id = document.getElementById('matrixSession').value;
+            const method = document.querySelector('input[name="assignMethod"]:checked').value;
+            const thead = document.getElementById('matrixHead');
+            const tbody = document.getElementById('matrixBody');
+
+            if(!session_id) {
+                thead.innerHTML = '<tr><th>Please select a Session</th></tr>';
+                tbody.innerHTML = '<tr><td>...</td></tr>';
+                return;
+            }
+
+            if(method === 'class') {
+                const class_id = document.getElementById('matrixClass').value;
+                if(!class_id) {
+                    thead.innerHTML = '<tr><th>Please select a Class</th></tr>';
+                    tbody.innerHTML = '<tr><td>...</td></tr>';
+                    return;
+                }
+                
+                // Columns are subjects assigned to this class
+                const { data: cSubs } = await supabase.from('class_subjects').select('subject_id').eq('class_id', class_id);
+                const classSubIds = cSubs ? cSubs.map(c => c.subject_id) : [];
+                const cols = subjects.filter(s => classSubIds.includes(s.id));
+
+                if(cols.length === 0) {
+                    thead.innerHTML = '<tr><th>No subjects assigned to this class yet.</th></tr>';
+                    tbody.innerHTML = '<tr><td>Assign subjects to this class first.</td></tr>';
+                    return;
+                }
+
+                // Get current assignments for this session and class
+                const { data: assignments } = await supabase.from('teacher_class_subjects').select('*').eq('session_id', session_id).eq('class_id', class_id);
+                matrixAssignments = assignments || [];
+
+                thead.innerHTML = `<tr><th>S/N</th><th class="text-start">Teacher</th>${cols.map(c => `<th style="width: 120px; font-size: 0.8rem;">${c.name}</th>`).join('')}</tr>`;
+                
+                tbody.innerHTML = teachers.map((t, idx) => {
+                    const rowHtml = cols.map(c => {
+                        const isAssigned = matrixAssignments.some(a => a.teacher_id === t.id && a.subject_id === c.id);
+                        return `<td><input type="checkbox" class="form-check-input matrix-cb" data-teacher="${t.id}" data-class="${class_id}" data-subject="${c.id}" ${isAssigned ? 'checked':''}></td>`;
+                    }).join('');
+                    return `<tr><td>${idx+1}</td><td class="text-start fw-bold"><i class="fas fa-user-circle me-2 text-muted"></i>${t.first_name} ${t.last_name || ''}</td>${rowHtml}</tr>`;
+                }).join('');
+
+            } else {
+                // Teacher Method
+                const teacher_id = document.getElementById('matrixTeacher').value;
+                const school_id = document.getElementById('matrixSchool').value;
+                
+                if(!teacher_id || !school_id) {
+                    thead.innerHTML = '<tr><th>Please select School and Teacher</th></tr>';
+                    tbody.innerHTML = '<tr><td>...</td></tr>';
+                    return;
+                }
+
+                // Rows are Classes, Columns are Subjects in the school
+                const cols = subjects.filter(s => s.school_id == school_id);
+                if(cols.length === 0) {
+                    thead.innerHTML = '<tr><th>No subjects found in this school.</th></tr>';
+                    tbody.innerHTML = '<tr><td>...</td></tr>';
+                    return;
+                }
+
+                const { data: assignments } = await supabase.from('teacher_class_subjects').select('*').eq('session_id', session_id).eq('teacher_id', teacher_id);
+                matrixAssignments = assignments || [];
+
+                thead.innerHTML = `<tr><th>S/N</th><th class="text-start">Class</th>${cols.map(c => `<th style="width: 120px; font-size: 0.8rem;">${c.name}</th>`).join('')}</tr>`;
+                
+                tbody.innerHTML = classes.map((cls, idx) => {
+                    const rowHtml = cols.map(c => {
+                        const isAssigned = matrixAssignments.some(a => a.class_id === cls.id && a.subject_id === c.id);
+                        return `<td><input type="checkbox" class="form-check-input matrix-cb" data-teacher="${teacher_id}" data-class="${cls.id}" data-subject="${c.id}" ${isAssigned ? 'checked':''}></td>`;
+                    }).join('');
+                    return `<tr><td>${idx+1}</td><td class="text-start fw-bold">${cls.name}</td>${rowHtml}</tr>`;
+                }).join('');
+            }
+        };
+
+        window.saveMatrixAssignments = async () => {
+            const session_id = document.getElementById('matrixSession').value;
+            const method = document.querySelector('input[name="assignMethod"]:checked').value;
+            
+            if(!session_id) return alert('Select a session!');
+            
+            const checkboxes = document.querySelectorAll('.matrix-cb');
+            const newAssignments = [];
+            
+            checkboxes.forEach(cb => {
+                if(cb.checked) {
+                    newAssignments.push({
+                        session_id,
+                        teacher_id: cb.dataset.teacher,
+                        class_id: cb.dataset.class,
+                        subject_id: cb.dataset.subject
+                    });
+                }
+            });
+
+            // We need to delete old assignments for the CURRENT view, then insert new ones.
+            if(method === 'class') {
+                const class_id = document.getElementById('matrixClass').value;
+                await supabase.from('teacher_class_subjects').delete().match({ session_id, class_id });
+            } else {
+                const teacher_id = document.getElementById('matrixTeacher').value;
+                await supabase.from('teacher_class_subjects').delete().match({ session_id, teacher_id });
+            }
+
+            if(newAssignments.length > 0) {
+                const { error } = await supabase.from('teacher_class_subjects').insert(newAssignments);
+                if(error) return alert(error.message);
+            }
+            
+            alert('Assignments saved successfully!');
+            renderMatrix();
+        };
         async function assignSubjectHead() {
             const subject_id = document.getElementById('hSubject').value;
             const head_teacher_id = document.getElementById('hTeacher').value;
