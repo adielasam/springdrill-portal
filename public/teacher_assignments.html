@@ -282,16 +282,26 @@
         let mySubjects = [];
         let allAssignments = [];
         let activeSubjectId = null;
+        let activeClassId = null;
         
         document.addEventListener('DOMContentLoaded', async () => {
             initializeDashboard();
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) return;
             
-            // Load subjects
-            const { data: subjectsData } = await supabase.from('subjects').select('id, name, class_id, classes(name)').eq('teacher_id', session.user.id);
-            if (subjectsData) {
-                mySubjects = subjectsData;
+            // Load teacher's assigned subjects via the join table
+            const { data: tcsData } = await supabase
+                .from('teacher_class_subjects')
+                .select('subject_id, class_id, subjects(id, name), classes(id, name)')
+                .eq('teacher_id', session.user.id);
+            
+            if (tcsData) {
+                mySubjects = tcsData.map(tcs => ({
+                    subject_id: tcs.subject_id,
+                    class_id: tcs.class_id,
+                    subjectName: tcs.subjects?.name || 'N/A',
+                    className: tcs.classes?.name || 'N/A'
+                }));
             }
             
             // Load all assignments
@@ -312,27 +322,28 @@
 
             tbody.innerHTML = '';
             mySubjects.forEach((sub, idx) => {
-                const subjectAssignments = allAssignments.filter(a => a.subject_id === sub.id);
+                const subjectAssignments = allAssignments.filter(a => a.subject_id === sub.subject_id && a.class_id === sub.class_id);
                 const count = subjectAssignments.length;
                 
                 tbody.innerHTML += `
                     <tr>
                         <td class="fw-bold">${idx + 1}</td>
-                        <td class="fw-bold text-dark">${sub.name}</td>
-                        <td class="text-muted">${sub.classes?.name || 'N/A'}</td>
+                        <td class="fw-bold text-dark">${sub.subjectName}</td>
+                        <td class="text-muted">${sub.className}</td>
                         <td><span class="badge bg-secondary px-3 py-1 border rounded-pill shadow-sm" style="font-size: 0.8rem;">${count}</span></td>
                         <td class="text-end">
-                            <button class="btn btn-sm btn-success fw-bold px-3" onclick="manageSubject('${sub.id}')"><i class="fas fa-cog me-1"></i>Manage</button>
+                            <button class="btn btn-sm btn-success fw-bold px-3" onclick="manageSubject('${sub.subject_id}', '${sub.class_id}')"><i class="fas fa-cog me-1"></i>Manage</button>
                         </td>
                     </tr>
                 `;
             });
         }
 
-        window.manageSubject = function(subjectId) {
+        window.manageSubject = function(subjectId, classId) {
             activeSubjectId = subjectId;
-            const subject = mySubjects.find(s => s.id === subjectId);
-            document.getElementById('manageTitle').innerText = `Assignment for ${subject.name.toUpperCase()} (${(subject.classes?.name || '').toUpperCase()})`;
+            activeClassId = classId;
+            const subject = mySubjects.find(s => s.subject_id === subjectId && s.class_id === classId);
+            document.getElementById('manageTitle').innerText = `Assignment for ${subject.subjectName.toUpperCase()} (${subject.className.toUpperCase()})`;
             
             document.getElementById('subjectsView').classList.add('d-none');
             document.getElementById('assignmentsView').classList.remove('d-none');
@@ -348,7 +359,7 @@
 
         function renderAssignmentsTable() {
             const tbody = document.getElementById('assignmentsTableBody');
-            const subjectAssignments = allAssignments.filter(a => a.subject_id === activeSubjectId);
+            const subjectAssignments = allAssignments.filter(a => a.subject_id === activeSubjectId && a.class_id === activeClassId);
             
             if (subjectAssignments.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted">You have not created any assignments for this class yet.</td></tr>';
@@ -393,7 +404,6 @@
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 const subjId = activeSubjectId;
-                const subject = mySubjects.find(s => s.id === subjId);
                 
                 const title = document.getElementById('newAssignTitle').value;
                 if (!title) throw new Error("Please enter a title.");
@@ -415,7 +425,7 @@
                     description: document.getElementById('newAssignDesc').value,
                     due_date: document.getElementById('newAssignDue').value || null,
                     subject_id: subjId,
-                    class_id: subject.class_id,
+                    class_id: activeClassId,
                     teacher_id: session.user.id,
                     file_url: fileUrl
                 }).select().single();
