@@ -12,8 +12,12 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isDark, setIsDark] = useState(false);
   const [showPreloader, setShowPreloader] = useState(true);
+
+  // Form State
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setShowPreloader(false), 800);
@@ -23,32 +27,22 @@ function LoginForm() {
   useEffect(() => {
     const err = searchParams.get('error');
     if (err) setError(err);
-
-    const theme = localStorage.getItem('SPRINGDRILL_THEME');
-    if (theme === 'dark') {
-      document.body.classList.add('dark-mode');
-      setIsDark(true);
-    }
   }, [searchParams]);
 
-  const toggleTheme = () => {
-    const body = document.body;
-    body.classList.toggle('dark-mode');
-    const dark = body.classList.contains('dark-mode');
-    localStorage.setItem('SPRINGDRILL_THEME', dark ? 'dark' : 'light');
-    setIsDark(dark);
+  const fillDemoStudent = () => {
+    setEmail('sam.john4331@springdrill.edu');
+    setPassword('Spring7067!');
   };
 
-  const [showPassword, setShowPassword] = useState(false);
+  const fillDemoTeacher = () => {
+    setEmail('chukwuemaka.john1560@springdrill.edu');
+    setPassword('Spring1187!');
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
 
     try {
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
@@ -90,12 +84,15 @@ function LoginForm() {
           margin: 0;
           padding: 0;
           height: 100%;
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .login-page-bg {
-          background: linear-gradient(rgba(0, 77, 52, 0.4), rgba(0, 77, 52, 0.7)), url('/tech3.jpg') no-repeat center center fixed;
-          background-size: cover;
+          background-color: #f0fdf4;
+          background-image: 
+            radial-gradient(at 40% 20%, hsla(153, 80%, 80%, 0.5) 0px, transparent 50%),
+            radial-gradient(at 80% 0%, hsla(189, 100%, 56%, 0.15) 0px, transparent 50%),
+            radial-gradient(at 0% 50%, hsla(153, 80%, 80%, 0.5) 0px, transparent 50%);
           position: absolute;
           top: 0;
           left: 0;
@@ -110,151 +107,175 @@ function LoginForm() {
         }
 
         .glass-panel {
-          background: rgba(255, 255, 255, 0.9);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          border-radius: 12px;
-          box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-          padding: 40px;
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.5);
+          border-radius: 16px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+          padding: 45px 40px;
           width: 100%;
-          max-width: 450px;
+          max-width: 440px;
           position: relative;
           z-index: 10;
         }
 
         .login-header {
           text-align: center;
-          margin-bottom: 30px;
+          margin-bottom: 35px;
         }
 
         .login-header img {
-          max-height: 60px;
+          max-height: 55px;
           margin-bottom: 15px;
         }
 
         .login-header h2 {
           color: #007a4d;
-          font-weight: 700;
+          font-weight: 800;
           margin: 0;
-          font-size: 1.5rem;
+          font-size: 1.6rem;
+          letter-spacing: -0.5px;
         }
 
         .login-header p {
-          color: #666;
-          margin-top: 5px;
+          color: #64748b;
+          margin-top: 8px;
           font-size: 0.95rem;
         }
 
         .custom-input-group {
           display: flex;
           align-items: center;
-          background: #f8f9fa;
-          border: 1px solid #ced4da;
-          border-radius: 6px;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 8px;
           overflow: hidden;
           margin-bottom: 20px;
-          transition: border-color 0.3s;
+          transition: all 0.3s ease;
         }
 
         .custom-input-group:focus-within {
           border-color: #007a4d;
-          box-shadow: 0 0 0 0.2rem rgba(0, 122, 77, 0.1);
+          background: #ffffff;
+          box-shadow: 0 0 0 3px rgba(0, 122, 77, 0.1);
         }
 
         .custom-input-icon {
-          padding: 12px 15px;
-          color: #6c757d;
+          padding: 14px 16px;
+          color: #94a3b8;
           background: transparent;
+        }
+
+        .custom-input-group:focus-within .custom-input-icon {
+          color: #007a4d;
         }
 
         .custom-input {
           border: none;
-          padding: 12px 10px;
+          padding: 14px 10px 14px 0;
           width: 100%;
           background: transparent;
           outline: none;
-          color: #333;
+          color: #334155;
+          font-size: 0.95rem;
         }
 
         .btn-toggle-pass {
           background: transparent;
           border: none;
           padding: 0 15px;
-          color: #6c757d;
+          color: #94a3b8;
           cursor: pointer;
         }
 
-        .btn-toggle-pass:focus {
-          outline: none;
-        }
+        .btn-toggle-pass:hover { color: #64748b; }
+        .btn-toggle-pass:focus { outline: none; }
 
         .btn-login {
           background: #007a4d;
           color: white;
           border: none;
-          border-radius: 6px;
-          padding: 12px;
+          border-radius: 8px;
+          padding: 14px;
           width: 100%;
-          font-weight: bold;
-          font-size: 1rem;
+          font-weight: 700;
+          font-size: 1.05rem;
           cursor: pointer;
-          transition: background 0.3s;
+          transition: all 0.2s ease;
           display: flex;
           justify-content: center;
           align-items: center;
+          margin-top: 10px;
+          box-shadow: 0 4px 12px rgba(0, 122, 77, 0.2);
         }
 
         .btn-login:hover {
-          background: #005c3a;
+          background: #006640;
+          transform: translateY(-1px);
+          box-shadow: 0 6px 16px rgba(0, 122, 77, 0.3);
         }
 
         .btn-login:disabled {
-          background: #6c757d;
+          background: #94a3b8;
           cursor: not-allowed;
+          box-shadow: none;
+          transform: none;
         }
 
         .demo-panel {
-          background: rgba(0, 0, 0, 0.6);
-          backdrop-filter: blur(5px);
-          color: white;
-          border-radius: 10px;
-          padding: 20px;
-          margin-top: 30px;
+          background: rgba(255, 255, 255, 0.85);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          color: #334155;
+          border-radius: 16px;
+          border: 1px solid rgba(255, 255, 255, 0.6);
+          padding: 25px 30px;
+          margin-top: 25px;
           width: 100%;
-          max-width: 700px;
+          max-width: 440px;
           text-align: center;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.04);
         }
 
         .demo-grid {
           display: flex;
-          gap: 20px;
-          margin-top: 15px;
-          text-align: left;
+          gap: 15px;
+          margin-top: 20px;
         }
 
-        .demo-card {
+        .btn-demo-student, .btn-demo-teacher {
           flex: 1;
-          background: rgba(255, 255, 255, 0.1);
-          padding: 15px;
+          padding: 10px;
           border-radius: 8px;
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          border: 1px solid #e2e8f0;
+          background: #ffffff;
+          color: #475569;
+          font-size: 0.85rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .btn-demo-student i { color: #3b82f6; font-size: 1.1rem; }
+        .btn-demo-teacher i { color: #10b981; font-size: 1.1rem; }
+
+        .btn-demo-student:hover, .btn-demo-teacher:hover {
+          background: #f8fafc;
+          border-color: #cbd5e1;
+          transform: translateY(-1px);
         }
 
         .footer-text {
-          margin-top: 30px;
-          color: rgba(255, 255, 255, 0.8);
+          margin-top: 40px;
+          color: #64748b;
           font-size: 0.85rem;
           text-align: center;
-        }
-        
-        .footer-text a {
-          color: #f1c40f;
-          text-decoration: none;
-        }
-        
-        @media (max-width: 768px) {
-          .demo-grid { flex-direction: column; }
         }
       `}</style>
       
@@ -285,12 +306,20 @@ function LoginForm() {
             <p>Welcome to SpringDrill Portal</p>
           </div>
 
-          {error && <div className="alert alert-danger" style={{color: '#721c24', backgroundColor: '#f8d7da', padding: '10px', borderRadius: '5px', marginBottom: '15px', fontSize: '0.9rem', border: '1px solid #f5c6cb'}}>{error}</div>}
+          {error && <div className="alert alert-danger" style={{color: '#b91c1c', backgroundColor: '#fef2f2', padding: '12px', borderRadius: '8px', marginBottom: '20px', fontSize: '0.9rem', border: '1px solid #fecaca'}}>{error}</div>}
           
           <form onSubmit={handleSubmit}>
             <div className="custom-input-group">
               <div className="custom-input-icon"><i className="fas fa-envelope"></i></div>
-              <input type="email" name="email" className="custom-input" placeholder="Email Address" required />
+              <input 
+                type="email" 
+                name="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="custom-input" 
+                placeholder="Email Address" 
+                required 
+              />
             </div>
 
             <div className="custom-input-group">
@@ -298,6 +327,8 @@ function LoginForm() {
               <input 
                 type={showPassword ? "text" : "password"} 
                 name="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="custom-input" 
                 placeholder="Password" 
                 required 
@@ -313,10 +344,10 @@ function LoginForm() {
             </div>
 
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', fontSize: '0.85rem'}}>
-              <label style={{display: 'flex', alignItems: 'center', cursor: 'pointer', color: '#555'}}>
-                <input type="checkbox" style={{marginRight: '8px', accentColor: '#007a4d'}} /> Remember me
+              <label style={{display: 'flex', alignItems: 'center', cursor: 'pointer', color: '#64748b', fontWeight: '500'}}>
+                <input type="checkbox" style={{marginRight: '8px', accentColor: '#007a4d', width: '16px', height: '16px'}} /> Remember me
               </label>
-              <a href="#" style={{color: '#007a4d', textDecoration: 'none', fontWeight: 'bold'}}>Forgot Password?</a>
+              <a href="#" style={{color: '#007a4d', textDecoration: 'none', fontWeight: '600'}}>Forgot Password?</a>
             </div>
 
             <button type="submit" className="btn-login" disabled={isLoading}>
@@ -330,24 +361,22 @@ function LoginForm() {
         </div>
 
         <div className="demo-panel">
-          <h5 style={{margin: '0 0 5px 0', color: '#f1c40f'}}><i className="fas fa-rocket me-2"></i> Test Drive the Portal</h5>
-          <p style={{margin: '0', fontSize: '0.9rem'}}>Experience SpringDrill using these demo credentials</p>
+          <h5 style={{margin: '0 0 8px 0', color: '#0f172a', fontWeight: '700', fontSize: '1.1rem'}}><i className="fas fa-rocket me-2 text-warning"></i> Demo Access</h5>
+          <p style={{margin: '0', fontSize: '0.9rem', color: '#64748b'}}>Select an account to auto-fill the login form instantly.</p>
           
           <div className="demo-grid">
-            <div className="demo-card">
-              <div style={{fontWeight: 'bold', marginBottom: '8px', color: '#3498db'}}><i className="fas fa-user-graduate me-1"></i> Student Login</div>
-              <div style={{fontSize: '0.85rem', marginBottom: '4px'}}><span style={{opacity: 0.7}}>Email:</span> <b>sam.john4331@springdrill.edu</b></div>
-              <div style={{fontSize: '0.85rem'}}><span style={{opacity: 0.7}}>Pass:</span> <b>Spring7067!</b></div>
-            </div>
-            <div className="demo-card">
-              <div style={{fontWeight: 'bold', marginBottom: '8px', color: '#2ecc71'}}><i className="fas fa-chalkboard-teacher me-1"></i> Teacher Login</div>
-              <div style={{fontSize: '0.85rem', marginBottom: '4px'}}><span style={{opacity: 0.7}}>Email:</span> <b>chukwuemaka.john1560@springdrill.edu</b></div>
-              <div style={{fontSize: '0.85rem'}}><span style={{opacity: 0.7}}>Pass:</span> <b>Spring1187!</b></div>
-            </div>
+            <button type="button" onClick={fillDemoStudent} className="btn-demo-student">
+              <i className="fas fa-user-graduate"></i>
+              <span>Demo Student</span>
+            </button>
+            <button type="button" onClick={fillDemoTeacher} className="btn-demo-teacher">
+              <i className="fas fa-chalkboard-teacher"></i>
+              <span>Demo Teacher</span>
+            </button>
           </div>
           
-          <div style={{marginTop: '15px', fontSize: '0.9rem', color: '#f1c40f'}}>
-            <i className="fas fa-handshake me-2"></i> For Partnership & Purchase: <b>08162337303</b>
+          <div style={{marginTop: '25px', fontSize: '0.9rem', color: '#475569', fontWeight: '500'}}>
+            <i className="fas fa-handshake me-2 text-primary"></i> For Partnership & Purchase: <b style={{color: '#0f172a'}}>08162337303</b>
           </div>
         </div>
 
