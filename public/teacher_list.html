@@ -503,7 +503,7 @@
         }
 
         // --- PROFILE MODAL LOGIC ---
-        window.openProfile = function(id) {
+        window.openProfile = async function(id) {
             currentTeacher = allTeachers.find(t => t.id === id);
             if(!currentTeacher) return;
             
@@ -530,10 +530,29 @@
             }
             document.getElementById('viewCreated').innerText = dateStr;
             
-            // Classes
+            // Classes & Subjects dynamic fetch
+            document.getElementById('viewClasses').innerHTML = '<span class="text-muted" style="font-size:13px;"><i class="fas fa-spinner fa-spin"></i> Loading assignments...</span>';
+            
+            const { data: assignments, error: assignErr } = await supabase
+                .from('teacher_class_subjects')
+                .select('classes(name), subjects(name)')
+                .eq('teacher_id', currentTeacher.id);
+            
             let classHtml = '';
-            if(currentTeacher.assigned_classes && currentTeacher.assigned_classes.length > 0) {
-                classHtml = currentTeacher.assigned_classes.map(c => `<span class="badge-soft-success">${c}</span>`).join('');
+            if (assignments && assignments.length > 0) {
+                // Group by Class
+                const classMap = {};
+                assignments.forEach(a => {
+                    const cName = a.classes?.name || 'Unknown Class';
+                    const sName = a.subjects?.name || 'Unknown Subject';
+                    if (!classMap[cName]) classMap[cName] = [];
+                    classMap[cName].push(sName);
+                });
+                
+                classHtml = Object.keys(classMap).map(cName => {
+                    const subs = classMap[cName].join(', ');
+                    return `<span class="badge-soft-success mb-1" style="display:block; text-align:left; width:100%; white-space:normal;" title="${subs}"><strong>${cName}:</strong> ${subs}</span>`;
+                }).join('');
             } else {
                 classHtml = '<span class="text-muted" style="font-size:13px;">No classes assigned</span>';
             }
