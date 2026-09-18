@@ -221,11 +221,25 @@
                     .eq('class_id', student.class_id)
                     .order('created_at', { ascending: false });
 
+                // ENFORCEMENT: Check test_students assignments
+                const { data: assignments, error: assignErr } = await supabase
+                    .from('test_students')
+                    .select('test_id')
+                    .eq('student_id', userId);
+                
+                let allowedRawTests = rawTests || [];
+                
+                // If assignErr is not PGRST205 (table missing), enforce the assignments
+                if (!assignErr && assignments) {
+                    const assignedTestIds = assignments.map(a => a.test_id);
+                    allowedRawTests = allowedRawTests.filter(t => assignedTestIds.includes(t.id));
+                }
+
                 // 3. BULLETPROOF FILTER: Ensure tests actually have questions mapped!
                 let validTests = [];
                 const stats = {};
-                if (rawTests && rawTests.length > 0) {
-                    const testIds = rawTests.map(t => t.id);
+                if (allowedRawTests && allowedRawTests.length > 0) {
+                    const testIds = allowedRawTests.map(t => t.id);
                     const { data: testQs } = await supabase.from('test_questions').select('test_id, questions(marks)').in('test_id', testIds);
                     
                     if (testQs) {

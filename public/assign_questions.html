@@ -143,9 +143,23 @@
 
         <div id="alertBox" class="alert d-none shadow-sm mb-4" role="alert"></div>
 
-        <div class="row" id="workspaceContainer" style="display: none;">
+        <div id="workspaceContainer" style="display: none;">
             
-            <div class="col-lg-5 mb-4">
+            <ul class="nav nav-tabs fw-bold mb-4" id="mainCbtTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="questions-main-tab" data-bs-toggle="tab" data-bs-target="#questionsMainPane" type="button" role="tab" style="color: #007a4d;">ASSIGN QUESTIONS</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="students-main-tab" data-bs-toggle="tab" data-bs-target="#studentsMainPane" type="button" role="tab" style="color: #007a4d;">STUDENTS</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="mainCbtTabsContent">
+                
+                <div class="tab-pane fade show active" id="questionsMainPane" role="tabpanel">
+                    <div class="row">
+            
+                        <div class="col-lg-5 mb-4">
                 <div class="content-card shadow-sm">
                     <h5 class="fw-bold pb-3 mb-3 text-success" style="border-bottom: 1px solid var(--border-color);"><i class="fas fa-layer-group me-2"></i> Add Questions</h5>
                     
@@ -297,8 +311,51 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+                    </div> <!-- /row -->
+                    
+                    <div class="mt-4 text-end">
+                        <button class="btn btn-primary px-5 py-2 fw-bold shadow-sm" onclick="bootstrap.Tab.getOrCreateInstance(document.getElementById('students-main-tab')).show()">Continue <i class="fas fa-arrow-right ms-2"></i></button>
+                    </div>
+
+                </div> <!-- /questionsMainPane -->
+
+                <div class="tab-pane fade" id="studentsMainPane" role="tabpanel">
+                    <div class="content-card shadow-sm border-top border-success border-4">
+                        <div class="d-flex justify-content-between align-items-center pb-3 mb-3" style="border-bottom: 1px solid var(--border-color);">
+                            <h5 class="fw-bold mb-0" style="color: var(--text-color);"><i class="fas fa-users me-2 text-success"></i> Assign Students</h5>
+                            <div>
+                                <span class="badge bg-success me-2" id="totalAssignedBadge">0 Assigned</span>
+                                <span class="badge bg-secondary" id="classTotalBadge">0 Class Total</span>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive rounded" style="max-height: 500px; overflow-y: auto; border: 1px solid var(--border-color);">
+                            <table class="table table-hover mb-0">
+                                <thead class="sticky-top" style="background-color: var(--input-bg);">
+                                    <tr>
+                                        <th width="5%"><input type="checkbox" id="selectAllStudents" onchange="window.toggleAllStudents(this)"></th>
+                                        <th width="10%">S/N</th>
+                                        <th width="45%">Student Name</th>
+                                        <th width="40%">Student Class</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentsTbody">
+                                    <tr><td colspan="4" class="text-center py-5 text-muted">Loading students...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="text-end mt-4 pt-3" style="border-top: 1px solid var(--border-color);">
+                            <button class="btn btn-outline-secondary px-4 fw-bold me-2 shadow-sm" onclick="bootstrap.Tab.getOrCreateInstance(document.getElementById('questions-main-tab')).show()"><i class="fas fa-arrow-left me-2"></i> Go Back</button>
+                            <button class="btn btn-success px-5 py-2 fw-bold shadow-sm" id="saveStudentsBtn"><i class="fas fa-save me-2"></i> Update & Save</button>
+                        </div>
+                    </div>
+                </div> <!-- /studentsMainPane -->
+
+            </div> <!-- /mainCbtTabsContent -->
+
+        </div> <!-- /workspaceContainer -->
+    </div> <!-- /main-content -->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
@@ -386,6 +443,7 @@
                 updatePublishUI();
                 await loadActiveQuestions();
                 await loadBankQuestions();
+                await loadStudents();
 
                 document.getElementById('loadingOverlay').style.display = 'none';
             } catch (err) {
@@ -684,6 +742,121 @@
                 alert("Import error: " + err.message); 
             } finally { 
                 btn.innerHTML = '<i class="fas fa-bolt me-2"></i> Bulk Import to Exam'; btn.disabled = false; 
+            }
+        });
+
+        // --- STUDENTS TAB LOGIC ---
+        window.toggleAllStudents = function(checkbox) {
+            const studentCheckboxes = document.querySelectorAll('.student-checkbox');
+            studentCheckboxes.forEach(cb => cb.checked = checkbox.checked);
+        };
+
+        async function loadStudents() {
+            const tbody = document.getElementById('studentsTbody');
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i> Fetching students...</td></tr>`;
+            
+            try {
+                // 1. Get all students in the test's class who offer the test's subject
+                const { data: studentSubjects, error: ssErr } = await supabase
+                    .from('student_subjects')
+                    .select('student_id')
+                    .eq('subject_id', activeTest.subject_id);
+                
+                if (ssErr) throw ssErr;
+                
+                if (!studentSubjects || studentSubjects.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">No students found taking this subject.</td></tr>`;
+                    return;
+                }
+
+                const studentUserIds = studentSubjects.map(ss => ss.student_id);
+
+                // 2. Fetch those specific students from the users table
+                const { data: students, error: uErr } = await supabase
+                    .from('users')
+                    .select('id, name')
+                    .eq('role', 'student')
+                    .in('id', studentUserIds);
+                
+                if (uErr) throw uErr;
+
+                // 3. Check who is ALREADY assigned to this test
+                const { data: assignedStudents, error: assignErr } = await supabase
+                    .from('test_students')
+                    .select('student_id')
+                    .eq('test_id', activeTest.id);
+                
+                // Note: PGRST205 means table doesn't exist yet, which is fine, we just pretend none are assigned.
+                const assignedIds = (assignErr && assignErr.code === 'PGRST205') ? [] : (assignedStudents ? assignedStudents.map(a => a.student_id) : []);
+
+                document.getElementById('classTotalBadge').innerText = `${students.length} Class Total`;
+                document.getElementById('totalAssignedBadge').innerText = `${assignedIds.length} Assigned`;
+
+                if (students.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">No students found taking this subject in this class.</td></tr>`;
+                    return;
+                }
+
+                // Sort alphabetically
+                students.sort((a, b) => a.name.localeCompare(b.name));
+
+                tbody.innerHTML = students.map((s, index) => {
+                    const isAssigned = assignedIds.includes(s.id);
+                    return `
+                    <tr>
+                        <td><input type="checkbox" class="form-check-input student-checkbox border-success" value="${s.id}" ${isAssigned ? 'checked' : ''}></td>
+                        <td>${index + 1}</td>
+                        <td class="fw-bold">${s.name}</td>
+                        <td>${activeTest.classes?.name || 'Unknown Class'}</td>
+                    </tr>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error("Error loading students:", err);
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-danger">Error loading students. Ensure the test_students table exists.</td></tr>`;
+            }
+        }
+
+        document.getElementById('saveStudentsBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('saveStudentsBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Saving...';
+            btn.disabled = true;
+
+            const selectedStudentIds = Array.from(document.querySelectorAll('.student-checkbox:checked')).map(cb => cb.value);
+
+            try {
+                // First, delete existing assignments for this test
+                const { error: delErr } = await supabase
+                    .from('test_students')
+                    .delete()
+                    .eq('test_id', activeTest.id);
+                
+                // If it's PGRST205, the table doesn't exist yet. The user MUST run the SQL.
+                if (delErr) {
+                    if (delErr.code === 'PGRST205') throw new Error("The 'test_students' database table does not exist yet. Please run the provided SQL code first.");
+                    throw delErr;
+                }
+
+                // Insert the new selections
+                if (selectedStudentIds.length > 0) {
+                    const inserts = selectedStudentIds.map(student_id => ({
+                        test_id: activeTest.id,
+                        student_id: student_id
+                    }));
+                    const { error: insErr } = await supabase.from('test_students').insert(inserts);
+                    if (insErr) throw insErr;
+                }
+
+                document.getElementById('totalAssignedBadge').innerText = `${selectedStudentIds.length} Assigned`;
+                alert("Students successfully assigned to this Exam! Returning to Test List...");
+                window.location.href = 'manage_cbt';
+
+            } catch (err) {
+                alert("Save Failed: " + err.message);
+            } finally {
+                btn.innerHTML = '<i class="fas fa-save me-2"></i> Update & Save';
+                btn.disabled = false;
             }
         });
 
