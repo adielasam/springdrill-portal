@@ -220,6 +220,13 @@
             </a>
 
         </div>
+
+        <h4 class="section-title mt-5">Teacher Announcements</h4>
+        <div id="postsFeed" class="row">
+            <div class="col-12">
+                <div class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Loading announcements...</div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -250,10 +257,91 @@
                 }
 
                 document.getElementById('loadingOverlay').style.display = 'none';
+                loadPosts(session.user.id);
                 
             } catch (err) {
                 console.error(err);
                 document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        }
+        
+        async function loadPosts(userId) {
+            const feed = document.getElementById('postsFeed');
+            try {
+                // 1. Get student's class
+                const { data: student } = await supabase.from('students').select('class_id').eq('user_id', userId).single();
+                if (!student || !student.class_id) {
+                    feed.innerHTML = '<div class="col-12 text-center text-muted py-4">You are not assigned to a class yet.</div>';
+                    return;
+                }
+                
+                // 2. Get teachers for this class
+                const { data: assignments } = await supabase.from('teacher_class_subjects').select('teacher_id').eq('class_id', student.class_id);
+                if (!assignments || assignments.length === 0) {
+                    feed.innerHTML = '<div class="col-12 text-center text-muted py-4">No teachers assigned to your class yet.</div>';
+                    return;
+                }
+                
+                const teacherIds = [...new Set(assignments.map(a => a.teacher_id))];
+                
+                // 3. Get posts
+                const { data: posts, error } = await supabase
+                    .from('teacher_posts')
+                    .select('*, teacher:users(name, avatar_url)')
+                    .in('teacher_id', teacherIds)
+                    .order('created_at', { ascending: false })
+                    .limit(20);
+                    
+                if (error) throw error;
+                
+                if (!posts || posts.length === 0) {
+                    feed.innerHTML = '<div class="col-12 text-center text-muted py-4">No announcements from your teachers yet.</div>';
+                    return;
+                }
+                
+                let html = '';
+                posts.forEach(post => {
+                    const date = new Date(post.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+                    const teacherName = post.teacher?.name || 'Unknown Teacher';
+                    const avatarUrl = post.teacher?.avatar_url;
+                    
+                    const avatarHtml = avatarUrl 
+                        ? `<img src="${avatarUrl}" style="width: 100%; height: 100%; object-fit: cover;">` 
+                        : `<div style="width:100%; height:100%; background: #004d34; color: white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:14px;">${teacherName.substring(0,2).toUpperCase()}</div>`;
+                    
+                    const formattedContent = post.content.replace(/\n/g, '<br>');
+                    
+                    const imageHtml = post.image_url 
+                        ? `<div class="mt-3"><img src="${post.image_url}" class="img-fluid rounded border" style="max-height: 400px; width: auto;"></div>` 
+                        : '';
+                        
+                    html += `
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 border-0 shadow-sm" style="background: var(--card-bg);">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="me-2" style="width: 36px; height: 36px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                                            ${avatarHtml}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold" style="font-size: 0.85rem; color: var(--text-color);">${teacherName}</div>
+                                            <div class="text-muted" style="font-size: 0.7rem;">${date}</div>
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 0.85rem; line-height: 1.5; color: var(--text-color);">
+                                        ${formattedContent}
+                                    </div>
+                                    ${imageHtml}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                feed.innerHTML = html;
+            } catch(e) {
+                console.error('Error loading posts:', e);
+                feed.innerHTML = `<div class="col-12 text-center text-danger py-4">Error loading announcements.</div>`;
             }
         }
 
