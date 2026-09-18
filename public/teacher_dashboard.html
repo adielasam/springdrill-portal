@@ -403,8 +403,13 @@
                     const updateData = { content: content };
                     if (imageUrl) updateData.image_url = imageUrl;
                     
-                    const { error } = await supabase.from('teacher_posts').update(updateData).eq('id', window.editPostId);
-                    if (error) throw error;
+                    const { data: updatedPost, error } = await supabase.from('teacher_posts').update(updateData).eq('id', window.editPostId).select().single();
+                    if (error) {
+                        if (error.code === 'PGRST116') {
+                            throw new Error("Update blocked by database security. Please make sure you ran the SQL artifact to add the UPDATE policy.");
+                        }
+                        throw error;
+                    }
                     window.editPostId = null;
                     btn.innerHTML = 'Publish';
                 } else {
@@ -449,8 +454,11 @@
         window.deletePost = async function(id) {
             if(!confirm('Are you sure you want to delete this post?')) return;
             try {
-                const { error } = await supabase.from('teacher_posts').delete().eq('id', id);
+                const { data, error } = await supabase.from('teacher_posts').delete().eq('id', id).select();
                 if (error) throw error;
+                if (!data || data.length === 0) {
+                     throw new Error("Delete blocked by database security. Please make sure you ran the SQL artifact to add the DELETE policy.");
+                }
                 loadPosts();
             } catch(e) {
                 alert('Error deleting post: ' + e.message);
