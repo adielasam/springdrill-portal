@@ -54,7 +54,7 @@ function LoginForm() {
 
       const { data: profile, error: profileErr } = await supabase
         .from('users')
-        .select('role, expires_at')
+        .select('*')
         .eq('id', authData.user.id)
         .single();
 
