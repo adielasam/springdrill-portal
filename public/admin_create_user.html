@@ -144,6 +144,7 @@
                                         <option value="student">Student</option>
                                         <option value="teacher">Teacher</option>
                                         <option value="admin">Administrator</option>
+                                        <option value="temp_admin">Temporary Admin (24h)</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4 mb-4">
@@ -267,7 +268,7 @@
                     const roleSelect = document.getElementById('roleSelect');
                     if (roleSelect) {
                         Array.from(roleSelect.options).forEach(opt => {
-                            if (opt.value === 'admin') {
+                            if (opt.value === 'admin' || opt.value === 'temp_admin') {
                                 opt.remove();
                             }
                         });
@@ -333,8 +334,16 @@
             const name = document.getElementById('userName').value.trim();
             const email = document.getElementById('userEmail').value.trim();
             const password = document.getElementById('userPassword').value;
-            const role = document.getElementById('roleSelect').value;
+            const rawRole = document.getElementById('roleSelect').value;
+            const role = rawRole === 'temp_admin' ? 'admin' : rawRole;
             const gender = document.getElementById('userGender').value;
+
+            let expiresAt = null;
+            if (rawRole === 'temp_admin') {
+                const tomorrow = new Date();
+                tomorrow.setHours(tomorrow.getHours() + 24);
+                expiresAt = tomorrow.toISOString();
+            }
 
             try {
                 // 1. Create User in Auth
@@ -363,7 +372,8 @@
                     email: email,
                     username: generatedUsername, 
                     role: role,
-                    gender: gender
+                    gender: gender,
+                    expires_at: expiresAt
                 }, { onConflict: 'id' });
                 
                 if (syncErr) throw new Error("Database blocked user sync. " + syncErr.message);

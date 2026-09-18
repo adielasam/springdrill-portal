@@ -54,11 +54,16 @@ function LoginForm() {
 
       const { data: profile, error: profileErr } = await supabase
         .from('users')
-        .select('role')
+        .select('role, expires_at')
         .eq('id', authData.user.id)
         .single();
 
       if (profileErr || !profile) throw new Error('Could not verify account role.');
+
+      if (profile.expires_at && new Date(profile.expires_at) < new Date()) {
+          await supabase.auth.signOut();
+          throw new Error('This temporary account has expired.');
+      }
 
       if (profile.role === 'admin') {
         window.location.href = '/admin_dashboard.html';
