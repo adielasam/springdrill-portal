@@ -88,11 +88,8 @@ function LoginForm() {
         }
 
         .login-page-bg {
-          background-color: #f0fdf4;
-          background-image: 
-            radial-gradient(at 40% 20%, hsla(153, 80%, 80%, 0.5) 0px, transparent 50%),
-            radial-gradient(at 80% 0%, hsla(189, 100%, 56%, 0.15) 0px, transparent 50%),
-            radial-gradient(at 0% 50%, hsla(153, 80%, 80%, 0.5) 0px, transparent 50%);
+          background: linear-gradient(rgba(0, 77, 52, 0.4), rgba(0, 77, 52, 0.7)), url('/tech3.jpg') no-repeat center center fixed;
+          background-size: cover;
           position: absolute;
           top: 0;
           left: 0;
@@ -107,63 +104,61 @@ function LoginForm() {
         }
 
         .glass-panel {
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border: 1px solid rgba(255, 255, 255, 0.5);
-          border-radius: 16px;
-          box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-          padding: 45px 40px;
+          background: rgba(255, 255, 255, 0.9);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          border-radius: 12px;
+          box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+          padding: 40px;
           width: 100%;
-          max-width: 440px;
+          max-width: 450px;
           position: relative;
           z-index: 10;
         }
 
         .login-header {
           text-align: center;
-          margin-bottom: 35px;
+          margin-bottom: 30px;
         }
 
         .login-header img {
-          max-height: 55px;
+          max-height: 60px;
           margin-bottom: 15px;
         }
 
         .login-header h2 {
           color: #007a4d;
-          font-weight: 800;
+          font-weight: 700;
           margin: 0;
-          font-size: 1.6rem;
-          letter-spacing: -0.5px;
+          font-size: 1.5rem;
         }
 
         .login-header p {
-          color: #64748b;
-          margin-top: 8px;
+          color: #666;
+          margin-top: 5px;
           font-size: 0.95rem;
         }
 
         .custom-input-group {
           display: flex;
           align-items: center;
-          background: #f8fafc;
-          border: 1px solid #e2e8f0;
-          border-radius: 8px;
+          background: #f8f9fa;
+          border: 1px solid #ced4da;
+          border-radius: 6px;
           overflow: hidden;
           margin-bottom: 20px;
-          transition: all 0.3s ease;
+          transition: border-color 0.3s;
         }
 
         .custom-input-group:focus-within {
           border-color: #007a4d;
-          background: #ffffff;
-          box-shadow: 0 0 0 3px rgba(0, 122, 77, 0.1);
+          box-shadow: 0 0 0 0.2rem rgba(0, 122, 77, 0.1);
         }
 
         .custom-input-icon {
-          padding: 14px 16px;
-          color: #94a3b8;
+          padding: 12px 15px;
+          color: #6c757d;
           background: transparent;
         }
 
@@ -173,85 +168,77 @@ function LoginForm() {
 
         .custom-input {
           border: none;
-          padding: 14px 10px 14px 0;
+          padding: 12px 10px;
           width: 100%;
           background: transparent;
           outline: none;
-          color: #334155;
-          font-size: 0.95rem;
+          color: #333;
         }
 
         .btn-toggle-pass {
           background: transparent;
           border: none;
           padding: 0 15px;
-          color: #94a3b8;
+          color: #6c757d;
           cursor: pointer;
         }
 
-        .btn-toggle-pass:hover { color: #64748b; }
+        .btn-toggle-pass:hover { color: #333; }
         .btn-toggle-pass:focus { outline: none; }
 
         .btn-login {
           background: #007a4d;
           color: white;
           border: none;
-          border-radius: 8px;
-          padding: 14px;
+          border-radius: 6px;
+          padding: 12px;
           width: 100%;
-          font-weight: 700;
-          font-size: 1.05rem;
+          font-weight: bold;
+          font-size: 1rem;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: background 0.3s;
           display: flex;
           justify-content: center;
           align-items: center;
           margin-top: 10px;
-          box-shadow: 0 4px 12px rgba(0, 122, 77, 0.2);
         }
 
         .btn-login:hover {
-          background: #006640;
-          transform: translateY(-1px);
-          box-shadow: 0 6px 16px rgba(0, 122, 77, 0.3);
+          background: #005c3a;
         }
 
         .btn-login:disabled {
-          background: #94a3b8;
+          background: #6c757d;
           cursor: not-allowed;
-          box-shadow: none;
-          transform: none;
         }
 
         .demo-panel {
-          background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          color: #334155;
-          border-radius: 16px;
-          border: 1px solid rgba(255, 255, 255, 0.6);
-          padding: 25px 30px;
-          margin-top: 25px;
+          background: rgba(0, 0, 0, 0.6);
+          backdrop-filter: blur(5px);
+          color: white;
+          border-radius: 10px;
+          padding: 20px;
+          margin-top: 30px;
           width: 100%;
-          max-width: 440px;
+          max-width: 700px;
           text-align: center;
-          box-shadow: 0 10px 25px rgba(0,0,0,0.04);
         }
 
         .demo-grid {
           display: flex;
-          gap: 15px;
-          margin-top: 20px;
+          gap: 20px;
+          margin-top: 15px;
+          text-align: left;
         }
 
         .btn-demo-student, .btn-demo-teacher {
           flex: 1;
-          padding: 10px;
+          padding: 12px;
           border-radius: 8px;
-          border: 1px solid #e2e8f0;
-          background: #ffffff;
-          color: #475569;
-          font-size: 0.85rem;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          background: rgba(255, 255, 255, 0.1);
+          color: white;
+          font-size: 0.9rem;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.2s ease;
@@ -262,18 +249,18 @@ function LoginForm() {
           gap: 6px;
         }
 
-        .btn-demo-student i { color: #3b82f6; font-size: 1.1rem; }
-        .btn-demo-teacher i { color: #10b981; font-size: 1.1rem; }
+        .btn-demo-student i { color: #3498db; font-size: 1.2rem; }
+        .btn-demo-teacher i { color: #2ecc71; font-size: 1.2rem; }
 
         .btn-demo-student:hover, .btn-demo-teacher:hover {
-          background: #f8fafc;
-          border-color: #cbd5e1;
+          background: rgba(255, 255, 255, 0.2);
+          border-color: rgba(255, 255, 255, 0.4);
           transform: translateY(-1px);
         }
 
         .footer-text {
-          margin-top: 40px;
-          color: #64748b;
+          margin-top: 30px;
+          color: rgba(255, 255, 255, 0.8);
           font-size: 0.85rem;
           text-align: center;
         }
@@ -361,8 +348,8 @@ function LoginForm() {
         </div>
 
         <div className="demo-panel">
-          <h5 style={{margin: '0 0 8px 0', color: '#0f172a', fontWeight: '700', fontSize: '1.1rem'}}><i className="fas fa-rocket me-2 text-warning"></i> Demo Access</h5>
-          <p style={{margin: '0', fontSize: '0.9rem', color: '#64748b'}}>Select an account to auto-fill the login form instantly.</p>
+          <h5 style={{margin: '0 0 5px 0', color: '#f1c40f'}}><i className="fas fa-rocket me-2"></i> Demo Access</h5>
+          <p style={{margin: '0', fontSize: '0.9rem', color: '#ffffff'}}>Select an account to auto-fill the login form instantly.</p>
           
           <div className="demo-grid">
             <button type="button" onClick={fillDemoStudent} className="btn-demo-student">
@@ -375,8 +362,8 @@ function LoginForm() {
             </button>
           </div>
           
-          <div style={{marginTop: '25px', fontSize: '0.9rem', color: '#475569', fontWeight: '500'}}>
-            <i className="fas fa-handshake me-2 text-primary"></i> For Partnership & Purchase: <b style={{color: '#0f172a'}}>08162337303</b>
+          <div style={{marginTop: '15px', fontSize: '0.9rem', color: '#f1c40f'}}>
+            <i className="fas fa-handshake me-2"></i> For Partnership & Purchase: <b>08162337303</b>
           </div>
         </div>
 
