@@ -94,14 +94,19 @@ function LoginForm() {
         }
 
         .login-page-bg {
-          background: linear-gradient(rgba(0, 77, 52, 0.4), rgba(0, 77, 52, 0.7)), url('/springvalleyclass.jpg') no-repeat center center fixed;
+          background: linear-gradient(rgba(0, 77, 52, 0.4), rgba(0, 77, 52, 0.7)), url('/tech3.jpg') no-repeat center center fixed;
           background-size: cover;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100vw;
           min-height: 100vh;
           display: flex;
           align-items: center;
           justify-content: center;
           padding: 20px;
           flex-direction: column;
+          box-sizing: border-box;
         }
 
         .glass-panel {
@@ -347,7 +352,7 @@ function LoginForm() {
         </div>
 
         <div className="footer-text">
-          Copyright &copy; 2026 <b>SpringDrill</b> | <a href="#">Licensed to Spring Valley School</a>
+          Copyright &copy; 2026 <b>SpringDrill</b> | All Rights Reserved
         </div>
       </div>
     </>
