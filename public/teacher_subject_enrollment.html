@@ -244,8 +244,21 @@
             if (!session) return;
             
             // Load unique classes from teacher's subjects
-            const { data: subjects } = await supabase.from('subjects').select('id, name, class_id, classes(name)').eq('teacher_id', session.user.id);
-            if (subjects) {
+            const { data: tcsData } = await supabase
+                .from('teacher_class_subjects')
+                .select('subject_id, class_id, subjects(id, name), classes(id, name)')
+                .eq('teacher_id', session.user.id);
+            
+            let subjects = [];
+            if (tcsData) {
+                subjects = tcsData.map(tcs => ({
+                    id: tcs.subject_id,
+                    name: tcs.subjects?.name || 'Unknown Subject',
+                    class_id: tcs.class_id,
+                    classes: tcs.classes
+                }));
+            }
+            if (subjects && subjects.length > 0) {
                 const classSelect = document.getElementById('enrollClassFilter');
                 const uniqueClasses = {};
                 subjects.forEach(sub => {

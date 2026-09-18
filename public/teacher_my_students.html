@@ -230,13 +230,19 @@
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) return;
             
-            // Load subjects assigned to this teacher
-            const { data: subjects } = await supabase.from('subjects').select('id, name, class_id, classes(name)').eq('teacher_id', session.user.id);
+            // Load subjects assigned to this teacher via join table
+            const { data: tcsData } = await supabase
+                .from('teacher_class_subjects')
+                .select('subject_id, class_id, subjects(id, name), classes(id, name)')
+                .eq('teacher_id', session.user.id);
+
             const subjectSelect = document.getElementById('subjectFilter');
-            if (subjects && subjects.length > 0) {
+            if (tcsData && tcsData.length > 0) {
                 subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>';
-                subjects.forEach(sub => {
-                    subjectSelect.innerHTML += `<option value="${sub.id}">${sub.name} (${sub.classes?.name || 'Unknown Class'})</option>`;
+                tcsData.forEach(tcs => {
+                    if (tcs.subjects && tcs.classes) {
+                        subjectSelect.innerHTML += `<option value="${tcs.subject_id}">${tcs.subjects.name} (${tcs.classes.name})</option>`;
+                    }
                 });
             } else {
                 subjectSelect.innerHTML = '<option value="">No subjects assigned to you yet</option>';
