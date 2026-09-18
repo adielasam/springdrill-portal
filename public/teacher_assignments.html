@@ -322,7 +322,7 @@
 
             tbody.innerHTML = '';
             mySubjects.forEach((sub, idx) => {
-                const subjectAssignments = allAssignments.filter(a => a.subject_id === sub.subject_id && a.class_id === sub.class_id);
+                const subjectAssignments = allAssignments.filter(a => String(a.subject_id) === String(sub.subject_id) && String(a.class_id) === String(sub.class_id));
                 const count = subjectAssignments.length;
                 
                 tbody.innerHTML += `
@@ -332,17 +332,17 @@
                         <td class="text-muted">${sub.className}</td>
                         <td><span class="badge bg-secondary px-3 py-1 border rounded-pill shadow-sm" style="font-size: 0.8rem;">${count}</span></td>
                         <td class="text-end">
-                            <button class="btn btn-sm btn-success fw-bold px-3" onclick="manageSubject('${sub.subject_id}', '${sub.class_id}')"><i class="fas fa-cog me-1"></i>Manage</button>
+                            <button class="btn btn-sm btn-success fw-bold px-3" onclick="manageSubject(${idx})"><i class="fas fa-cog me-1"></i>Manage</button>
                         </td>
                     </tr>
                 `;
             });
         }
 
-        window.manageSubject = function(subjectId, classId) {
-            activeSubjectId = subjectId;
-            activeClassId = classId;
-            const subject = mySubjects.find(s => s.subject_id === subjectId && s.class_id === classId);
+        window.manageSubject = function(index) {
+            const subject = mySubjects[index];
+            activeSubjectId = subject.subject_id;
+            activeClassId = subject.class_id;
             document.getElementById('manageTitle').innerText = `Assignment for ${subject.subjectName.toUpperCase()} (${subject.className.toUpperCase()})`;
             
             document.getElementById('subjectsView').classList.add('d-none');
@@ -359,7 +359,7 @@
 
         function renderAssignmentsTable() {
             const tbody = document.getElementById('assignmentsTableBody');
-            const subjectAssignments = allAssignments.filter(a => a.subject_id === activeSubjectId && a.class_id === activeClassId);
+            const subjectAssignments = allAssignments.filter(a => String(a.subject_id) === String(activeSubjectId) && String(a.class_id) === String(activeClassId));
             
             if (subjectAssignments.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted">You have not created any assignments for this class yet.</td></tr>';
