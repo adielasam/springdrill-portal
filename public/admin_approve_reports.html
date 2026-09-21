@@ -275,40 +275,15 @@
         }
 
         async function fetchTerms() {
-            try {
-                const { data, error } = await supabase.from('terms').select('*');
-                const select = document.getElementById('filterTerm');
-                if (data && data.length > 0) {
-                    allTerms = data;
-                    data.forEach(t => select.add(new Option(t.label, t.id)));
-                } else {
-                    // Fallback if table is empty
-                    allTerms = [
-                        { id: 1, label: 'Ember Term' },
-                        { id: 2, label: 'Lent Term' },
-                        { id: 3, label: 'Trinity Term' }
-                    ];
-                    allTerms.forEach(t => select.add(new Option(t.label, t.id)));
-                }
-            } catch(e) { console.error('Error fetching terms', e); }
+            const select = document.getElementById('filterTerm');
+            const terms = ['First Term', 'Second Term', 'Third Term', 'Ember Term', 'Lent Term', 'Trinity Term'];
+            terms.forEach(t => select.add(new Option(t, t)));
         }
 
         async function fetchSubTerms() {
-            try {
-                const { data, error } = await supabase.from('sub_terms').select('*');
-                const select = document.getElementById('filterSubTerm');
-                if (data && data.length > 0) {
-                    allSubTerms = data;
-                    data.forEach(t => select.add(new Option(t.label, t.id)));
-                } else {
-                    // Fallback if table is empty
-                    allSubTerms = [
-                        { id: 1, label: 'Half Term' },
-                        { id: 2, label: 'Full Term' }
-                    ];
-                    allSubTerms.forEach(t => select.add(new Option(t.label, t.id)));
-                }
-            } catch(e) { console.error('Error fetching sub-terms', e); }
+            const select = document.getElementById('filterSubTerm');
+            const subTerms = ['Half Term', 'Full Term'];
+            subTerms.forEach(t => select.add(new Option(t, t)));
         }
 
         async function fetchClasses() {
@@ -355,8 +330,8 @@
                 const { data: results, error } = await supabase
                     .from('term_results')
                     .select('*')
-                    .eq('term_id', termId)
-                    .eq('sub_term_id', subTermId)
+                    .eq('term', termId) // The variable is still called termId but contains a string now
+                    .eq('sub_term', subTermId)
                     .eq('class_id', classId);
 
                 if (error) throw error;
@@ -404,12 +379,12 @@
                         } else if (rawStatus === 'final' || rawStatus === 'submitted') {
                             statusBadge = `<span class="status-badge status-final">Pending Approval</span>`;
                             actionButtons = `
-                                <button class="action-btn btn-approve" onclick="window.approveResult(${classId}, ${g.subject_id}, ${termId}, ${subTermId})"><i data-lucide="check"></i> Approve</button>
-                                <button class="action-btn btn-reject" onclick="window.promptReject(${classId}, ${g.subject_id}, ${termId}, ${subTermId})"><i data-lucide="x"></i> Reject</button>
+                                <button class="action-btn btn-approve" onclick="window.approveResult(${classId}, ${g.subject_id}, '${termId}', '${subTermId}')"><i data-lucide="check"></i> Approve</button>
+                                <button class="action-btn btn-reject" onclick="window.promptReject(${classId}, ${g.subject_id}, '${termId}', '${subTermId}')"><i data-lucide="x"></i> Reject</button>
                             `;
                         } else if (rawStatus === 'approved') {
                             statusBadge = `<span class="status-badge status-approved">Approved</span>`;
-                            actionButtons = `<button class="action-btn btn-reject" onclick="window.promptReject(${classId}, ${g.subject_id}, ${termId}, ${subTermId})"><i data-lucide="corner-up-left"></i> Revoke & Reject</button>`;
+                            actionButtons = `<button class="action-btn btn-reject" onclick="window.promptReject(${classId}, ${g.subject_id}, '${termId}', '${subTermId}')"><i data-lucide="corner-up-left"></i> Revoke & Reject</button>`;
                         } else if (rawStatus === 'rejected') {
                             statusBadge = `<span class="status-badge status-rejected">Rejected</span>`;
                             actionButtons = `<span class="text-muted" style="font-size:11px;">Awaiting Teacher Fix</span>`;
@@ -425,7 +400,7 @@
                             <td>${teacher}</td>
                             <td>${statusBadge}</td>
                             <td class="text-end">
-                                <a href="admin_view_result.html?class=${classId}&subject=${g.subject_id}&term=${termId}&subterm=${subTermId}" class="action-btn btn-view" target="_blank"><i data-lucide="eye"></i> View</a>
+                                <a href="admin_view_result.html?class=${classId}&subject=${g.subject_id}&term=${encodeURIComponent(termId)}&subterm=${encodeURIComponent(subTermId)}" class="action-btn btn-view" target="_blank"><i data-lucide="eye"></i> View</a>
                                 ${actionButtons}
                             </td>
                         </tr>
@@ -463,8 +438,8 @@
                     .update({ status: 'approved' })
                     .eq('class_id', classId)
                     .eq('subject_id', subjectId)
-                    .eq('term_id', termId)
-                    .eq('sub_term_id', subTermId);
+                    .eq('term', termId)
+                    .eq('sub_term', subTermId);
                 
                 if (error) {
                     if (error.message.includes('term_results_status_check')) {
@@ -497,8 +472,8 @@
                     .update({ status: 'rejected' })
                     .eq('class_id', data.classId)
                     .eq('subject_id', data.subjectId)
-                    .eq('term_id', data.termId)
-                    .eq('sub_term_id', data.subTermId);
+                    .eq('term', data.termId)
+                    .eq('sub_term', data.subTermId);
                 
                 if (error) {
                     if (error.message.includes('term_results_status_check')) {
@@ -507,8 +482,8 @@
                             .update({ status: 'draft', submitted_by: null, submitted_at: null })
                             .eq('class_id', data.classId)
                             .eq('subject_id', data.subjectId)
-                            .eq('term_id', data.termId)
-                            .eq('sub_term_id', data.subTermId);
+                            .eq('term', data.termId)
+                            .eq('sub_term', data.subTermId);
                         
                         if (fallbackError) throw fallbackError;
                         showAlert('warning', 'Result reverted to Draft (Teacher can edit). Note: SQL script needed for proper "Rejected" status label.');

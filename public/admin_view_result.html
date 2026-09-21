@@ -56,8 +56,8 @@
                 .select('*, students(first_name, surname)')
                 .eq('class_id', classId)
                 .eq('subject_id', subjectId)
-                .eq('term_id', termId)
-                .eq('sub_term_id', subTermId)
+                .eq('term', termId)
+                .eq('sub_term', subTermId)
                 .order('id');
                 
             const tbody = document.getElementById('resultsBody');
