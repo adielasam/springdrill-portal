@@ -148,19 +148,45 @@ export default function ReportClient() {
 
       if (resultsError) throw resultsError
 
-      const merged = students?.map((student: any) => {
+      
+        let halfTermResults: any[] = [];
+        if (subTermId === 'Full Term') {
+            const { data: htData } = await supabase
+                .from('term_results')
+                .select('*')
+                .eq('class_id', selectedClass)
+                .eq('subject_id', selectedSubject)
+                .eq('term', termId)
+                .eq('sub_term', 'Half Term');
+            if (htData) halfTermResults = htData;
+        }
+
+        const merged = students?.map((student: any) => {
         // Construct full name from legacy columns
         const studName = student.name || `${student.surname || ''} ${student.first_name || ''}`.trim() || 'Unknown Student';
         
         // Match existing term_results using the integer student.id
         const existing = termResults?.find((r: any) => String(r.student_id) === String(student.id))
         
-        return {
-          student_id: student.id,         // INTEGER for term_results
-          cbt_user_id: student.user_id,   // UUID for test_results (CBT import)
-          student_name: studName,
-          first_cat: existing?.first_cat ?? '',
-          second_cat: existing?.second_cat ?? '',
+        
+          const existingHalf = halfTermResults?.find((r: any) => String(r.student_id) === String(student.id))
+          
+          let f_cat = '';
+          let s_cat = '';
+          if (subTermId === 'Full Term') {
+              f_cat = existingHalf?.first_cat ?? '';
+              s_cat = existingHalf?.second_cat ?? '';
+          } else {
+              f_cat = existing?.first_cat ?? '';
+              s_cat = existing?.second_cat ?? '';
+          }
+
+          return {
+            student_id: student.id,         // INTEGER for term_results
+            cbt_user_id: student.user_id,   // UUID for test_results (CBT import)
+            student_name: studName,
+            first_cat: f_cat,
+            second_cat: s_cat,
           exam: existing?.exam ?? '',
           status: existing?.status ?? 'draft'
         }
@@ -189,8 +215,8 @@ export default function ReportClient() {
       } else {
         setAvailableTests(cbtTests)
         setSelectedTestId(cbtTests[0].id)
-        setImportTargetCol('first_cat')
-        setShowImportModal(true)
+          setImportTargetCol(selectedSubTerm === 'Full Term' ? 'exam' : 'first_cat')
+          setShowImportModal(true)
       }
     } catch (err: any) {
       showToast("Error loading CBTs: " + err.message)
@@ -423,12 +449,12 @@ export default function ReportClient() {
                           <td className="fw-bold text-dark">{r.student_name}</td>
                           {visibleFields.includes('first_cat') && (
                             <td>
-                              <input type="number" max="20" min="0" className={`form-control form-control-sm text-center fw-bold ${r.first_cat !== '' && Number(r.first_cat) > 20 ? 'is-invalid' : ''}`} value={r.first_cat} onChange={e => handleScoreChange(r.student_id, 'first_cat', e.target.value)} disabled={isFinal} />
+                              <input type="number" max="20" min="0" className={`form-control form-control-sm text-center fw-bold ${r.first_cat !== '' && Number(r.first_cat) > 20 ? 'is-invalid' : ''}`} value={r.first_cat} onChange={e => handleScoreChange(r.student_id, 'first_cat', e.target.value)} disabled={isFinal || selectedSubTerm === 'Full Term'} />
                             </td>
                           )}
                           {visibleFields.includes('second_cat') && (
                             <td>
-                              <input type="number" max="20" min="0" className={`form-control form-control-sm text-center fw-bold ${r.second_cat !== '' && Number(r.second_cat) > 20 ? 'is-invalid' : ''}`} value={r.second_cat} onChange={e => handleScoreChange(r.student_id, 'second_cat', e.target.value)} disabled={isFinal} />
+                              <input type="number" max="20" min="0" className={`form-control form-control-sm text-center fw-bold ${r.second_cat !== '' && Number(r.second_cat) > 20 ? 'is-invalid' : ''}`} value={r.second_cat} onChange={e => handleScoreChange(r.student_id, 'second_cat', e.target.value)} disabled={isFinal || selectedSubTerm === 'Full Term'} />
                             </td>
                           )}
                           {visibleFields.includes('exam') && (
@@ -484,8 +510,8 @@ export default function ReportClient() {
 
                <label className="form-label fw-bold text-muted small text-uppercase">Import Into Column</label>
                <select className="form-select mb-4 shadow-sm" value={importTargetCol} onChange={e => setImportTargetCol(e.target.value)}>
-                 {visibleFields.includes('first_cat') && <option value="first_cat">1st CAT (20 Marks)</option>}
-                 {visibleFields.includes('second_cat') && <option value="second_cat">2nd CAT (20 Marks)</option>}
+                 {visibleFields.includes('first_cat') && selectedSubTerm !== 'Full Term' && <option value="first_cat">1st CAT (20 Marks)</option>}
+                   {visibleFields.includes('second_cat') && selectedSubTerm !== 'Full Term' && <option value="second_cat">2nd CAT (20 Marks)</option>}
                  {visibleFields.includes('exam') && <option value="exam">EXAM (60 Marks)</option>}
                </select>
 
