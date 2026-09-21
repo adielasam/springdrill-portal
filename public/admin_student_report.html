@@ -84,12 +84,12 @@
             </div>
 
             <div class="details-row"><div>NAME: <span id="rName">LOADING...</span></div><div>CLASS: <span id="rClass">LOADING...</span></div></div>
-            <div class="details-row"><div>STUDENT ID: <span id="rId">--</span></div><div>TERM: <span>FIRST TERM</span></div></div>
-            <div class="details-row text-danger"><div>SCHOOL RE-OPENS: <span>TBA</span></div><div>SESSION: <span>2025/2026</span></div></div>
+            <div class="details-row"><div>STUDENT ID: <span id="rId">--</span></div><div>TERM: <span id="rTermName">FIRST TERM</span></div></div>
+            <div class="details-row text-danger"><div>SUB-TERM: <span id="rSubTermName">FULL TERM</span></div><div>SESSION: <span>2025/2026</span></div></div>
 
             <table class="report-table">
                 <thead>
-                    <tr><th width="5%">S/N</th><th width="35%">SUBJECT</th><th width="15%">EXAM (100%)</th><th width="15%">GRADE</th><th width="30%">REMARK</th></tr>
+                    <tr><th width="5%">S/N</th><th width="25%">SUBJECT</th><th width="12%">1ST CAT</th><th width="12%">2ND CAT</th><th width="12%">EXAM</th><th width="12%">TOTAL</th><th width="10%">GRADE</th><th width="12%">REMARK</th></tr>
                 </thead>
                 <tbody id="reportTbody"><tr><td colspan="5">Compiling records...</td></tr></tbody>
             </table>
@@ -142,27 +142,55 @@
                 const photoUrl = student.passport_url || `https://ui-avatars.com/api/?name=${student.first_name}+${student.surname}&background=ffffff&color=000&size=256`;
                 document.getElementById('photoBox').src = photoUrl;
 
-                const { data: rawResults } = await supabase.from('test_results').select('score, total_questions, tests(subjects(name))').eq('student_id', targetStudentId);
+                const termId = document.getElementById('termSelect').value;
+                const subTermId = document.getElementById('subTermSelect').value;
+
+                // Update UI text dynamically
+                document.getElementById('rTermName').innerText = termId.toUpperCase();
+                document.getElementById('rSubTermName').innerText = subTermId.toUpperCase();
+
+                // Fetch APPROVED term_results
+                const { data: rawResults } = await supabase.from('term_results')
+                    .select('first_cat, second_cat, exam, subjects(name)')
+                    .eq('student_id', student.id) // term_results uses INTEGER student.id, NOT UUID
+                    .eq('term', termId)
+                    .eq('sub_term', subTermId)
+                    .eq('status', 'approved');
                 
                 let htmlRows = '', sn = 1, sum = 0, count = 0;
                 
                 if (rawResults) {
                     rawResults.forEach(r => {
-                        const subj = r.tests?.subjects?.name || 'TEST';
-                        const score = Math.round((r.score / (r.total_questions || 1)) * 100);
-                        sum += score; count++;
-                        let grade = score >= 70 ? 'A' : score >= 60 ? 'B' : score >= 50 ? 'C' : score >= 40 ? 'P' : 'F';
-                        let remark = score >= 70 ? 'EXCELLENT' : score >= 50 ? 'CREDIT' : score >= 40 ? 'PASS' : 'FAIL';
-                        htmlRows += `<tr><td>${sn++}</td><td class="subj-name">${subj}</td><td>${score}</td><td>${grade}</td><td>${remark}</td></tr>`;
+                        const subj = r.subjects?.name || 'SUBJECT';
+                        const cat1 = Number(r.first_cat) || 0;
+                        const cat2 = Number(r.second_cat) || 0;
+                        const exam = Number(r.exam) || 0;
+                        const total = cat1 + cat2 + exam;
+                        
+                        sum += total; count++;
+                        let grade = total >= 70 ? 'A' : total >= 60 ? 'B' : total >= 50 ? 'C' : total >= 40 ? 'P' : 'F';
+                        let remark = total >= 70 ? 'EXCELLENT' : total >= 60 ? 'VERY GOOD' : total >= 50 ? 'GOOD' : total >= 40 ? 'PASS' : 'FAIL';
+                        
+                        htmlRows += `<tr>
+                            <td>${sn++}</td>
+                            <td class="subj-name">${subj}</td>
+                            <td>${r.first_cat !== null ? cat1 : '-'}</td>
+                            <td>${r.second_cat !== null ? cat2 : '-'}</td>
+                            <td>${r.exam !== null ? exam : '-'}</td>
+                            <td>${total}</td>
+                            <td>${grade}</td>
+                            <td>${remark}</td>
+                        </tr>`;
                     });
                 }
-                while (sn <= 10) htmlRows += `<tr><td>${sn++}</td><td></td><td></td><td></td><td></td></tr>`;
+                while (sn <= 10) htmlRows += `<tr><td>${sn++}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
                 
                 document.getElementById('reportTbody').innerHTML = htmlRows;
                 document.getElementById('rAverage').innerText = count > 0 ? (sum/count).toFixed(1) : '0';
             } catch (err) { console.error("Error loading report:", err); }
         }
 
+        window.generateReport = generateReport;
         document.addEventListener('DOMContentLoaded', generateReport);
         
         window.downloadPDF = function() {

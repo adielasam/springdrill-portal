@@ -207,6 +207,7 @@
 
         let allStudents = [];
         let classesMap = {};
+        let allClasses = [];
 
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
@@ -215,6 +216,7 @@
             // Fetch classes
             const { data: classes } = await supabase.from('classes').select('id, name').order('name');
             if (classes) {
+                allClasses = classes;
                 const classSelect = document.getElementById('filterClass');
                 classes.forEach(c => {
                     classesMap[c.id] = c.name;
@@ -234,14 +236,34 @@
             }
         }
 
+        window.filterClassesByYearGroup = function() {
+            const yearGroup = document.getElementById('filterYearGroup').value;
+            const classSelect = document.getElementById('filterClass');
+            classSelect.innerHTML = '<option value="all">All</option>';
+            
+            allClasses.forEach(c => {
+                if (yearGroup === 'all' || c.name.toLowerCase().includes(`year ${yearGroup}`) || c.name.toLowerCase().includes(`year${yearGroup}`)) {
+                    classSelect.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+                }
+            });
+            fetchStudents();
+        }
+
         window.fetchStudents = function() {
+            const yearGroup = document.getElementById('filterYearGroup').value;
             const classFilter = document.getElementById('filterClass').value;
             const genderFilter = document.getElementById('filterGender').value;
             
             let filtered = allStudents;
             if (classFilter !== 'all') {
                 filtered = filtered.filter(s => s.class_id == classFilter);
+            } else if (yearGroup !== 'all') {
+                filtered = filtered.filter(s => {
+                    const cName = classesMap[s.class_id]?.toLowerCase() || '';
+                    return cName.includes(`year ${yearGroup}`) || cName.includes(`year${yearGroup}`);
+                });
             }
+
             if (genderFilter !== 'all') {
                 filtered = filtered.filter(s => s.gender === genderFilter);
             }
