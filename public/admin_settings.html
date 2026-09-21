@@ -389,9 +389,10 @@
                         <form id="profileForm">
                             <div class="mb-3 d-flex align-items-center gap-3">
                                 <div id="settingsAvatarPreview" style="width: 70px; height: 70px; border-radius: 50%; background: var(--brand-100); color: var(--brand-600); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 24px; overflow: hidden; border: 2px solid var(--brand-300);"></div>
-                                <div>
-                                    <label class="form-label mb-1" style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Profile Picture URL</label>
-                                    <input type="url" class="form-control" id="profileAvatarUrl" placeholder="https://example.com/photo.jpg" style="border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg);">
+                                <div style="flex: 1;">
+                                    <label class="form-label mb-1" style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Upload Profile Picture</label>
+                                    <input type="file" accept="image/*" class="form-control" id="profileAvatarFile" style="border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg);">
+                                    <input type="hidden" id="profileAvatarUrl">
                                 </div>
                             </div>
                             
@@ -515,8 +516,12 @@
             }
         }
 
-        document.getElementById('profileAvatarUrl').addEventListener('input', (e) => {
-            updateAvatarPreview(e.target.value, document.getElementById('profileName').value);
+        document.getElementById('profileAvatarFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const objectUrl = URL.createObjectURL(file);
+                updateAvatarPreview(objectUrl, document.getElementById('profileName').value);
+            }
         });
 
         // PROFILE SUBMISSION
@@ -526,13 +531,36 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Updating...';
             btn.disabled = true;
             
-            const payload = {
-                name: document.getElementById('profileName').value,
-                phone: document.getElementById('profilePhone').value,
-                avatar_url: document.getElementById('profileAvatarUrl').value
-            };
+            const name = document.getElementById('profileName').value;
+            const phone = document.getElementById('profilePhone').value;
+            let avatar_url = document.getElementById('profileAvatarUrl').value;
+            const fileInput = document.getElementById('profileAvatarFile');
 
             try {
+                if (fileInput.files && fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${currentUserId}_${Date.now()}.${fileExt}`;
+                    
+                    const { error: uploadError } = await supabase.storage
+                        .from('passports')
+                        .upload(fileName, file, { cacheControl: '3600', upsert: true });
+                        
+                    if (uploadError) throw new Error("Image Upload Failed: " + uploadError.message);
+                    
+                    const { data: publicUrlData } = supabase.storage
+                        .from('passports')
+                        .getPublicUrl(fileName);
+                        
+                    avatar_url = publicUrlData.publicUrl;
+                }
+
+                const payload = {
+                    name,
+                    phone,
+                    avatar_url
+                };
+
                 const { error } = await supabase.from('users').update(payload).eq('id', currentUserId);
                 if(error) throw error;
                 
