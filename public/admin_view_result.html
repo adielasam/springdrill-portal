@@ -53,12 +53,11 @@
             if(!classId || !subjectId) return document.getElementById('resultsBody').innerHTML = '<tr><td colspan="6" class="text-center">Missing parameters</td></tr>';
 
             const { data, error } = await supabase.from('term_results')
-                .select('*, students(first_name, surname)')
+                .select('*')
                 .eq('class_id', classId)
                 .eq('subject_id', subjectId)
                 .eq('term', termId)
-                .eq('sub_term', subTermId)
-                .order('id');
+                .eq('sub_term', subTermId);
                 
             const tbody = document.getElementById('resultsBody');
             
@@ -71,10 +70,21 @@
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center">No grades found.</td></tr>';
                 return;
             }
+
+            const numericIds = data.map(r => Number(r.student_id)).filter(id => !isNaN(id));
+            const { data: studentsData } = await supabase.from('students')
+                .select('id, first_name, surname')
+                .in('id', numericIds);
+                
+            const studentMap = {};
+            if (studentsData) {
+                studentsData.forEach(s => studentMap[s.id.toString()] = s);
+            }
             
             let html = '';
             data.forEach(r => {
-                const name = r.students ? `${r.students.first_name || ''} ${r.students.surname || ''}`.trim() : 'Unknown';
+                const student = studentMap[r.student_id.toString()];
+                const name = student ? `${student.first_name || ''} ${student.surname || ''}`.trim() : `Unknown (${r.student_id})`;
                 const cat1 = r.first_cat || 0;
                 const cat2 = r.second_cat || 0;
                 const exam = r.exam || 0;
