@@ -135,16 +135,16 @@ export default function ReportClient() {
 
       if (studentError) throw studentError
 
-      const termId = termMap[selectedTerm] || 1;
-      const subTermId = subTermMap[selectedSubTerm] || 1;
+      const termId = selectedTerm;
+      const subTermId = selectedSubTerm;
 
       const { data: termResults, error: resultsError } = await supabase
         .from('term_results')
         .select('*')
         .eq('class_id', selectedClass)
         .eq('subject_id', selectedSubject)
-        .eq('term_id', termId)
-        .eq('sub_term_id', subTermId)
+        .eq('term', termId)
+        .eq('sub_term', subTermId)
 
       if (resultsError) throw resultsError
 
@@ -260,15 +260,15 @@ export default function ReportClient() {
 
     setIsLoading(true)
     try {
-      const termId = termMap[selectedTerm] || 1;
-      const subTermId = subTermMap[selectedSubTerm] || 1;
+      const termId = selectedTerm;
+      const subTermId = selectedSubTerm;
 
       const upsertData = results.map(r => ({
         student_id: r.student_id,
         class_id: Number(selectedClass),
         subject_id: Number(selectedSubject),
-        term_id: termId,
-        sub_term_id: subTermId,
+        term: termId,
+        sub_term: subTermId,
         first_cat: r.first_cat === '' ? null : Number(r.first_cat),
         second_cat: r.second_cat === '' ? null : Number(r.second_cat),
         exam: r.exam === '' ? null : Number(r.exam),
@@ -279,7 +279,7 @@ export default function ReportClient() {
       const { error } = await supabase
         .from('term_results')
         .upsert(upsertData, { 
-          onConflict: 'student_id, class_id, subject_id, term_id, sub_term_id'
+          onConflict: 'student_id, class_id, subject_id, term, sub_term'
         })
 
       if (error) throw error
@@ -288,8 +288,8 @@ export default function ReportClient() {
         const { error: rpcError } = await supabase.rpc('submit_final_term_results', {
           p_class_id: Number(selectedClass),
           p_subject_id: Number(selectedSubject),
-          p_term_id: termId,
-          p_sub_term_id: subTermId
+          p_term: termId,
+          p_sub_term: subTermId
         })
         if (rpcError) throw rpcError
         setIsFinal(true)
