@@ -142,7 +142,7 @@
                     <tr class="table-light border-top border-dark border-2">
                         <td class="fw-bold text-end">OVERALL AVERAGE:</td>
                         <td class="text-center fw-bold fs-5" id="rcTotalAvg">--%</td>
-                        <td colspan="2"></td>
+                        <td colspan="5"></td>
                     </tr>
                 </tfoot>
             </table>
@@ -227,9 +227,10 @@
                 // 1. Get Student Info & Passport
                 const { data: studentInfo } = await supabase
                     .from('students')
-                    .select('passport_url, classes(name), users(name)')
+                    .select('id, passport_url, classes(name), users(name)')
                     .eq('user_id', studentId)
                     .single();
+                const studentData = studentInfo;
 
                 document.getElementById('rcStudentName').innerText = studentInfo.users.name;
                 document.getElementById('rcClass').innerText = studentInfo.classes.name;
@@ -242,52 +243,57 @@
                     document.getElementById('rcPassport').src = "https://via.placeholder.com/150?text=No+Photo";
                 }
 
-                // 2. Get Grades (Average per subject)
-                const { data: attempts } = await supabase
-                    .from('test_attempts')
-                    .select(`percentage, tests!inner(subjects(name))`)
-                    .eq('student_id', studentId)
-                    .not('end_time', 'is', null);
+                // 2. Get Grades from term_results
+                const termId = document.getElementById('termSelect') ? document.getElementById('termSelect').value : 'First Term';
+                const subTermId = document.getElementById('subTermSelect') ? document.getElementById('subTermSelect').value : 'Full Term';
+
+                const { data: results } = await supabase
+                    .from('term_results')
+                    .select('first_cat, second_cat, exam, status, subjects(name)')
+                    .eq('student_id', studentData.id)
+                    .eq('term', termId)
+                    .eq('sub_term', subTermId)
+                    .eq('status', 'approved');
 
                 const tbody = document.getElementById('rcGradesTbody');
                 
-                if (!attempts || attempts.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-4">No exam records found for this student.</td></tr>`;
+                if (!results || results.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">No approved results found for this term.</td></tr>`;
                     document.getElementById('rcTotalAvg').innerText = '0%';
                 } else {
-                    // Aggregate scores by subject
-                    const subjectData = {};
-                    attempts.forEach(a => {
-                        const subName = a.tests.subjects.name;
-                        if (!subjectData[subName]) subjectData[subName] = [];
-                        subjectData[subName].push(parseFloat(a.percentage));
-                    });
-
                     let totalSum = 0;
                     let subCount = 0;
                     let rowsHtml = '';
 
-                    for (const [subject, scores] of Object.entries(subjectData)) {
-                        const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
-                        totalSum += avg;
+                    results.forEach(r => {
+                        const subj = r.subjects ? r.subjects.name : 'Unknown';
+                        const cat1 = Number(r.first_cat) || 0;
+                        const cat2 = Number(r.second_cat) || 0;
+                        const exam = Number(r.exam) || 0;
+                        const total = cat1 + cat2 + exam;
+                        totalSum += total;
                         subCount++;
 
                         let grade = 'F';
-                        let remark = 'Fail';
+                        let remark = 'FAIL';
                         let color = 'text-danger';
-                        if (avg >= 75) { grade = 'A'; remark = 'Excellent'; color = 'text-success'; }
-                        else if (avg >= 60) { grade = 'B'; remark = 'Good'; color = 'text-primary'; }
-                        else if (avg >= 50) { grade = 'C'; remark = 'Pass'; color = 'text-warning'; }
+                        if (total >= 70) { grade = 'A'; remark = 'EXCELLENT'; color = 'text-success'; }
+                        else if (total >= 60) { grade = 'B'; remark = 'VERY GOOD'; color = 'text-primary'; }
+                        else if (total >= 50) { grade = 'C'; remark = 'GOOD'; color = 'text-warning'; }
+                        else if (total >= 40) { grade = 'P'; remark = 'PASS'; color = 'text-dark'; }
 
                         rowsHtml += `
                             <tr>
-                                <td>${subject}</td>
-                                <td class="text-center">${avg.toFixed(1)}</td>
+                                <td>${subj}</td>
+                                <td class="text-center">${r.first_cat !== null ? cat1 : '-'}</td>
+                                <td class="text-center">${r.second_cat !== null ? cat2 : '-'}</td>
+                                <td class="text-center">${r.exam !== null ? exam : '-'}</td>
+                                <td class="text-center fw-bold text-primary">${total}</td>
                                 <td class="text-center fw-bold ${color}">${grade}</td>
-                                <td>${remark}</td>
+                                <td class="text-center" style="font-size:12px;">${remark}</td>
                             </tr>
                         `;
-                    }
+                    });
 
                     tbody.innerHTML = rowsHtml;
                     const finalAvg = (totalSum / subCount).toFixed(1);
@@ -295,7 +301,7 @@
 
                     // Dynamic Comment
                     let finalComment = "Requires urgent academic intervention and focus.";
-                    if (finalAvg >= 75) finalComment = "An outstanding academic performance. Keep up the excellent work!";
+                    if (finalAvg >= 70) finalComment = "An outstanding academic performance. Keep up the excellent work!";
                     else if (finalAvg >= 60) finalComment = "A good result with room for continued improvement.";
                     else if (finalAvg >= 50) finalComment = "An average performance. More effort is needed next session.";
                     
