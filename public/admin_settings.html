@@ -278,7 +278,7 @@
         
         <nav class="nav flex-column">
             <div class="sidebar-heading">Overview</div>
-            <a href="admin_dashboard" class="nav-link active"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+            <a href="admin_dashboard" class="nav-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
             
             <div class="sidebar-heading">Academics</div>
             <a class="nav-link" data-bs-toggle="collapse" href="#subjectsMenu" role="button" aria-expanded="false" aria-controls="subjectsMenu">
@@ -344,7 +344,7 @@
             <a href="admin_create_user" class="nav-link"><i data-lucide="user-plus"></i> Accounts</a>
             <a href="manage_users" class="nav-link"><i data-lucide="user-check"></i> Approvals</a>
             <a href="admin_messages" class="nav-link"><i data-lucide="mail"></i> Messages</a>
-            <a href="admin_settings" class="nav-link"><i data-lucide="settings"></i> Settings</a>
+            <a href="admin_settings" class="nav-link active"><i data-lucide="settings"></i> Settings</a>
         </nav>
     </div>
 
@@ -352,164 +352,99 @@
         <!-- TOPBAR -->
         <div class="top-navbar">
             <div class="breadcrumb">
-                SpringDrill / <span>Dashboard</span>
+                SpringDrill / <span>Settings</span>
             </div>
             
-            <div class="topbar-profile" onclick="window.location.href='admin_settings'">
+            <div class="topbar-profile">
                 <div class="info">
                     <div class="name" id="navAdminName">Admin</div>
                     <div class="role">Workspace Owner</div>
                 </div>
-                <div class="avatar" id="navAvatar" style="overflow: hidden;">
-                    <div id="navAdminInitials">AD</div>
-                </div>
+                <div class="avatar" id="navAdminInitials">AD</div>
             </div>
             <button id="logoutBtn" class="btn btn-outline-danger ms-3 btn-sm"><i data-lucide="log-out" style="width: 14px; height: 14px;"></i> Logout</button>
         </div>
 
         <!-- HEADER -->
         <div class="page-header">
-            <h1>Welcome back</h1>
-            <p>Here is what's happening across your workspace today.</p>
+            <h1>Account Settings</h1>
+            <p>Manage your profile details and security preferences.</p>
         </div>
 
-        <!-- STAT CARDS -->
-          <div class="row g-3 mb-5 justify-content-center">
-              <div class="col-12 col-md-4 col-xl-2">
-                  <div class="stat-block bg-blue" onclick="window.location.href='class_list.html'" title="View all students">
-                      <i data-lucide="users" class="stat-bg-icon"></i>
-                      <div class="stat-val" id="statActiveStudents">0</div>
-                      <div class="stat-text">Active Students</div>
-                  </div>
-              </div>
-              <div class="col-12 col-md-4 col-xl-2">
-                  <div class="stat-block bg-teal" onclick="window.location.href='class_list.html'">
-                      <i data-lucide="user" class="stat-bg-icon"></i>
-                      <div class="stat-val" id="statMale">0</div>
-                      <div class="stat-text">Male Students</div>
-                  </div>
-              </div>
-              <div class="col-12 col-md-4 col-xl-2">
-                  <div class="stat-block bg-yellow" onclick="window.location.href='class_list.html'">
-                      <i data-lucide="user" class="stat-bg-icon"></i>
-                      <div class="stat-val" id="statFemale">0</div>
-                      <div class="stat-text">Female Students</div>
-                  </div>
-              </div>
-              <div class="col-12 col-md-4 col-xl-2">
-                  <div class="stat-block bg-coral" onclick="window.location.href='class_list.html'">
-                      <i data-lucide="monitor" class="stat-bg-icon"></i>
-                      <div class="stat-val" id="statClasses">0</div>
-                      <div class="stat-text">Classes</div>
-                  </div>
-              </div>
-              <div class="col-12 col-md-4 col-xl-2">
-                  <div class="stat-block bg-purple" onclick="window.location.href='teacher_list'">
-                      <i data-lucide="globe" class="stat-bg-icon"></i>
-                      <div class="stat-val" id="statTeachers">0</div>
-                      <div class="stat-text">Teachers</div>
-                  </div>
-              </div>
-              <div class="col-12 col-md-4 col-xl-2">
-                  <div class="stat-block bg-cyan" onclick="window.location.href='class_list.html'">
-                      <i data-lucide="calendar" class="stat-bg-icon"></i>
-                      <div class="stat-val" id="statAttendance">0</div>
-                      <div class="stat-text">Total Attendance</div>
-                  </div>
-              </div>
-          </div>
-  
-          <!-- QUICK ACTIONS -->
-        <h5 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Quick Actions</h5>
-        <div class="row g-4 mb-5">
-            <div class="col-12 col-sm-6 col-xl-4">
-                <a href="admin_create_user" class="quick-action-btn qa-blue">
-                    <div class="icon-3d icon-3d-blue"><i data-lucide="user-plus"></i></div>
-                    <span>Create Account</span>
-                </a>
-            </div>
-            <div class="col-12 col-sm-6 col-xl-4">
-                <a href="class_list" class="quick-action-btn qa-violet">
-                    <div class="icon-3d icon-3d-violet"><i data-lucide="clipboard-list"></i></div>
-                    <span>Manage Classes</span>
-                </a>
-            </div>
-            <div class="col-12 col-sm-6 col-xl-4">
-                <a href="admin_attendance" class="quick-action-btn qa-amber">
-                    <div class="icon-3d icon-3d-amber"><i data-lucide="calendar-check"></i></div>
-                    <span>Log Attendance</span>
-                </a>
-            </div>
-        </div>
+        <div id="alertBox" class="alert d-none shadow-sm mb-4" role="alert"></div>
 
-        <!-- CHARTS AND PANELS -->
         <div class="row g-4 mb-5">
-            <div class="col-xl-8">
-                <div class="premium-card h-100">
-                    <div class="panel-header">
-                        <h2 class="panel-title"><i data-lucide="bar-chart-2"></i> Class Distribution</h2>
-                    </div>
-                    <div class="panel-body">
-                        <canvas id="classDistributionChart" height="90"></canvas>
+            <!-- Profile Settings -->
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: var(--card-bg);">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4" style="color: var(--brand-600);"><i data-lucide="user" class="me-2 text-success"></i> Profile Details</h5>
+                        <form id="profileForm">
+                            <div class="mb-3 d-flex align-items-center gap-3">
+                                <div id="settingsAvatarPreview" style="width: 70px; height: 70px; border-radius: 50%; background: var(--brand-100); color: var(--brand-600); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 24px; overflow: hidden; border: 2px solid var(--brand-300);"></div>
+                                <div>
+                                    <label class="form-label mb-1" style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Profile Picture URL</label>
+                                    <input type="url" class="form-control" id="profileAvatarUrl" placeholder="https://example.com/photo.jpg" style="border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg);">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label" style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Full Name</label>
+                                <input type="text" class="form-control" id="profileName" required style="border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg);">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label" style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Phone Number</label>
+                                <input type="text" class="form-control" id="profilePhone" style="border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg);">
+                            </div>
+                            
+                            <div class="text-end mt-4">
+                                <button type="submit" class="btn btn-success px-4 py-2 fw-bold" id="updateProfileBtn" style="border-radius: 8px;"><i data-lucide="save" class="me-2" style="width: 16px; height: 16px;"></i> Update Profile</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-4">
-                <div class="premium-card h-100 d-flex flex-column">
-                    <div class="panel-header">
-                        <h2 class="panel-title"><i data-lucide="users"></i> Daily Attendance</h2>
-                        <a href="admin_attendance" class="btn-link-action">View All</a>
-                    </div>
-                    <div class="panel-body flex-grow-1" id="attendanceListWidget" style="max-height: 320px; overflow-y: auto;">
-                        <div class="text-center text-muted py-5">
-                            <i data-lucide="loader-2" class="lucide-spin mx-auto mb-2"></i>
-                            <div style="font-size: 13px;">Syncing records...</div>
+
+            <!-- Security Settings -->
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: var(--card-bg);">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4" style="color: #dc3545;"><i data-lucide="shield" class="me-2 text-danger"></i> Security & Password</h5>
+                        
+                        <div class="alert alert-light border shadow-sm mb-4" style="font-size: 13px; color: var(--text-muted);">
+                            <i data-lucide="info" class="me-1 text-primary" style="width:14px; height:14px;"></i> For your security, you must provide your current password to change it.
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- TABLES -->
-        <div class="row g-4 mb-5">
-            <div class="col-xl-8">
-                <div class="premium-card">
-                    <div class="panel-header">
-                        <h2 class="panel-title"><i data-lucide="award"></i> Global Top Performers</h2>
-                        <a href="admin_league_table" class="btn-link-action">Full Table</a>
-                    </div>
-                    <div style="overflow-x: auto;">
-                        <table class="table-premium">
-                            <thead>
-                                <tr>
-                                    <th width="15%">Rank</th>
-                                    <th width="65%">Student Name</th>
-                                    <th class="numeric" width="20%">Points</th>
-                                </tr>
-                            </thead>
-                            <tbody id="leagueWidgetBody">
-                                <tr><td colspan="3" class="text-center py-5 text-muted" style="font-size: 13px;">Calculating leaderboard...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-4">
-                <div class="premium-card">
-                    <div class="panel-header">
-                        <h2 class="panel-title"><i data-lucide="gift"></i> Birthdays</h2>
-                    </div>
-                    <div class="panel-body" id="birthdayWidgetBody">
-                        <div class="text-center text-muted py-5" style="font-size: 13px;">
-                            <i data-lucide="loader-2" class="lucide-spin mx-auto mb-2"></i>
-                            Checking records...
-                        </div>
+                        <form id="passwordForm">
+                            <div class="mb-3">
+                                <label class="form-label" style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Current Password <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="currentPassword" required style="border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg);">
+                            </div>
+                            
+                            <hr class="my-4 border-secondary opacity-25">
+
+                            <div class="mb-3">
+                                <label class="form-label" style="font-size: 13px; font-weight: 600; color: var(--text-muted);">New Password <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="newPassword" required minlength="6" style="border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg);">
+                                <div class="form-text" style="font-size: 11px;">Must be at least 6 characters long.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Confirm New Password <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="confirmPassword" required minlength="6" style="border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg);">
+                            </div>
+                            
+                            <div class="text-end mt-4">
+                                <button type="submit" class="btn btn-danger px-4 py-2 fw-bold" id="updatePasswordBtn" style="border-radius: 8px;"><i data-lucide="key" class="me-2" style="width: 16px; height: 16px;"></i> Change Password</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+    
     <!-- SCRIPTS -->
     <script>
         // Initialize Lucide Icons immediately
@@ -519,53 +454,34 @@
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
-        async function initializeDashboard() {
+        let currentUserId = null;
+        let currentUserEmail = null;
+        let userProfile = null;
+
+        async function initializeSettings() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = '/';
-
-                const { data: profile } = await supabase.from('users').select('name, avatar_url').eq('id', session.user.id).single();
-                if(profile) {
-                    document.getElementById('navAdminName').innerText = profile.name;
-                    
-                    const avatarContainer = document.getElementById('navAvatar');
-                    if(avatarContainer) {
-                        const avatarHtml = profile.avatar_url 
-                            ? `<img src="${profile.avatar_url}" style="width: 100%; height: 100%; object-fit: cover;">` 
-                            : `<div style="width:100%; height:100%; background: #059669; color: white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:14px;">${profile.name.substring(0,2).toUpperCase()}</div>`;
-                        avatarContainer.innerHTML = avatarHtml;
-                    }
-                }
-
-                const [
-                    { count: activeStudents }, { count: pendingCount },
-                    { count: maleCount }, { count: femaleCount },
-                    { count: classCount }, { count: teacherCount }
-                ] = await Promise.all([
-                    supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', true),
-                    supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', false),
-                    supabase.from('students').select('*', { count: 'exact', head: true }).eq('gender', 'Male').eq('approved', true),
-                    supabase.from('students').select('*', { count: 'exact', head: true }).eq('gender', 'Female').eq('approved', true),
-                    supabase.from('classes').select('*', { count: 'exact', head: true }),
-                    supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'teacher')
-                ]);
-
-                document.getElementById('statActiveStudents').innerText = activeStudents || 0;
                 
-                document.getElementById('statMale').innerText = maleCount || 0;
-                document.getElementById('statFemale').innerText = femaleCount || 0;
-                // statClasses is now set by renderClassChart()
-                document.getElementById('statTeachers').innerText = teacherCount || 0;
+                currentUserId = session.user.id;
+                currentUserEmail = session.user.email;
+
+                const { data: profile } = await supabase.from('users').select('*').eq('id', currentUserId).single();
+                if(profile) {
+                    userProfile = profile;
+                    document.getElementById('navAdminName').innerText = profile.name || 'Admin';
+                    document.getElementById('navAdminInitials').innerText = profile.name ? profile.name.substring(0, 2).toUpperCase() : 'AD';
+                    
+                    // Pre-fill forms
+                    document.getElementById('profileName').value = profile.name || '';
+                    document.getElementById('profilePhone').value = profile.phone || '';
+                    document.getElementById('profileAvatarUrl').value = profile.avatar_url || '';
+                    
+                    updateAvatarPreview(profile.avatar_url, profile.name);
+                }
 
                 document.getElementById('loadingOverlay').style.opacity = '0';
                 setTimeout(() => document.getElementById('loadingOverlay').style.display = 'none', 300);
-
-                Promise.all([
-                    renderClassChart(),
-                    fetchRecentAttendance(),
-                    populateLeagueWidget(),
-                    fetchBirthdays()
-                ]).catch(console.error);
 
             } catch (err) {
                 console.error(err);
@@ -573,209 +489,119 @@
             }
         }
 
-        async function renderClassChart() {
-            try {
-                const { data: students } = await supabase.from('students').select('classes(name)').eq('approved', true);
-                const classCounts = {};
-                if (students) {
-                    students.forEach(s => {
-                        const cName = s.classes?.name || 'Unassigned';
-                        classCounts[cName] = (classCounts[cName] || 0) + 1;
-                    });
-                }
-                const labels = Object.keys(classCounts);
-                document.getElementById('statClasses').innerText = labels.length;
-                const data = Object.values(classCounts);
-                
-                // Brand-derived colors (shades of teal/emerald)
-                const bgColors = ['#3b82f6', '#14b8a6', '#facc15', '#f43f5e', '#a855f7', '#10b981', '#3b82f6', '#14b8a6', '#facc15', '#f43f5e', '#a855f7', '#10b981'];
-
-                const ctx = document.getElementById('classDistributionChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: { 
-                        labels: labels, 
-                        datasets: [{ 
-                            label: 'Students', 
-                            data: data, 
-                            backgroundColor: bgColors.slice(0, labels.length), 
-                            borderRadius: 6,
-                            borderSkipped: false
-                        }] 
-                    },
-                    options: { 
-                        responsive: true, 
-                        plugins: { legend: { display: false } }, 
-                        scales: { 
-                            y: { 
-                                beginAtZero: true, 
-                                grid: { color: '#f3f4f6' },
-                                border: { display: false }
-                            }, 
-                            x: { 
-                                grid: { display: false },
-                                border: { display: false }
-                            } 
-                        } 
-                    }
-                });
-            } catch(e) { console.error("Chart Error:", e); }
-        }
-
-        async function fetchRecentAttendance() {
-            try {
-                const attContainer = document.getElementById('attendanceListWidget');
-                const [rawAtt, allStudents, allClasses] = await Promise.all([
-                    supabase.from('attendance').select('*').order('created_at', { ascending: false }),
-                    supabase.from('students').select('*'),
-                    supabase.from('classes').select('*')
-                ]);
-
-                if (rawAtt.error || !rawAtt.data || rawAtt.data.length === 0) {
-                    attContainer.innerHTML = '<div class="text-center text-muted py-5" style="font-size:13px;">No records found.</div>';
-                    return;
-                }
-
-                const classMap = {};
-                if (allClasses.data) allClasses.data.forEach(c => classMap[c.id] = c.name);
-
-                const studentMap = {};
-                if (allStudents.data) {
-                    allStudents.data.forEach(s => {
-                        if (s.id) studentMap[String(s.id).trim().toLowerCase()] = s;
-                        if (s.user_id) studentMap[String(s.user_id).trim().toLowerCase()] = s;
-                        if (s.reg_number) studentMap[String(s.reg_number).trim().toLowerCase()] = s; 
-                    });
-                }
-
-                let targetDateString = "";
-                if (rawAtt.data.length > 0) {
-                    targetDateString = rawAtt.data[0].created_at ? rawAtt.data[0].created_at.split('T')[0] : (rawAtt.data[0].date ? rawAtt.data[0].date.split('T')[0] : "");
-                }
-
-                let classCounts = {};
-                rawAtt.data.forEach(record => {
-                    const dbDateString = record.created_at ? record.created_at.split('T')[0] : (record.date ? record.date.split('T')[0] : "");
-                    if (dbDateString === targetDateString) {
-                        const rawId = record.student_id || record.user_id || record.studentId || record.reg_number || "";
-                        const cleanId = String(rawId).trim().toLowerCase();
-                        const stu = studentMap[cleanId];
-                        
-                        let cName = 'Unknown';
-                        if (stu && classMap[stu.class_id]) cName = classMap[stu.class_id];
-                        else if (classMap[record.class_id]) cName = classMap[record.class_id];
-                        else if (record.class_id) cName = record.class_id; 
-                        else if (record.className) cName = record.className;
-                        
-                        if (!classCounts[cName]) classCounts[cName] = { present: 0, absent: 0 };
-                        const stat = String(record.status).toLowerCase();
-                        if (stat.includes('present') || stat.includes('late')) classCounts[cName].present++;
-                        else classCounts[cName].absent++;
-                    }
-                });
-
-                attContainer.innerHTML = Object.entries(classCounts).map(([className, counts]) => `
-                    <div class="att-item">
-                        <div>
-                            <div style="font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 4px;">${className}</div>
-                            <div style="font-size: 12px; color: var(--text-muted);">${targetDateString}</div>
-                        </div>
-                        <div style="display: flex; gap: 8px;">
-                            <span class="badge-soft-success">${counts.present} Present</span>
-                            <span class="badge-soft-danger">${counts.absent} Absent</span>
-                        </div>
-                    </div>
-                `).join('');
-
-            } catch (err) {
-                console.error("Attendance Widget Error:", err);
-                document.getElementById('attendanceListWidget').innerHTML = '<div class="text-center text-danger py-4" style="font-size:13px;">Failed to load attendance.</div>';
+        function updateAvatarPreview(url, name) {
+            const preview = document.getElementById('settingsAvatarPreview');
+            if(url) {
+                preview.innerHTML = <img src="" style="width:100%; height:100%; object-fit:cover;">;
+            } else {
+                preview.innerHTML = name ? name.substring(0, 2).toUpperCase() : 'AD';
+            }
+            
+            // Also update topbar if changed
+            const navAvatar = document.getElementById('navAdminInitials');
+            if(url) {
+                navAvatar.style.background = url('') center/cover;
+                navAvatar.innerText = '';
+            } else {
+                navAvatar.style.background = 'var(--brand-100)';
+                navAvatar.innerText = name ? name.substring(0, 2).toUpperCase() : 'AD';
             }
         }
 
-        async function populateLeagueWidget() {
+        document.getElementById('profileAvatarUrl').addEventListener('input', (e) => {
+            updateAvatarPreview(e.target.value, document.getElementById('profileName').value);
+        });
+
+        // PROFILE SUBMISSION
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('updateProfileBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Updating...';
+            btn.disabled = true;
+            
+            const payload = {
+                name: document.getElementById('profileName').value,
+                phone: document.getElementById('profilePhone').value,
+                avatar_url: document.getElementById('profileAvatarUrl').value
+            };
+
             try {
-                const { data: students } = await supabase.from('students').select('user_id, first_name, surname, classes(name)').eq('approved', true);
-                const { data: results } = await supabase.from('test_results').select('student_id, score');
-                const pointsMap = {};
-                if (results) {
-                    results.forEach(r => {
-                        if (!pointsMap[r.student_id]) pointsMap[r.student_id] = 0;
-                        pointsMap[r.student_id] += r.score;
-                    });
-                }
-                let rankings = students.map(s => ({
-                    name: `${s.first_name} ${s.surname || ''}`,
-                    class_name: s.classes?.name || 'Unassigned',
-                    points: pointsMap[s.user_id] || 0
-                })).filter(s => s.points > 0).sort((a, b) => b.points - a.points).slice(0, 5);
+                const { error } = await supabase.from('users').update(payload).eq('id', currentUserId);
+                if(error) throw error;
+                
+                showAlert('success', 'Profile updated successfully!');
+                document.getElementById('navAdminName').innerText = payload.name;
+                updateAvatarPreview(payload.avatar_url, payload.name);
+            } catch(err) {
+                showAlert('danger', 'Failed to update profile: ' + err.message);
+            } finally {
+                btn.innerHTML = '<i data-lucide="save" class="me-2" style="width: 16px; height: 16px;"></i> Update Profile';
+                btn.disabled = false;
+                lucide.createIcons();
+            }
+        });
 
-                const tbody = document.getElementById('leagueWidgetBody');
-                if (rankings.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="3" class="text-center py-5 text-muted" style="font-size: 13px;">No points recorded yet.</td></tr>`;
-                    return;
-                }
-                tbody.innerHTML = rankings.map((s, index) => {
-                    const rank = index + 1;
-                    let rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
-                    return `<tr>
-                        <td><div class="rank-badge ${rankClass}">${rank}</div></td>
-                        <td>
-                            <div style="font-weight: 600;">${s.name}</div>
-                            <div style="font-size: 12px; color: var(--text-muted);">${s.class_name}</div>
-                        </td>
-                        <td class="numeric" style="font-weight: 700; color: var(--brand-600);">${s.points} Pts</td>
-                    </tr>`;
-                }).join('');
-            } catch(e) { console.error("League Error:", e); }
-        }
+        // PASSWORD SUBMISSION
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('updatePasswordBtn');
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
 
-        async function fetchBirthdays() {
+            if (newPassword !== confirmPassword) {
+                return showAlert('danger', 'New passwords do not match.');
+            }
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Verifying...';
+            btn.disabled = true;
+
             try {
-                const currentMonth = new Date().getMonth();
-                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                const { data: students } = await supabase.from('students').select('first_name, surname, dob').not('dob', 'is', null);
-                const bdayContainer = document.getElementById('birthdayWidgetBody');
-
-                if (!students || students.length === 0) { bdayContainer.innerHTML = '<div class="text-center text-muted py-5" style="font-size:13px;">No birthdays recorded.</div>'; return; }
-
-                const birthdaysThisMonth = students.filter(s => new Date(s.dob).getMonth() === currentMonth).sort((a, b) => new Date(a.dob).getDate() - new Date(b.dob).getDate());
-
-                if (birthdaysThisMonth.length === 0) {
-                    bdayContainer.innerHTML = '<div class="text-center text-muted py-5" style="font-size:13px;">No birthdays this month.</div>';
-                } else {
-                    bdayContainer.innerHTML = birthdaysThisMonth.map(s => {
-                        const bDate = new Date(s.dob);
-                        return `<div class="att-item" style="border: none; padding: 12px 0;">
-                            <div style="display: flex; gap: 12px; align-items: center;">
-                                <div style="background: var(--input-bg); border-radius: 8px; padding: 8px; text-align: center; min-width: 48px;">
-                                    <div style="font-weight: 700; color: var(--text-main); font-size: 16px; line-height: 1;">${bDate.getDate()}</div>
-                                    <div style="font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-top: 2px;">${monthNames[bDate.getMonth()]}</div>
-                                </div>
-                                <div>
-                                    <div style="font-weight: 600; font-size: 14px; color: var(--text-main);">${s.first_name} ${s.surname || ''}</div>
-                                    <div style="font-size: 12px; color: var(--text-muted);">Student</div>
-                                </div>
-                            </div>
-                        </div>`;
-                    }).join('');
+                // 1. Verify old password by attempting to sign in
+                const { error: signInError } = await supabase.auth.signInWithPassword({
+                    email: currentUserEmail,
+                    password: currentPassword
+                });
+                
+                if(signInError) {
+                    throw new Error("Current password is incorrect.");
                 }
-            } catch (err) { console.error(err); }
+
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Changing...';
+                
+                // 2. Update to new password
+                const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
+                if(updateError) throw updateError;
+                
+                showAlert('success', 'Password updated successfully!');
+                document.getElementById('passwordForm').reset();
+            } catch(err) {
+                showAlert('danger', err.message);
+            } finally {
+                btn.innerHTML = '<i data-lucide="key" class="me-2" style="width: 16px; height: 16px;"></i> Change Password';
+                btn.disabled = false;
+                lucide.createIcons();
+            }
+        });
+
+        function showAlert(type, msg) {
+            const box = document.getElementById('alertBox');
+            box.className = `alert alert-${type} shadow-sm mb-4`;
+            box.innerHTML = type === 'success' 
+                ? `<i class="fas fa-check-circle me-2"></i> ${msg}`
+                : `<i class="fas fa-exclamation-triangle me-2"></i> ${msg}`;
+            box.classList.remove('d-none');
+            setTimeout(() => box.classList.add('d-none'), 5000);
         }
 
-        
-        const logoutBtn = document.getElementById('logoutBtn');
-        if(logoutBtn) {
-            logoutBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                await supabase.auth.signOut();
-                window.location.href = '/';
-            });
-        }
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = '/';
+        });
 
-        document.addEventListener('DOMContentLoaded', initializeDashboard);
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/'; });
+        document.addEventListener('DOMContentLoaded', initializeSettings);
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
