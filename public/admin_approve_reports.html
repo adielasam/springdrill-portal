@@ -141,16 +141,28 @@
             </div>
             <div class="p-4" style="background: white;">
                 <div class="row g-4 align-items-end">
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label class="form-label">Term</label>
                         <select id="filterTerm" class="form-select">
                             <option value="">Select Term</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label class="form-label">Sub-Term</label>
                         <select id="filterSubTerm" class="form-select">
                             <option value="">Select Sub-Term</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Year Group</label>
+                        <select id="filterYearGroup" class="form-select">
+                            <option value="">Select Year Group</option>
+                            <option value="7">Year 7</option>
+                            <option value="8">Year 8</option>
+                            <option value="9">Year 9</option>
+                            <option value="10">Year 10</option>
+                            <option value="11">Year 11</option>
+                            <option value="12">Year 12</option>
                         </select>
                     </div>
                     <div class="col-md-3">
@@ -159,7 +171,7 @@
                             <option value="">Select Class</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <button id="loadBtn" class="btn w-100" style="background: #007a4d; color: white; font-weight: 600; font-size: 13px; padding: 10px; border-radius: 6px;"><i data-lucide="search" style="width:16px; height:16px; margin-right:4px;"></i> Load Results</button>
                     </div>
                 </div>
@@ -263,21 +275,40 @@
         }
 
         async function fetchTerms() {
-            const { data } = await supabase.from('terms').select('*');
-            if (data) {
-                allTerms = data;
+            try {
+                const { data, error } = await supabase.from('terms').select('*');
                 const select = document.getElementById('filterTerm');
-                data.forEach(t => select.add(new Option(t.label, t.id)));
-            }
+                if (data && data.length > 0) {
+                    allTerms = data;
+                    data.forEach(t => select.add(new Option(t.label, t.id)));
+                } else {
+                    // Fallback if table is empty
+                    allTerms = [
+                        { id: 1, label: 'Ember Term' },
+                        { id: 2, label: 'Lent Term' },
+                        { id: 3, label: 'Trinity Term' }
+                    ];
+                    allTerms.forEach(t => select.add(new Option(t.label, t.id)));
+                }
+            } catch(e) { console.error('Error fetching terms', e); }
         }
 
         async function fetchSubTerms() {
-            const { data } = await supabase.from('sub_terms').select('*');
-            if (data) {
-                allSubTerms = data;
+            try {
+                const { data, error } = await supabase.from('sub_terms').select('*');
                 const select = document.getElementById('filterSubTerm');
-                data.forEach(t => select.add(new Option(t.label, t.id)));
-            }
+                if (data && data.length > 0) {
+                    allSubTerms = data;
+                    data.forEach(t => select.add(new Option(t.label, t.id)));
+                } else {
+                    // Fallback if table is empty
+                    allSubTerms = [
+                        { id: 1, label: 'Half Term' },
+                        { id: 2, label: 'Full Term' }
+                    ];
+                    allSubTerms.forEach(t => select.add(new Option(t.label, t.id)));
+                }
+            } catch(e) { console.error('Error fetching sub-terms', e); }
         }
 
         async function fetchClasses() {
