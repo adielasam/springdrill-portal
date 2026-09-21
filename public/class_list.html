@@ -291,7 +291,7 @@
                             <div class="d-flex flex-wrap gap-1">
                                 <a href="teacher_student_profile.html?student_id=${s.user_id}" class="btn-action btn-details"><i data-lucide="eye"></i> Details</a>
                                 <a href="admin_student_report.html?student_id=${s.user_id}" class="btn-action btn-report"><i data-lucide="file-text"></i> Report</a>
-                                <button class="btn-action btn-edit" onclick="alert('Edit coming soon')"><i data-lucide="edit"></i> Edit</button>
+                                <button class="btn-action btn-edit" onclick="window.openEditModal('${s.id}')"><i data-lucide="edit"></i> Edit</button>
                                 <button class="btn-action btn-delete" onclick="alert('Delete coming soon')"><i data-lucide="trash-2"></i> Delete</button>
                             </div>
                         </td>
@@ -303,6 +303,139 @@
         }
 
         document.addEventListener('DOMContentLoaded', init);
+
+        window.openEditModal = function(id) {
+            const student = allStudents.find(s => s.id == id);
+            if (!student) return;
+            
+            document.getElementById('editStudentId').value = student.id;
+            document.getElementById('editSurname').value = student.surname || '';
+            document.getElementById('editFirstName').value = student.first_name || '';
+            document.getElementById('editOtherName').value = student.other_name || '';
+            document.getElementById('editClassId').value = student.class_id || '';
+            document.getElementById('editGender').value = student.gender || '';
+            document.getElementById('editParentName').value = student.parent_guardian_name || student.parent_name || '';
+            document.getElementById('editPassportUrl').value = student.passport_url || '';
+            
+            new bootstrap.Modal(document.getElementById('editStudentModal')).show();
+        };
+
+        document.getElementById('editStudentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('saveStudentBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            btn.disabled = true;
+
+            const id = document.getElementById('editStudentId').value;
+            const payload = {
+                surname: document.getElementById('editSurname').value,
+                first_name: document.getElementById('editFirstName').value,
+                other_name: document.getElementById('editOtherName').value,
+                class_id: document.getElementById('editClassId').value || null,
+                gender: document.getElementById('editGender').value || null,
+                parent_guardian_name: document.getElementById('editParentName').value,
+                passport_url: document.getElementById('editPassportUrl').value
+            };
+
+            try {
+                const { error } = await supabase.from('students').update(payload).eq('id', id);
+                if (error) throw error;
+                
+                const index = allStudents.findIndex(s => s.id == id);
+                if (index > -1) {
+                    for(const key in payload) {
+                        allStudents[index][key] = payload[key];
+                    }
+                    
+                    const cl = document.getElementById('editClassId').options[document.getElementById('editClassId').selectedIndex];
+                    if (cl && payload.class_id) {
+                        allStudents[index].classes = { name: cl.text };
+                    }
+                    
+                    applyFilters();
+                }
+
+                bootstrap.Modal.getInstance(document.getElementById('editStudentModal')).hide();
+                alert('Student updated successfully!');
+            } catch (err) {
+                console.error(err);
+                alert('Error updating student: ' + err.message);
+            } finally {
+                btn.innerHTML = 'Save Changes';
+                btn.disabled = false;
+            }
+        });
+        
+        async function fetchClassesForEdit() {
+            try {
+                const { data } = await supabase.from('classes').select('id, name').order('name');
+                if (data) {
+                    const select = document.getElementById('editClassId');
+                    select.innerHTML = '<option value="">Select Class</option>' + data.map(c => <option value=""></option>).join('');
+                }
+            } catch (e) {}
+        }
+        
+        document.addEventListener('DOMContentLoaded', fetchClassesForEdit);
+
     </script>
+
+    <!-- EDIT STUDENT MODAL -->
+    <div class="modal fade" id="editStudentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 12px; border: none; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                <div class="modal-header" style="background: #007a4d; color: white; border-bottom: none; padding: 15px 20px;">
+                    <h5 class="modal-title" style="font-weight: 700; font-size: 16px;"><i data-lucide="edit" style="width: 18px; height: 18px; margin-right: 6px;"></i> Edit Student</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding: 20px; background: #f8fafc;">
+                    <form id="editStudentForm">
+                        <input type="hidden" id="editStudentId">
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size: 12px; font-weight: 600; color: #64748b;">Surname</label>
+                                <input type="text" class="form-control" id="editSurname" required style="font-size: 13px; border-radius: 6px;">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size: 12px; font-weight: 600; color: #64748b;">First Name</label>
+                                <input type="text" class="form-control" id="editFirstName" required style="font-size: 13px; border-radius: 6px;">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label" style="font-size: 12px; font-weight: 600; color: #64748b;">Other Name(s)</label>
+                                <input type="text" class="form-control" id="editOtherName" style="font-size: 13px; border-radius: 6px;">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size: 12px; font-weight: 600; color: #64748b;">Class</label>
+                                <select class="form-select" id="editClassId" required style="font-size: 13px; border-radius: 6px;"></select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size: 12px; font-weight: 600; color: #64748b;">Gender</label>
+                                <select class="form-select" id="editGender" style="font-size: 13px; border-radius: 6px;">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label" style="font-size: 12px; font-weight: 600; color: #64748b;">Parent/Guardian Name</label>
+                                <input type="text" class="form-control" id="editParentName" style="font-size: 13px; border-radius: 6px;">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label" style="font-size: 12px; font-weight: 600; color: #64748b;">Passport URL (Optional)</label>
+                                <input type="url" class="form-control" id="editPassportUrl" style="font-size: 13px; border-radius: 6px;">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="font-size: 13px; font-weight: 600; border-radius: 6px; border: 1px solid #cbd5e1;">Cancel</button>
+                            <button type="submit" class="btn btn-success" id="saveStudentBtn" style="font-size: 13px; font-weight: 600; border-radius: 6px; background: #007a4d; border: none;">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
