@@ -221,18 +221,28 @@
                     .eq('class_id', student.class_id)
                     .order('created_at', { ascending: false });
 
-                // ENFORCEMENT: Check test_students assignments
-                const { data: assignments, error: assignErr } = await supabase
-                    .from('test_students')
-                    .select('test_id')
-                    .eq('student_id', userId);
-                
                 let allowedRawTests = rawTests || [];
-                
-                // If assignErr is not PGRST205 (table missing), enforce the assignments
-                if (!assignErr && assignments) {
-                    const assignedTestIds = assignments.map(a => a.test_id);
-                    allowedRawTests = allowedRawTests.filter(t => assignedTestIds.includes(t.id));
+
+                // SMART ENFORCEMENT: Check test_students assignments
+                if (rawTests && rawTests.length > 0) {
+                    const rawTestIds = rawTests.map(t => t.id);
+                    const { data: allAssignments, error: assignErr } = await supabase
+                        .from('test_students')
+                        .select('test_id, student_id')
+                        .in('test_id', rawTestIds);
+                    
+                    if (!assignErr && allAssignments) {
+                        allowedRawTests = rawTests.filter(t => {
+                            const testAssignments = allAssignments.filter(a => a.test_id === t.id);
+                            if (testAssignments.length === 0) {
+                                // Default: If no students explicitly assigned, allow ALL students in the class
+                                return true;
+                            } else {
+                                // If explicitly assigned, check if THIS student is included
+                                return testAssignments.some(a => a.student_id === userId);
+                            }
+                        });
+                    }
                 }
 
                 // 3. BULLETPROOF FILTER: Ensure tests actually have questions mapped!
@@ -249,7 +259,7 @@
                             stats[tq.test_id].marks += (tq.questions?.marks || 1);
                         });
                     }
-                    validTests = rawTests.filter(t => stats[t.id] && stats[t.id].count > 0);
+                    validTests = allowedRawTests.filter(t => stats[t.id] && stats[t.id].count > 0);
                 }
 
                 // 4. Fetch past attempts
