@@ -3,332 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SPRINGDRILL - Admin Dashboard</title>
+    <title>SPRINGDRILL - Approve Reports</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root { 
-            --brand-50: #ecfdf5;
-            --brand-100: #d1fae5;
-            --brand-500: #10b981;
-            --brand-600: #059669;
-            
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-400: #9ca3af;
-            --gray-500: #6b7280;
-            --gray-600: #4b5563;
-            --gray-800: #1f2937;
-            --gray-900: #111827;
-            
-            --bg-color: var(--gray-50); 
-            --card-bg: #ffffff; 
-            --text-main: var(--gray-900); 
-            --text-muted: var(--gray-500); 
-            --border-color: var(--gray-200); 
-            --input-bg: var(--gray-100); 
-            
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --info: #3b82f6;
-
-            --radius: 12px;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --brand-50: #ecfdf5; --brand-100: #d1fae5; --brand-500: #10b981; --brand-600: #059669;
+            --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-300: #d1d5db;
+            --gray-400: #9ca3af; --gray-500: #6b7280; --gray-600: #4b5563; --gray-800: #1f2937; --gray-900: #111827;
+            --bg-color: var(--gray-50); --card-bg: #ffffff; --text-main: var(--gray-900); --text-muted: var(--gray-500); 
+            --border-color: var(--gray-200); --input-bg: var(--gray-100); 
+            --radius: 12px; --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
         
-        body.dark-mode { 
-            --bg-color: #030712; 
-            --card-bg: #111827; 
-            --text-main: #f9fafb; 
-            --text-muted: #9ca3af; 
-            --border-color: #1f2937; 
-            --input-bg: #1f2937; 
-        }
-        
-        body { 
-            background-color: var(--bg-color); 
-            color: var(--text-main); 
-            font-family: 'Inter', sans-serif; 
-            overflow-x: hidden; 
-            transition: background-color 0.3s, color 0.3s;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* 3D ICON COMPONENT */
-        .icon-3d {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: linear-gradient(135deg, var(--brand-500) 0%, var(--brand-600) 100%);
-            box-shadow: 0 2px 4px rgba(5, 150, 105, 0.3), inset 0 1px 1px rgba(255,255,255,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            flex-shrink: 0;
-        }
-        .icon-3d-warning { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); box-shadow: 0 2px 4px rgba(217, 119, 6, 0.3), inset 0 1px 1px rgba(255,255,255,0.3); }
-        .icon-3d-info { background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%); box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3), inset 0 1px 1px rgba(255,255,255,0.3); }
-        .icon-3d-danger { background: linear-gradient(135deg, #f87171 0%, #dc2626 100%); box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3), inset 0 1px 1px rgba(255,255,255,0.3); }
-        .icon-3d-neutral { background: linear-gradient(135deg, var(--gray-400) 0%, var(--gray-600) 100%); box-shadow: 0 2px 4px rgba(75, 85, 99, 0.3), inset 0 1px 1px rgba(255,255,255,0.3); }
-        
-        .icon-3d svg { width: 16px; height: 16px; stroke-width: 2.5; }
-        .icon-3d-blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3), inset 0 1px 1px rgba(255,255,255,0.3); }
-        .icon-3d-teal { background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); box-shadow: 0 2px 4px rgba(13, 148, 136, 0.3), inset 0 1px 1px rgba(255,255,255,0.3); }
-        .icon-3d-violet { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); box-shadow: 0 2px 4px rgba(124, 58, 237, 0.3), inset 0 1px 1px rgba(255,255,255,0.3); }
-        .icon-3d-amber { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); box-shadow: 0 2px 4px rgba(217, 119, 6, 0.3), inset 0 1px 1px rgba(255,255,255,0.3); }
-        .icon-3d-coral { background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); box-shadow: 0 2px 4px rgba(225, 29, 72, 0.3), inset 0 1px 1px rgba(255,255,255,0.3); }
-        .icon-3d-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 2px 4px rgba(5, 150, 105, 0.3), inset 0 1px 1px rgba(255,255,255,0.3); }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; }
         
         /* SIDEBAR */
-        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); padding: 32px 16px; z-index: 1050; transition: transform 0.3s ease; overflow-y: auto;}
-        .sidebar-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 12px; }
-        .sidebar-brand h4 { font-weight: 800; margin: 0; font-size: 20px; letter-spacing: -0.5px; }
+        .sidebar { width: 280px; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); position: fixed; top: 0; left: 0; display: flex; flex-direction: column; z-index: 1000; }
+        .sidebar-header { padding: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border-color); }
+        .sidebar-header .logo-icon { width: 36px; height: 36px; background: var(--brand-500); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 18px; }
+        .sidebar-header .logo-text { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-main); }
+        .sidebar-nav { padding: 24px 16px; flex: 1; overflow-y: auto; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 10px 16px; color: var(--text-muted); text-decoration: none; border-radius: 8px; font-weight: 500; font-size: 14px; margin-bottom: 4px; transition: 0.2s; }
+        .nav-link:hover { background: var(--brand-50); color: var(--brand-600); }
+        .nav-link.active { background: var(--brand-50); color: var(--brand-600); font-weight: 600; }
+        .nav-link i { width: 18px; height: 18px; }
+        .sidebar-heading { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--gray-400); margin: 24px 0 8px 16px; letter-spacing: 0.5px; }
         
-        .sidebar-heading { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 16px 12px 8px; margin-top: 8px; }
-        
-        .nav-link { color: var(--text-muted); padding: 10px 12px; margin: 2px 0; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; }
-        .nav-link svg { width: 18px; height: 18px; stroke-width: 2; }
-        .nav-link:hover { background: var(--input-bg); color: var(--text-main); }
-        .nav-link.active { background: var(--brand-600); color: white; font-weight: 600; box-shadow: var(--shadow-sm); }
-        
-        /* TOP NAVBAR */
+        /* MAIN CONTENT */
         .main-content { margin-left: 280px; padding: 32px 48px; min-height: 100vh; }
         .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
         .breadcrumb { margin: 0; font-size: 14px; font-weight: 500; color: var(--text-muted); }
         .breadcrumb span { color: var(--text-main); font-weight: 600; }
         
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--brand-100); color: var(--brand-600); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
-        .topbar-profile { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 4px 8px; border-radius: 8px; transition: 0.2s; }
-        .topbar-profile:hover { background: var(--input-bg); }
-        .topbar-profile .info { text-align: right; }
-        .topbar-profile .info .name { font-weight: 600; font-size: 14px; color: var(--text-main); }
-        .topbar-profile .info .role { font-size: 12px; color: var(--text-muted); }
-
         /* HEADER */
         .page-header { margin-bottom: 32px; }
         .page-header h1 { font-size: 24px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; letter-spacing: -0.5px; }
         .page-header p { font-size: 14px; color: var(--text-muted); margin: 0; }
 
-        /* CARDS */
-        .premium-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: var(--shadow-sm); }
+        .premium-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
+        .card-header-green { background: #007a4d; color: white; padding: 12px 20px; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
         
+        /* FORM CONTROLS */
+        .form-label { font-size: 12px; font-weight: 600; color: var(--gray-500); margin-bottom: 4px; }
+        .form-select, .form-control { font-size: 13px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg); }
+        .form-select:focus, .form-control:focus { border-color: var(--brand-500); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
         
+        /* TABLE */
+        .table-responsive { overflow-x: auto; margin-top: 20px; }
+        .table th { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--gray-500); letter-spacing: 0.5px; padding: 12px 16px; border-bottom: 1px solid var(--border-color); background: var(--gray-50); white-space: nowrap; }
+        .table td { font-size: 13px; padding: 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; white-space: nowrap; }
         
-        /* COLORED STAT BLOCKS */
-        .stat-block {
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            justify-content: center;
-            height: 100px;
-            border-radius: 6px;
-            color: #ffffff;
-            cursor: pointer;
-            transition: transform 0.2s, opacity 0.2s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
-        }
-        .stat-block:hover { transform: translateY(-2px); opacity: 0.95; }
-        .stat-val { font-size: 28px; font-weight: 700; line-height: 1; margin-bottom: 4px; z-index: 2; position: relative; }
-        .stat-text { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0px; opacity: 0.9; text-align: right; z-index: 2; position: relative; }
-        
-        .stat-bg-icon {
-            position: absolute;
-            left: -10%;
-            bottom: -20%;
-            width: 70px;
-            height: 70px;
-            opacity: 0.25;
-            z-index: 1;
-        }
-        
-        .bg-blue { background: #3498db; }
-        .bg-teal { background: #2ecc71; }
-        .bg-yellow { background: #f1c40f; }
-        .bg-coral { background: #1abc9c; } 
-        .bg-purple { background: #9b59b6; }
-        .bg-cyan { background: #00bcd4; }
-        
-        .bg-yellow .stat-val, .bg-yellow .stat-text { color: #ffffff; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .status-draft { background: var(--gray-100); color: var(--gray-600); }
+        .status-final { background: #fef08a; color: #854d0e; } /* Pending Approval */
+        .status-approved { background: #d1fae5; color: #065f46; }
+        .status-rejected { background: #fee2e2; color: #991b1b; }
 
+        .action-btn { padding: 6px 12px; font-size: 11px; font-weight: 600; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: none; transition: 0.2s; text-decoration: none; }
+        .btn-approve { background: #007a4d; color: white; }
+        .btn-approve:hover { background: #00603c; color: white; }
+        .btn-reject { background: #ef4444; color: white; }
+        .btn-reject:hover { background: #dc2626; color: white; }
+        .btn-view { background: #f3f4f6; color: #111827; border: 1px solid #d1d5db; }
+        .btn-view:hover { background: #e5e7eb; color: #111827; }
 
-        /* STAT CARDS */
-        .stat-card { padding: 24px; display: flex; flex-direction: column; height: 100%; transition: box-shadow 0.2s; }
-        .stat-card:hover { box-shadow: var(--shadow-md); }
-        .stat-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
-        .stat-label { font-size: 14px; font-weight: 600; color: var(--text-muted); margin-top: 4px; }
-        .stat-value { font-size: 36px; font-weight: 700; color: var(--text-main); line-height: 1; letter-spacing: -1px; margin-top: auto; }
-
-        /* PANELS */
-        .panel-header { padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
-        .panel-title { font-size: 16px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px; margin: 0; }
-        .panel-title svg { width: 18px; height: 18px; color: var(--text-muted); }
-        .panel-body { padding: 24px; }
-        
-        /* QUICK ACTIONS */
-        .quick-action-btn { display: flex; align-items: center; gap: 16px; padding: 20px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); text-decoration: none; color: var(--text-main); transition: all 0.2s; box-shadow: var(--shadow-sm); height: 100%; }
-        .quick-action-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); color: var(--text-main); }
-        .qa-blue:hover { border-color: #3b82f6; }
-        .qa-violet:hover { border-color: #8b5cf6; }
-        .qa-amber:hover { border-color: #f59e0b; }
-        .quick-action-btn span { font-weight: 600; font-size: 14px; }
-
-        /* TABLES */
-        .table-premium { width: 100%; border-collapse: separate; border-spacing: 0; }
-        .table-premium th { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 24px; border-bottom: 1px solid var(--border-color); text-align: left; }
-        .table-premium td { padding: 16px 24px; font-size: 14px; font-weight: 500; color: var(--text-main); border-bottom: 1px solid var(--border-color); }
-        .table-premium tr:last-child td { border-bottom: none; }
-        .table-premium tr:hover td { background: var(--bg-color); }
-        .table-premium th.numeric, .table-premium td.numeric { text-align: right; }
-
-        .rank-badge { width: 28px; height: 28px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; }
-        .rank-1 { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); }
-        .rank-2 { background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%); }
-        .rank-3 { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); }
-        .rank-other { background: var(--input-bg); color: var(--text-muted); }
-        
-        .badge-soft-success { background: var(--brand-50); color: var(--brand-600); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
-        .badge-soft-danger { background: #fef2f2; color: var(--danger); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
-
-        /* ATTENDANCE LIST */
-        .att-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border-color); }
-        .att-item:last-child { border-bottom: none; padding-bottom: 0; }
-        
-        .btn-link-action { font-size: 13px; font-weight: 500; color: var(--brand-600); text-decoration: none; }
-        .btn-link-action:hover { text-decoration: underline; }
-
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
-
+        /* PRELOADER */
+        #loadingOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: 0.3s; }
     </style>
 </head>
 <body>
-
-    <style>
-        #preloader {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #ffffff;
-            z-index: 99999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s ease-out;
-        }
-        .preloader-logo-wrap {
-            position: relative;
-            width: 100px; height: 100px;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .preloader-logo-wrap img {
-            width: 60px; height: 60px;
-            z-index: 2;
-        }
-        .preloader-spinner {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #004d34;
-            border-bottom: 4px solid #004d34;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            z-index: 1;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
-    <div id="preloader">
-        <div class="preloader-logo-wrap">
-            <div class="preloader-spinner"></div>
-            <img src="/dorvas-logo.png" alt="Logo" onerror="this.src='https://ui-avatars.com/api/?name=SD&background=004d34&color=fff&rounded=true'">
-        </div>
-    </div>
-    <script>
-        window.addEventListener('load', () => {
-            const loader = document.getElementById('preloader');
-            if(loader) {
-                setTimeout(() => {
-                    loader.style.opacity = '0';
-                    setTimeout(() => loader.remove(), 500);
-                }, 800);
-            }
-        });
-    </script>
-
-
     <div id="loadingOverlay">
         <i data-lucide="loader-2" class="lucide-spin" style="width: 48px; height: 48px; color: var(--brand-500); margin-bottom: 16px;"></i>
-        <h5 style="font-weight: 600; color: var(--text-muted); font-size: 16px;">Syncing Workspace...</h5>
+        <h5 style="font-weight: 600; color: var(--text-muted); font-size: 16px;">Loading Reports...</h5>
     </div>
 
     <!-- SIDEBAR -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-brand">
-            <img src="dorvas-logo.png" alt="Dorvas" style="max-height: 50px;" />
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-icon">S</div>
+            <div class="logo-text">SpringDrill</div>
         </div>
-        
-        <nav class="nav flex-column">
+        <nav class="sidebar-nav">
             <div class="sidebar-heading">Overview</div>
-            <a href="admin_dashboard" class="nav-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+            <a href="admin_dashboard.html" class="nav-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
             
             <div class="sidebar-heading">Academics</div>
-            <a href="class_list" class="nav-link"><i data-lucide="users"></i> Classes & Students</a>
-            <a href="admin_attendance" class="nav-link"><i data-lucide="calendar-check"></i> Attendance</a>
-            <a href="admin_league_table" class="nav-link"><i data-lucide="trophy"></i> League Table</a>
-
+            <a href="admin_subjects.html" class="nav-link"><i data-lucide="book-open"></i> Subjects</a>
+            <a href="class_list.html" class="nav-link"><i class="fas fa-chalkboard"></i> Classes & Students</a>
             
             <div class="sidebar-heading">Reports</div>
-            
-            <a class="nav-link" data-bs-toggle="collapse" href="#juniorReportMenu" role="button" aria-expanded="false" aria-controls="juniorReportMenu">
-                <i data-lucide="file-bar-chart"></i> Junior School Report
-                <i class="fas fa-chevron-down ms-auto" style="font-size: 10px;"></i>
-            </a>
-            <div class="collapse" id="juniorReportMenu">
-                <nav class="nav flex-column ms-3 mb-2" style="border-left: 2px solid var(--brand-100);">
-                    <a href="#" class="nav-link py-1" style="font-size: 13px;">Report Setup</a>
-                    <a href="#" class="nav-link py-1" style="font-size: 13px;">Reports View</a>
-                    <a href="admin_approve_reports.html" class="nav-link py-1 active text-success fw-bold" style="font-size: 13px;">Approve Reports</a>
-                    <a href="#" class="nav-link py-1" style="font-size: 13px;">Promotion Manager</a>
-                    <a href="#" class="nav-link py-1" style="font-size: 13px;">Transfer Manager</a>
-                    <a href="#" class="nav-link py-1" style="font-size: 13px;">Process Reports</a>
-                    <a href="#" class="nav-link py-1" style="font-size: 13px;">Publish Report</a>
-                    <a href="#" class="nav-link py-1" style="font-size: 13px;">Report Entry</a>
-                </nav>
-            </div>
-
-            <a class="nav-link" data-bs-toggle="collapse" href="#highReportMenu" role="button" aria-expanded="false" aria-controls="highReportMenu">
-                <i data-lucide="file-bar-chart"></i> High School Report
-                <i class="fas fa-chevron-down ms-auto" style="font-size: 10px;"></i>
-            </a>
-            <div class="collapse" id="highReportMenu">
-                <nav class="nav flex-column ms-3 mb-2" style="border-left: 2px solid var(--brand-100);">
-                    <a href="#" class="nav-link py-1" style="font-size: 13px;">Report Setup</a>
-                    <a href="#" class="nav-link py-1" style="font-size: 13px;">Reports View</a>
-                    <a href="admin_approve_reports.html" class="nav-link py-1" style="font-size: 13px;">Approve Reports</a>
-                    <a href="#" class="nav-link py-1" style="font-size: 13px;">Process Reports</a>
-                    <a href="#" class="nav-link py-1" style="font-size: 13px;">Publish Report</a>
-                </nav>
-            </div>
-
-            <div class="sidebar-heading">Operations</div>
-            <a href="admin_admissions" class="nav-link"><i data-lucide="graduation-cap"></i> Admissions</a>
-            <a href="admin_fees" class="nav-link"><i data-lucide="wallet"></i> Fees</a>
-            <a href="admin_payments" class="nav-link"><i data-lucide="credit-card"></i> Payments</a>
-            <a href="admin_invoices" class="nav-link"><i data-lucide="file-text"></i> Invoices</a>
+            <a href="admin_approve_reports.html" class="nav-link active"><i data-lucide="check-square"></i> Approve Reports</a>
             
             <div class="sidebar-heading">Administration</div>
-            <a href="admin_create_user" class="nav-link"><i data-lucide="user-plus"></i> Accounts</a>
-            <a href="manage_users" class="nav-link"><i data-lucide="user-check"></i> Approvals</a>
-            <a href="admin_messages" class="nav-link"><i data-lucide="mail"></i> Messages</a>
+            <a href="admin_create_user.html" class="nav-link"><i data-lucide="user-plus"></i> Accounts</a>
+            <a href="admin_settings.html" class="nav-link"><i data-lucide="settings"></i> Settings</a>
         </nav>
     </div>
 
@@ -339,319 +109,410 @@
                 SpringDrill / Reports / <span>Approve Reports</span>
             </div>
             
-            <div class="topbar-profile" onclick="document.getElementById('logoutBtn').click()">
-                <div class="info">
-                    <div class="name" id="navAdminName">Admin</div>
-                    <div class="role">Workspace Owner</div>
+            <div class="dropdown">
+                <div class="topbar-profile" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 4px 8px; border-radius: 8px;">
+                    <div class="info" style="text-align: right;">
+                        <div class="name" id="navAdminName" style="font-weight: 600; font-size: 14px; color: var(--text-main);">Admin</div>
+                        <div class="role" style="font-size: 12px; color: var(--text-muted);">Workspace Owner</div>
+                    </div>
+                    <div class="avatar" id="navAvatar" style="overflow: hidden; width: 40px; height: 40px; border-radius: 50%; background: var(--brand-100); color: var(--brand-600); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">AD</div>
                 </div>
-                <div class="avatar">
-                    <i data-lucide="user" style="width:20px; height:20px;"></i>
-                </div>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border: 1px solid var(--border-color); border-radius: 8px;">
+                    <li><a class="dropdown-item" href="admin_settings.html" style="font-size: 13px; font-weight: 500;"><i data-lucide="user" class="me-2" style="width:16px; height:16px;"></i> My Profile</a></li>
+                    <li><a class="dropdown-item" href="admin_settings.html" style="font-size: 13px; font-weight: 500;"><i data-lucide="settings" class="me-2" style="width:16px; height:16px;"></i> Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#" id="logoutBtn" style="font-size: 13px; font-weight: 500;"><i data-lucide="log-out" class="me-2" style="width:16px; height:16px;"></i> Log Out</a></li>
+                </ul>
             </div>
-            <button id="logoutBtn" style="display: none;"></button>
         </div>
 
-        <!-- HEADER -->
         <div class="page-header">
-            <h1>Welcome back</h1>
-            <p>Here is what's happening across your workspace today.</p>
+            <h1>Result Approval</h1>
+            <p>Review submitted results from teachers and approve them for final report cards.</p>
         </div>
 
-        <!-- STAT CARDS -->
-          
-        <div class="page-header mt-4">
-            <h1>Approve Reports</h1>
-            <p>Review submitted term results and teacher comments before publishing.</p>
-        </div>
+        <!-- NOTIFICATION ALERTS -->
+        <div id="alertBox" class="alert d-none shadow-sm mb-4" role="alert" style="font-size: 13px; font-weight: 500;"></div>
 
-        <div class="premium-card p-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="fw-bold m-0"><i data-lucide="check-circle" class="text-success me-2"></i> Submitted Reports Pending Review</h5>
-                <div class="d-flex gap-2">
-                    <select id="filterClass" class="form-select w-auto">
-                        <option value="">All Classes</option>
-                    </select>
-                    <select id="filterTerm" class="form-select w-auto">
-                        <option value="">All Terms</option>
-                        <option value="1">First Term</option>
-                        <option value="2">Second Term</option>
-                        <option value="3">Third Term</option>
-                    </select>
-                    <button class="btn btn-success" id="loadReportsBtn">Load Reports</button>
+        <!-- FILTER CARD -->
+        <div class="premium-card mb-4">
+            <div class="card-header-green">
+                <i data-lucide="filter" style="width:16px; height:16px;"></i> Select Result to View
+            </div>
+            <div class="p-4" style="background: white;">
+                <div class="row g-4 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Term</label>
+                        <select id="filterTerm" class="form-select">
+                            <option value="">Select Term</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Sub-Term</label>
+                        <select id="filterSubTerm" class="form-select">
+                            <option value="">Select Sub-Term</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Class</label>
+                        <select id="filterClass" class="form-select">
+                            <option value="">Select Class</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button id="loadBtn" class="btn w-100" style="background: #007a4d; color: white; font-weight: 600; font-size: 13px; padding: 10px; border-radius: 6px;"><i data-lucide="search" style="width:16px; height:16px; margin-right:4px;"></i> Load Results</button>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Student</th>
-                            <th>Class</th>
-                            <th>Subject</th>
-                            <th>Term / Sub-Term</th>
-                            <th>1st CAT</th>
-                            <th>2nd CAT</th>
-                            <th>Exam</th>
-                            <th>Total</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="reportsTableBody">
-                        <tr>
-                            <td colspan="10" class="text-center py-4 text-muted">Select filters and click Load Reports</td>
-                        </tr>
-                    </tbody>
-                </table>
+        <!-- RESULTS TABLE -->
+        <div class="premium-card">
+            <div class="card-header-green" id="tableHeaderLabel">
+                <i data-lucide="list" style="width:16px; height:16px;"></i> Result Approval List
             </div>
-            
-            <div class="d-flex justify-content-end mt-4 pt-3 border-top">
-                <button class="btn btn-outline-danger me-2"><i data-lucide="x-circle" class="me-2"></i>Reject Selected</button>
-                <button class="btn btn-success"><i data-lucide="check-check" class="me-2"></i>Publish Approved Reports</button>
+            <div class="p-0">
+                <div class="table-responsive m-0" style="min-height: 200px;">
+                    <table class="table table-hover align-middle m-0" id="reportsTable">
+                        <thead style="background: #f8fafc;">
+                            <tr>
+                                <th>Date Submitted</th>
+                                <th>Class</th>
+                                <th>Subject</th>
+                                <th>Teacher Name</th>
+                                <th>Status</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportsTableBody">
+                            <tr><td colspan="6" class="text-center py-5 text-muted" style="font-size:13px;">Please select filters and click Load Results</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
     </div>
+
+    <!-- REJECT MODAL -->
+    <div class="modal fade" id="rejectModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border: none; border-radius: 12px; overflow: hidden;">
+                <div class="modal-header" style="background: #ef4444; color: white; border: none;">
+                    <h5 class="modal-title" style="font-size: 15px; font-weight: 600;"><i data-lucide="alert-triangle" class="me-2" style="width:18px; height:18px;"></i> Reject Result</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Are you sure you want to reject this result? The teacher will be able to edit and resubmit it.</p>
+                    <input type="hidden" id="rejectData">
+                    <div class="d-flex justify-content-end gap-2 mt-2">
+                        <button class="btn btn-light" data-bs-dismiss="modal" style="font-size:13px; font-weight:600;">Cancel</button>
+                        <button class="btn btn-danger" id="confirmRejectBtn" style="font-size:13px; font-weight:600;">Yes, Reject Result</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
-        async function initializeDashboard() {
+        let allTerms = [];
+        let allSubTerms = [];
+        let allClasses = [];
+        let allSubjects = [];
+        let allTeachers = [];
+
+        async function init() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = '/';
 
-                supabase.from('users').select('name').eq('id', session.user.id).single().then(({data: profile}) => {
-                    if(profile) document.getElementById('navAdminName').innerText = profile.name;
-                });
+                const { data: profile } = await supabase.from('users').select('name, avatar_url, role').eq('id', session.user.id).single();
+                if(profile && profile.role !== 'admin') return window.location.href = '/'; // Admin only
+                
+                if (profile) {
+                    document.getElementById('navAdminName').innerText = profile.name;
+                    const navAvatar = document.getElementById('navAvatar');
+                    if(profile.avatar_url) {
+                        navAvatar.style.background = `url('${profile.avatar_url}') center/cover`;
+                        navAvatar.innerText = '';
+                    } else {
+                        navAvatar.innerText = profile.name.substring(0, 2).toUpperCase();
+                    }
+                }
 
-                const [
-                    { count: activeStudents }, { count: pendingCount },
-                    { count: maleCount }, { count: femaleCount },
-                    { count: classCount }, { count: teacherCount }
-                ] = await Promise.all([
-                    supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', true),
-                    supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', false),
-                    supabase.from('students').select('*', { count: 'exact', head: true }).eq('gender', 'Male').eq('approved', true),
-                    supabase.from('students').select('*', { count: 'exact', head: true }).eq('gender', 'Female').eq('approved', true),
-                    supabase.from('classes').select('*', { count: 'exact', head: true }),
-                    supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'teacher')
+                // Load filter data
+                await Promise.all([
+                    fetchTerms(),
+                    fetchSubTerms(),
+                    fetchClasses(),
+                    fetchSubjects(),
+                    fetchTeachers()
                 ]);
 
-                document.getElementById('statActiveStudents').innerText = activeStudents || 0;
-                
-                document.getElementById('statMale').innerText = maleCount || 0;
-                document.getElementById('statFemale').innerText = femaleCount || 0;
-                // statClasses is now set by renderClassChart()
-                document.getElementById('statTeachers').innerText = teacherCount || 0;
-
+                lucide.createIcons();
                 document.getElementById('loadingOverlay').style.opacity = '0';
                 setTimeout(() => document.getElementById('loadingOverlay').style.display = 'none', 300);
 
-                Promise.all([
-                    renderClassChart(),
-                    fetchRecentAttendance(),
-                    populateLeagueWidget(),
-                    fetchBirthdays()
-                ]).catch(console.error);
+            } catch (err) {
+                console.error(err);
+                showAlert('danger', 'Failed to load app data.');
+            }
+        }
+
+        async function fetchTerms() {
+            const { data } = await supabase.from('terms').select('*');
+            if (data) {
+                allTerms = data;
+                const select = document.getElementById('filterTerm');
+                data.forEach(t => select.add(new Option(t.label, t.id)));
+            }
+        }
+
+        async function fetchSubTerms() {
+            const { data } = await supabase.from('sub_terms').select('*');
+            if (data) {
+                allSubTerms = data;
+                const select = document.getElementById('filterSubTerm');
+                data.forEach(t => select.add(new Option(t.label, t.id)));
+            }
+        }
+
+        async function fetchClasses() {
+            const { data } = await supabase.from('classes').select('*').order('name');
+            if (data) {
+                allClasses = data;
+                const select = document.getElementById('filterClass');
+                data.forEach(c => select.add(new Option(c.name, c.id)));
+            }
+        }
+
+        async function fetchSubjects() {
+            const { data } = await supabase.from('subjects').select('*');
+            if(data) allSubjects = data;
+        }
+
+        async function fetchTeachers() {
+            const { data } = await supabase.from('users').select('id, name').eq('role', 'teacher');
+            if(data) allTeachers = data;
+        }
+
+        document.getElementById('loadBtn').addEventListener('click', loadReports);
+
+        async function loadReports() {
+            const termId = document.getElementById('filterTerm').value;
+            const subTermId = document.getElementById('filterSubTerm').value;
+            const classId = document.getElementById('filterClass').value;
+
+            if (!termId || !subTermId || !classId) {
+                return showAlert('warning', 'Please select Term, Sub-Term, and Class to load results.');
+            }
+
+            const btn = document.getElementById('loadBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            btn.disabled = true;
+
+            const tbody = document.getElementById('reportsTableBody');
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i> Fetching results...</td></tr>';
+
+            try {
+                // Fetch term_results grouped by subject_id. Since we can't easily group in REST, we fetch all and group in JS.
+                // We only care about rows that are NOT drafts, or we check if there are 'final' rows.
+                // Because status might not have 'approved' in the DB constraint, we handle gracefully.
+                const { data: results, error } = await supabase
+                    .from('term_results')
+                    .select('*')
+                    .eq('term_id', termId)
+                    .eq('sub_term_id', subTermId)
+                    .eq('class_id', classId);
+
+                if (error) throw error;
+
+                // Group by subject_id
+                const subjectGroups = {};
+                if (results) {
+                    results.forEach(r => {
+                        if(!subjectGroups[r.subject_id]) {
+                            subjectGroups[r.subject_id] = {
+                                subject_id: r.subject_id,
+                                teacher_id: r.submitted_by, // Assuming submitted_by is the teacher
+                                status: r.status, // We use the status of the first row (they should be identical for a batch)
+                                submitted_at: r.submitted_at,
+                                count: 1
+                            };
+                        } else {
+                            subjectGroups[r.subject_id].count++;
+                        }
+                    });
+                }
+
+                const groups = Object.values(subjectGroups);
+                
+                if (groups.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5 text-muted" style="font-size:13px;">No results found for this selection.</td></tr>';
+                } else {
+                    let html = '';
+                    groups.forEach(g => {
+                        const subject = allSubjects.find(s => s.id == g.subject_id)?.name || 'Unknown Subject';
+                        const teacher = allTeachers.find(t => t.id == g.teacher_id)?.name || 'Unknown Teacher';
+                        const className = allClasses.find(c => c.id == classId)?.name || '';
+                        
+                        // Fallback UI status based on actual DB status
+                        let statusBadge = '';
+                        let actionButtons = '';
+                        
+                        // If DB only has draft and final, we treat final as Pending Approval.
+                        // If we inject approved/rejected later, we handle them.
+                        const rawStatus = g.status || 'draft';
+                        
+                        if (rawStatus === 'draft') {
+                            statusBadge = `<span class="status-badge status-draft">Draft (Not Submitted)</span>`;
+                            actionButtons = `<span class="text-muted" style="font-size:11px;">Waiting for teacher</span>`;
+                        } else if (rawStatus === 'final' || rawStatus === 'submitted') {
+                            statusBadge = `<span class="status-badge status-final">Pending Approval</span>`;
+                            actionButtons = `
+                                <button class="action-btn btn-approve" onclick="window.approveResult(${classId}, ${g.subject_id}, ${termId}, ${subTermId})"><i data-lucide="check"></i> Approve</button>
+                                <button class="action-btn btn-reject" onclick="window.promptReject(${classId}, ${g.subject_id}, ${termId}, ${subTermId})"><i data-lucide="x"></i> Reject</button>
+                            `;
+                        } else if (rawStatus === 'approved') {
+                            statusBadge = `<span class="status-badge status-approved">Approved</span>`;
+                            actionButtons = `<button class="action-btn btn-reject" onclick="window.promptReject(${classId}, ${g.subject_id}, ${termId}, ${subTermId})"><i data-lucide="corner-up-left"></i> Revoke & Reject</button>`;
+                        } else if (rawStatus === 'rejected') {
+                            statusBadge = `<span class="status-badge status-rejected">Rejected</span>`;
+                            actionButtons = `<span class="text-muted" style="font-size:11px;">Awaiting Teacher Fix</span>`;
+                        }
+
+                        const dateStr = g.submitted_at ? new Date(g.submitted_at).toLocaleDateString() : 'N/A';
+
+                        html += `
+                        <tr>
+                            <td class="text-muted fw-bold" style="font-size:12px;">${dateStr}</td>
+                            <td class="fw-bold">${className}</td>
+                            <td class="fw-bold" style="color:var(--brand-600);">${subject}</td>
+                            <td>${teacher}</td>
+                            <td>${statusBadge}</td>
+                            <td class="text-end">
+                                <a href="admin_view_result.html?class=${classId}&subject=${g.subject_id}&term=${termId}&subterm=${subTermId}" class="action-btn btn-view" target="_blank"><i data-lucide="eye"></i> View</a>
+                                ${actionButtons}
+                            </td>
+                        </tr>
+                        `;
+                    });
+                    tbody.innerHTML = html;
+                    lucide.createIcons();
+                }
+
+                // Update Header Label
+                const termName = document.getElementById('filterTerm').options[document.getElementById('filterTerm').selectedIndex].text;
+                const className = document.getElementById('filterClass').options[document.getElementById('filterClass').selectedIndex].text;
+                document.getElementById('tableHeaderLabel').innerHTML = `<i data-lucide="list" style="width:16px; height:16px;"></i> ${termName.toUpperCase()} Result Approval List for ${className.toUpperCase()}`;
+                lucide.createIcons();
 
             } catch (err) {
                 console.error(err);
-                document.getElementById('loadingOverlay').style.display = 'none';
+                showAlert('danger', 'Failed to load results: ' + err.message);
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-danger">Error loading data.</td></tr>';
+            } finally {
+                btn.innerHTML = '<i data-lucide="search" style="width:16px; height:16px; margin-right:4px;"></i> Load Results';
+                btn.disabled = false;
+                lucide.createIcons();
             }
         }
 
-        async function renderClassChart() {
+        // Action Handlers
+        window.approveResult = async (classId, subjectId, termId, subTermId) => {
+            if(!confirm('Are you sure you want to approve this result for the final report card?')) return;
+            
             try {
-                const { data: students } = await supabase.from('students').select('classes(name)').eq('approved', true);
-                const classCounts = {};
-                if (students) {
-                    students.forEach(s => {
-                        const cName = s.classes?.name || 'Unassigned';
-                        classCounts[cName] = (classCounts[cName] || 0) + 1;
-                    });
-                }
-                const labels = Object.keys(classCounts);
-                document.getElementById('statClasses').innerText = labels.length;
-                const data = Object.values(classCounts);
+                // If DB constraint still enforces IN ('draft','final'), we might hit an error if we set 'approved'.
+                // If so, we need to instruct user to alter DB, but we will try anyway.
+                const { error } = await supabase.from('term_results')
+                    .update({ status: 'approved' })
+                    .eq('class_id', classId)
+                    .eq('subject_id', subjectId)
+                    .eq('term_id', termId)
+                    .eq('sub_term_id', subTermId);
                 
-                // Brand-derived colors (shades of teal/emerald)
-                const bgColors = ['#3b82f6', '#14b8a6', '#facc15', '#f43f5e', '#a855f7', '#10b981', '#3b82f6', '#14b8a6', '#facc15', '#f43f5e', '#a855f7', '#10b981'];
-
-                const ctx = document.getElementById('classDistributionChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: { 
-                        labels: labels, 
-                        datasets: [{ 
-                            label: 'Students', 
-                            data: data, 
-                            backgroundColor: bgColors.slice(0, labels.length), 
-                            borderRadius: 6,
-                            borderSkipped: false
-                        }] 
-                    },
-                    options: { 
-                        responsive: true, 
-                        plugins: { legend: { display: false } }, 
-                        scales: { 
-                            y: { 
-                                beginAtZero: true, 
-                                grid: { color: '#f3f4f6' },
-                                border: { display: false }
-                            }, 
-                            x: { 
-                                grid: { display: false },
-                                border: { display: false }
-                            } 
-                        } 
+                if (error) {
+                    if (error.message.includes('term_results_status_check')) {
+                        showAlert('danger', 'Database constraint prevents "approved" status. Please run the provided SQL setup script first.');
+                    } else {
+                        throw error;
                     }
-                });
-            } catch(e) { console.error("Chart Error:", e); }
-        }
-
-        async function fetchRecentAttendance() {
-            try {
-                const attContainer = document.getElementById('attendanceListWidget');
-                const [rawAtt, allStudents, allClasses] = await Promise.all([
-                    supabase.from('attendance').select('*').order('created_at', { ascending: false }),
-                    supabase.from('students').select('*'),
-                    supabase.from('classes').select('*')
-                ]);
-
-                if (rawAtt.error || !rawAtt.data || rawAtt.data.length === 0) {
-                    attContainer.innerHTML = '<div class="text-center text-muted py-5" style="font-size:13px;">No records found.</div>';
-                    return;
-                }
-
-                const classMap = {};
-                if (allClasses.data) allClasses.data.forEach(c => classMap[c.id] = c.name);
-
-                const studentMap = {};
-                if (allStudents.data) {
-                    allStudents.data.forEach(s => {
-                        if (s.id) studentMap[String(s.id).trim().toLowerCase()] = s;
-                        if (s.user_id) studentMap[String(s.user_id).trim().toLowerCase()] = s;
-                        if (s.reg_number) studentMap[String(s.reg_number).trim().toLowerCase()] = s; 
-                    });
-                }
-
-                let targetDateString = "";
-                if (rawAtt.data.length > 0) {
-                    targetDateString = rawAtt.data[0].created_at ? rawAtt.data[0].created_at.split('T')[0] : (rawAtt.data[0].date ? rawAtt.data[0].date.split('T')[0] : "");
-                }
-
-                let classCounts = {};
-                rawAtt.data.forEach(record => {
-                    const dbDateString = record.created_at ? record.created_at.split('T')[0] : (record.date ? record.date.split('T')[0] : "");
-                    if (dbDateString === targetDateString) {
-                        const rawId = record.student_id || record.user_id || record.studentId || record.reg_number || "";
-                        const cleanId = String(rawId).trim().toLowerCase();
-                        const stu = studentMap[cleanId];
-                        
-                        let cName = 'Unknown';
-                        if (stu && classMap[stu.class_id]) cName = classMap[stu.class_id];
-                        else if (classMap[record.class_id]) cName = classMap[record.class_id];
-                        else if (record.class_id) cName = record.class_id; 
-                        else if (record.className) cName = record.className;
-                        
-                        if (!classCounts[cName]) classCounts[cName] = { present: 0, absent: 0 };
-                        const stat = String(record.status).toLowerCase();
-                        if (stat.includes('present') || stat.includes('late')) classCounts[cName].present++;
-                        else classCounts[cName].absent++;
-                    }
-                });
-
-                attContainer.innerHTML = Object.entries(classCounts).map(([className, counts]) => `
-                    <div class="att-item">
-                        <div>
-                            <div style="font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 4px;">${className}</div>
-                            <div style="font-size: 12px; color: var(--text-muted);">${targetDateString}</div>
-                        </div>
-                        <div style="display: flex; gap: 8px;">
-                            <span class="badge-soft-success">${counts.present} Present</span>
-                            <span class="badge-soft-danger">${counts.absent} Absent</span>
-                        </div>
-                    </div>
-                `).join('');
-
-            } catch (err) {
-                console.error("Attendance Widget Error:", err);
-                document.getElementById('attendanceListWidget').innerHTML = '<div class="text-center text-danger py-4" style="font-size:13px;">Failed to load attendance.</div>';
-            }
-        }
-
-        async function populateLeagueWidget() {
-            try {
-                const { data: students } = await supabase.from('students').select('user_id, first_name, surname, classes(name)').eq('approved', true);
-                const { data: results } = await supabase.from('test_results').select('student_id, score');
-                const pointsMap = {};
-                if (results) {
-                    results.forEach(r => {
-                        if (!pointsMap[r.student_id]) pointsMap[r.student_id] = 0;
-                        pointsMap[r.student_id] += r.score;
-                    });
-                }
-                let rankings = students.map(s => ({
-                    name: `${s.first_name} ${s.surname || ''}`,
-                    class_name: s.classes?.name || 'Unassigned',
-                    points: pointsMap[s.user_id] || 0
-                })).filter(s => s.points > 0).sort((a, b) => b.points - a.points).slice(0, 5);
-
-                const tbody = document.getElementById('leagueWidgetBody');
-                if (rankings.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="3" class="text-center py-5 text-muted" style="font-size: 13px;">No points recorded yet.</td></tr>`;
-                    return;
-                }
-                tbody.innerHTML = rankings.map((s, index) => {
-                    const rank = index + 1;
-                    let rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
-                    return `<tr>
-                        <td><div class="rank-badge ${rankClass}">${rank}</div></td>
-                        <td>
-                            <div style="font-weight: 600;">${s.name}</div>
-                            <div style="font-size: 12px; color: var(--text-muted);">${s.class_name}</div>
-                        </td>
-                        <td class="numeric" style="font-weight: 700; color: var(--brand-600);">${s.points} Pts</td>
-                    </tr>`;
-                }).join('');
-            } catch(e) { console.error("League Error:", e); }
-        }
-
-        async function fetchBirthdays() {
-            try {
-                const currentMonth = new Date().getMonth();
-                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                const { data: students } = await supabase.from('students').select('first_name, surname, dob').not('dob', 'is', null);
-                const bdayContainer = document.getElementById('birthdayWidgetBody');
-
-                if (!students || students.length === 0) { bdayContainer.innerHTML = '<div class="text-center text-muted py-5" style="font-size:13px;">No birthdays recorded.</div>'; return; }
-
-                const birthdaysThisMonth = students.filter(s => new Date(s.dob).getMonth() === currentMonth).sort((a, b) => new Date(a.dob).getDate() - new Date(b.dob).getDate());
-
-                if (birthdaysThisMonth.length === 0) {
-                    bdayContainer.innerHTML = '<div class="text-center text-muted py-5" style="font-size:13px;">No birthdays this month.</div>';
                 } else {
-                    bdayContainer.innerHTML = birthdaysThisMonth.map(s => {
-                        const bDate = new Date(s.dob);
-                        return `<div class="att-item" style="border: none; padding: 12px 0;">
-                            <div style="display: flex; gap: 12px; align-items: center;">
-                                <div style="background: var(--input-bg); border-radius: 8px; padding: 8px; text-align: center; min-width: 48px;">
-                                    <div style="font-weight: 700; color: var(--text-main); font-size: 16px; line-height: 1;">${bDate.getDate()}</div>
-                                    <div style="font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-top: 2px;">${monthNames[bDate.getMonth()]}</div>
-                                </div>
-                                <div>
-                                    <div style="font-weight: 600; font-size: 14px; color: var(--text-main);">${s.first_name} ${s.surname || ''}</div>
-                                    <div style="font-size: 12px; color: var(--text-muted);">Student</div>
-                                </div>
-                            </div>
-                        </div>`;
-                    }).join('');
+                    showAlert('success', 'Result successfully approved!');
+                    loadReports();
                 }
-            } catch (err) { console.error(err); }
+            } catch (err) {
+                showAlert('danger', 'Approval failed: ' + err.message);
+            }
+        };
+
+        window.promptReject = (classId, subjectId, termId, subTermId) => {
+            document.getElementById('rejectData').value = JSON.stringify({classId, subjectId, termId, subTermId});
+            new bootstrap.Modal(document.getElementById('rejectModal')).show();
+        };
+
+        document.getElementById('confirmRejectBtn').addEventListener('click', async (e) => {
+            const btn = e.target;
+            btn.innerHTML = 'Rejecting...';
+            btn.disabled = true;
+
+            try {
+                const data = JSON.parse(document.getElementById('rejectData').value);
+                const { error } = await supabase.from('term_results')
+                    .update({ status: 'rejected' })
+                    .eq('class_id', data.classId)
+                    .eq('subject_id', data.subjectId)
+                    .eq('term_id', data.termId)
+                    .eq('sub_term_id', data.subTermId);
+                
+                if (error) {
+                    if (error.message.includes('term_results_status_check')) {
+                        // Fallback: If DB rejects 'rejected' status, revert to 'draft' so teacher can edit!
+                        const { error: fallbackError } = await supabase.from('term_results')
+                            .update({ status: 'draft', submitted_by: null, submitted_at: null })
+                            .eq('class_id', data.classId)
+                            .eq('subject_id', data.subjectId)
+                            .eq('term_id', data.termId)
+                            .eq('sub_term_id', data.subTermId);
+                        
+                        if (fallbackError) throw fallbackError;
+                        showAlert('warning', 'Result reverted to Draft (Teacher can edit). Note: SQL script needed for proper "Rejected" status label.');
+                    } else {
+                        throw error;
+                    }
+                } else {
+                    showAlert('success', 'Result successfully rejected. The teacher can now edit and resubmit.');
+                }
+                
+                bootstrap.Modal.getInstance(document.getElementById('rejectModal')).hide();
+                loadReports();
+            } catch (err) {
+                showAlert('danger', 'Rejection failed: ' + err.message);
+            } finally {
+                btn.innerHTML = 'Yes, Reject Result';
+                btn.disabled = false;
+            }
+        });
+
+        function showAlert(type, msg) {
+            const box = document.getElementById('alertBox');
+            box.className = `alert alert-${type} shadow-sm mb-4`;
+            box.innerHTML = type === 'success' ? `<i class="fas fa-check-circle me-2"></i> ${msg}` : `<i class="fas fa-exclamation-triangle me-2"></i> ${msg}`;
+            box.classList.remove('d-none');
+            setTimeout(() => box.classList.add('d-none'), 5000);
         }
 
-        document.addEventListener('DOMContentLoaded', initializeDashboard);
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/'; });
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = '/';
+        });
+
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>

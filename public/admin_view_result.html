@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Results - SPRINGDRILL</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; padding: 20px; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .table th { background: #f3f4f6; font-size: 12px; text-transform: uppercase; color: #6b7280; }
+        .table td { font-size: 14px; vertical-align: middle; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid max-w-6xl mx-auto">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4><i data-lucide="file-text" class="me-2"></i> Result Review</h4>
+            <button class="btn btn-secondary btn-sm" onclick="window.close()">Close Window</button>
+        </div>
+
+        <div class="card p-0 overflow-hidden">
+            <table class="table table-hover m-0">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th class="text-center">1st CAT (20)</th>
+                        <th class="text-center">2nd CAT (20)</th>
+                        <th class="text-center">Exam (60)</th>
+                        <th class="text-center fw-bold">Total (100)</th>
+                        <th class="text-center">Grade</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody">
+                    <tr><td colspan="6" class="text-center py-4">Loading results...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+        
+        async function load() {
+            lucide.createIcons();
+            const params = new URLSearchParams(window.location.search);
+            const classId = params.get('class');
+            const subjectId = params.get('subject');
+            const termId = params.get('term');
+            const subTermId = params.get('subterm');
+            
+            if(!classId || !subjectId) return document.getElementById('resultsBody').innerHTML = '<tr><td colspan="6" class="text-center">Missing parameters</td></tr>';
+
+            const { data, error } = await supabase.from('term_results')
+                .select('*, students(first_name, surname)')
+                .eq('class_id', classId)
+                .eq('subject_id', subjectId)
+                .eq('term_id', termId)
+                .eq('sub_term_id', subTermId)
+                .order('id');
+                
+            const tbody = document.getElementById('resultsBody');
+            
+            if(error) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">${error.message}</td></tr>`;
+                return;
+            }
+            
+            if(!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">No grades found.</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            data.forEach(r => {
+                const name = r.students ? `${r.students.first_name || ''} ${r.students.surname || ''}`.trim() : 'Unknown';
+                const cat1 = r.first_cat || 0;
+                const cat2 = r.second_cat || 0;
+                const exam = r.exam || 0;
+                const total = r.total || (cat1 + cat2 + exam);
+                
+                let grade = 'F';
+                if(total >= 70) grade = 'A';
+                else if(total >= 60) grade = 'B';
+                else if(total >= 50) grade = 'C';
+                else if(total >= 40) grade = 'D';
+                
+                html += `
+                <tr>
+                    <td class="fw-bold">${name}</td>
+                    <td class="text-center">${cat1}</td>
+                    <td class="text-center">${cat2}</td>
+                    <td class="text-center">${exam}</td>
+                    <td class="text-center fw-bold" style="color:#059669;">${total}</td>
+                    <td class="text-center fw-bold">${grade}</td>
+                </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+        
+        document.addEventListener('DOMContentLoaded', load);
+    </script>
+</body>
+</html>
