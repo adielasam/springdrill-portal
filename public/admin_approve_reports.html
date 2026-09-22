@@ -20,16 +20,17 @@
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; }
         
         /* SIDEBAR */
-        .sidebar { width: 280px; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); position: fixed; top: 0; left: 0; display: flex; flex-direction: column; z-index: 1000; }
-        .sidebar-header { padding: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border-color); }
-        .sidebar-header .logo-icon { width: 36px; height: 36px; background: var(--brand-500); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 18px; }
-        .sidebar-header .logo-text { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-main); }
-        .sidebar-nav { padding: 24px 16px; flex: 1; overflow-y: auto; }
-        .nav-link { display: flex; align-items: center; gap: 12px; padding: 10px 16px; color: var(--text-muted); text-decoration: none; border-radius: 8px; font-weight: 500; font-size: 14px; margin-bottom: 4px; transition: 0.2s; }
-        .nav-link:hover { background: var(--brand-50); color: var(--brand-600); }
-        .nav-link.active { background: var(--brand-50); color: var(--brand-600); font-weight: 600; }
-        .nav-link i { width: 18px; height: 18px; }
-        .sidebar-heading { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--gray-400); margin: 24px 0 8px 16px; letter-spacing: 0.5px; }
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); padding: 32px 16px; z-index: 1050; transition: transform 0.3s ease; overflow-y: auto;}
+        .sidebar-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 12px; }
+        .sidebar-brand h4 { font-weight: 800; margin: 0; font-size: 20px; letter-spacing: -0.5px; }
+        
+        .sidebar-heading { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 16px 12px 8px; margin-top: 8px; }
+        
+        .nav-link { color: var(--text-muted); padding: 10px 12px; margin: 2px 0; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; }
+        .nav-link svg { width: 18px; height: 18px; stroke-width: 2; }
+        .nav-link:hover { background: var(--input-bg); color: var(--text-main); }
+        .nav-link.active { background: var(--brand-600); color: white; font-weight: 600; box-shadow: var(--shadow-sm); }
+        
         
         /* MAIN CONTENT */
         .main-content { margin-left: 280px; padding: 32px 48px; min-height: 100vh; }
@@ -80,28 +81,84 @@
     </div>
 
     <!-- SIDEBAR -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <div class="logo-icon">S</div>
-            <div class="logo-text">SpringDrill</div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <img src="dorvas-logo.png" alt="Dorvas" style="max-height: 50px;" />
         </div>
-        <nav class="sidebar-nav">
+        
+        <nav class="nav flex-column">
             <div class="sidebar-heading">Overview</div>
-            <a href="admin_dashboard.html" class="nav-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+            <a href="admin_dashboard" class="nav-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
             
             <div class="sidebar-heading">Academics</div>
-            <a href="admin_subjects.html" class="nav-link"><i data-lucide="book-open"></i> Subjects</a>
-            <a href="class_list.html" class="nav-link"><i class="fas fa-chalkboard"></i> Classes & Students</a>
+            <a class="nav-link" data-bs-toggle="collapse" href="#subjectsMenu" role="button" aria-expanded="false" aria-controls="subjectsMenu">
+                <i data-lucide="book-open"></i> Subjects
+                <i class="fas fa-chevron-down ms-auto" style="font-size: 10px;"></i>
+            </a>
+            <div class="collapse" id="subjectsMenu">
+                <nav class="nav flex-column ms-4 mb-2" style="border-left: 2px solid var(--brand-100);">
+                    <a href="admin_subjects.html#subjectsTab" class="nav-link py-1" style="font-size: 13px;">Create Subjects</a>
+                    <a href="admin_subjects.html#subjectsTab" class="nav-link py-1" style="font-size: 13px;">Manage Subjects</a>
+                    <a href="admin_subjects.html#classesTab" class="nav-link py-1" style="font-size: 13px;">Assign to Classes</a>
+                    <a href="admin_subjects.html#creditsTab" class="nav-link py-1" style="font-size: 13px;">Manage Credit Units</a>
+                    <a href="admin_subjects.html#categoriesTab" class="nav-link py-1" style="font-size: 13px;">Manage Subject Categories</a>
+                    <a href="admin_subjects.html#teachersTab" class="nav-link py-1" style="font-size: 13px;">Assign to Teachers</a>
+                    <a href="admin_subjects.html#headsTab" class="nav-link py-1" style="font-size: 13px;">Assign to Subject Heads</a>
+                </nav>
+            </div>
+            <a href="class_list" class="nav-link"><i data-lucide="users"></i> Classes & Students</a>
+            <a href="admin_attendance" class="nav-link"><i data-lucide="calendar-check"></i> Attendance</a>
+            <a href="admin_league_table" class="nav-link"><i data-lucide="trophy"></i> League Table</a>
+
             
             <div class="sidebar-heading">Reports</div>
-            <a href="admin_approve_reports.html" class="nav-link active"><i data-lucide="check-square"></i> Approve Reports</a>
+            
+            <a class="nav-link" data-bs-toggle="collapse" href="#juniorReportMenu" role="button" aria-expanded="false" aria-controls="juniorReportMenu">
+                <i data-lucide="file-bar-chart"></i> Junior School Report
+                <i class="fas fa-chevron-down ms-auto" style="font-size: 10px;"></i>
+            </a>
+            <div class="collapse" id="juniorReportMenu">
+                <nav class="nav flex-column ms-3 mb-2" style="border-left: 2px solid var(--brand-100);">
+                    <a href="#" class="nav-link py-1" style="font-size: 13px;">Report Setup</a>
+                    <a href="#" class="nav-link py-1" style="font-size: 13px;">Reports View</a>
+                    <a href="admin_approve_reports.html" class="nav-link active py-1" style="font-size: 13px;">Approve Reports</a>
+                    <a href="#" class="nav-link py-1" style="font-size: 13px;">Promotion Manager</a>
+                    <a href="#" class="nav-link py-1" style="font-size: 13px;">Transfer Manager</a>
+                    <a href="#" class="nav-link py-1" style="font-size: 13px;">Process Reports</a>
+                    <a href="admin_publish_reports.html" class="nav-link py-1" style="font-size: 13px;">Publish Report</a>
+                    <a href="#" class="nav-link py-1" style="font-size: 13px;">Report Entry</a>
+                </nav>
+            </div>
+
+            <a class="nav-link" data-bs-toggle="collapse" href="#highReportMenu" role="button" aria-expanded="true" aria-controls="highReportMenu">
+                <i data-lucide="file-bar-chart"></i> High School Report
+                <i class="fas fa-chevron-down ms-auto" style="font-size: 10px;"></i>
+            </a>
+            <div class="collapse show" id="highReportMenu">
+                <nav class="nav flex-column ms-3 mb-2" style="border-left: 2px solid var(--brand-100);">
+                    <a href="#" class="nav-link py-1" style="font-size: 13px;">Report Setup</a>
+                    <a href="#" class="nav-link py-1" style="font-size: 13px;">Reports View</a>
+                    <a href="admin_approve_reports.html" class="nav-link active py-1" style="font-size: 13px;">Approve Reports</a>
+                    <a href="#" class="nav-link py-1" style="font-size: 13px;">Process Reports</a>
+                    <a href="admin_publish_reports.html" class="nav-link py-1" style="font-size: 13px;">Publish Report</a>
+                </nav>
+            </div>
+
+            <div class="sidebar-heading">Operations</div>
+            <a href="admin_admissions" class="nav-link"><i data-lucide="graduation-cap"></i> Admissions</a>
+            <a href="admin_fees" class="nav-link"><i data-lucide="wallet"></i> Fees</a>
+            <a href="admin_payments" class="nav-link"><i data-lucide="credit-card"></i> Payments</a>
+            <a href="admin_invoices" class="nav-link"><i data-lucide="file-text"></i> Invoices</a>
             
             <div class="sidebar-heading">Administration</div>
-            <a href="admin_create_user.html" class="nav-link"><i data-lucide="user-plus"></i> Accounts</a>
-            <a href="admin_settings.html" class="nav-link"><i data-lucide="settings"></i> Settings</a>
+            <a href="admin_create_user" class="nav-link"><i data-lucide="user-plus"></i> Accounts</a>
+            <a href="manage_users" class="nav-link"><i data-lucide="user-check"></i> Approvals</a>
+            <a href="admin_messages" class="nav-link"><i data-lucide="mail"></i> Messages</a>
+            <a href="admin_settings" class="nav-link"><i data-lucide="settings"></i> Settings</a>
         </nav>
     </div>
 
+    
     <div class="main-content">
         <!-- TOPBAR -->
         <div class="top-navbar">
