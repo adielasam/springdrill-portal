@@ -241,7 +241,7 @@
                 subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>';
                 tcsData.forEach(tcs => {
                     if (tcs.subjects && tcs.classes) {
-                        subjectSelect.innerHTML += `<option value="${tcs.subject_id}_${tcs.class_id}">${tcs.subjects.name} (${tcs.classes.name})</option>`;
+                        subjectSelect.innerHTML += `<option value="${tcs.subject_id}">${tcs.subjects.name} (${tcs.classes.name})</option>`;
                     }
                 });
             } else {
@@ -249,24 +249,37 @@
             }
 
             subjectSelect.addEventListener('change', async (e) => {
-                const val = e.target.value;
+                const subjId = e.target.value;
                 const tbody = document.getElementById('studentsTableBody');
-                if (!val) {
+                if (!subjId) {
                     tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-muted">Select a subject to view enrolled students</td></tr>';
                     return;
                 }
                 
-                const [subjId, classId] = val.split('_');
-                
                 tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4"><i class="fas fa-spinner fa-spin text-success fa-2x"></i></td></tr>';
                 
-                // Since the school uses class-based enrollment rather than individual subject enrollment,
-                // we fetch all students belonging to the assigned class.
+                // Fetch approved enrollments
+                const { data: enrollments, error } = await supabase
+                    .from('student_subjects')
+                    .select('student_id')
+                    .eq('subject_id', subjId)
+                    .eq('status', 'approved');
+                    
+                if (error) {
+                    tbody.innerHTML = `<tr><td colspan="3" class="text-danger py-4 text-center">${error.message}</td></tr>`;
+                    return;
+                }
+                
+                if (!enrollments || enrollments.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-muted">No students are currently approved/enrolled for this subject.</td></tr>';
+                    return;
+                }
+                
+                const studentIds = enrollments.map(e => e.student_id);
                 const { data: students, error: studentError } = await supabase
                     .from('students')
                     .select('user_id, first_name, surname, reg_number')
-                    .eq('class_id', classId)
-                    .eq('approved', true)
+                    .in('user_id', studentIds)
                     .order('surname', { ascending: true });
 
                 if (studentError) {
