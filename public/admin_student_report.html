@@ -155,7 +155,7 @@
                     .eq('student_id', student.id) // term_results uses INTEGER student.id, NOT UUID
                     .eq('term', termId)
                     .eq('sub_term', subTermId)
-                    .eq('status', 'approved');
+                    .in('status', ['approved', 'published']);
                 
                 let htmlRows = '', sn = 1, sum = 0, count = 0;
                 

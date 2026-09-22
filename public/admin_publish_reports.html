@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPRINGDRILL - Approve Reports</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root { 
+            --brand-50: #ecfdf5; --brand-100: #d1fae5; --brand-500: #10b981; --brand-600: #059669;
+            --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-300: #d1d5db;
+            --gray-400: #9ca3af; --gray-500: #6b7280; --gray-600: #4b5563; --gray-800: #1f2937; --gray-900: #111827;
+            --bg-color: var(--gray-50); --card-bg: #ffffff; --text-main: var(--gray-900); --text-muted: var(--gray-500); 
+            --border-color: var(--gray-200); --input-bg: var(--gray-100); 
+            --radius: 12px; --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; }
+        
+        /* SIDEBAR */
+        .sidebar { width: 280px; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); position: fixed; top: 0; left: 0; display: flex; flex-direction: column; z-index: 1000; }
+        .sidebar-header { padding: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border-color); }
+        .sidebar-header .logo-icon { width: 36px; height: 36px; background: var(--brand-500); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 18px; }
+        .sidebar-header .logo-text { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-main); }
+        .sidebar-nav { padding: 24px 16px; flex: 1; overflow-y: auto; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 10px 16px; color: var(--text-muted); text-decoration: none; border-radius: 8px; font-weight: 500; font-size: 14px; margin-bottom: 4px; transition: 0.2s; }
+        .nav-link:hover { background: var(--brand-50); color: var(--brand-600); }
+        .nav-link.active { background: var(--brand-50); color: var(--brand-600); font-weight: 600; }
+        .nav-link i { width: 18px; height: 18px; }
+        .sidebar-heading { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--gray-400); margin: 24px 0 8px 16px; letter-spacing: 0.5px; }
+        
+        /* MAIN CONTENT */
+        .main-content { margin-left: 280px; padding: 32px 48px; min-height: 100vh; }
+        .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .breadcrumb { margin: 0; font-size: 14px; font-weight: 500; color: var(--text-muted); }
+        .breadcrumb span { color: var(--text-main); font-weight: 600; }
+        
+        /* HEADER */
+        .page-header { margin-bottom: 32px; }
+        .page-header h1 { font-size: 24px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; letter-spacing: -0.5px; }
+        .page-header p { font-size: 14px; color: var(--text-muted); margin: 0; }
+
+        .premium-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
+        .card-header-green { background: #007a4d; color: white; padding: 12px 20px; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+        
+        /* FORM CONTROLS */
+        .form-label { font-size: 12px; font-weight: 600; color: var(--gray-500); margin-bottom: 4px; }
+        .form-select, .form-control { font-size: 13px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg); }
+        .form-select:focus, .form-control:focus { border-color: var(--brand-500); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
+        
+        /* TABLE */
+        .table-responsive { overflow-x: auto; margin-top: 20px; }
+        .table th { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--gray-500); letter-spacing: 0.5px; padding: 12px 16px; border-bottom: 1px solid var(--border-color); background: var(--gray-50); white-space: nowrap; }
+        .table td { font-size: 13px; padding: 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; white-space: nowrap; }
+        
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .status-draft { background: var(--gray-100); color: var(--gray-600); }
+        .status-final { background: #fef08a; color: #854d0e; } /* Pending Approval */
+        .status-approved { background: #d1fae5; color: #065f46; }
+        .status-rejected { background: #fee2e2; color: #991b1b; }
+
+        .action-btn { padding: 6px 12px; font-size: 11px; font-weight: 600; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: none; transition: 0.2s; text-decoration: none; }
+        .btn-approve { background: #007a4d; color: white; }
+        .btn-approve:hover { background: #00603c; color: white; }
+        .btn-reject { background: #ef4444; color: white; }
+        .btn-reject:hover { background: #dc2626; color: white; }
+        .btn-view { background: #f3f4f6; color: #111827; border: 1px solid #d1d5db; }
+        .btn-view:hover { background: #e5e7eb; color: #111827; }
+
+        /* PRELOADER */
+        #loadingOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: 0.3s; }
+    </style>
+</head>
+<body>
+    <div id="loadingOverlay">
+        <i data-lucide="loader-2" class="lucide-spin" style="width: 48px; height: 48px; color: var(--brand-500); margin-bottom: 16px;"></i>
+        <h5 style="font-weight: 600; color: var(--text-muted); font-size: 16px;">Loading Reports...</h5>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-icon">S</div>
+            <div class="logo-text">SpringDrill</div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-heading">Overview</div>
+            <a href="admin_dashboard.html" class="nav-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+            
+            <div class="sidebar-heading">Academics</div>
+            <a href="admin_subjects.html" class="nav-link"><i data-lucide="book-open"></i> Subjects</a>
+            <a href="class_list.html" class="nav-link"><i class="fas fa-chalkboard"></i> Classes & Students</a>
+            
+            <div class="sidebar-heading">Reports</div>
+            <a href="admin_approve_reports.html" class="nav-link"><i data-lucide="check-square"></i> Approve Reports</a>
+            
+            <div class="sidebar-heading">Administration</div>
+            <a href="admin_create_user.html" class="nav-link"><i data-lucide="user-plus"></i> Accounts</a>
+            <a href="admin_settings.html" class="nav-link"><i data-lucide="settings"></i> Settings</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <!-- TOPBAR -->
+        <div class="top-navbar">
+            <div class="breadcrumb">
+                SpringDrill / Reports / <span>Publish Reports</span>
+            </div>
+            
+            <div class="dropdown">
+                <div class="topbar-profile" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 4px 8px; border-radius: 8px;">
+                    <div class="info" style="text-align: right;">
+                        <div class="name" id="navAdminName" style="font-weight: 600; font-size: 14px; color: var(--text-main);">Admin</div>
+                        <div class="role" style="font-size: 12px; color: var(--text-muted);">Workspace Owner</div>
+                    </div>
+                    <div class="avatar" id="navAvatar" style="overflow: hidden; width: 40px; height: 40px; border-radius: 50%; background: var(--brand-100); color: var(--brand-600); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">AD</div>
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border: 1px solid var(--border-color); border-radius: 8px;">
+                    <li><a class="dropdown-item" href="admin_settings.html" style="font-size: 13px; font-weight: 500;"><i data-lucide="user" class="me-2" style="width:16px; height:16px;"></i> My Profile</a></li>
+                    <li><a class="dropdown-item" href="admin_settings.html" style="font-size: 13px; font-weight: 500;"><i data-lucide="settings" class="me-2" style="width:16px; height:16px;"></i> Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#" id="logoutBtn" style="font-size: 13px; font-weight: 500;"><i data-lucide="log-out" class="me-2" style="width:16px; height:16px;"></i> Log Out</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="page-header">
+            <h1>Result Approval</h1>
+            <p>Review submitted results from teachers and approve them for final report cards.</p>
+        </div>
+
+        <!-- NOTIFICATION ALERTS -->
+        <div id="alertBox" class="alert d-none shadow-sm mb-4" role="alert" style="font-size: 13px; font-weight: 500;"></div>
+
+        <!-- FILTER CARD -->
+        <div class="premium-card mb-4">
+            <div class="card-header-green">
+                <i data-lucide="filter" style="width:16px; height:16px;"></i> Select Result to View
+            </div>
+            <div class="p-4" style="background: white;">
+                <div class="row g-4 align-items-end">
+                    <div class="col-md-2">
+                        <label class="form-label">Term</label>
+                        <select id="filterTerm" class="form-select">
+                            <option value="">Select Term</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Sub-Term</label>
+                        <select id="filterSubTerm" class="form-select">
+                            <option value="">Select Sub-Term</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Year Group</label>
+                        <select id="filterYearGroup" class="form-select">
+                            <option value="">Select Year Group</option>
+                            <option value="7">Year 7</option>
+                            <option value="8">Year 8</option>
+                            <option value="9">Year 9</option>
+                            <option value="10">Year 10</option>
+                            <option value="11">Year 11</option>
+                            <option value="12">Year 12</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Class</label>
+                        <select id="filterClass" class="form-select">
+                            <option value="">Select Class</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button id="loadBtn" class="btn w-100" style="background: #007a4d; color: white; font-weight: 600; font-size: 13px; padding: 10px; border-radius: 6px;"><i data-lucide="search" style="width:16px; height:16px; margin-right:4px;"></i> Load Results</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTS TABLE -->
+        <div class="premium-card">
+            <div class="card-header-green" id="tableHeaderLabel">
+                <i data-lucide="list" style="width:16px; height:16px;"></i> Result Approval List
+            </div>
+            <div class="p-0">
+                <div class="table-responsive m-0" style="min-height: 200px;">
+                    <table class="table table-hover align-middle m-0" id="reportsTable">
+                        <thead style="background: #f8fafc;">
+                            <tr>
+                                <th>Date Submitted</th>
+                                <th>Class</th>
+                                <th>Subject</th>
+                                <th>Teacher Name</th>
+                                <th>Status</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportsTableBody">
+                            <tr><td colspan="6" class="text-center py-5 text-muted" style="font-size:13px;">Please select filters and click Load Results</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- REJECT MODAL -->
+    <div class="modal fade" id="rejectModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border: none; border-radius: 12px; overflow: hidden;">
+                <div class="modal-header" style="background: #ef4444; color: white; border: none;">
+                    <h5 class="modal-title" style="font-size: 15px; font-weight: 600;"><i data-lucide="alert-triangle" class="me-2" style="width:18px; height:18px;"></i> Reject Result</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Are you sure you want to reject this result? The teacher will be able to edit and resubmit it.</p>
+                    <input type="hidden" id="rejectData">
+                    <div class="d-flex justify-content-end gap-2 mt-2">
+                        <button class="btn btn-light" data-bs-dismiss="modal" style="font-size:13px; font-weight:600;">Cancel</button>
+                        <button class="btn btn-danger" id="confirmRejectBtn" style="font-size:13px; font-weight:600;">Yes, Reject Result</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+        lucide.createIcons();
+
+        let allClasses = [];
+
+        async function init() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = '/';
+
+                const { data: profile } = await supabase.from('users').select('name, avatar_url, role').eq('id', session.user.id).single();
+                if(profile && profile.role !== 'admin') return window.location.href = '/'; // Admin only
+
+                document.getElementById('navAdminName').innerText = profile.name || 'Admin';
+
+                // Load filters
+                await Promise.all([
+                    fetchTerms(),
+                    fetchSubTerms(),
+                    fetchClasses()
+                ]);
+                document.getElementById('loadingOverlay').style.display = 'none';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        }
+
+        async function fetchTerms() {
+            const select = document.getElementById('filterTerm');
+            const terms = ['First Term', 'Second Term', 'Third Term', 'Ember Term', 'Lent Term', 'Trinity Term'];
+            terms.forEach(t => select.add(new Option(t, t)));
+        }
+
+        async function fetchSubTerms() {
+            const select = document.getElementById('filterSubTerm');
+            const subTerms = ['Half Term', 'Full Term'];
+            subTerms.forEach(t => select.add(new Option(t, t)));
+        }
+
+        async function fetchClasses() {
+            const { data } = await supabase.from('classes').select('*').order('name');
+            if (data) {
+                allClasses = data;
+                const select = document.getElementById('filterClass');
+                data.forEach(c => select.add(new Option(c.name, c.id)));
+            }
+        }
+
+        // Hook up Year Group filter dynamically
+        document.getElementById('filterYearGroup').addEventListener('change', (e) => {
+            const y = e.target.value;
+            const select = document.getElementById('filterClass');
+            select.innerHTML = '<option value="">Select Class</option>';
+            let filtered = allClasses;
+            if (y) {
+                filtered = allClasses.filter(c => c.name.toLowerCase().includes(`year ${y}`) || c.name.toLowerCase().includes(`year${y}`));
+            }
+            filtered.forEach(c => select.add(new Option(c.name, c.id)));
+        });
+
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Bind the Load Results button to fetchReports
+        document.querySelector('.btn-primary').addEventListener('click', (e) => {
+            e.preventDefault();
+            loadReports();
+        });
+
+        window.loadReports = async function() {
+            const term = document.getElementById('filterTerm').value;
+            const subTerm = document.getElementById('filterSubTerm').value;
+            const classId = document.getElementById('filterClass').value;
+
+            if (!term || !subTerm) {
+                alert("Please select Term and Sub-Term to search for reports.");
+                return;
+            }
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            try {
+                let query = supabase.from('term_results').select('id, student_id, term, sub_term, class_id, status').eq('term', term).eq('sub_term', subTerm).eq('status', 'approved');
+                if (classId) {
+                    query = query.eq('class_id', classId);
+                }
+
+                const { data, error } = await query;
+                if (error) throw error;
+
+                const tbody = document.getElementById('reportsTableBody');
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5 text-muted" style="font-size:13px;">No approved reports found ready to be published for this selection. Note: Subject Results must be Approved by the Admin first before they can be published.</td></tr>';
+                    document.getElementById('publishBtnContainer').innerHTML = '';
+                } else {
+                    // Group by student
+                    const uniqueStudents = new Set(data.map(d => d.student_id)).size;
+                    
+                    tbody.innerHTML = `<tr>
+                        <td colspan="6" class="text-center py-5">
+                            <i data-lucide="check-circle" class="text-success mb-2" style="width:48px; height:48px;"></i>
+                            <h4 class="text-success fw-bold">${data.length} Subject Results Approved!</h4>
+                            <p class="text-muted mb-0">Found across ${uniqueStudents} student(s) in the selected term.</p>
+                        </td>
+                    </tr>`;
+                    lucide.createIcons();
+
+                    document.getElementById('publishBtnContainer').innerHTML = `
+                        <button class="btn btn-success fw-bold px-4 py-2" onclick="publishAllReports()">
+                            <i class="fas fa-paper-plane me-2"></i> Publish Reports to Students
+                        </button>
+                    `;
+                    window.pendingPublishData = { term, subTerm, classId };
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Failed to load reports");
+            } finally {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        }
+
+        window.publishAllReports = async function() {
+            if (!window.pendingPublishData) return;
+            const { term, subTerm, classId } = window.pendingPublishData;
+
+            if (!confirm(`Are you sure you want to PUBLISH all approved reports for ${term} - ${subTerm}? Students will immediately see their results on their portal.`)) return;
+
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            try {
+                let query = supabase.from('term_results').update({ status: 'published' })
+                    .eq('term', term)
+                    .eq('sub_term', subTerm)
+                    .eq('status', 'approved');
+                
+                if (classId) {
+                    query = query.eq('class_id', classId);
+                }
+
+                const { error } = await query;
+                if (error) throw error;
+
+                alert("Reports successfully published! Students can now view their report cards.");
+                loadReports(); // Refresh view
+            } catch (err) {
+                console.error(err);
+                alert("An error occurred while publishing.");
+            } finally {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        }
+
+        document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = '/';
+        });
+    </script>
+</body>
+</html>
