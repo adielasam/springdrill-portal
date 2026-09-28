@@ -152,7 +152,7 @@
                     <div class="filter-row">
                         <div class="filter-label">Session</div>
                         <div class="filter-input">
-                            <select class="form-select" id="fltSession"><option value="">2025/2026</option></select>
+                            <select class="form-select" id="fltSession"><option value="">Loading...</option></select>
                         </div>
                     </div>
                     <div class="filter-row">
@@ -271,6 +271,12 @@
                 if (!session) return window.location.href = '/';
 
                 // Load basic filters
+                const { data: sessions } = await supabase.from('academic_sessions').select('id, name').order('name', { ascending: false });
+                const fltSession = document.getElementById('fltSession');
+                if (sessions && sessions.length > 0) {
+                    fltSession.innerHTML = sessions.map((s, i) => `<option value="${s.id}" ${i === 0 ? 'selected' : ''}>${s.name}</option>`).join('');
+                }
+
                 const { data: classes } = await supabase.from('classes').select('id, name');
                 const fltClass = document.getElementById('fltClass');
                 if (classes) classes.forEach(c => fltClass.innerHTML += `<option value="${c.id}">${c.name}</option>`);
