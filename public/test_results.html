@@ -299,7 +299,7 @@
         };
 
         window.viewTestDetails = async function(examId) {
-            selectedExam = allExams.find(e => e.id === examId);
+            selectedExam = allExams.find(e => String(e.id) === String(examId));
             if (!selectedExam) return;
 
             document.getElementById('listView').style.display = 'none';
