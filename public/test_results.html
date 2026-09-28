@@ -281,8 +281,7 @@
 
                 document.getElementById('loadingOverlay').style.display = 'none';
                 
-                // Fetch exams immediately
-                window.loadExams();
+                // No longer fetching exams immediately; waiting for Class selection.
 
             } catch (err) {
                 console.error(err);
@@ -293,8 +292,13 @@
         window.loadExams = async function() {
             const classId = document.getElementById('fltClass').value;
             const subjectId = document.getElementById('fltSubject').value;
-            
             const tbody = document.getElementById('examListBody');
+            
+            if (!classId) {
+                tbody.innerHTML = '<div class="p-4 text-center text-muted"><i class="fas fa-info-circle me-2"></i>Please select a Class to view exams.</div>';
+                return;
+            }
+            
             tbody.innerHTML = '<div class="p-4 text-center"><i class="fas fa-spinner fa-spin me-2"></i> Loading exams...</div>';
 
             let query = supabase.from('tests').select('*, subjects(name), classes(name)').order('created_at', { ascending: false });
