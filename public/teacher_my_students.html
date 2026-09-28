@@ -1,82 +1,58 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRINGDRILL - My Students</title>
+    <title>My Students - Teacher Portal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* SPRINGDRILL COLORS */
-        :root { 
-            --bg-color: #f4f7fa; 
-            --card-bg: #ffffff; 
-            --text-color: #333333; 
-            --text-muted: #6c757d; 
-            --border-color: #e9ecef; 
-            --input-bg: #f8f9fa; 
-            --springdrill-green: #004d34;
-            --springdrill-green-light: #007a4d;
+        :root {
+            --springdrill-green: #114c31;
+            --springdrill-green-light: #1b724a;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --border-color: #e2e8f0;
+            --text-muted: #64748b;
         }
 
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8f9fa; color: var(--text-color); margin: 0; padding: 0; }
         
-        /* Sidebar Styling (Matching Spring Valley exactly in structure, but SpringDrill colors) */
         .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; background: var(--springdrill-green); color: white; padding-top: 15px; z-index: 1050; box-shadow: 4px 0 15px rgba(0,0,0,0.1);}
         .sidebar::-webkit-scrollbar { width: 6px; }
         .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
-        
         .sidebar-brand { display: flex; align-items: center; justify-content: center; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; background: white;}
         .sidebar-brand img { max-width: 180px; }
-        .sidebar-brand span { color: var(--springdrill-green); font-weight: 800; font-size: 1.2rem; }
-
         .nav-link { color: rgba(255,255,255,0.85); padding: 10px 20px; margin: 1px 0; transition: all 0.2s; display: flex; align-items: center; font-size: 0.85rem; text-decoration: none; border-left: 4px solid transparent; }
         .nav-link i { width: 22px; font-size: 0.9rem; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; border-left: 4px solid #f1c40f; }
-
-        /* Nested Menus */
         .collapse .nav-link { padding-left: 45px; font-size: 0.8rem; }
         .collapse { background: rgba(0,0,0,0.15); }
 
-        .main-content { margin-left: 260px; padding: 0; min-height: 100vh; }
+        .main-content { margin-left: 260px; padding: 0; min-height: 100vh; background: #fff; }
         
-        /* Top Navbar */
-        .top-navbar { background: var(--card-bg); padding: 10px 30px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .top-navbar { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
         
-        /* Quick Links Circles */
-        .quick-links-container { padding: 30px; display: flex; justify-content: space-evenly; background: white; border-bottom: 1px solid var(--border-color); }
-        .quick-link-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: var(--text-color); cursor: pointer; transition: transform 0.2s; }
-        .quick-link-item:hover { transform: scale(1.05); }
-        .circle-icon { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin-bottom: 10px; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        
-        .circle-red { background: #e74c3c; }
-        .circle-green { background: #2ecc71; }
-        .circle-blue { background: #3498db; }
-
-        .quick-link-text { font-size: 0.85rem; font-weight: 600; }
-
-        /* Tabs */
         .dashboard-tabs { background: white; padding: 0 30px; border-bottom: 1px solid var(--border-color); display: flex; gap: 20px; }
-        .tab-item { padding: 12px 10px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; }
-        .tab-item.active { color: var(--springdrill-green-light); border-bottom-color: var(--springdrill-green-light); }
+        .tab-item { padding: 12px 10px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; text-decoration: none;}
+        .tab-item.active { color: var(--springdrill-green); border-bottom-color: var(--springdrill-green); }
+        .tab-item:hover { color: var(--springdrill-green); }
 
-        /* Layout Grid */
-        .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; padding: 20px 30px; }
-        
-        .panel { background: white; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; margin-bottom: 20px; }
-        .panel-header { padding: 12px 15px; font-size: 0.85rem; font-weight: 700; color: var(--springdrill-green); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; }
-        .panel-header i { margin-right: 8px; }
-        .panel-body { padding: 15px; }
+        .sv-card { border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; margin: 20px 30px; box-shadow: none; }
+        .sv-card-header { background: var(--springdrill-green); color: white; padding: 10px 15px; font-weight: 600; font-size: 0.9rem; }
+        .sv-card-body { padding: 20px; }
 
-        .list-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--border-color); font-size: 0.8rem; }
-        .list-item:last-child { border-bottom: none; }
-        .list-icon { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1rem; margin-right: 15px; }
-        
+        .sv-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .sv-table th { background: #f8f9fa; color: #555; padding: 12px 15px; border-bottom: 2px solid #ddd; font-weight: 600; font-size: 0.75rem; text-align: left; border-right: 1px solid #eee; }
+        .sv-table td { padding: 12px 15px; border-bottom: 1px solid #eee; vertical-align: middle; color: #555; border-right: 1px solid #eee; }
+        .sv-table th:first-child, .sv-table td:first-child { width: 50px; text-align: center; }
+        .sv-table th:last-child, .sv-table td:last-child { border-right: none; }
+        .sv-table tbody tr:hover { background: #f8f9fa; }
+
     </style>
 </head>
 <body>
-
-    <!-- Sidebar exactly modeling the Spring Valley structure -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <img src="dorvas-logo.png" alt="Dorvas Logo" style="max-height: 50px; padding: 5px;" />
@@ -147,104 +123,101 @@
 
     <div class="main-content">
         <div class="top-navbar">
-            <div class="text-muted fw-bold small">Welcome <span id="navTeacherName">Staff</span></div>
+            <div class="fw-bold d-flex align-items-center" style="color: var(--text-color);">
+                Welcome <span id="navTeacherName" class="ms-1">Teacher</span>
+            </div>
             <div>
                 <i class="fas fa-bell text-muted me-3"></i>
                 <i class="fas fa-user-circle text-muted fs-4"></i>
             </div>
         </div>
 
-        <div class="quick-links-container">
-            <a href="teacher_eclassroom.html" class="quick-link-item">
-                <div class="circle-icon circle-red"><i class="fas fa-play"></i></div>
-                <div class="quick-link-text">eClassroom</div>
-            </a>
-            <a href="teacher_assignments.html" class="quick-link-item">
-                <div class="circle-icon circle-green"><i class="fas fa-edit"></i></div>
-                <div class="quick-link-text">Assignments</div>
-            </a>
-            <a href="manage_cbt.html" class="quick-link-item">
-                <div class="circle-icon circle-red"><i class="fas fa-award"></i></div>
-                <div class="quick-link-text">CBT</div>
-            </a>
-            <a href="#" class="quick-link-item" onclick="alert('Check Schedules coming soon')">
-                <div class="circle-icon circle-green"><i class="fas fa-calendar-check"></i></div>
-                <div class="quick-link-text">Check Schedules</div>
-            </a>
-        </div>
-
         <div class="dashboard-tabs">
             <a href="teacher_dashboard.html" style="text-decoration:none;"><div class="tab-item">Overview</div></a>
             <a href="teacher_subjects.html" style="text-decoration:none;"><div class="tab-item">My Subjects</div></a>
             <a href="#" style="text-decoration:none;" onclick="alert('Weekly Reflection coming soon')"><div class="tab-item">Weekly Reflection</div></a>
-            <a href="class_list.html" style="text-decoration:none;"><div class="tab-item">My Students</div></a>
+            <a href="teacher_my_students.html" style="text-decoration:none;"><div class="tab-item active">My Students</div></a>
         </div>
 
-        
-        <div class="p-4">
-            <div class="panel border-0 shadow-sm mb-4">
-                <div class="panel-header bg-success text-white"><i class="fas fa-filter"></i> Select Filter</div>
-                <div class="panel-body bg-white">
-                    <div class="row align-items-center mb-3">
-                        <div class="col-md-2 text-end fw-bold text-muted small">Student form:</div>
-                        <div class="col-md-8">
-                            <select class="form-select" id="formFilter">
-                                <option value="Subject Students">Subject Students</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row align-items-center">
-                        <div class="col-md-2 text-end fw-bold text-muted small">Subject:</div>
-                        <div class="col-md-8">
-                            <select class="form-select" id="subjectFilter">
-                                <option value="">Loading your subjects...</option>
-                            </select>
-                        </div>
+        <div class="sv-card">
+            <div class="sv-card-header">Select Filter</div>
+            <div class="sv-card-body p-4">
+                <div class="row align-items-center mb-3">
+                    <div class="col-md-2 text-end fw-bold text-muted small">Student Type:</div>
+                    <div class="col-md-7">
+                        <select class="form-select form-select-sm" id="formFilter">
+                            <option value="Subject Students">Subject Students</option>
+                        </select>
                     </div>
                 </div>
-            </div>
-
-            <div class="panel border-0 shadow-sm">
-                <div class="panel-body p-0">
-                    <table class="table table-hover table-striped mb-0 align-middle">
-                        <thead class="table-light text-muted small">
-                            <tr>
-                                <th width="50">#</th>
-                                <th>Full Name</th>
-                                <th>Reg No</th>
-                            </tr>
-                        </thead>
-                        <tbody id="studentsTableBody">
-                            <tr><td colspan="3" class="text-center py-4 text-muted">Select a subject to view enrolled students</td></tr>
-                        </tbody>
-                    </table>
+                <div class="row align-items-center">
+                    <div class="col-md-2 text-end fw-bold text-muted small">Subject:</div>
+                    <div class="col-md-7">
+                        <select class="form-select form-select-sm" id="subjectFilter">
+                            <option value="">Loading your subjects...</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <div class="sv-card">
+            <div class="sv-card-body p-0">
+                <div class="p-3 d-flex justify-content-between align-items-center border-bottom">
+                    <div class="d-flex align-items-center gap-2">
+                        <select class="form-select form-select-sm" style="width: 70px;">
+                            <option>10</option>
+                            <option>25</option>
+                            <option>50</option>
+                            <option>100</option>
+                        </select>
+                        <span class="text-muted small">records</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="text-muted small">Search:</span>
+                        <input type="text" class="form-control form-control-sm" style="width: 200px;" id="searchInput">
+                    </div>
+                </div>
+                
+                <table class="sv-table">
+                    <thead>
+                        <tr>
+                            <th># <i class="fas fa-sort text-muted ms-1" style="font-size: 10px;"></i></th>
+                            <th>Full Name <i class="fas fa-sort text-muted ms-1" style="font-size: 10px;"></i></th>
+                            <th>Reg. No <i class="fas fa-sort text-muted ms-1" style="font-size: 10px;"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody">
+                        <tr><td colspan="3" class="text-center py-5 text-muted">Select a subject to view enrolled students</td></tr>
+                    </tbody>
+                </table>
+                
+                <div class="p-3 text-muted small d-flex justify-content-between align-items-center border-top">
+                    <span id="tableInfo">Showing 0 entries</span>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item disabled"><a class="page-link" href="#"><i class="fas fa-chevron-left" style="font-size: 10px;"></i></a></li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item disabled"><a class="page-link" href="#"><i class="fas fa-chevron-right" style="font-size: 10px;"></i></a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
         
-        async function initializeDashboard() {
-            try {
-                const { data: { session } } = await supabase.auth.getSession();
-                if (!session) return window.location.href = '/';
-                
-                const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
-                if(profile) {
-                    document.getElementById('navTeacherName').innerText = profile.name;
-                    document.getElementById('postAuthor').innerText = profile.name;
-                }
-            } catch(e) { console.error(e); }
-        }
-        
-        document.addEventListener('DOMContentLoaded', initializeDashboard);
-    
+        let allStudents = [];
+
         document.addEventListener('DOMContentLoaded', async () => {
             const { data: { session } } = await supabase.auth.getSession();
-            if (!session) return;
+            if (!session) return window.location.href = '/';
+            
+            const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
+            if(profile) document.getElementById('navTeacherName').innerText = profile.name;
             
             // Load subjects assigned to this teacher via join table
             const { data: tcsData } = await supabase
@@ -257,7 +230,8 @@
                 subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>';
                 tcsData.forEach(tcs => {
                     if (tcs.subjects && tcs.classes) {
-                        subjectSelect.innerHTML += `<option value="${tcs.subject_id}">${tcs.subjects.name} (${tcs.classes.name})</option>`;
+                        // Crucially, pass BOTH subject_id and class_id so we don't mix students across classes
+                        subjectSelect.innerHTML += `<option value="${tcs.subject_id}|${tcs.class_id}">${tcs.subjects.name.toUpperCase()} (${tcs.classes.name.toUpperCase()})</option>`;
                     }
                 });
             } else {
@@ -265,62 +239,96 @@
             }
 
             subjectSelect.addEventListener('change', async (e) => {
-                const subjId = e.target.value;
+                const val = e.target.value;
                 const tbody = document.getElementById('studentsTableBody');
-                if (!subjId) {
-                    tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-muted">Select a subject to view enrolled students</td></tr>';
+                
+                if (!val) {
+                    allStudents = [];
+                    renderTable();
+                    tbody.innerHTML = '<tr><td colspan="3" class="text-center py-5 text-muted">Select a subject to view enrolled students</td></tr>';
+                    document.getElementById('tableInfo').innerText = 'Showing 0 entries';
                     return;
                 }
                 
-                tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4"><i class="fas fa-spinner fa-spin text-success fa-2x"></i></td></tr>';
+                const [subjId, classId] = val.split('|');
                 
-                // Fetch approved enrollments
-                const { data: enrollments, error } = await supabase
-                    .from('student_subjects')
-                    .select('student_id')
-                    .eq('subject_id', subjId)
-                    .eq('status', 'approved');
+                tbody.innerHTML = '<tr><td colspan="3" class="text-center py-5"><i class="fas fa-spinner fa-spin text-success me-2"></i> Loading students...</td></tr>';
+                
+                try {
+                    // Fetch approved enrollments for this subject
+                    const { data: enrollments, error } = await supabase
+                        .from('student_subjects')
+                        .select('student_id')
+                        .eq('subject_id', subjId)
+                        .eq('status', 'approved');
+                        
+                    if (error) throw error;
                     
-                if (error) {
-                    tbody.innerHTML = `<tr><td colspan="3" class="text-danger py-4 text-center">${error.message}</td></tr>`;
-                    return;
-                }
-                
-                if (!enrollments || enrollments.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-muted">No students are currently approved/enrolled for this subject.</td></tr>';
-                    return;
-                }
-                
-                const studentIds = enrollments.map(e => e.student_id);
-                const { data: students, error: studentError } = await supabase
-                    .from('students')
-                    .select('user_id, first_name, surname, reg_number')
-                    .in('user_id', studentIds)
-                    .order('surname', { ascending: true });
+                    if (!enrollments || enrollments.length === 0) {
+                        allStudents = [];
+                        renderTable();
+                        tbody.innerHTML = '<tr><td colspan="3" class="text-center py-5 text-muted">No students are currently approved/enrolled for this subject.</td></tr>';
+                        return;
+                    }
+                    
+                    const studentIds = enrollments.map(e => e.student_id);
+                    
+                    // Fetch students who are IN the list of enrolled IDs, AND belong to the specific class
+                    const { data: students, error: studentError } = await supabase
+                        .from('students')
+                        .select('user_id, first_name, surname, reg_number')
+                        .eq('class_id', classId)
+                        .in('user_id', studentIds)
+                        .order('surname', { ascending: true });
 
-                if (studentError) {
-                    tbody.innerHTML = `<tr><td colspan="3" class="text-danger py-4 text-center">${studentError.message}</td></tr>`;
-                    return;
-                }
+                    if (studentError) throw studentError;
 
-                if (!students || students.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-muted">Student details could not be found.</td></tr>';
-                    return;
+                    if (!students || students.length === 0) {
+                        allStudents = [];
+                        renderTable();
+                        tbody.innerHTML = '<tr><td colspan="3" class="text-center py-5 text-muted">No students from this class are enrolled in this subject.</td></tr>';
+                        return;
+                    }
+                    
+                    allStudents = students;
+                    renderTable();
+                    
+                } catch(err) {
+                    tbody.innerHTML = `<tr><td colspan="3" class="text-danger py-5 text-center">${err.message}</td></tr>`;
                 }
-                
-                tbody.innerHTML = '';
-                students.forEach((st, idx) => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td class="fw-bold text-muted">${idx + 1}</td>
-                            <td class="fw-bold">${st.surname} ${st.first_name}</td>
-                            <td class="text-muted">${st.reg_number || 'N/A'}</td>
-                        </tr>
-                    `;
-                });
             });
+            
+            document.getElementById('searchInput').addEventListener('input', renderTable);
         });
 
-</script>
+        function renderTable() {
+            const tbody = document.getElementById('studentsTableBody');
+            if (allStudents.length === 0) return;
+            
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allStudents.filter(st => {
+                const fullName = `${st.surname} ${st.first_name}`.toLowerCase();
+                const reg = (st.reg_number || '').toLowerCase();
+                return fullName.includes(query) || reg.includes(query);
+            });
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="text-center py-5 text-muted">No students match your search.</td></tr>';
+                document.getElementById('tableInfo').innerText = 'Showing 0 entries';
+                return;
+            }
+            
+            tbody.innerHTML = filtered.map((st, idx) => `
+                <tr>
+                    <td class="text-muted fw-bold">${idx + 1}</td>
+                    <td class="fw-bold" style="color: #444;">${st.surname.toUpperCase()} ${st.first_name.toUpperCase()}</td>
+                    <td class="text-muted">${st.reg_number || 'N/A'}</td>
+                </tr>
+            `).join('');
+            
+            document.getElementById('tableInfo').innerText = `Showing 1 to ${filtered.length} of ${filtered.length} entries`;
+        }
+
+    </script>
 </body>
 </html>
