@@ -71,26 +71,71 @@
         <h4>Loading...</h4>
     </div>
 
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <h5 class="text-white fw-bold m-0"><img src="dorvas-logo.png" alt="Dorvas" style="max-height: 40px; margin-right: 10px;" /></h5>
+            <img src="dorvas-logo.png" alt="Dorvas Logo" style="max-height: 50px; padding: 5px;" />
         </div>
         
-        <nav class="nav flex-column mt-3">
-            <a href="teacher_dashboard" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <nav class="d-flex flex-column mb-5">
+            <a href="teacher_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
             
-            <a href="#cbtMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center mt-2 bg-success text-white">
-                <span><i class="fas fa-laptop-code me-2"></i> CBT</span>
-                <i class="fas fa-caret-down"></i>
+            <a href="#highSchoolReportMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-file-alt"></i> High School Report</span>
+                <i class="fas fa-caret-down me-2"></i>
             </a>
-            <div class="collapse show bg-dark mx-2 mt-1 rounded" id="cbtMenu">
-                <a href="#" class="nav-link small py-2 text-muted"><i class="fas fa-database me-2"></i> Question Bank</a>
-                <a href="manage_cbt" class="nav-link small py-2"><i class="fas fa-list me-2"></i> Manage CBT</a>
-                <a href="test_results" class="nav-link small py-2 active text-success fw-bold"><i class="fas fa-chart-bar me-2"></i> Result Manager</a>
+            <div class="collapse" id="highSchoolReportMenu">
+                <a href="/high/result/make" class="nav-link"><i class="fas fa-edit"></i> Make Report</a>
+                <a href="#" class="nav-link" onclick="alert('Teacher Reports coming soon')"><i class="fas fa-eye"></i> Teacher Reports</a>
+                <a href="#" class="nav-link" onclick="alert('Teacher Comments coming soon')"><i class="fas fa-comment-dots"></i> Teacher Comments</a>
             </div>
 
-            <hr class="mx-3 my-4 border-secondary">
-            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Logout</a>
+            <a href="teacher_eclassroom.html" class="nav-link"><i class="fas fa-laptop-house"></i> eClassroom</a>
+            <a href="teacher_messages.html" class="nav-link"><i class="fas fa-comments"></i> Feedback / Messages</a>
+            
+            <a href="#subjectsMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-book"></i> Subjects</span>
+                <i class="fas fa-caret-down me-2"></i>
+            </a>
+            <div class="collapse" id="subjectsMenu">
+                <a href="teacher_subjects.html" class="nav-link"><i class="fas fa-edit"></i> Subjects Overview</a>
+                <a href="teacher_subject_enrollment.html" class="nav-link"><i class="fas fa-users"></i> Subjects Enrollment</a>
+            </div>
+
+            <a href="#" class="nav-link" onclick="alert('Lesson Planner coming soon')"><i class="fas fa-chalkboard"></i> Lesson Planner</a>
+
+            <a href="#cbtMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-desktop"></i> CBT</span>
+                <i class="fas fa-caret-down me-2"></i>
+            </a>
+            <div class="collapse show" id="cbtMenu">
+                <a href="question_bank.html" class="nav-link"><i class="fas fa-database"></i> Question Bank</a>
+                <a href="manage_cbt.html" class="nav-link"><i class="fas fa-cog"></i> Manage CBT</a>
+                <a href="test_results.html" class="nav-link active"><i class="fas fa-chart-line"></i> Result Manager</a>
+                <a href="teacher_bulk_upload.html" class="nav-link"><i class="fas fa-upload"></i> JAMB Uploader</a>
+            </div>
+
+            <a href="#" class="nav-link" onclick="alert('BehaviourTracker coming soon')"><i class="fas fa-user-check"></i> BehaviourTracker</a>
+            <a href="#" class="nav-link" onclick="alert('TimeTable coming soon')"><i class="fas fa-calendar-alt"></i> TimeTable</a>
+            
+            <a href="#calendarMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-calendar-day"></i> Calendar</span>
+                <i class="fas fa-caret-down me-2"></i>
+            </a>
+            <div class="collapse" id="calendarMenu">
+                <a href="view_calendar.html" class="nav-link ps-4"><i class="fas fa-calendar-alt me-2"></i> View Calendar</a>
+                <a href="manage_calendar.html" class="nav-link ps-4"><i class="fas fa-cog me-2"></i> Manage Calendar</a>
+            </div>
+    
+            <a href="#attendanceMenu" data-bs-toggle="collapse" class="nav-link d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-clipboard-list"></i> Attendance</span>
+                <i class="fas fa-caret-down me-2"></i>
+            </a>
+            <div class="collapse" id="attendanceMenu">
+                <a href="teacher_attendance.html" class="nav-link ps-4"><i class="fas fa-plus me-2"></i> Add Attendance</a>
+                <a href="teacher_view_attendance.html" class="nav-link ps-4"><i class="fas fa-list me-2"></i> View Attendance</a>
+            </div>
+            <a href="#" class="nav-link" onclick="alert('Photo Journals coming soon')"><i class="fas fa-camera"></i> Photo Journals</a>
+            <a href="#" class="nav-link text-danger mt-3 border-top border-secondary pt-3" id="logoutBtn"><i class="fas fa-power-off"></i> Secure Logout</a>
         </nav>
     </div>
 
