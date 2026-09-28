@@ -196,10 +196,10 @@
                                 <th>Name</th>
                                 <th>Class</th>
                                 <th>Submitted Date</th>
-                                <th class="text-center">Marks</th>
+                                <th class="text-center">Marks / Total Marks</th>
                                 <th class="text-center">Time Elapsed (Min)</th>
                                 <th class="text-center">Status</th>
-                                <th class="text-center">Action</th>
+                                <th class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="studentResultsBody">
@@ -357,11 +357,16 @@
                     <td class="fw-bold text-uppercase" style="color: #2c3e50;">${st.name}</td>
                     <td>${st.className}</td>
                     <td>${st.date}</td>
-                    <td class="text-center fw-bold text-success">${st.score}</td>
+                    <td class="text-center fw-bold text-success">${st.score} / ${selectedExam.total_questions || 0}</td>
                     <td class="text-center">${st.timeElapsed}</td>
-                    <td class="text-center"><span class="status-badge status-completed"><i class="fas fa-check-circle me-1"></i>${st.status}</span></td>
+                    <td class="text-center"><button class="btn btn-sm btn-success text-white fw-bold" style="font-size: 10px; padding: 2px 8px; border-radius: 12px;">Completed</button></td>
                     <td class="text-center">
-                        <button class="btn-sv-blue" onclick="alert('Student Result Details breakdown coming soon')"><i class="fas fa-list me-1"></i> Result Details</button>
+                        
+<div class="d-flex justify-content-center gap-1">
+    <button class="btn btn-sm btn-outline-success" style="font-size: 10px; padding: 2px 6px;" onclick="alert('Result Details')">Result Details</button>
+    <button class="btn btn-sm btn-outline-primary" style="font-size: 10px; padding: 2px 6px;" onclick="alert('Exporting')">Export</button>
+</div>
+
                     </td>
                 </tr>
             `).join('');
