@@ -274,26 +274,9 @@
                 <div class="panel">
                     <div class="panel-header"><i class="fas fa-birthday-cake"></i> Upcoming Birthdays</div>
                     <div class="panel-body p-0">
-                        <div class="px-3 py-2 text-muted" style="font-size: 0.75rem; font-style: italic; border-bottom: 1px solid #eee;">Upcoming birthdays for this month</div>
-                        
-                        <div class="list-item px-3">
-                            <div class="list-icon bg-danger"><i class="fas fa-birthday-cake"></i></div>
-                            <div class="flex-grow-1">
-                                <div class="fw-bold" style="font-size: 0.75rem;">JOHN SAM - <span class="text-muted">Student</span></div>
-                            </div>
-                            <div class="text-muted" style="font-size: 0.65rem;">Birthday is on Fri Sep 18, 2026</div>
-                        </div>
-
-                        <div class="list-item px-3">
-                            <div class="list-icon bg-danger"><i class="fas fa-birthday-cake"></i></div>
-                            <div class="flex-grow-1">
-                                <div class="fw-bold" style="font-size: 0.75rem;">AMOO PRAISE - <span class="text-muted">Student</span></div>
-                            </div>
-                            <div class="text-muted" style="font-size: 0.65rem;">Birthday is on Mon Sep 21, 2026</div>
-                        </div>
-                        
-                        <div class="p-2">
-                            <button class="btn btn-success w-100 btn-sm fw-bold">Load More</button>
+                        <div class="px-3 py-2 text-muted" style="font-size: 0.75rem; font-style: italic; border-bottom: 1px solid #eee;">Upcoming birthdays across the school</div>
+                        <div id="birthdaysList">
+                            <div class="p-3 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i> Loading...</div>
                         </div>
                     </div>
                 </div>
@@ -550,7 +533,66 @@
         document.addEventListener('DOMContentLoaded', () => {
             initializeDashboard();
             loadPosts();
+            loadUpcomingBirthdays();
         });
+
+        async function loadUpcomingBirthdays() {
+            const container = document.getElementById('birthdaysList');
+            if (!container) return; // Wait, I already replaced the HTML above... let's just make sure it's in the DOM.
+            container.innerHTML = '<div class="p-3 text-center text-muted small"><i class="fas fa-spinner fa-spin me-2"></i> Loading...</div>';
+            try {
+                const { data: students, error } = await supabase
+                    .from('students')
+                    .select('first_name, surname, dob')
+                    .not('dob', 'is', null);
+                    
+                if (error) throw error;
+                
+                if (!students || students.length === 0) {
+                    container.innerHTML = '<div class="p-3 text-center text-muted small">No birthdays found.</div>';
+                    return;
+                }
+                
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                
+                const upcoming = students.map(st => {
+                    const bday = new Date(st.dob);
+                    let nextBday = new Date(today.getFullYear(), bday.getMonth(), bday.getDate());
+                    if (nextBday < today) nextBday.setFullYear(today.getFullYear() + 1);
+                    return {
+                        name: `${st.surname} ${st.first_name}`.toUpperCase(),
+                        nextBday: nextBday,
+                        timeDiff: nextBday.getTime() - today.getTime()
+                    };
+                });
+                
+                upcoming.sort((a, b) => a.timeDiff - b.timeDiff);
+                const top5 = upcoming.slice(0, 5);
+                
+                if (top5.length === 0) {
+                    container.innerHTML = '<div class="p-3 text-center text-muted small">No upcoming birthdays.</div>';
+                    return;
+                }
+                
+                container.innerHTML = top5.map(st => {
+                    const dateStr = st.nextBday.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+                    return `
+                        <div class="list-item px-3 py-2 border-bottom">
+                            <div class="list-icon bg-danger me-2"><i class="fas fa-birthday-cake"></i></div>
+                            <div class="flex-grow-1">
+                                <div class="fw-bold" style="font-size: 0.75rem;">${st.name} - <span class="text-muted fw-normal">Student</span></div>
+                                <div class="text-muted" style="font-size: 0.65rem;">Birthday is on ${dateStr}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = '<div class="p-3 text-center text-danger small">Error loading birthdays.</div>';
+            }
+        }
     </script>
 </body>
 </html>
