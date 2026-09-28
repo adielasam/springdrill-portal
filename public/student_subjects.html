@@ -224,7 +224,9 @@
                 document.getElementById('studentClassDisplay').innerText = `Class: ${student.classes.name}`;
                 const classId = student.class_id;
 
-                const { data: subjects } = await supabase.from('subjects').select('*').order('name');
+                const { data: enrollments } = await supabase.from('student_subjects').select('subject_id, subjects(*)').eq('student_id', currentUserId).eq('status', 'approved');
+                const subjects = enrollments ? enrollments.map(e => e.subjects).filter(s => s) : [];
+                subjects.sort((a, b) => a.name.localeCompare(b.name));
                 const { data: schemes } = await supabase.from('schemes_of_work').select('*').eq('class_id', classId);
                 const { data: notes } = await supabase.from('lesson_notes').select('*').eq('class_id', classId);
 
