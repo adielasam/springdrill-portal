@@ -318,14 +318,47 @@
             const tbody = document.getElementById('studentResultsBody');
             tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i> Loading results...</td></tr>';
 
-            const { data: results, error: resErr } = await supabase
+            const { data: rawResults, error: resErr } = await supabase
                 .from('test_results')
-                .select('*, students(first_name, surname, classes(name))')
+                .select('*')
                 .eq('test_id', examId);
 
             if (resErr) {
                 tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-danger">${resErr.message}</td></tr>`;
                 return;
+            }
+            
+            let results = rawResults || [];
+            
+            if (results.length > 0) {
+                const studentIds = results.map(r => r.student_id);
+                const { data: studentRecords } = await supabase
+                    .from('students')
+                    .select('user_id, first_name, surname, classes(name)')
+                    .in('user_id', studentIds);
+                    
+                const { data: userRecords } = await supabase
+                    .from('users')
+                    .select('id, name')
+                    .in('id', studentIds);
+                    
+                results = results.map(r => {
+                    const sRecord = studentRecords?.find(s => s.user_id === r.student_id);
+                    const uRecord = userRecords?.find(u => u.id === r.student_id);
+                    
+                    let name = 'Unknown Student';
+                    if (sRecord && sRecord.surname) name = `${sRecord.surname} ${sRecord.first_name}`.trim();
+                    else if (uRecord) name = uRecord.name;
+                    
+                    return {
+                        ...r,
+                        students: {
+                            first_name: sRecord?.first_name || '',
+                            surname: sRecord?.surname || uRecord?.name || 'Unknown',
+                            classes: sRecord?.classes || null
+                        }
+                    };
+                });
             }
 
             if (!results || results.length === 0) {
