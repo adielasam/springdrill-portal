@@ -85,35 +85,30 @@
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
     
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-brand"><h4 class="fw-bold m-0"><i class="fas fa-layer-group text-success me-2"></i> Admin Panel</h4></div>
+        <div class="sidebar-brand">
+            <img src="dorvas-logo.png" alt="Dorvas" style="max-height: 50px;" />
+        </div>
+        
         <nav class="nav flex-column">
             <div class="sidebar-heading">Overview</div>
-            <a href="admin_dashboard" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="admin_dashboard" class="nav-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
             
             <div class="sidebar-heading">Academics</div>
-            <a href="class_list" class="nav-link"><i class="fas fa-chalkboard"></i> Classes & Students</a>
-            <a href="admin_attendance" class="nav-link"><i class="fas fa-calendar-check"></i> Attendance Log</a>
-            <a href="admin_league_table" class="nav-link"><i class="fas fa-trophy"></i> League Table</a>
-
-            <div class="sidebar-heading">Management</div>
-            <a href="admin_admissions" class="nav-link"><i class="fas fa-user-graduate"></i> Admissions</a>
-            <a href="admin_fees" class="nav-link"><i class="fas fa-money-bill-wave"></i> Fees</a>
-            <a href="admin_payments" class="nav-link active"><i class="fas fa-credit-card"></i> Payments</a>
-            <a href="admin_invoices" class="nav-link"><i class="fas fa-file-invoice"></i> Invoices</a>
-            <a href="#" onclick="alert('Academic Calendar Coming Soon!')" class="nav-link"><i class="fas fa-calendar-alt"></i> Calendar</a>
-            <a href="#" onclick="alert('Academic Session Coming Soon!')" class="nav-link"><i class="fas fa-calendar-check"></i> Academic session</a>
-
-            <div class="sidebar-heading">Administration</div>
-            <a href="admin_create_user" class="nav-link"><i class="fas fa-user-plus"></i> Generate Account</a>
-            <a href="manage_users" class="nav-link"><i class="fas fa-user-check"></i> Approvals</a>
-            <a href="admin_messages" class="nav-link"><i class="fas fa-envelope"></i> Internal Mail</a>
-            
-            <div class="sidebar-heading">System</div>
-            <a href="admin_announcements" class="nav-link"><i class="fas fa-bullhorn"></i> Announcements</a>
-            <a href="#" onclick="alert('System Settings Coming Soon!')" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
-            <div class="mt-4 mb-4"></div>
-        </nav>
-    </div>
+            <a class="nav-link" data-bs-toggle="collapse" href="#subjectsMenu" role="button" aria-expanded="false" aria-controls="subjectsMenu">
+                <i data-lucide="book-open"></i> Subjects
+                <i class="fas fa-chevron-down ms-auto" style="font-size: 10px;"></i>
+            </a>
+            <div class="collapse" id="subjectsMenu">
+                <nav class="nav flex-column ms-4 mb-2" style="border-left: 2px solid var(--brand-100);">
+                    <a href="admin_subjects.html#subjectsTab" class="nav-link py-1" style="font-size: 13px;">Create Subjects</a>
+                    <a href="admin_subjects.html#subjectsTab" class="nav-link py-1" style="font-size: 13px;">Manage Subjects</a>
+                    <a href="admin_subjects.html#classesTab" class="nav-link py-1" style="font-size: 13px;">Assign to Classes</a>
+                    <a href="admin_subjects.html#creditsTab" class="nav-link py-1" style="font-size: 13px;">Manage Credit Units</a>
+                    <a href="admin_subjects.html#categoriesTab" class="nav-link py-1" style="font-size: 13px;">Manage Subject Categories</a>
+                    <a href="admin_subjects.html#teachersTab" class="nav-link py-1" style="font-size: 13px;">Assign to Teachers</a>
+                    <a href="admin_subjects.html#headsTab" class="nav-link py-1" style="font-size: 13px;">Assign to Subject Heads</a>
+                </nav>
+            </div>
 
     <div class="main-content">
         <div class="top-navbar">
