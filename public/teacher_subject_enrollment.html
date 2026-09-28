@@ -294,7 +294,7 @@
                         return;
                     }
                     subSelect.disabled = false;
-                    subjects.filter(s => s.class_id === cid).forEach(sub => {
+                    subjects.filter(s => String(s.class_id) === String(cid)).forEach(sub => {
                         subSelect.innerHTML += `<option value="${sub.id}">${sub.name}</option>`;
                     });
                 });
