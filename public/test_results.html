@@ -252,7 +252,7 @@
             const tbody = document.getElementById('examListBody');
             tbody.innerHTML = '<div class="p-4 text-center"><i class="fas fa-spinner fa-spin me-2"></i> Loading exams...</div>';
 
-            let query = supabase.from('cbt_exams').select('*, subjects(name), classes(name)').order('created_at', { ascending: false });
+            let query = supabase.from('tests').select('*, subjects(name), classes(name)').order('created_at', { ascending: false });
             if (classId) query = query.eq('class_id', classId);
             if (subjectId) query = query.eq('subject_id', subjectId);
 
@@ -271,7 +271,7 @@
 
             tbody.innerHTML = allExams.map((exam, i) => {
                 // Determine duration
-                const duration = exam.duration_minutes || 0;
+                const duration = exam.duration_minutes || exam.duration || 30;
                 
                 return `
                     <div class="test-list-item">
@@ -291,7 +291,7 @@
                         </div>
                         <div class="text-end" style="font-size: 11px;">
                             <div class="fw-bold text-muted mb-1">Start Date - End Date</div>
-                            <div>${new Date(exam.start_time).toLocaleString([], {dateStyle:'medium', timeStyle:'short'})}</div>
+                            <div>${new Date(exam.start_date || exam.created_at).toLocaleString([], {dateStyle:'medium', timeStyle:'short'})}</div>
                         </div>
                     </div>
                 `;
@@ -308,9 +308,9 @@
             // Populate Grid
             document.getElementById('detTitle').innerText = selectedExam.title;
             document.getElementById('detSubject').innerText = selectedExam.subjects?.name || 'N/A';
-            document.getElementById('detDuration').innerText = selectedExam.duration_minutes || '0';
-            document.getElementById('detStart').innerText = new Date(selectedExam.start_time).toLocaleString();
-            document.getElementById('detEnd').innerText = new Date(selectedExam.end_time).toLocaleString();
+            document.getElementById('detDuration').innerText = selectedExam.duration_minutes || selectedExam.duration || '30';
+            document.getElementById('detStart').innerText = new Date(selectedExam.start_date || selectedExam.created_at).toLocaleString();
+            document.getElementById('detEnd').innerText = new Date(selectedExam.end_date || selectedExam.created_at).toLocaleString();
             document.getElementById('detTotalQ').innerText = selectedExam.total_questions || '0';
             document.getElementById('chartTitle').innerText = `${selectedExam.title} PERFORMANCE ANALYSIS (SCORES VS TIME TAKEN)`;
 
@@ -338,7 +338,7 @@
                 // Calculate time elapsed (Mocked if not in DB, assume they took (score / total) * duration for visualization if time elapsed missing)
                 // In reality, SpringDrill test_results doesn't currently store time_elapsed natively.
                 // We will create a fake time based on creation time or just random within duration for the chart to look good.
-                const timeTakenMin = Math.max(1, Math.min(selectedExam.duration_minutes || 20, Math.round(r.score * 1.5))); 
+                const timeTakenMin = Math.max(1, Math.min(selectedExam.duration_minutes || selectedExam.duration || 20, Math.round(r.score * 1.5))); 
                 return {
                     id: r.student_id,
                     name: `${r.students?.surname || ''} ${r.students?.first_name || ''}`.trim() || 'Unknown Student',
@@ -424,7 +424,7 @@
                             position: 'right',
                             title: { display: true, text: 'Time Taken (min)' },
                             grid: { drawOnChartArea: false },
-                            suggestedMax: selectedExam.duration_minutes || 30
+                            suggestedMax: selectedExam.duration_minutes || selectedExam.duration || 30
                         }
                     },
                     plugins: {
