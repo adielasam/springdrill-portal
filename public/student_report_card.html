@@ -1,15 +1,21 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRINGDRILL - Student Dashboard</title>
+    <title>My Term Reports - SpringDrill</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        :root { --bg-color: #f4f7fa; --card-bg: #ffffff; --text-color: #333333; --text-muted: #6c757d; --border-color: #e9ecef; --input-bg: #f8f9fa; --utme-green: #007a4d;}
-        body.dark-mode { --bg-color: #121212; --card-bg: #1e1e1e; --text-color: #e0e0e0; --text-muted: #a0a0a0; --border-color: #333333; --input-bg: #2c2c2c; }
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --border-color: #e2e8f0;
+        }
+
+        body { background-color: var(--bg-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; }
         
         .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.1);}
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
@@ -17,67 +23,9 @@
         .nav-link i { width: 25px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
 
-        .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        .main-content { margin-left: 260px; padding: 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
         
-        .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; }
-        .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
-
-        .welcome-banner { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; border-radius: 10px; padding: 30px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);}
-        .welcome-banner h2 { font-weight: 800; margin-bottom: 5px;}
-        .welcome-banner p { margin: 0; opacity: 0.9; font-size: 1.1rem;}
-        .welcome-icon { font-size: 5rem; opacity: 0.3; }
-
-        .section-title { font-weight: 800; font-size: 1.2rem; margin-bottom: 20px; color: var(--text-color); }
-
-        .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 40px; }
-        
-        .action-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 30px 20px; text-align: center; text-decoration: none; color: var(--text-color); transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 180px; position: relative;}
-        .action-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); color: inherit; }
-        
-        .action-card i { font-size: 2.5rem; margin-bottom: 15px; }
-        .action-card h5 { font-weight: 700; margin-bottom: 10px; color: var(--text-color);}
-        .action-card p { font-size: 0.9rem; color: var(--text-muted); margin: 0;}
-
-        /* The original Green Border for Simulator */
-        .card-ai-sim { border: 2px solid #2ecc71; background: rgba(46, 204, 113, 0.02); }
-        .card-ai-sim i { color: #2ecc71; }
-        .card-ai-sim h5 { color: #27ae60; }
-
-        /* Icon Colors */
-        .card-cbt i { color: #3498db; }
-        .card-notes i { color: #2980b9; }
-        .card-class i { color: #e74c3c; }
-        .card-results i { color: #f1c40f; }
-        .card-msg i { color: #95a5a6; }
-        .card-real-hub i { color: #9b59b6; }
-
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
-
-        @media (max-width: 992px) {
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.mobile-open { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 15px; }
-            .mobile-menu-toggle { display: inline-block !important; }
-            .welcome-icon { display: none; }
-        }
-        .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
-        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
-    </style>
-</head>
-<body>
-<style>
-        body { background-color: #f4f7fa; overflow-x: hidden; }
-        
-        /* Sidebar Styling (Hidden in Print) */
-        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding-top: 30px; z-index: 1000; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
-        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-brand i { color: #3498db; font-size: 2.5rem; margin-bottom: 10px; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 15px 25px; margin: 4px 15px; border-radius: 8px; text-decoration: none; display: flex; align-items: center; }
-        .nav-link i { width: 25px; }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; }
-
-        .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
-        .controls-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; border-left: 5px solid #0d6efd; }
+        .controls-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; border-left: 5px solid #004d34; display: flex; gap: 15px; align-items:flex-end;}
 
         /* A4 Report Card Styling */
         .report-card-container {
@@ -91,7 +39,6 @@
             position: relative;
         }
         
-        /* Report Card Elements */
         .rc-header { text-align: center; border-bottom: 4px double #1a3c34; padding-bottom: 20px; margin-bottom: 30px; }
         .rc-logo { font-size: 4rem; color: #1a3c34; margin-bottom: 10px; }
         .rc-school-name { font-size: 28px; font-weight: 900; color: #1a3c34; text-transform: uppercase; letter-spacing: 2px; margin: 0; }
@@ -102,14 +49,13 @@
         
         .rc-table th { background-color: #f4f7fa !important; color: #1a3c34; border-bottom: 2px solid #1a3c34; }
         .rc-table td { font-weight: bold; }
-        
-        .rc-footer { margin-top: 50px; display: flex; justify-content: space-between; }
-        .rc-signature { width: 250px; border-top: 2px solid #1a3c34; text-align: center; padding-top: 10px; font-weight: bold; }
 
-        /* Print Media Query */
+        .rc-footer { display: flex; justify-content: space-between; margin-top: 50px; }
+        .rc-signature { text-align: center; width: 250px; border-top: 2px solid #333; padding-top: 10px; font-weight: bold; }
+
         @media print {
             body { background: white; margin: 0; padding: 0; }
-            .sidebar, .controls-card { display: none !important; }
+            .sidebar, .controls-card, .mobile-menu-toggle, .sidebar-overlay { display: none !important; }
             .main-content { margin: 0; padding: 0; }
             .report-card-container { width: 100%; box-shadow: none; border-radius: 0; padding: 0; margin: 0; min-height: auto; }
             .rc-table th { background-color: #f4f7fa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -118,25 +64,22 @@
         }
 
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-    
-    /* Reset some report card styles so they don't break the dashboard layout */
-    body { background-color: var(--bg-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    .main-content { margin-left: 260px; padding: 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
-    
-    @media print {
-        .sidebar, .sidebar-overlay, .mobile-menu-toggle { display: none !important; }
-        .main-content { margin-left: 0 !important; padding: 0 !important; }
-    }
-    @media (max-width: 992px) {
-        .sidebar { transform: translateX(-100%); }
-        .sidebar.mobile-open { transform: translateX(0); }
-        .main-content { margin-left: 0; padding: 15px; }
-        .mobile-menu-toggle { display: inline-block !important; }
-    }
-    .mobile-menu-toggle { display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer; margin-right: 15px; margin-bottom: 20px;}
-    .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
-</style>
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .mobile-menu-toggle { display: inline-block !important; }
+            .report-card-container { width: 100%; padding: 10px; }
+            .rc-student-info { flex-direction: column-reverse; gap: 15px; }
+        }
+        .mobile-menu-toggle { display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer; margin-right: 15px; margin-bottom: 20px;}
+        .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
@@ -145,103 +88,90 @@
         </div>
         
         <nav class="nav flex-column mt-3">
-            <a href="student_dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
-            <a href="student_subjects.html" class="nav-link"><i class="fas fa-book"></i> My Subjects & Notes</a>
-            <a href="student_eclassroom.html" class="nav-link"><i class="fas fa-video text-danger"></i> Live eClassroom</a>
-            <a href="student_cbt.html" class="nav-link"><i class="fas fa-laptop-code text-info"></i> Take CBT Exam</a>
-            
-            <a href="student_utme.html" class="nav-link"><i class="fas fa-university text-success"></i> UTME Simulator</a>
-            
-            <a href="student_results.html" class="nav-link"><i class="fas fa-chart-line text-warning"></i> My Results</a>
-            <a href="student_report_card.html" class="nav-link active"><i class="fas fa-file-pdf text-danger"></i> Term Reports</a>
-            <a href="student_messages.html" class="nav-link"><i class="fas fa-envelope"></i> Messages</a>
-
+            <a href="student_dashboard" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="student_subjects" class="nav-link"><i class="fas fa-book"></i> My Subjects & Notes</a>
+            <a href="student_eclassroom" class="nav-link"><i class="fas fa-video text-danger"></i> Live eClassroom</a>
+            <a href="student_cbt" class="nav-link"><i class="fas fa-laptop-code text-info"></i> Take CBT Exam</a>
+            <a href="student_utme" class="nav-link"><i class="fas fa-university text-success"></i> UTME Simulator</a>
+            <a href="student_results" class="nav-link"><i class="fas fa-chart-line text-warning"></i> My Results</a>
+            <a href="student_report_card" class="nav-link active"><i class="fas fa-file-pdf text-danger"></i> Term Reports</a>
+            <a href="student_messages" class="nav-link"><i class="fas fa-envelope"></i> Messages</a>
             <hr class="mx-3 my-2 border-secondary">
-            <a href="student_utme_hub.html" class="nav-link fw-bold text-warning"><i class="fas fa-rocket"></i> Real UTME Hub (New)</a>
-
+            <a href="student_utme_hub" class="nav-link fw-bold text-warning"><i class="fas fa-rocket"></i> Real UTME Hub (New)</a>
             <hr class="mx-3 my-4 border-secondary">
             <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Secure Logout</a>
         </nav>
     </div>
-<div class="main-content">
-    <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-
-
-    <div id="loadingOverlay">
-        <i class="fas fa-spinner fa-spin fa-3x text-primary mb-3"></i>
-        <h4>Loading Report Engine...</h4>
-    </div>
-
-    <div class="sidebar">
-        <div class="sidebar-brand">
-            <i class="fas fa-chalkboard-teacher"></i>
-            <h4 class="text-white fw-bold mb-0">STAFF PORTAL</h4>
-        </div>
-        <nav class="nav flex-column mt-4">
-            <a href="teacher_dashboard" class="nav-link"><i class="fas fa-home me-2"></i> Dashboard Home</a>
-            <a href="report_scores" class="nav-link"><i class="fas fa-th me-2"></i> Gradebook Heatmap</a>
-            <a href="report_card" class="nav-link active"><i class="fas fa-print me-2"></i> Print Report Cards</a>
-            <hr class="mx-3 my-4 border-secondary">
-            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-sign-out-alt me-2"></i> Secure Logout</a>
-        </nav>
-    </div>
 
     <div class="main-content">
-        
+        <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+        <div id="loadingOverlay">
+            <i class="fas fa-spinner fa-spin fa-3x text-primary mb-3"></i>
+            <h4>Loading your profile...</h4>
+        </div>
+
+        <h3 class="fw-bold mb-4" style="color: var(--text-color);"><i class="fas fa-file-pdf text-danger me-2"></i> Official Term Reports</h3>
+
         <div class="controls-card">
-            <div class="row align-items-end">
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">1. Select Class</label>
-                    <select id="classSelect" class="form-select">
-                        <option value="">Loading classes...</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">2. Select Student</label>
-                    <select id="studentSelect" class="form-select" disabled>
-                        <option value="">Select a class first...</option>
-                    </select>
-                </div>
-                <div class="col-md-4 text-end">
-                    <button class="btn btn-primary fw-bold px-4" onclick="window.print()" id="printBtn" disabled>
-                        <i class="fas fa-print me-2"></i> Print Document
-                    </button>
-                </div>
+            <div style="flex: 1;">
+                <label class="form-label fw-bold text-muted small text-uppercase">Academic Term</label>
+                <select id="termSelect" class="form-select border-success">
+                    <option value="1">First Term</option>
+                    <option value="2">Second Term</option>
+                    <option value="3">Third Term</option>
+                </select>
+            </div>
+            <div style="flex: 1;">
+                <label class="form-label fw-bold text-muted small text-uppercase">Assessment Type</label>
+                <select id="subTermSelect" class="form-select border-success">
+                    <option value="mid_term">Mid Term</option>
+                    <option value="end_term">End of Term</option>
+                </select>
+            </div>
+            <div>
+                <button class="btn btn-success fw-bold px-4" id="viewReportBtn"><i class="fas fa-search me-2"></i> View Report</button>
+                <button class="btn btn-outline-secondary fw-bold px-4 ms-2" onclick="window.print()" id="printBtn" disabled><i class="fas fa-print me-2"></i> Print</button>
             </div>
         </div>
 
-        <div class="report-card-container" id="reportDocument" style="display: none;">
+        <!-- The Report Card Document -->
+        <div id="reportDocument" class="report-card-container" style="display: none;">
             
             <div class="rc-header">
                 <i class="fas fa-graduation-cap rc-logo"></i>
-                <h1 class="rc-school-name">SPRINGDRILL ACADEMY</h1>
-                <p class="mb-1 text-muted fw-bold">Excellence in Education & Character</p>
-                <div class="rc-title">OFFICIAL STUDENT REPORT CARD</div>
+                <h1 class="rc-school-name">SpringDrill Academy</h1>
+                <p class="mb-0 text-muted fw-bold">Excellence in Knowledge and Character</p>
+                <div class="rc-title" id="rcDocumentTitle">STUDENT ACADEMIC REPORT</div>
             </div>
 
             <div class="rc-student-info">
                 <div>
-                    <h4 class="fw-bold mb-3 text-dark text-uppercase" id="rcStudentName">STUDENT NAME</h4>
-                    <p class="mb-1"><strong>Admission No:</strong> <span id="rcRegNo">--</span></p>
-                    <p class="mb-1"><strong>Class Assigned:</strong> <span id="rcClass">--</span></p>
-                    <p class="mb-0"><strong>Current Session:</strong> 2024/2025</p>
+                    <table class="table table-borderless table-sm mb-0">
+                        <tr><td class="text-muted text-end">Student Name:</td><td class="fw-bold fs-5 text-uppercase" id="rcStudentName">--</td></tr>
+                        <tr><td class="text-muted text-end">Reg Number:</td><td class="fw-bold" id="rcRegNo">--</td></tr>
+                        <tr><td class="text-muted text-end">Class:</td><td class="fw-bold" id="rcClass">--</td></tr>
+                    </table>
                 </div>
                 <div>
-                    <img id="rcPassport" src="https://via.placeholder.com/150?text=No+Photo" class="rc-passport" alt="Passport">
+                    <img src="" id="rcPassport" alt="Student Photo" class="rc-passport">
                 </div>
             </div>
 
-            <table class="table table-bordered rc-table mb-5">
+            <table class="table table-bordered rc-table mb-4">
                 <thead>
                     <tr>
-                        <th width="40%">SUBJECT</th>
-                        <th width="20%" class="text-center">SCORE (%)</th>
-                        <th width="20%" class="text-center">GRADE</th>
-                        <th width="20%">REMARKS</th>
+                        <th width="30%">SUBJECT</th>
+                        <th class="text-center" width="10%">CAT 1 (20)</th>
+                        <th class="text-center" width="10%">CAT 2 (20)</th>
+                        <th class="text-center" width="10%">EXAM (60)</th>
+                        <th class="text-center" width="10%">TOTAL (100)</th>
+                        <th class="text-center" width="10%">GRADE</th>
+                        <th class="text-center" width="20%">REMARK</th>
                     </tr>
                 </thead>
                 <tbody id="rcGradesTbody">
-                    </tbody>
+                </tbody>
                 <tfoot>
                     <tr class="table-light border-top border-dark border-2">
                         <td class="fw-bold text-end">OVERALL AVERAGE:</td>
@@ -253,7 +183,7 @@
 
             <div class="alert alert-light border border-dark rounded-0 p-3 mb-5">
                 <h6 class="fw-bold mb-2 text-decoration-underline">Principal's Comment:</h6>
-                <p class="fst-italic mb-0" id="rcComment">An outstanding academic performance. Keep up the excellent work!</p>
+                <p class="fst-italic mb-0" id="rcComment">--</p>
             </div>
 
             <div class="rc-footer">
@@ -269,16 +199,14 @@
 
     </div>
 
-    
-</div>
-<script type="module">
-    window.toggleSidebar = () => {
-        document.getElementById('sidebar').classList.toggle('mobile-open');
-        const overlay = document.getElementById('sidebarOverlay');
-        overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
-    };
-
+    <script type="module">
         import { supabase } from './supabaseClient.js';
+
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+            const overlay = document.getElementById('sidebarOverlay');
+            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+        };
 
         async function initializePage() {
             try {
@@ -295,58 +223,64 @@
 
         document.getElementById('viewReportBtn').addEventListener('click', async () => {
             const studentId = window.currentUser.id;
-            document.getElementById('loadingOverlay').style.display = 'flex';
+            
+            // Show loading state
+            document.getElementById('viewReportBtn').innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Loading...';
+            document.getElementById('viewReportBtn').disabled = true;
 
             try {
-                // 1. Get Student Info & Passport
+                // 1. Get Student Info
                 const { data: studentInfo } = await supabase
                     .from('students')
                     .select('id, passport_url, classes(name), users(name)')
                     .eq('user_id', studentId)
                     .single();
-                const studentData = studentInfo;
                 
                 if (!studentInfo) {
                     alert("Student profile not found.");
-                    document.getElementById('loadingOverlay').style.display = 'none';
                     return;
                 }
 
-                document.getElementById('rcStudentName').innerText = studentInfo.users.name;
+                document.getElementById('rcStudentName').innerText = studentInfo.users?.name || 'Unknown';
                 document.getElementById('rcClass').innerText = studentInfo.classes?.name || 'N/A';
                 document.getElementById('rcRegNo').innerText = "SD-" + studentId.substring(0, 8).toUpperCase();
                 
                 if (studentInfo.passport_url) {
                     document.getElementById('rcPassport').src = studentInfo.passport_url;
                 } else {
-                    document.getElementById('rcPassport').src = "https://via.placeholder.com/150?text=No+Photo";
+                    document.getElementById('rcPassport').src = "https://ui-avatars.com/api/?name=" + encodeURIComponent(studentInfo.users?.name || 'Student') + "&size=150&background=1a3c34&color=fff";
                 }
 
-                // 2. Get Grades from term_results
+                // 2. Get Published Grades
                 const termId = document.getElementById('termSelect').value;
                 const subTermId = document.getElementById('subTermSelect').value;
 
-                const { data: results } = await supabase
+                document.getElementById('rcDocumentTitle').innerText = `${termId.toUpperCase()} TERM - ${subTermId.replace('_', ' ').toUpperCase()} REPORT`;
+
+                const { data: results, error } = await supabase
                     .from('term_results')
                     .select('first_cat, second_cat, exam, status, subjects(name)')
-                    .eq('student_id', studentData.id)
+                    .eq('student_id', studentInfo.id)
                     .eq('term', termId)
                     .eq('sub_term', subTermId)
                     .eq('status', 'published');
 
                 const tbody = document.getElementById('rcGradesTbody');
                 
+                if (error) throw error;
+
                 if (!results || results.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">No published report card found for this term. It may not be released yet.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger fw-bold py-5"><i class="fas fa-lock fs-2 mb-2 d-block"></i>No published report card found for this term.<br><small class="fw-normal">It may not be released yet by the Admin.</small></td></tr>`;
                     document.getElementById('rcTotalAvg').innerText = '0%';
                     document.getElementById('rcComment').innerText = "-";
+                    document.getElementById('printBtn').disabled = true;
                 } else {
                     let totalSum = 0;
                     let subCount = 0;
                     let rowsHtml = '';
 
                     results.forEach(r => {
-                        const subj = r.subjects ? r.subjects.name : 'Unknown';
+                        const subj = r.subjects ? r.subjects.name : 'Unknown Subject';
                         const cat1 = Number(r.first_cat) || 0;
                         const cat2 = Number(r.second_cat) || 0;
                         const exam = Number(r.exam) || 0;
@@ -376,7 +310,7 @@
                     });
 
                     tbody.innerHTML = rowsHtml;
-                    const finalAvg = (totalSum / subCount).toFixed(1);
+                    const finalAvg = subCount > 0 ? (totalSum / subCount).toFixed(1) : 0;
                     document.getElementById('rcTotalAvg').innerText = finalAvg + '%';
 
                     // Dynamic Comment
@@ -386,17 +320,18 @@
                     else if (finalAvg >= 50) finalComment = "An average performance. More effort is needed next session.";
                     
                     document.getElementById('rcComment').innerText = finalComment;
+                    document.getElementById('printBtn').disabled = false;
                 }
 
-                // Show Document and Enable Print
+                // Show Document
                 document.getElementById('reportDocument').style.display = 'block';
-                document.getElementById('printBtn').disabled = false;
-                document.getElementById('loadingOverlay').style.display = 'none';
 
             } catch (err) {
                 console.error(err);
                 alert("Error generating report card.");
-                document.getElementById('loadingOverlay').style.display = 'none';
+            } finally {
+                document.getElementById('viewReportBtn').innerHTML = '<i class="fas fa-search me-2"></i> View Report';
+                document.getElementById('viewReportBtn').disabled = false;
             }
         });
 
@@ -405,7 +340,6 @@
             await supabase.auth.signOut();
             window.location.href = '/';
         });
-    
-</script>
+    </script>
 </body>
 </html>
