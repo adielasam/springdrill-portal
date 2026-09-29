@@ -234,8 +234,12 @@
                 }
                 
                 await loadMail();
+            } catch (err) { 
+                console.error("Mail init error:", err); 
+                alert("Error loading messages: " + (err.message || err.toString()));
+            } finally {
                 document.getElementById('loadingOverlay').style.display = 'none';
-            } catch (err) { console.error(err); }
+            }
         }
 
         async function loadMail() {
