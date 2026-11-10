@@ -67,11 +67,11 @@
             .header-profile-section { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         }
     </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
 </head>
 <body>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-    <div class="sidebar" id="sidebar">
+<div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <img src="dorvas-logo.png" alt="Dorvas" style="max-height: 50px;" />
         </div>
@@ -449,5 +449,6 @@
             e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/';
         });
     </script>
+    <script src="mobile_nav.js"></script>
 </body>
 </html>

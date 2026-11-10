@@ -33,10 +33,11 @@
         .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
         @media (max-width: 992px) { .sidebar { left: -260px; } .sidebar.mobile-open { left: 0; } .main-content { margin-left: 0; padding: 20px; } .mobile-menu-toggle { display: inline-block !important; } }
     </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
 </head>
 <body>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-    <div class="sidebar" id="sidebar">
+<div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <img src="dorvas-logo.png" alt="Dorvas" style="max-height: 50px;" />
         </div>
@@ -120,5 +121,6 @@
         };
         if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') { document.body.classList.add('dark-mode'); document.getElementById('themeIcon').className = 'fas fa-sun text-warning'; }
     </script>
+    <script src="mobile_nav.js"></script>
 </body>
 </html>

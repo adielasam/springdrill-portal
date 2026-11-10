@@ -46,10 +46,12 @@
         .listbox-item:hover { background: #f0f7f4; }
         .listbox-item.selected { background: var(--primary-color); color: white; }
     </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
 </head>
 <body>
 
-    <div class="sidebar" id="sidebar">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <img src="dorvas-logo.png" alt="Dorvas" style="max-height: 50px;" />
         </div>
@@ -77,6 +79,7 @@
 
     <div class="main-content">
         <div class="topbar">
+            <button class="mobile-menu-toggle me-2" onclick="toggleSidebar()" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
             <div class="fw-bold fs-5 text-muted">Academic Setup</div>
             <div><i class="fas fa-user-circle fs-3 text-muted"></i></div>
         </div>
@@ -953,5 +956,6 @@
         }
 
     </script>
+    <script src="mobile_nav.js"></script>
 </body>
 </html>

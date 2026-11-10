@@ -49,12 +49,12 @@
             .top-navbar { padding: 10px 15px; }
         }
     </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
 </head>
 <body>
 
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-    <div class="sidebar" id="sidebar">
+<div class="sidebar" id="sidebar">
         <div class="sidebar-brand d-flex justify-content-between align-items-center px-3">
             <h5 class="text-white fw-bold m-0"><img src="dorvas-logo.png" alt="Dorvas" style="max-height: 40px; margin-right: 10px;" /></h5>
             <button class="btn btn-sm btn-link text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
@@ -197,5 +197,6 @@
         document.addEventListener('DOMContentLoaded', init);
         document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/'; });
     </script>
+    <script src="mobile_nav.js"></script>
 </body>
 </html>

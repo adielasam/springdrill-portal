@@ -52,10 +52,12 @@
             .profile-area { border-right: none; border-bottom: 1px solid var(--border-color); padding-bottom: 30px; margin-bottom: 30px;}
         }
     </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
 </head>
 <body>
 
-    <div class="sidebar" id="sidebar">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <h5 class="text-white fw-bold m-0"><img src="dorvas-logo.png" alt="Dorvas" style="max-height: 40px; margin-right: 10px;" /></h5>
         </div>
@@ -73,6 +75,9 @@
     </div>
 
     <div class="main-content">
+        <div class="d-flex align-items-center mb-3 d-lg-none">
+            <button class="mobile-menu-toggle me-2" onclick="toggleSidebar()" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
+        </div>
         <div class="setup-card">
             <div class="setup-header">
                 <div><i class="fas fa-rocket me-2"></i> Practice For UTME</div>
@@ -244,5 +249,6 @@
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
+    <script src="mobile_nav.js"></script>
 </body>
 </html>

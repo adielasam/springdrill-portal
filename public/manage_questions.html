@@ -77,6 +77,7 @@
             .test-selector-wrapper { width: 100% !important; margin-top: 10px; }
         }
     </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
 </head>
 <body>
 
@@ -86,8 +87,7 @@
     </div>
 
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-    <div class="sidebar" id="sidebar">
+<div class="sidebar" id="sidebar">
         <div class="sidebar-brand position-relative">
             <button class="btn btn-sm btn-link text-white position-absolute top-0 end-0 d-lg-none mt-2 me-2" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
             <i class="fas fa-graduation-cap"></i>
@@ -526,5 +526,6 @@
             window.location.href = '/';
         });
     </script>
+    <script src="mobile_nav.js"></script>
 </body>
 </html>

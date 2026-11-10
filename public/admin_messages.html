@@ -78,13 +78,13 @@
             .header-profile-section { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         }
     </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
 </head>
 <body>
     <div id="loadingOverlay"><i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i><h4 class="fw-bold" style="color: var(--text-muted);">Loading System...</h4></div>
 
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-    <div class="sidebar" id="sidebar">
+<div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <img src="dorvas-logo.png" alt="Dorvas" style="max-height: 50px;" />
         </div>
@@ -405,5 +405,6 @@
         document.addEventListener('DOMContentLoaded', initMail);
         document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/'; });
     </script>
+    <script src="mobile_nav.js"></script>
 </body>
 </html>

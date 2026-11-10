@@ -86,10 +86,12 @@
             .info-body { grid-template-columns: 1fr; gap: 24px; }
         }
     </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
 </head>
 <body>
 
-    <div class="sidebar" id="sidebar">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <img src="dorvas-logo.png" alt="Dorvas" style="max-height: 50px;" />
         </div>
@@ -101,7 +103,10 @@
 
     <div class="main-content">
         <div class="topbar">
-            <div class="breadcrumb-text">Home > Students > <span>Student Details</span></div>
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle me-2" onclick="toggleSidebar()" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
+                <div class="breadcrumb-text">Home > Students > <span>Student Details</span></div>
+            </div>
         </div>
 
         <div class="details-grid">
@@ -684,5 +689,6 @@
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
+    <script src="mobile_nav.js"></script>
 </body>
 </html>

@@ -83,10 +83,12 @@
             .main-content { margin-left: 0; padding: 20px; }
         }
     </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
 </head>
 <body>
 
-    <!-- SIDEBAR -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <img src="dorvas-logo.png" alt="Dorvas" style="max-height: 50px;" />
@@ -108,7 +110,10 @@
     <!-- MAIN CONTENT -->
     <div class="main-content">
         <div class="topbar">
-            <div class="breadcrumb-text">Home > Students > <span>Manage Active Students</span></div>
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle me-2" onclick="toggleSidebar()" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
+                <div class="breadcrumb-text">Home > Students > <span>Manage Active Students</span></div>
+            </div>
             <div style="display: flex; align-items: center; gap: 16px;">
                 <div class="text-end">
                     <div style="font-size: 13px; font-weight: 600;">Super Admin</div>
@@ -465,5 +470,6 @@
         </div>
     </div>
 
+    <script src="mobile_nav.js"></script>
 </body>
 </html>

@@ -59,12 +59,12 @@
         @media (max-width: 992px) { .sidebar { left: -260px; } .sidebar.mobile-open { left: 0; } .main-content { margin-left: 0; padding: 20px; } .mobile-menu-toggle { display: inline-block !important; } }
         @media print { .sidebar, .top-navbar, .breadcrumb-custom, button { display: none !important; } .main-content { margin: 0; padding: 0; } .dash-widget { box-shadow: none; border: none; } body.dark-mode { background: #fff; color: #000; } body.dark-mode .detail-value, body.dark-mode .detail-label { color: #000; } }
     </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
 </head>
 <body>
     <div id="loadingOverlay"><i class="fas fa-circle-notch fa-spin fa-3x text-success mb-3"></i><h5 class="fw-bold" style="color: var(--text-muted);">Generating Invoices...</h5></div>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-    
-    <div class="sidebar" id="sidebar">
+<div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <img src="dorvas-logo.png" alt="Dorvas" style="max-height: 50px;" />
         </div>
@@ -349,5 +349,6 @@
             await loadInvoices();
         });
     </script>
+    <script src="mobile_nav.js"></script>
 </body>
 </html>

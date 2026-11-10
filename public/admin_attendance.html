@@ -35,6 +35,7 @@
 
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
 </head>
 <body>
 
@@ -43,7 +44,8 @@
         <h4 class="fw-bold" style="color: var(--text-muted);">Syncing Data...</h4>
     </div>
 
-    <div class="sidebar" id="sidebar">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <img src="dorvas-logo.png" alt="Dorvas" style="max-height: 50px;" />
         </div>
@@ -76,6 +78,7 @@
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-4">
+                <button class="mobile-menu-toggle me-2" onclick="toggleSidebar()" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
             <h3 class="fw-bold m-0">Student Attendance Records</h3>
         </div>
 
@@ -250,5 +253,6 @@
         document.addEventListener('DOMContentLoaded', initialize);
         document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/'; });
     </script>
+    <script src="mobile_nav.js"></script>
 </body>
 </html>

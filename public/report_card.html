@@ -60,15 +60,17 @@
 
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
 </head>
 <body>
 
     <div id="loadingOverlay">
         <i class="fas fa-spinner fa-spin fa-3x text-primary mb-3"></i>
-        <h4>Loading Report Engine...</h4>
+ <h4>Loading Report Engine...</h4>
     </div>
 
-    <div class="sidebar">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <i class="fas fa-chalkboard-teacher"></i>
             <h4 class="text-white fw-bold mb-0">STAFF PORTAL</h4>
@@ -83,6 +85,9 @@
     </div>
 
     <div class="main-content">
+        <div class="d-flex align-items-center mb-3 d-lg-none">
+            <button class="mobile-menu-toggle me-2" onclick="toggleSidebar()" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
+        </div>
         
         <div class="controls-card">
             <div class="row align-items-end">
@@ -326,5 +331,6 @@
             window.location.href = '/';
         });
     </script>
+    <script src="mobile_nav.js"></script>
 </body>
 </html>

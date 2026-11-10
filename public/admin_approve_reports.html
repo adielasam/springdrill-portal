@@ -73,6 +73,7 @@
         /* PRELOADER */
         #loadingOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: 0.3s; }
     </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
 </head>
 <body>
     <div id="loadingOverlay">
@@ -80,7 +81,8 @@
         <h5 style="font-weight: 600; color: var(--text-muted); font-size: 16px;">Loading Reports...</h5>
     </div>
 
-    <!-- SIDEBAR -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <img src="dorvas-logo.png" alt="Dorvas" style="max-height: 50px;" />
@@ -162,8 +164,11 @@
     <div class="main-content">
         <!-- TOPBAR -->
         <div class="top-navbar">
-            <div class="breadcrumb">
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle me-2" onclick="toggleSidebar()" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
+                <div class="breadcrumb">
                 SpringDrill / Reports / <span>Approve Reports</span>
+            </div>
             </div>
             
             <div class="dropdown">
@@ -577,5 +582,6 @@
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
+    <script src="mobile_nav.js"></script>
 </body>
 </html>

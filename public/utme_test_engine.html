@@ -65,6 +65,7 @@
             .timer-text { font-size: 1.3rem; }
         }
     </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
 </head>
 <body>
 
@@ -118,7 +119,8 @@
             </div>
         </div>
 
-        <div class="nav-sidebar">
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="nav-sidebar">
             <div class="nav-buttons">
                 <button class="btn-nav" id="btnPrev" onclick="navigate(-1)"><i class="fas fa-arrow-left me-2"></i> Previous</button>
                 <button class="btn-nav" id="btnNext" onclick="navigate(1)">Next <i class="fas fa-arrow-right ms-2"></i></button>
@@ -435,5 +437,6 @@
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
+    <script src="mobile_nav.js"></script>
 </body>
 </html>

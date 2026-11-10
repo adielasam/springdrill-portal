@@ -102,6 +102,7 @@
         .sidebar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.45); }
 
     </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
 </head>
 <body>
 
@@ -111,8 +112,7 @@
     </div>
 
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-            <!-- Sidebar exactly modeling the Spring Valley structure -->
+<!-- Sidebar exactly modeling the Spring Valley structure -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <img src="dorvas-logo.png" alt="Dorvas Logo" style="max-height: 50px; padding: 5px;" />
@@ -462,5 +462,6 @@
             e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/';
         });
     </script>
+    <script src="mobile_nav.js"></script>
 </body>
 </html>

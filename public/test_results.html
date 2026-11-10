@@ -90,6 +90,7 @@
         .sidebar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.45); }
 
     </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
 </head>
 <body>
     <div id="loadingOverlay">
@@ -97,7 +98,8 @@
         <h4>Loading...</h4>
     </div>
 
-            <!-- Sidebar exactly modeling the Spring Valley structure -->
+            <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<!-- Sidebar exactly modeling the Spring Valley structure -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <img src="dorvas-logo.png" alt="Dorvas Logo" style="max-height: 50px; padding: 5px;" />
@@ -167,6 +169,9 @@
     </div>
 
     <div class="main-content">
+        <div class="d-flex align-items-center mb-3 d-lg-none">
+            <button class="mobile-menu-toggle me-2" onclick="toggleSidebar()" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
+        </div>
         <div class="breadcrumb-text">
             Home &nbsp;/&nbsp; Cbt &nbsp;/&nbsp; <strong style="color: #333;">Result Manager</strong>
         </div>
@@ -596,5 +601,6 @@
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
+    <script src="mobile_nav.js"></script>
 </body>
 </html>
