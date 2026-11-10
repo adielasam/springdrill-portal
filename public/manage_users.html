@@ -242,6 +242,11 @@
         
         let currentAdminId = null;
         let profileModal = null;
+        let currentUserEmail = null;
+        // Admin-only page: the Delete button is shown to admins.
+        // deleteUser() itself still refuses to delete a super-admin account.
+        const canDelete = true;
+        const SUPER_ADMIN_EMAILS = ['microsoftportharcourt@gmail.com'];
 
         // === UI TOGGLES ===
         window.toggleSidebar = () => {
@@ -289,16 +294,18 @@
                 // Initialize Bootstrap Modal
                 profileModal = new bootstrap.Modal(document.getElementById('userProfileModal'));
 
-                const { data: allUsers } = await supabase.from('users').select('*').order('created_at', { ascending: false });
-                const { data: students } = await supabase.from('students').select('user_id, approved');
-                const { data: teachers } = await supabase.from('teachers').select('user_id, approved');
+                const { data: allUsers, error: usersError } = await supabase.from('users').select('*').order('created_at', { ascending: false });
+                const { data: students, error: studentsError } = await supabase.from('students').select('user_id, approved');
+                const { data: teachers, error: teachersError } = await supabase.from('teachers').select('user_id, approved');
+                const loadError = usersError || studentsError || teachersError;
+                if (loadError) throw new Error('Could not load the directory: ' + loadError.message);
 
                 const sMap = {}; if (students) students.forEach(s => sMap[s.user_id] = s.approved);
                 const tMap = {}; if (teachers) teachers.forEach(t => tMap[t.user_id] = t.approved);
 
                 let pHtml = '', aHtml = '', aCount = 1;
 
-                allUsers.forEach(u => {
+                (allUsers || []).forEach(u => {
                     let approved = true;
                     if (u.role === 'student' && sMap[u.id] === false) approved = false;
                     if (u.role === 'teacher' && tMap[u.id] === false) approved = false;
@@ -337,9 +344,16 @@
 
                 document.getElementById('pendingListBody').innerHTML = pHtml || `<tr><td colspan="4" class="text-center py-5" style="color: var(--text-muted);"><i class="fas fa-check-circle fa-2x mb-2 text-success opacity-50"></i><br>No pending approvals.</td></tr>`;
                 document.getElementById('activeListBody').innerHTML = aHtml;
+            } catch (err) {
+                console.error(err);
+                document.getElementById('pendingListBody').innerHTML = `<tr><td colspan="4" class="text-center py-5 text-danger"><i class="fas fa-exclamation-triangle fa-2x mb-2"></i><br>Could not load the directory.<br><span class="small">${err.message || err}</span><br><button class="btn btn-sm btn-success fw-bold mt-3" onclick="window.loadUsers()">Retry</button></td></tr>`;
+                document.getElementById('activeListBody').innerHTML = '';
+            } finally {
                 document.getElementById('loadingOverlay').style.display = 'none';
-            } catch (err) { console.error(err); }
+            }
         }
+
+        window.loadUsers = loadUsers;
 
         window.openProfileModal = async function(userId, role, email, name) {
             document.getElementById('editUserId').value = userId;
@@ -461,7 +475,8 @@
 
 
         document.addEventListener('DOMContentLoaded', loadUsers);
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/'; });
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) logoutBtn.addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/'; });
     </script>
     <script src="mobile_nav.js"></script>
 </body>
