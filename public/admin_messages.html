@@ -109,6 +109,8 @@
                     <a href="admin_subjects.html#headsTab" class="nav-link py-1" style="font-size: 13px;">Assign to Subject Heads</a>
                 </nav>
             </div>
+        </nav>
+    </div>
 
     <div class="main-content">
         <div class="top-navbar">
@@ -274,9 +276,15 @@
                 }
                 
                 await loadMail();
+            } catch (err) {
+                console.error(err);
+                document.getElementById('inboxBody').innerHTML = `<tr><td class="text-center py-5 text-danger"><i class="fas fa-exclamation-triangle fa-2x mb-2"></i><br>Could not load mail.<br><span class="small">${err.message || err}</span><br><button class="btn btn-sm btn-success fw-bold mt-3" onclick="window.initMail()">Retry</button></td></tr>`;
+            } finally {
                 document.getElementById('loadingOverlay').style.display = 'none';
-            } catch (err) { console.error(err); }
+            }
         }
+
+        window.initMail = initMail;
 
         async function loadMail() {
             // Fetch literally every message in the database
@@ -290,21 +298,21 @@
                 if (!m.is_read) unread++;
                 return `<tr class="msg-row ${m.is_read?'':'msg-unread'}" onclick="openMsg(${i}, 'inbox')" style="border-bottom: 1px solid var(--border-color);">
                     <td width="20%" class="ps-4">${allUsers[m.sender_id]?.name || 'Unknown'}</td>
-                    <td width="60%"><strong>${m.subject}</strong> <span style="color: var(--text-muted);" class="small">- ${m.body.substring(0,30)}...</span></td>
+                    <td width="60%"><strong>${m.subject}</strong> <span style="color: var(--text-muted);" class="small">- ${(m.body || '').substring(0,30)}...</span></td>
                     <td width="20%" class="text-end pe-4 small" style="color: var(--text-muted);">${new Date(m.created_at).toLocaleDateString()}</td>
                 </tr>`;
             }).join('') : `<tr><td class="text-center py-5" style="color: var(--text-muted);">Inbox is empty.</td></tr>`;
 
             document.getElementById('tabUnread').innerText = unread;
             const navBadge = document.getElementById('navUnread');
-            navBadge.innerText = unread; navBadge.style.display = unread > 0 ? 'inline-block' : 'none';
+            if (navBadge) { navBadge.innerText = unread; navBadge.style.display = unread > 0 ? 'inline-block' : 'none'; }
 
             // 2. Filter for Admin's Sent Mail
             sentMsgs = allMessages.filter(m => m.sender_id === currentId);
             document.getElementById('sentBody').innerHTML = sentMsgs.length ? sentMsgs.map((m, i) => {
                 return `<tr class="msg-row" onclick="openMsg(${i}, 'sent')" style="border-bottom: 1px solid var(--border-color);">
                     <td width="20%" class="ps-4">To: ${allUsers[m.receiver_id]?.name || 'Unknown'}</td>
-                    <td width="60%"><strong>${m.subject}</strong> <span style="color: var(--text-muted);" class="small">- ${m.body.substring(0,30)}...</span></td>
+                    <td width="60%"><strong>${m.subject}</strong> <span style="color: var(--text-muted);" class="small">- ${(m.body || '').substring(0,30)}...</span></td>
                     <td width="20%" class="text-end pe-4 small" style="color: var(--text-muted);">${new Date(m.created_at).toLocaleDateString()}</td>
                 </tr>`;
             }).join('') : `<tr><td class="text-center py-5" style="color: var(--text-muted);">No sent messages.</td></tr>`;
@@ -315,7 +323,7 @@
                 return `<tr style="border-bottom: 1px solid var(--border-color);">
                     <td class="fw-bold ps-3" onclick="openMsg(${i}, 'monitor')" style="cursor:pointer; color: var(--text-color);">${allUsers[m.sender_id]?.name || 'Unknown'}</td>
                     <td onclick="openMsg(${i}, 'monitor')" style="cursor:pointer; color: var(--text-muted);">${allUsers[m.receiver_id]?.name || 'Unknown'}</td>
-                    <td onclick="openMsg(${i}, 'monitor')" style="cursor:pointer;"><strong>${m.subject}</strong> <span style="color: var(--text-muted);" class="small d-block">${m.body.substring(0,35)}...</span></td>
+                    <td onclick="openMsg(${i}, 'monitor')" style="cursor:pointer;"><strong>${m.subject}</strong> <span style="color: var(--text-muted);" class="small d-block">${(m.body || '').substring(0,35)}...</span></td>
                     <td class="text-center small" onclick="openMsg(${i}, 'monitor')" style="cursor:pointer; color: var(--text-muted);">${new Date(m.created_at).toLocaleDateString()}</td>
                     <td class="text-center">
                         <button class="btn btn-sm btn-danger shadow-sm" onclick="deleteAnyMessage('${m.id}')" title="Permanently Delete">
@@ -403,7 +411,8 @@
         });
 
         document.addEventListener('DOMContentLoaded', initMail);
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/'; });
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) logoutBtn.addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/'; });
     </script>
     <script src="mobile_nav.js"></script>
 </body>
