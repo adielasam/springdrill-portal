@@ -15,7 +15,7 @@
             --sidebar-width: 260px;
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; display: flex; height: 100vh; overflow: hidden; }
-        .sidebar { width: var(--sidebar-width); background: var(--primary-color); color: white; height: 100vh; overflow-y: auto; flex-shrink: 0; }
+        .sidebar { width: var(--sidebar-width); background: var(--primary-color); color: white; height: 100vh; overflow-y: auto; flex-shrink: 0; overscroll-behavior: contain; scrollbar-width: thin;}
         .sidebar .logo-area { padding: 15px; background: white; text-align: center; border-bottom: 2px solid var(--secondary-color); }
         .sidebar .logo-area img { max-width: 150px; }
         .sidebar .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; text-decoration: none; display: block; border-left: 4px solid transparent; transition: all 0.3s; }

@@ -672,7 +672,7 @@ function LoginForm() {
                 </div>
 
                 <div style={{marginTop: '18px', fontSize: '0.9rem'}}>
-                  For partnerships and purchases, call <b>08162337303</b>
+                  For partnerships and purchases, call{' '}<b>08162337303</b>
                 </div>
               </div>
             </div>

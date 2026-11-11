@@ -22,7 +22,7 @@
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
         
         /* Sidebar Styling (Matching Spring Valley exactly in structure, but SpringDrill colors) */
-        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; background: var(--springdrill-green); color: white; padding-top: 15px; z-index: 1050; box-shadow: 4px 0 15px rgba(0,0,0,0.1);}
+        .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; background: var(--springdrill-green); color: white; padding-top: 15px; z-index: 1050; box-shadow: 4px 0 15px rgba(0,0,0,0.1); overscroll-behavior: contain; scrollbar-width: thin;}
         .sidebar::-webkit-scrollbar { width: 6px; }
         .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
         
@@ -116,16 +116,15 @@
         }
         .preloader-logo-wrap {
             position: relative;
-            width: 100px; height: 100px;
-            display: flex; align-items: center; justify-content: center;
+            width: auto; height: auto;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
         }
-        .preloader-logo-wrap img {
-            width: 60px; height: 60px;
-            z-index: 2;
+        .preloader-wordmark {
+            font-weight: 800; font-size: 20px; letter-spacing: -.5px; color: var(--brand-600, #0d7a4d);
         }
         .preloader-spinner {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: relative;
+            width: 84px; height: 84px;
             border: 4px solid #f3f3f3;
             border-top: 4px solid #004d34;
             border-bottom: 4px solid #004d34;
@@ -138,7 +137,7 @@
     <div id="preloader">
         <div class="preloader-logo-wrap">
             <div class="preloader-spinner"></div>
-            <img src="/dorvas-logo.png" alt="Logo" onerror="this.src='https://ui-avatars.com/api/?name=SD&background=004d34&color=fff&rounded=true'">
+            <span class="preloader-wordmark">SpringDrill</span>
         </div>
     </div>
     <script>
