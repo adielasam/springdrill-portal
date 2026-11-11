@@ -395,6 +395,10 @@ function LoginForm() {
         .sd-feature h3 { font-size: 1.05rem; font-weight: 700; margin: 0 0 10px 0; color: #123227; }
         .sd-feature p { font-size: 0.95rem; line-height: 1.65; color: #5a6b63; margin: 0; }
 
+        /* Wide section image (Features) — rides the section reveal */
+        .sd-section-media { margin-top: 32px; overflow: hidden; border-radius: 16px; border: 1px solid #dce6df; }
+        .sd-section-media img { width: 100%; height: 320px; object-fit: cover; display: block; }
+
         /* How it works */
         .sd-step-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; }
         .sd-step { background: #ffffff; border: 1px solid #dce6df; border-radius: 12px; padding: 28px 24px; }
@@ -402,12 +406,19 @@ function LoginForm() {
         .sd-step h3 { font-size: 1.05rem; font-weight: 700; margin: 0 0 10px 0; color: #123227; }
         .sd-step p { font-size: 0.95rem; line-height: 1.65; color: #5a6b63; margin: 0; }
 
+        /* Step image at the top of each How-it-works card — rides the card entrance */
+        .sd-step-media { width: 100%; height: 170px; object-fit: cover; display: block; border-radius: 16px; margin-bottom: 16px; }
+
         /* Who it is for */
         .sd-audience-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 40px; }
         .sd-audience { display: flex; gap: 16px; align-items: flex-start; }
         .sd-audience i { font-size: 1.4rem; color: #007a4d; margin-top: 2px; }
         .sd-audience h3 { font-size: 1.05rem; font-weight: 700; margin: 0 0 6px 0; color: #123227; }
         .sd-audience p { font-size: 0.95rem; line-height: 1.65; color: #5a6b63; margin: 0; }
+
+        /* Two-image row (For schools) — rides the section reveal */
+        .sd-schools-media { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 32px; }
+        .sd-schools-media img { width: 100%; height: 240px; object-fit: cover; display: block; border-radius: 16px; border: 1px solid #dce6df; }
 
         /* Sign-in */
         .sd-signin-card {
@@ -557,6 +568,10 @@ function LoginForm() {
           .sd-hero-media img { height: 260px; }
           .sd-feature-grid { grid-template-columns: repeat(2, 1fr); }
           .sd-step-grid { grid-template-columns: 1fr; }
+          .sd-section-media img { height: 220px; }
+          .sd-step-media { height: 160px; }
+          .sd-schools-media { grid-template-columns: 1fr; }
+          .sd-schools-media img { height: 220px; }
           .sd-section { padding: 64px 0; }
         }
 
@@ -628,7 +643,7 @@ function LoginForm() {
                 </div>
               </div>
               <div className="sd-hero-media" ref={heroMediaRef}>
-                <img src="/springvalleyclass.jpg" alt="Students in a classroom" />
+                <img src="/hero-classroom.jpg" alt="Teacher guiding students at computers in a Nigerian classroom" />
               </div>
             </div>
           </section>
@@ -637,6 +652,9 @@ function LoginForm() {
             <div className="sd-wrap" data-reveal>
               <p className="sd-eyebrow">What SpringDrill does</p>
               <h2 className="sd-h2" data-anim="letters"><SplitLetters text="Everything a school needs to run exams and results." /></h2>
+              <div className="sd-section-media">
+                <img src="/features-cbt-exam.jpg" alt="Students taking a computer-based test on laptops in a Nigerian exam hall" />
+              </div>
               <div className="sd-feature-grid" data-anim="cards">
                 <div className="sd-feature">
                   <i className="fas fa-chart-line"></i>
@@ -668,16 +686,19 @@ function LoginForm() {
               <h2 className="sd-h2" data-anim="letters"><SplitLetters text="Three steps, from test to report card." /></h2>
               <div className="sd-step-grid" data-anim="cards">
                 <div className="sd-step">
+                  <img className="sd-step-media" src="/how-set-test.jpg" alt="Teacher setting exam questions on a laptop" />
                   <div className="sd-step-num">1</div>
                   <h3>Teacher sets the test</h3>
                   <p data-anim="words"><SplitWords text="A teacher picks a class and subject, sets questions from the bank, and opens the test." /></p>
                 </div>
                 <div className="sd-step">
+                  <img className="sd-step-media" src="/how-take-test.jpg" alt="Students taking a computer-based test on laptops" />
                   <div className="sd-step-num">2</div>
                   <h3>Students take it</h3>
                   <p data-anim="words"><SplitWords text="Students log in, answer on screen, and submit. Scores are recorded immediately." /></p>
                 </div>
                 <div className="sd-step">
+                  <img className="sd-step-media" src="/how-report-card.jpg" alt="A printed student report card held up in a classroom" />
                   <div className="sd-step-num">3</div>
                   <h3>Results are ready</h3>
                   <p data-anim="words"><SplitWords text="Totals, averages and positions are worked out automatically, and report cards print in minutes." /></p>
@@ -690,6 +711,10 @@ function LoginForm() {
             <div className="sd-wrap" data-reveal>
               <p className="sd-eyebrow">Who it is for</p>
               <h2 className="sd-h2" data-anim="letters"><SplitLetters text="Built for the whole school." /></h2>
+              <div className="sd-schools-media">
+                <img src="/schools-compound.jpg" alt="Students in uniform outside a Nigerian secondary school building" />
+                <img src="/schools-parent-report.jpg" alt="A mother and her daughter looking at a report card together at home" />
+              </div>
               <div className="sd-audience-grid" data-anim="cards">
                 <div className="sd-audience">
                   <i className="fas fa-school"></i>
