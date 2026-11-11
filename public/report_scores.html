@@ -52,36 +52,10 @@
     </div>
 
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-<div class="sidebar" id="sidebar">
-        <div class="sidebar-brand">
-            <i class="fas fa-chalkboard-teacher"></i>
-            <h4 class="text-white fw-bold mb-0">STAFF PORTAL</h4>
-        </div>
-        
-        <nav class="nav flex-column mt-4">
-            <a href="teacher_dashboard" class="nav-link">
-                <i class="fas fa-home"></i> Dashboard Home
-            </a>
-            <a href="create_test" class="nav-link">
-                <i class="fas fa-plus-circle"></i> Create New Test
-            </a>
-            <a href="manage_cbt" class="nav-link">
-                <i class="fas fa-tasks"></i> Manage CBT
-            </a>
-            <a href="test_results" class="nav-link">
-                <i class="fas fa-poll"></i> Student Results
-            </a>
-            <a href="report_scores" class="nav-link active">
-                <i class="fas fa-file-signature"></i> Report Scores
-            </a>
-            
-            <hr class="mx-3 my-4 border-secondary">
-            
-            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto">
-                <i class="fas fa-sign-out-alt"></i> Secure Logout
-            </a>
-        </nav>
-    </div>
+<div class="sidebar" id="sidebar" data-role="teacher">
+    <!-- Shared sidebar: rendered by sidebar.js (one menu for all admin/teacher pages). -->
+</div>
+    <script src="sidebar.js"></script>
 
     <div class="main-content">
         <div class="d-flex align-items-center mb-3 d-lg-none">
