@@ -109,13 +109,15 @@ function LoginForm() {
     return () => observer.disconnect();
   }, []);
 
-  // ZRK-style text animations (PR #7): per-letter headings, per-word body
-  // copy, staggered card entrances. Hidden states are added from JS only,
-  // so the page stays fully visible if JS never runs. Everything is
-  // on-enter (IntersectionObserver), NOT scroll-scrubbed: ZRK pins sections
-  // to scroll position, which would break our anchor jumps and the nav logo
-  // transition, so this keeps the look without the breakage. Each element
-  // animates once per visit.
+  // ZRK-style text animations (PR #7, replay in PR #8): per-letter
+  // headings, per-word body copy, staggered card entrances. Hidden states
+  // are added from JS only, so the page stays fully visible if JS never
+  // runs. Everything is on-enter (IntersectionObserver), NOT
+  // scroll-scrubbed: ZRK pins sections to scroll position, which would
+  // break our anchor jumps and the nav logo transition, so this keeps the
+  // look without the breakage. PR #8: animations REPLAY on every re-entry
+  // — once an element has fully left the viewport it resets to its hidden
+  // state and animates again the next time it scrolls in.
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const animEls = Array.from(document.querySelectorAll('[data-anim]'));
@@ -133,25 +135,50 @@ function LoginForm() {
         });
       }
     });
-    // Hero text sits behind the ~800ms preloader on load, so it gets its
-    // own timer instead of the observer: letters/words/photo start at 950ms.
+    // When each element last started animating. A reset is only armed once
+    // its entrance has fully finished (~0.9s max), so fast scroll-back and
+    // forth at a section edge never strobes the animation.
+    const lastPlay = new Map<Element, number>();
+    const RESET_COOLDOWN_MS = 1000;
+    // Hero text sits behind the ~800ms preloader on load, so its FIRST play
+    // still comes from a timer at 950ms; after that it joins the observer
+    // and replays like everything else when the user scrolls back to top.
     const heroRoot = document.querySelector('.sd-hero');
+    let heroReady = false;
     const heroTimer = window.setTimeout(() => {
+      heroReady = true;
       heroRoot?.classList.add('is-in');
       animEls
         .filter((el) => el.hasAttribute('data-anim-hero'))
-        .forEach((el) => el.classList.add('is-in'));
+        .forEach((el) => {
+          el.classList.add('is-in');
+          lastPlay.set(el, performance.now());
+        });
     }, 950);
-    const rest = animEls.filter((el) => !el.hasAttribute('data-anim-hero'));
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
+        const el = entry.target;
         if (entry.isIntersecting) {
-          entry.target.classList.add('is-in');
-          observer.unobserve(entry.target);
+          // Hero text must not start before the preloader timer has fired.
+          if (el.hasAttribute('data-anim-hero') && !heroReady) return;
+          if (!el.classList.contains('is-in')) {
+            el.classList.add('is-in');
+            lastPlay.set(el, performance.now());
+          }
+        } else {
+          // Reset only once the element has FULLY left the viewport — a
+          // partial exit (e.g. a tall card grid still peeking in) must not
+          // hide it — and only after its entrance has finished.
+          const r = entry.boundingClientRect;
+          const fullyOut = r.bottom <= 0 || r.top >= window.innerHeight;
+          const playedAt = lastPlay.get(el) ?? 0;
+          if (fullyOut && performance.now() - playedAt >= RESET_COOLDOWN_MS) {
+            el.classList.remove('is-in');
+          }
         }
       });
     }, { threshold: 0.15 });
-    rest.forEach((el) => observer.observe(el));
+    animEls.forEach((el) => observer.observe(el));
     return () => { window.clearTimeout(heroTimer); observer.disconnect(); };
   }, []);
 
@@ -485,9 +512,11 @@ function LoginForm() {
         /* Scroll progress bar (width set from JS; stays 0 without JS) */
         .sd-progress { position: fixed; top: 64px; left: 0; height: 3px; width: 0; background: #007a4d; z-index: 101; }
 
-        /* ZRK-style text animations (PR #7). Hidden states only apply once
-           JS adds the sd-anim-* class, so text stays visible without JS.
-           All entrances are fast (<=0.8s per element) and run once. */
+        /* ZRK-style text animations (PR #7, replay in PR #8). Hidden states
+           only apply once JS adds the sd-anim-* class, so text stays
+           visible without JS. All entrances are fast (<=0.8s per element)
+           and replay on every re-entry: removing .is-in returns an element
+           to its hidden base state, re-adding it restarts the animation. */
         .sd-word { display: inline-block; white-space: nowrap; }
         .sd-anim-letters .sd-ch { display: inline-block; opacity: 0; transform: translateY(0.55em); }
         .sd-anim-letters.is-in .sd-ch { animation: sd-letter-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: var(--sd-d, 0ms); }
