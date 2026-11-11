@@ -458,7 +458,10 @@ function LoginForm() {
         .sd-hero h1 { font-size: 3.1rem; font-weight: 800; line-height: 1.15; letter-spacing: -1px; margin: 0 0 20px 0; color: #123227; }
         .sd-hero p { font-size: 1.15rem; line-height: 1.7; color: #5a6b63; margin: 0 0 32px 0; }
         .sd-hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
-        .sd-hero-media { overflow: hidden; border-radius: 16px; border: 1px solid #dce6df; }
+        /* Premium frame for the one hero photo: green ring + soft outer glow +
+           deep shadow. Box-shadow (not a pseudo-element) so it survives the
+           wrapper's overflow: hidden and the parallax transform. */
+        .sd-hero-media { overflow: hidden; border-radius: 16px; border: 2px solid #007a4d; box-shadow: 0 0 0 6px rgba(0, 122, 77, 0.12), 0 24px 48px rgba(18, 50, 39, 0.18); }
         .sd-hero-media img { width: 100%; height: 340px; object-fit: cover; display: block; border: none; border-radius: 0; transform: scale(1.06); }
         .sd-hero.is-in .sd-hero-media img { animation: sd-photo-settle 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
         @keyframes sd-photo-settle { from { transform: scale(1.06); } to { transform: scale(1); } }
@@ -466,13 +469,13 @@ function LoginForm() {
         /* Features */
         .sd-feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 40px; }
         .sd-feature { border: 1px solid #dce6df; border-radius: 12px; padding: 28px 24px; background: #ffffff; }
-        .sd-feature i { font-size: 1.6rem; color: #007a4d; margin-bottom: 16px; }
+        /* Premium thin-line icons: hand-written inline SVG, stroke-based in
+           the site green. The icon rides the card entrance — it has no hidden
+           state of its own, so it can never end up stuck hidden. */
+        .sd-icon { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: rgba(0, 122, 77, 0.08); color: #007a4d; margin-bottom: 16px; }
+        .sd-icon svg { width: 24px; height: 24px; }
         .sd-feature h3 { font-size: 1.05rem; font-weight: 700; margin: 0 0 10px 0; color: #123227; }
         .sd-feature p { font-size: 0.95rem; line-height: 1.65; color: #5a6b63; margin: 0; }
-
-        /* Wide section image (Features) — rides the section reveal */
-        .sd-section-media { margin-top: 32px; overflow: hidden; border-radius: 16px; border: 1px solid #dce6df; }
-        .sd-section-media img { width: 100%; height: 320px; object-fit: cover; display: block; }
 
         /* How it works */
         .sd-step-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; }
@@ -481,23 +484,13 @@ function LoginForm() {
         .sd-step h3 { font-size: 1.05rem; font-weight: 700; margin: 0 0 10px 0; color: #123227; }
         .sd-step p { font-size: 0.95rem; line-height: 1.65; color: #5a6b63; margin: 0; }
 
-        /* Step image at the top of each How-it-works card — rides the card entrance.
-           The wrapper clips the hover zoom so it never spills past the frame. */
-        .sd-step-media-wrap { overflow: hidden; border-radius: 16px; margin-bottom: 16px; }
-        .sd-step-media { width: 100%; height: 170px; object-fit: cover; display: block; }
-
         /* Who it is for */
         .sd-audience-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 40px; }
         .sd-audience { display: flex; gap: 16px; align-items: flex-start; }
-        .sd-audience i { font-size: 1.4rem; color: #007a4d; margin-top: 2px; }
+        .sd-audience .sd-icon { width: 40px; height: 40px; flex-shrink: 0; margin: 0; }
+        .sd-audience .sd-icon svg { width: 22px; height: 22px; }
         .sd-audience h3 { font-size: 1.05rem; font-weight: 700; margin: 0 0 6px 0; color: #123227; }
         .sd-audience p { font-size: 0.95rem; line-height: 1.65; color: #5a6b63; margin: 0; }
-
-        /* Two-image row (For schools) — rides the section reveal.
-           Each photo gets its own clipping frame for the hover zoom. */
-        .sd-schools-media { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 32px; }
-        .sd-schools-media-item { overflow: hidden; border-radius: 16px; border: 1px solid #dce6df; }
-        .sd-schools-media img { width: 100%; height: 240px; object-fit: cover; display: block; }
 
         /* Sign-in */
         .sd-signin-card {
@@ -635,14 +628,13 @@ function LoginForm() {
         .sd-audience:focus-visible { translate: 0 -4px; outline: 2px solid #007a4d; outline-offset: 3px; }
         [data-anim="letters"]:focus-visible { outline: 2px solid #007a4d; outline-offset: 3px; }
 
-        /* Image hover zoom (PR #9 follow-up): photos gently zoom inside their
-           overflow-hidden frames on fine pointers. Uses the separate scale
-           property so it composes with the hero settle animation's transform
-           instead of fighting it, and with the card entrance on step photos. */
-        .sd-hero-media img, .sd-section-media img, .sd-step-media, .sd-schools-media img { transition: scale 0.5s ease; }
+        /* Image hover zoom (PR #9 follow-up): the one hero photo gently zooms
+           inside its overflow-hidden frame on fine pointers. Uses the separate
+           scale property so it composes with the hero settle animation's
+           transform instead of fighting it. */
+        .sd-hero-media img { transition: scale 0.5s ease; }
         @media (hover: hover) and (pointer: fine) {
-          .sd-hero-media:hover img, .sd-section-media:hover img,
-          .sd-step-media-wrap:hover .sd-step-media, .sd-schools-media-item:hover img { scale: 1.04; }
+          .sd-hero-media:hover img { scale: 1.04; }
         }
 
         /* Scroll-reveal (classes added from JS; content stays visible without JS) */
@@ -658,7 +650,7 @@ function LoginForm() {
           .sd-feature:hover, .sd-step:hover, .sd-audience:hover,
           .sd-feature:focus-visible, .sd-step:focus-visible, .sd-audience:focus-visible { translate: none; box-shadow: none; }
           .sd-hero-media img { transform: none; animation: none; }
-          .sd-hero-media img, .sd-section-media img, .sd-step-media, .sd-schools-media img { transition: none; scale: none; }
+          .sd-hero-media img { transition: none; scale: none; }
           .sd-progress { display: none; }
         }
 
@@ -678,10 +670,6 @@ function LoginForm() {
           .sd-hero-media img { height: 260px; }
           .sd-feature-grid { grid-template-columns: repeat(2, 1fr); }
           .sd-step-grid { grid-template-columns: 1fr; }
-          .sd-section-media img { height: 220px; }
-          .sd-step-media { height: 160px; }
-          .sd-schools-media { grid-template-columns: 1fr; }
-          .sd-schools-media img { height: 220px; }
           .sd-section { padding: 64px 0; }
         }
 
@@ -762,27 +750,24 @@ function LoginForm() {
             <div className="sd-wrap" data-reveal>
               <p className="sd-eyebrow">What SpringDrill does</p>
               <h2 className="sd-h2" data-anim="letters"><SplitLetters text="Everything a school needs to run exams and results." /></h2>
-              <div className="sd-section-media">
-                <img src="/features-cbt-exam.jpg" alt="Students taking a computer-based test on laptops in a Nigerian exam hall" />
-              </div>
               <div className="sd-feature-grid" data-anim="cards">
                 <div className="sd-feature">
-                  <i className="fas fa-chart-line"></i>
+                  <span className="sd-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="3" width="14" height="18" rx="2" /><line x1="9" y1="8" x2="15" y2="8" /><line x1="9" y1="12" x2="15" y2="12" /><line x1="9" y1="16" x2="13" y2="16" /></svg></span>
                   <h3>Results &amp; report cards</h3>
                   <p data-anim="words"><SplitWords text="Scores from class tests and exams are added up automatically into totals, averages and positions, and printed as report cards. No hand calculation, no spreadsheet wrangling." /></p>
                 </div>
                 <div className="sd-feature">
-                  <i className="fas fa-clipboard-check"></i>
+                  <span className="sd-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="5" width="16" height="11" rx="1.5" /><path d="M2 19h20" /></svg></span>
                   <h3>CBT tests</h3>
                   <p data-anim="words"><SplitWords text="Teachers set timed computer-based tests from the question bank. Students answer on screen, and scores are recorded straight away." /></p>
                 </div>
                 <div className="sd-feature">
-                  <i className="fas fa-book-open"></i>
+                  <span className="sd-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg></span>
                   <h3>AI lesson plans</h3>
                   <p data-anim="words"><SplitWords text="Teachers generate lesson plans with AI from the scheme of work, then edit them before use." /></p>
                 </div>
                 <div className="sd-feature">
-                  <i className="fas fa-graduation-cap"></i>
+                  <span className="sd-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1" fill="currentColor" /></svg></span>
                   <h3>JAMB practice</h3>
                   <p data-anim="words"><SplitWords text="Students practise with JAMB-style questions in the UTME Simulator and see their scores and progress over time." /></p>
                 </div>
@@ -796,19 +781,19 @@ function LoginForm() {
               <h2 className="sd-h2" data-anim="letters"><SplitLetters text="Three steps, from test to report card." /></h2>
               <div className="sd-step-grid" data-anim="cards">
                 <div className="sd-step">
-                  <div className="sd-step-media-wrap"><img className="sd-step-media" src="/how-set-test.jpg" alt="Teacher setting exam questions on a laptop" /></div>
+                  <span className="sd-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg></span>
                   <div className="sd-step-num">1</div>
                   <h3>Teacher sets the test</h3>
                   <p data-anim="words"><SplitWords text="A teacher picks a class and subject, sets questions from the bank, and opens the test." /></p>
                 </div>
                 <div className="sd-step">
-                  <div className="sd-step-media-wrap"><img className="sd-step-media" src="/how-take-test.jpg" alt="Students taking a computer-based test on laptops" /></div>
+                  <span className="sd-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="13" rx="2" /><path d="M8 21h8" /><path d="M12 17v4" /><path d="M9 10.5l2 2 4-4" /></svg></span>
                   <div className="sd-step-num">2</div>
                   <h3>Students take it</h3>
                   <p data-anim="words"><SplitWords text="Students log in, answer on screen, and submit. Scores are recorded immediately." /></p>
                 </div>
                 <div className="sd-step">
-                  <div className="sd-step-media-wrap"><img className="sd-step-media" src="/how-report-card.jpg" alt="A printed student report card held up in a classroom" /></div>
+                  <span className="sd-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9V3h12v6" /><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" /><rect x="6" y="14" width="12" height="8" /></svg></span>
                   <div className="sd-step-num">3</div>
                   <h3>Results are ready</h3>
                   <p data-anim="words"><SplitWords text="Totals, averages and positions are worked out automatically, and report cards print in minutes." /></p>
@@ -821,34 +806,30 @@ function LoginForm() {
             <div className="sd-wrap" data-reveal>
               <p className="sd-eyebrow">Who it is for</p>
               <h2 className="sd-h2" data-anim="letters"><SplitLetters text="Built for the whole school." /></h2>
-              <div className="sd-schools-media">
-                <div className="sd-schools-media-item"><img src="/schools-compound.jpg" alt="Students in uniform outside a Nigerian secondary school building" /></div>
-                <div className="sd-schools-media-item"><img src="/schools-parent-report.jpg" alt="A mother and her daughter looking at a report card together at home" /></div>
-              </div>
               <div className="sd-audience-grid" data-anim="cards">
                 <div className="sd-audience">
-                  <i className="fas fa-school"></i>
+                  <span className="sd-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18" /><path d="M5 21V7l7-4 7 4v14" /><path d="M9 21v-4h6v4" /><path d="M12 7v2" /></svg></span>
                   <div>
                     <h3>Schools</h3>
                     <p data-anim="words"><SplitWords text="Run exams, results and report cards from one portal." /></p>
                   </div>
                 </div>
                 <div className="sd-audience">
-                  <i className="fas fa-chalkboard-teacher"></i>
+                  <span className="sd-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h20" /><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3" /><path d="M7 21h10" /><path d="M12 16v5" /></svg></span>
                   <div>
                     <h3>Teachers</h3>
                     <p data-anim="words"><SplitWords text="Set tests, enter scores, and plan lessons without the paperwork." /></p>
                   </div>
                 </div>
                 <div className="sd-audience">
-                  <i className="fas fa-user-graduate"></i>
+                  <span className="sd-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z" /><path d="M6 12v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5" /><line x1="22" y1="10" x2="22" y2="16" /></svg></span>
                   <div>
                     <h3>Students</h3>
                     <p data-anim="words"><SplitWords text="Practise for JAMB and see your own results and progress." /></p>
                   </div>
                 </div>
                 <div className="sd-audience">
-                  <i className="fas fa-users"></i>
+                  <span className="sd-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg></span>
                   <div>
                     <h3>Parents</h3>
                     <p data-anim="words"><SplitWords text="Follow your child's results and report cards through the parent portal." /></p>
