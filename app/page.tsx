@@ -135,6 +135,17 @@ function LoginForm() {
         });
       }
     });
+    // Keyboard parity (PR #9): headings and cards are focusable so a
+    // keyboard user can trigger the same replay with focus-visible.
+    // Added from JS like the animation classes, so the tab order is
+    // unchanged without JS. Body paragraphs stay out of the tab order.
+    animEls.forEach((el) => {
+      const kind = el.getAttribute('data-anim');
+      if (kind === 'letters') el.setAttribute('tabindex', '0');
+      if (kind === 'cards') {
+        Array.from(el.children).forEach((child) => child.setAttribute('tabindex', '0'));
+      }
+    });
     // When each element last started animating. A reset is only armed once
     // its entrance has fully finished (~0.9s max), so fast scroll-back and
     // forth at a section edge never strobes the animation.
@@ -174,12 +185,72 @@ function LoginForm() {
           const playedAt = lastPlay.get(el) ?? 0;
           if (fullyOut && performance.now() - playedAt >= RESET_COOLDOWN_MS) {
             el.classList.remove('is-in');
+            // A card replayed by hover keeps its sd-card-play class (its
+            // fill holds the visible end state); clear it here so the card
+            // returns to the hidden base state with the rest of the grid.
+            if (el.getAttribute('data-anim') === 'cards') {
+              Array.from(el.children).forEach((child) => child.classList.remove('sd-card-play'));
+            }
           }
         }
       });
     }, { threshold: 0.15 });
     animEls.forEach((el) => observer.observe(el));
-    return () => { window.clearTimeout(heroTimer); observer.disconnect(); };
+
+    // Hover + keyboard-focus replay (PR #9). On fine-pointer devices,
+    // hovering an animated element replays its animation; keyboard focus
+    // (focus-visible) does the same. Touch devices get no hover behaviour.
+    // A replay is skipped while an entrance is still playing (same 1s
+    // cooldown as the scroll reset), so a hover can never reset or glitch
+    // a scroll-triggered animation mid-flight. Hover targets the WHOLE
+    // element (heading / paragraph / card): moving the pointer across the
+    // text never restarts it.
+    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const replay = (el: Element) => {
+      if (el.hasAttribute('data-anim-hero') && !heroReady) return;
+      const now = performance.now();
+      if (now - (lastPlay.get(el) ?? 0) < RESET_COOLDOWN_MS) return;
+      lastPlay.set(el, now);
+      el.classList.remove('is-in');
+      void (el as HTMLElement).offsetWidth; // reflow: re-adding restarts the CSS animation
+      el.classList.add('is-in');
+    };
+    // One card, not the whole grid: replay just that card's entrance plus
+    // its inner words paragraph. The sd-card-play class is left on the
+    // card afterwards (its fill holds the visible end state); the observer
+    // reset above clears it when the grid scrolls out of view.
+    const replayCard = (card: Element) => {
+      const now = performance.now();
+      if (now - (lastPlay.get(card) ?? 0) < RESET_COOLDOWN_MS) return;
+      lastPlay.set(card, now);
+      card.classList.remove('sd-card-play');
+      void (card as HTMLElement).offsetWidth;
+      card.classList.add('sd-card-play');
+      const words = card.querySelector('[data-anim="words"]');
+      if (words) replay(words);
+    };
+    const listeners: Array<() => void> = [];
+    const on = (target: Element, type: string, fn: () => void) => {
+      target.addEventListener(type, fn);
+      listeners.push(() => target.removeEventListener(type, fn));
+    };
+    const focusReplay = (target: Element, fn: () => void) => () => {
+      if ((target as HTMLElement).matches(':focus-visible')) fn();
+    };
+    animEls.forEach((el) => {
+      if (el.getAttribute('data-anim') === 'cards') {
+        Array.from(el.children).forEach((card) => {
+          if (canHover) on(card, 'mouseenter', () => replayCard(card));
+          on(card, 'focusin', focusReplay(card, () => replayCard(card)));
+        });
+      } else {
+        if (canHover) on(el, 'mouseenter', () => replay(el));
+        if (el.getAttribute('data-anim') === 'letters') {
+          on(el, 'focusin', focusReplay(el, () => replay(el)));
+        }
+      }
+    });
+    return () => { window.clearTimeout(heroTimer); observer.disconnect(); listeners.forEach((off) => off()); };
   }, []);
 
   // Scroll progress bar + hero photo parallax (transform only, rAF-throttled).
@@ -364,8 +435,8 @@ function LoginForm() {
         .sd-eyebrow { font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #007a4d; margin: 0 0 12px 0; }
         .sd-h2 { font-size: 1.9rem; font-weight: 800; line-height: 1.25; margin: 0 0 16px 0; color: #123227; }
 
-        /* Header */
-        .sd-header { position: sticky; top: 0; z-index: 100; background: #ffffff; border-bottom: 1px solid #dce6df; }
+        /* Header — sticky with a frosted-glass blur so it reads as a modern menu */
+        .sd-header { position: sticky; top: 0; z-index: 100; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(220, 230, 223, 0.8); }
         .sd-header-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
         .sd-wordmark { font-size: 1.4rem; font-weight: 800; color: #004d34; text-decoration: none; letter-spacing: -0.5px; }
         .sd-nav { display: flex; align-items: center; gap: 28px; }
@@ -373,8 +444,12 @@ function LoginForm() {
         .sd-nav a:hover { color: #007a4d; }
         .sd-nav a:not(.sd-btn)::after { content: ''; position: absolute; left: 0; bottom: -4px; height: 2px; width: 100%; background: #007a4d; transform: scaleX(0); transform-origin: left; transition: transform 0.25s ease; }
         .sd-nav a:not(.sd-btn):hover::after { transform: scaleX(1); }
-        .sd-btn { display: inline-block; background: #007a4d; color: #ffffff; border: none; border-radius: 6px; padding: 11px 20px; font-weight: 700; font-size: 0.95rem; cursor: pointer; text-decoration: none; }
-        .sd-btn:hover { background: #005c3a; color: #ffffff; }
+        .sd-btn { display: inline-block; background: #007a4d; color: #ffffff; border: none; border-radius: 999px; padding: 11px 22px; font-weight: 700; font-size: 0.95rem; cursor: pointer; text-decoration: none; box-shadow: 0 2px 10px rgba(0, 122, 77, 0.25); transition: background 0.25s ease, translate 0.25s ease, box-shadow 0.25s ease; }
+        .sd-btn:hover { background: #005c3a; color: #ffffff; translate: 0 -1px; box-shadow: 0 6px 16px rgba(0, 122, 77, 0.30); }
+        /* The header button is an <a> inside .sd-nav, and .sd-nav a (higher
+           specificity) was beating .sd-btn and leaving dark text on the green
+           button — the low-contrast bug the user reported. This wins it back. */
+        .sd-nav a.sd-btn, .sd-nav a.sd-btn:hover { color: #ffffff; }
         .sd-btn-outline { display: inline-block; background: #ffffff; color: #004d34; border: 1px solid #004d34; border-radius: 6px; padding: 11px 20px; font-weight: 700; font-size: 0.95rem; cursor: pointer; text-decoration: none; }
         .sd-btn-outline:hover { background: #f3f7f4; color: #004d34; }
 
@@ -406,8 +481,10 @@ function LoginForm() {
         .sd-step h3 { font-size: 1.05rem; font-weight: 700; margin: 0 0 10px 0; color: #123227; }
         .sd-step p { font-size: 0.95rem; line-height: 1.65; color: #5a6b63; margin: 0; }
 
-        /* Step image at the top of each How-it-works card — rides the card entrance */
-        .sd-step-media { width: 100%; height: 170px; object-fit: cover; display: block; border-radius: 16px; margin-bottom: 16px; }
+        /* Step image at the top of each How-it-works card — rides the card entrance.
+           The wrapper clips the hover zoom so it never spills past the frame. */
+        .sd-step-media-wrap { overflow: hidden; border-radius: 16px; margin-bottom: 16px; }
+        .sd-step-media { width: 100%; height: 170px; object-fit: cover; display: block; }
 
         /* Who it is for */
         .sd-audience-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 40px; }
@@ -416,9 +493,11 @@ function LoginForm() {
         .sd-audience h3 { font-size: 1.05rem; font-weight: 700; margin: 0 0 6px 0; color: #123227; }
         .sd-audience p { font-size: 0.95rem; line-height: 1.65; color: #5a6b63; margin: 0; }
 
-        /* Two-image row (For schools) — rides the section reveal */
+        /* Two-image row (For schools) — rides the section reveal.
+           Each photo gets its own clipping frame for the hover zoom. */
         .sd-schools-media { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 32px; }
-        .sd-schools-media img { width: 100%; height: 240px; object-fit: cover; display: block; border-radius: 16px; border: 1px solid #dce6df; }
+        .sd-schools-media-item { overflow: hidden; border-radius: 16px; border: 1px solid #dce6df; }
+        .sd-schools-media img { width: 100%; height: 240px; object-fit: cover; display: block; }
 
         /* Sign-in */
         .sd-signin-card {
@@ -539,6 +618,33 @@ function LoginForm() {
         .sd-anim-cards.is-in > * { animation: sd-card-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: calc(var(--sd-i, 0) * 90ms); }
         @keyframes sd-card-in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* Hover replay (PR #9): a hovered card replays its entrance via
+           .sd-card-play (same keyframes, no stagger delay). It sits after
+           the base card rule so it wins at equal specificity, and the
+           scroll reset clears it when the grid leaves the viewport. */
+        .sd-anim-cards > *.sd-card-play { animation: sd-card-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        /* Gentle card lift on hover (fine pointers only) and on keyboard
+           focus. Uses the separate translate property so it composes
+           with — never fights — the entrance animation's transform. */
+        .sd-feature, .sd-step, .sd-audience { transition: translate 0.25s ease, box-shadow 0.25s ease; }
+        @media (hover: hover) and (pointer: fine) {
+          .sd-feature:hover, .sd-step:hover { translate: 0 -4px; box-shadow: 0 10px 24px rgba(18, 50, 39, 0.12); }
+          .sd-audience:hover { translate: 0 -4px; }
+        }
+        .sd-feature:focus-visible, .sd-step:focus-visible { translate: 0 -4px; box-shadow: 0 10px 24px rgba(18, 50, 39, 0.12); outline: 2px solid #007a4d; outline-offset: 3px; }
+        .sd-audience:focus-visible { translate: 0 -4px; outline: 2px solid #007a4d; outline-offset: 3px; }
+        [data-anim="letters"]:focus-visible { outline: 2px solid #007a4d; outline-offset: 3px; }
+
+        /* Image hover zoom (PR #9 follow-up): photos gently zoom inside their
+           overflow-hidden frames on fine pointers. Uses the separate scale
+           property so it composes with the hero settle animation's transform
+           instead of fighting it, and with the card entrance on step photos. */
+        .sd-hero-media img, .sd-section-media img, .sd-step-media, .sd-schools-media img { transition: scale 0.5s ease; }
+        @media (hover: hover) and (pointer: fine) {
+          .sd-hero-media:hover img, .sd-section-media:hover img,
+          .sd-step-media-wrap:hover .sd-step-media, .sd-schools-media-item:hover img { scale: 1.04; }
+        }
+
         /* Scroll-reveal (classes added from JS; content stays visible without JS) */
         .sd-reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.7s ease, transform 0.7s ease; }
         .sd-reveal.is-visible { opacity: 1; transform: translateY(0); }
@@ -548,7 +654,11 @@ function LoginForm() {
           .sd-overlay-bar { animation: none; width: 120px; }
           .sd-anim-letters .sd-ch, .sd-anim-words .sd-w { opacity: 1; transform: none; animation: none; }
           .sd-anim-cards > * { opacity: 1; transform: none; animation: none; }
+          .sd-feature, .sd-step, .sd-audience { transition: none; }
+          .sd-feature:hover, .sd-step:hover, .sd-audience:hover,
+          .sd-feature:focus-visible, .sd-step:focus-visible, .sd-audience:focus-visible { translate: none; box-shadow: none; }
           .sd-hero-media img { transform: none; animation: none; }
+          .sd-hero-media img, .sd-section-media img, .sd-step-media, .sd-schools-media img { transition: none; scale: none; }
           .sd-progress { display: none; }
         }
 
@@ -686,19 +796,19 @@ function LoginForm() {
               <h2 className="sd-h2" data-anim="letters"><SplitLetters text="Three steps, from test to report card." /></h2>
               <div className="sd-step-grid" data-anim="cards">
                 <div className="sd-step">
-                  <img className="sd-step-media" src="/how-set-test.jpg" alt="Teacher setting exam questions on a laptop" />
+                  <div className="sd-step-media-wrap"><img className="sd-step-media" src="/how-set-test.jpg" alt="Teacher setting exam questions on a laptop" /></div>
                   <div className="sd-step-num">1</div>
                   <h3>Teacher sets the test</h3>
                   <p data-anim="words"><SplitWords text="A teacher picks a class and subject, sets questions from the bank, and opens the test." /></p>
                 </div>
                 <div className="sd-step">
-                  <img className="sd-step-media" src="/how-take-test.jpg" alt="Students taking a computer-based test on laptops" />
+                  <div className="sd-step-media-wrap"><img className="sd-step-media" src="/how-take-test.jpg" alt="Students taking a computer-based test on laptops" /></div>
                   <div className="sd-step-num">2</div>
                   <h3>Students take it</h3>
                   <p data-anim="words"><SplitWords text="Students log in, answer on screen, and submit. Scores are recorded immediately." /></p>
                 </div>
                 <div className="sd-step">
-                  <img className="sd-step-media" src="/how-report-card.jpg" alt="A printed student report card held up in a classroom" />
+                  <div className="sd-step-media-wrap"><img className="sd-step-media" src="/how-report-card.jpg" alt="A printed student report card held up in a classroom" /></div>
                   <div className="sd-step-num">3</div>
                   <h3>Results are ready</h3>
                   <p data-anim="words"><SplitWords text="Totals, averages and positions are worked out automatically, and report cards print in minutes." /></p>
@@ -712,8 +822,8 @@ function LoginForm() {
               <p className="sd-eyebrow">Who it is for</p>
               <h2 className="sd-h2" data-anim="letters"><SplitLetters text="Built for the whole school." /></h2>
               <div className="sd-schools-media">
-                <img src="/schools-compound.jpg" alt="Students in uniform outside a Nigerian secondary school building" />
-                <img src="/schools-parent-report.jpg" alt="A mother and her daughter looking at a report card together at home" />
+                <div className="sd-schools-media-item"><img src="/schools-compound.jpg" alt="Students in uniform outside a Nigerian secondary school building" /></div>
+                <div className="sd-schools-media-item"><img src="/schools-parent-report.jpg" alt="A mother and her daughter looking at a report card together at home" /></div>
               </div>
               <div className="sd-audience-grid" data-anim="cards">
                 <div className="sd-audience">
