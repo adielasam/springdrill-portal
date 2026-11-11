@@ -50,6 +50,20 @@ function SplitWords({ text }: { text: string }) {
   );
 }
 
+// Logo mark: a green rounded square with a white check — "tests marked,
+// results ready". One component, reused in the header, preloader, nav
+// overlay and footer. Swap the SVG for a cap/book/"S" later if wanted.
+function LogoMark({ variant = 'green', size = 32 }: { variant?: 'green' | 'white'; size?: number }) {
+  const square = variant === 'white' ? '#ffffff' : '#007a4d';
+  const check = variant === 'white' ? '#007a4d' : '#ffffff';
+  return (
+    <svg className="sd-logo-mark" width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <rect width="32" height="32" rx="8" fill={square} />
+      <path d="M9 16.5 L13.8 21.3 L23.5 10.5" stroke={check} strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function LoginForm() {
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
@@ -59,6 +73,7 @@ function LoginForm() {
   // Nav-click logo transition: a full-screen deep-green overlay shows the
   // wordmark animating in before the page scrolls to the clicked section.
   const [navOverlay, setNavOverlay] = useState<null | { leaving: boolean }>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const navTimers = useRef<number[]>([]);
   const progressRef = useRef<HTMLDivElement>(null);
   const heroMediaRef = useRef<HTMLDivElement>(null);
@@ -439,6 +454,10 @@ function LoginForm() {
         .sd-header { position: sticky; top: 0; z-index: 100; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(220, 230, 223, 0.8); }
         .sd-header-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
         .sd-wordmark { font-size: 1.4rem; font-weight: 800; color: #004d34; text-decoration: none; letter-spacing: -0.5px; }
+        .sd-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .sd-logo-mark { flex: none; display: block; }
+        .sd-footer-brand { display: flex; align-items: center; gap: 10px; }
+        .sd-menu-btn { display: none; background: none; border: none; padding: 8px; cursor: pointer; }
         .sd-nav { display: flex; align-items: center; gap: 28px; }
         .sd-nav a { color: #1c2b25; text-decoration: none; font-size: 0.95rem; font-weight: 500; position: relative; }
         .sd-nav a:hover { color: #007a4d; }
@@ -587,6 +606,7 @@ function LoginForm() {
 
         /* Nav-click logo transition overlay */
         .sd-nav-overlay { position: fixed; inset: 0; background: #004d34; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 1; transition: opacity 0.3s ease; }
+        .sd-nav-overlay .sd-logo-mark { margin-bottom: 18px; }
         .sd-nav-overlay.sd-leaving { opacity: 0; pointer-events: none; }
         .sd-overlay-wordmark { color: #ffffff; font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; line-height: 1; }
         .sd-overlay-wordmark span { display: inline-block; opacity: 0; animation: sd-logo-letter-in 0.45s ease forwards; }
@@ -675,6 +695,10 @@ function LoginForm() {
 
         @media (max-width: 600px) {
           .sd-nav a { display: none; }
+          .sd-menu-btn { display: flex; align-items: center; justify-content: center; }
+          .sd-mobile-menu { display: flex; flex-direction: column; gap: 4px; position: fixed; top: 64px; left: 0; right: 0; z-index: 90; background: #fff; border-bottom: 1px solid rgba(220, 230, 223, 0.9); padding: 12px 24px 16px; box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08); }
+          .sd-mobile-menu a { color: #1c2b25; text-decoration: none; font-size: 1rem; font-weight: 500; padding: 10px 0; }
+          .sd-mobile-menu a.sd-btn { color: #fff; text-align: center; margin-top: 8px; padding: 12px; }
           .sd-hero h1 { font-size: 1.8rem; }
           .sd-hero p { font-size: 1.05rem; }
           .sd-feature-grid { grid-template-columns: 1fr; }
@@ -688,7 +712,7 @@ function LoginForm() {
       {showPreloader && (
         <div style={{
           position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-          background: '#ffffff', zIndex: 99999, display: 'flex', alignItems: 'center',
+          background: '#ffffff', zIndex: 99999, display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center',
           justifyContent: 'center', transition: 'opacity 0.5s ease-out'
         }}>
           <div style={{position: 'relative', width: 120, height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
@@ -697,13 +721,15 @@ function LoginForm() {
               border: '4px solid #f3f3f3', borderTop: '4px solid #004d34', borderBottom: '4px solid #004d34',
               borderRadius: '50%', animation: 'preloader-spin 1s linear infinite', zIndex: 1
             }}></div>
-            <span style={{fontSize: '1.05rem', fontWeight: 800, color: '#004d34', zIndex: 2}}>SpringDrill</span>
+            <span style={{zIndex: 2, display: 'flex'}}><LogoMark size={52} /></span>
           </div>
+          <span style={{fontSize: '1.4rem', fontWeight: 800, color: '#004d34'}}>SpringDrill</span>
         </div>
       )}
 
       {navOverlay && (
         <div className={`sd-nav-overlay${navOverlay.leaving ? ' sd-leaving' : ''}`} aria-hidden="true">
+          <LogoMark variant="white" size={44} />
           <div className="sd-overlay-wordmark">
             {'SpringDrill'.split('').map((letter, i) => (
               <span key={i} style={{ animationDelay: `${i * 45}ms` }}>{letter}</span>
@@ -716,7 +742,7 @@ function LoginForm() {
       <div className="sd-page" id="top">
         <header className="sd-header">
           <div className="sd-header-inner">
-            <a href="#top" className="sd-wordmark" onClick={(e) => handleNavClick(e, '#top')}>SpringDrill</a>
+            <a href="#top" className="sd-brand" onClick={(e) => handleNavClick(e, '#top')}><LogoMark size={30} /><span className="sd-wordmark">SpringDrill</span></a>
             <nav className="sd-nav">
               <a href="#features" onClick={(e) => handleNavClick(e, '#features')}>Features</a>
               <a href="#how" onClick={(e) => handleNavClick(e, '#how')}>How it works</a>
@@ -724,8 +750,25 @@ function LoginForm() {
               <a href="#contact" onClick={(e) => handleNavClick(e, '#contact')}>Contact</a>
               <a href="#signin" className="sd-btn" onClick={(e) => handleNavClick(e, '#signin')}>Portal sign-in</a>
             </nav>
+            <button type="button" className="sd-menu-btn" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} aria-controls="sd-mobile-menu" onClick={() => setMenuOpen(!menuOpen)}>
+              {menuOpen ? (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12 M18 6L6 18" stroke="#004d34" strokeWidth="2" strokeLinecap="round" /></svg>
+              ) : (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16 M4 12h16 M4 17h16" stroke="#004d34" strokeWidth="2" strokeLinecap="round" /></svg>
+              )}
+            </button>
           </div>
         </header>
+
+        {menuOpen && (
+          <div className="sd-mobile-menu" id="sd-mobile-menu">
+            <a href="#features" onClick={(e) => { setMenuOpen(false); handleNavClick(e, '#features'); }}>Features</a>
+            <a href="#how" onClick={(e) => { setMenuOpen(false); handleNavClick(e, '#how'); }}>How it works</a>
+            <a href="#schools" onClick={(e) => { setMenuOpen(false); handleNavClick(e, '#schools'); }}>For schools</a>
+            <a href="#contact" onClick={(e) => { setMenuOpen(false); handleNavClick(e, '#contact'); }}>Contact</a>
+            <a href="#signin" className="sd-btn" onClick={(e) => { setMenuOpen(false); handleNavClick(e, '#signin'); }}>Portal sign-in</a>
+          </div>
+        )}
 
         <div className="sd-progress" ref={progressRef} aria-hidden="true" />
 
@@ -970,7 +1013,7 @@ function LoginForm() {
         <footer id="contact" className="sd-footer">
           <div className="sd-footer-inner">
             <div>
-              <h3>SpringDrill</h3>
+              <h3 className="sd-footer-brand"><LogoMark size={26} />SpringDrill</h3>
               <p>CBT tests, results and report cards for Nigerian schools.</p>
             </div>
             <div className="sd-footer-contact">
