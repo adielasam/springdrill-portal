@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useRef, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 
@@ -13,6 +13,11 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showPreloader, setShowPreloader] = useState(true);
+
+  // Nav-click logo transition: a full-screen deep-green overlay shows the
+  // wordmark animating in before the page scrolls to the clicked section.
+  const [navOverlay, setNavOverlay] = useState<null | { leaving: boolean }>(null);
+  const navTimers = useRef<number[]>([]);
 
   // Form State
   const [email, setEmail] = useState('');
@@ -29,6 +34,55 @@ function LoginForm() {
     const t = setTimeout(() => setShowPreloader(false), 800);
     return () => clearTimeout(t);
   }, []);
+
+  // Clear any pending nav-transition timers when the component unmounts.
+  useEffect(() => {
+    const timers = navTimers.current;
+    return () => { timers.forEach((t) => window.clearTimeout(t)); };
+  }, []);
+
+  // Scroll-reveal: sections fade/slide in gently as they enter the viewport.
+  // The reveal classes are added from JS, so the page stays fully visible
+  // if JS never runs.
+  useEffect(() => {
+    const els = Array.from(document.querySelectorAll('[data-reveal]'));
+    if (!els.length) return;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    els.forEach((el) => el.classList.add('sd-reveal'));
+    if (reduceMotion || typeof IntersectionObserver === 'undefined') {
+      els.forEach((el) => el.classList.add('is-visible'));
+      return;
+    }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    els.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  // Intercept a nav click: show the logo overlay first (~950ms total), then
+  // smooth-scroll to the target. Never stacks, and the overlay can never
+  // trap the user: a failsafe clears it after 2s no matter what.
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, target: string) => {
+    e.preventDefault();
+    if (navOverlay) return;
+    const el = document.querySelector(target);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const go = () => {
+      if (el) el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+      window.history.pushState(null, '', target);
+    };
+    if (reduceMotion || !el) { go(); return; }
+    setNavOverlay({ leaving: false });
+    navTimers.current.push(window.setTimeout(() => setNavOverlay({ leaving: true }), 650));
+    navTimers.current.push(window.setTimeout(() => { setNavOverlay(null); go(); }, 950));
+    navTimers.current.push(window.setTimeout(() => setNavOverlay(null), 2000));
+  };
 
   useEffect(() => {
     const err = searchParams.get('error');
@@ -149,6 +203,8 @@ function LoginForm() {
     <>
       <style>{`
         @keyframes preloader-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes sd-logo-letter-in { from { opacity: 0; transform: translateY(10px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes sd-overlay-bar { from { width: 0; } to { width: 120px; } }
 
         html { scroll-behavior: smooth; }
 
@@ -163,7 +219,7 @@ function LoginForm() {
 
         .sd-page { color: #1c2b25; background: #ffffff; }
         .sd-wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
-        .sd-section { padding: 72px 0; scroll-margin-top: 80px; }
+        .sd-section { padding: 96px 0; scroll-margin-top: 80px; border-top: 1px solid #e6efe9; }
         .sd-section-soft { background: #f3f7f4; }
         .sd-eyebrow { font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #007a4d; margin: 0 0 12px 0; }
         .sd-h2 { font-size: 1.9rem; font-weight: 800; line-height: 1.25; margin: 0 0 16px 0; color: #123227; }
@@ -181,11 +237,11 @@ function LoginForm() {
         .sd-btn-outline:hover { background: #f3f7f4; color: #004d34; }
 
         /* Hero */
-        .sd-hero { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 48px; align-items: center; padding: 72px 0; }
-        .sd-hero h1 { font-size: 2.7rem; font-weight: 800; line-height: 1.15; letter-spacing: -1px; margin: 0 0 20px 0; color: #123227; }
+        .sd-hero { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 48px; align-items: center; padding: 96px 0; }
+        .sd-hero h1 { font-size: 3.1rem; font-weight: 800; line-height: 1.15; letter-spacing: -1px; margin: 0 0 20px 0; color: #123227; }
         .sd-hero p { font-size: 1.15rem; line-height: 1.7; color: #5a6b63; margin: 0 0 32px 0; }
         .sd-hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
-        .sd-hero img { width: 100%; height: 340px; object-fit: cover; border-radius: 12px; border: 1px solid #dce6df; display: block; }
+        .sd-hero img { width: 100%; height: 340px; object-fit: cover; border-radius: 16px; border: 1px solid #dce6df; display: block; }
 
         /* Features */
         .sd-feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 40px; }
@@ -301,6 +357,22 @@ function LoginForm() {
           border-color: rgba(255, 255, 255, 0.45);
         }
 
+        /* Nav-click logo transition overlay */
+        .sd-nav-overlay { position: fixed; inset: 0; background: #004d34; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 1; transition: opacity 0.3s ease; }
+        .sd-nav-overlay.sd-leaving { opacity: 0; pointer-events: none; }
+        .sd-overlay-wordmark { color: #ffffff; font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; line-height: 1; }
+        .sd-overlay-wordmark span { display: inline-block; opacity: 0; animation: sd-logo-letter-in 0.45s ease forwards; }
+        .sd-overlay-bar { height: 2px; background: rgba(255, 255, 255, 0.65); width: 0; margin-top: 16px; animation: sd-overlay-bar 0.6s ease 0.25s forwards; }
+
+        /* Scroll-reveal (classes added from JS; content stays visible without JS) */
+        .sd-reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.7s ease, transform 0.7s ease; }
+        .sd-reveal.is-visible { opacity: 1; transform: translateY(0); }
+        @media (prefers-reduced-motion: reduce) {
+          .sd-reveal { opacity: 1; transform: none; transition: none; }
+          .sd-overlay-wordmark span { animation: none; opacity: 1; }
+          .sd-overlay-bar { animation: none; width: 120px; }
+        }
+
         /* Footer */
         .sd-footer { background: #004d34; color: #ffffff; padding: 48px 0 32px 0; }
         .sd-footer-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
@@ -312,12 +384,12 @@ function LoginForm() {
         .sd-footer-copy { max-width: 1100px; margin: 32px auto 0 auto; padding: 24px 24px 0 24px; border-top: 1px solid rgba(255, 255, 255, 0.2); font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); text-align: center; }
 
         @media (max-width: 900px) {
-          .sd-hero { grid-template-columns: 1fr; gap: 32px; padding: 48px 0; }
+          .sd-hero { grid-template-columns: 1fr; gap: 32px; padding: 56px 0; }
           .sd-hero h1 { font-size: 2.1rem; }
           .sd-hero img { height: 260px; }
           .sd-feature-grid { grid-template-columns: repeat(2, 1fr); }
           .sd-step-grid { grid-template-columns: 1fr; }
-          .sd-section { padding: 56px 0; }
+          .sd-section { padding: 64px 0; }
         }
 
         @media (max-width: 600px) {
@@ -349,16 +421,27 @@ function LoginForm() {
         </div>
       )}
 
+      {navOverlay && (
+        <div className={`sd-nav-overlay${navOverlay.leaving ? ' sd-leaving' : ''}`} aria-hidden="true">
+          <div className="sd-overlay-wordmark">
+            {'SpringDrill'.split('').map((letter, i) => (
+              <span key={i} style={{ animationDelay: `${i * 45}ms` }}>{letter}</span>
+            ))}
+          </div>
+          <div className="sd-overlay-bar" />
+        </div>
+      )}
+
       <div className="sd-page" id="top">
         <header className="sd-header">
           <div className="sd-header-inner">
-            <a href="#top" className="sd-wordmark">SpringDrill</a>
+            <a href="#top" className="sd-wordmark" onClick={(e) => handleNavClick(e, '#top')}>SpringDrill</a>
             <nav className="sd-nav">
-              <a href="#features">Features</a>
-              <a href="#how">How it works</a>
-              <a href="#schools">For schools</a>
-              <a href="#contact">Contact</a>
-              <a href="#signin" className="sd-btn">Portal sign-in</a>
+              <a href="#features" onClick={(e) => handleNavClick(e, '#features')}>Features</a>
+              <a href="#how" onClick={(e) => handleNavClick(e, '#how')}>How it works</a>
+              <a href="#schools" onClick={(e) => handleNavClick(e, '#schools')}>For schools</a>
+              <a href="#contact" onClick={(e) => handleNavClick(e, '#contact')}>Contact</a>
+              <a href="#signin" className="sd-btn" onClick={(e) => handleNavClick(e, '#signin')}>Portal sign-in</a>
             </nav>
           </div>
         </header>
@@ -370,8 +453,8 @@ function LoginForm() {
                 <h1>Report cards in minutes, not weekends.</h1>
                 <p>SpringDrill helps Nigerian schools set CBT tests, mark them, auto-collate results and print report cards, generate lesson plans with AI, and give students JAMB practice.</p>
                 <div className="sd-hero-actions">
-                  <a href="#signin" className="sd-btn">Sign in to your portal</a>
-                  <a href="#how" className="sd-btn-outline">See how it works</a>
+                  <a href="#signin" className="sd-btn" onClick={(e) => handleNavClick(e, '#signin')}>Sign in to your portal</a>
+                  <a href="#how" className="sd-btn-outline" onClick={(e) => handleNavClick(e, '#how')}>See how it works</a>
                 </div>
               </div>
               <img src="/springvalleyclass.jpg" alt="Students in a classroom" />
@@ -379,7 +462,7 @@ function LoginForm() {
           </section>
 
           <section id="features" className="sd-section sd-section-soft">
-            <div className="sd-wrap">
+            <div className="sd-wrap" data-reveal>
               <p className="sd-eyebrow">What SpringDrill does</p>
               <h2 className="sd-h2">Everything a school needs to run exams and results.</h2>
               <div className="sd-feature-grid">
@@ -408,7 +491,7 @@ function LoginForm() {
           </section>
 
           <section id="how" className="sd-section">
-            <div className="sd-wrap">
+            <div className="sd-wrap" data-reveal>
               <p className="sd-eyebrow">How it works</p>
               <h2 className="sd-h2">Three steps, from test to report card.</h2>
               <div className="sd-step-grid">
@@ -432,7 +515,7 @@ function LoginForm() {
           </section>
 
           <section id="schools" className="sd-section sd-section-soft">
-            <div className="sd-wrap">
+            <div className="sd-wrap" data-reveal>
               <p className="sd-eyebrow">Who it is for</p>
               <h2 className="sd-h2">Built for the whole school.</h2>
               <div className="sd-audience-grid">
@@ -469,7 +552,7 @@ function LoginForm() {
           </section>
 
           <section id="signin" className="sd-section">
-            <div className="sd-wrap">
+            <div className="sd-wrap" data-reveal>
               <div className="sd-signin-card">
                 <div className="sd-signin-header">
                   <h2>{authMode === 'reset' ? 'Set a new password' : 'Sign in to your portal'}</h2>
