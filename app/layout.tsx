@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SPRINGDRILL",
-  description: "Secure Login and Portal",
+  title: "SpringDrill — CBT, Results & Report Cards for Nigerian Schools",
+  description: "SpringDrill helps Nigerian schools set CBT tests, auto-collate results and print report cards, generate lesson plans with AI, and give students JAMB practice.",
 };
 
 export default function RootLayout({
