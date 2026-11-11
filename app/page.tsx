@@ -1,12 +1,54 @@
 'use client';
 
-import { useEffect, useRef, useState, Suspense } from 'react';
+import { useEffect, useRef, useState, Suspense, Fragment } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jmxyopohngslqvzknjnt.supabase.co';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_yGvqUxGlwiJuSkFN4VOpWw_nKYmo-vl';
 const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Split a heading into per-letter spans (wrapped per word so lines can still
+// break between words). Each letter carries its own --sd-d stagger delay.
+function SplitLetters({ text }: { text: string }) {
+  const words = text.split(' ');
+  const total = text.replace(/ /g, '').length;
+  const step = Math.min(30, 320 / Math.max(1, total - 1));
+  let n = 0;
+  return (
+    <>
+      {words.map((word, wi) => (
+        <Fragment key={wi}>
+          <span className="sd-word">
+            {word.split('').map((ch) => {
+              const d = Math.round(n * step);
+              n += 1;
+              return (
+                <span key={n} className="sd-ch" style={{ '--sd-d': `${d}ms` } as React.CSSProperties}>{ch}</span>
+              );
+            })}
+          </span>
+          {wi < words.length - 1 ? ' ' : null}
+        </Fragment>
+      ))}
+    </>
+  );
+}
+
+// Split body copy into per-word spans, each with its own --sd-d delay.
+function SplitWords({ text }: { text: string }) {
+  const words = text.split(' ');
+  return (
+    <>
+      {words.map((word, wi) => (
+        <Fragment key={wi}>
+          <span className="sd-w" style={{ '--sd-d': `${Math.min(wi * 18, 380)}ms` } as React.CSSProperties}>{word}</span>
+          {wi < words.length - 1 ? ' ' : null}
+        </Fragment>
+      ))}
+    </>
+  );
+}
 
 function LoginForm() {
   const searchParams = useSearchParams();
@@ -18,6 +60,8 @@ function LoginForm() {
   // wordmark animating in before the page scrolls to the clicked section.
   const [navOverlay, setNavOverlay] = useState<null | { leaving: boolean }>(null);
   const navTimers = useRef<number[]>([]);
+  const progressRef = useRef<HTMLDivElement>(null);
+  const heroMediaRef = useRef<HTMLDivElement>(null);
 
   // Form State
   const [email, setEmail] = useState('');
@@ -63,6 +107,75 @@ function LoginForm() {
     }, { threshold: 0.15 });
     els.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
+  }, []);
+
+  // ZRK-style text animations (PR #7): per-letter headings, per-word body
+  // copy, staggered card entrances. Hidden states are added from JS only,
+  // so the page stays fully visible if JS never runs. Everything is
+  // on-enter (IntersectionObserver), NOT scroll-scrubbed: ZRK pins sections
+  // to scroll position, which would break our anchor jumps and the nav logo
+  // transition, so this keeps the look without the breakage. Each element
+  // animates once per visit.
+  useEffect(() => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const animEls = Array.from(document.querySelectorAll('[data-anim]'));
+    if (!animEls.length || reduceMotion || typeof IntersectionObserver === 'undefined') {
+      return; // no base classes added: everything stays visible, no motion
+    }
+    animEls.forEach((el) => {
+      const kind = el.getAttribute('data-anim');
+      if (kind === 'letters') el.classList.add('sd-anim-letters');
+      if (kind === 'words') el.classList.add('sd-anim-words');
+      if (kind === 'cards') {
+        el.classList.add('sd-anim-cards');
+        Array.from(el.children).forEach((child, i) => {
+          (child as HTMLElement).style.setProperty('--sd-i', String(i));
+        });
+      }
+    });
+    // Hero text sits behind the ~800ms preloader on load, so it gets its
+    // own timer instead of the observer: letters/words/photo start at 950ms.
+    const heroRoot = document.querySelector('.sd-hero');
+    const heroTimer = window.setTimeout(() => {
+      heroRoot?.classList.add('is-in');
+      animEls
+        .filter((el) => el.hasAttribute('data-anim-hero'))
+        .forEach((el) => el.classList.add('is-in'));
+    }, 950);
+    const rest = animEls.filter((el) => !el.hasAttribute('data-anim-hero'));
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-in');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    rest.forEach((el) => observer.observe(el));
+    return () => { window.clearTimeout(heroTimer); observer.disconnect(); };
+  }, []);
+
+  // Scroll progress bar + hero photo parallax (transform only, rAF-throttled).
+  useEffect(() => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) return;
+    const bar = progressRef.current;
+    const media = heroMediaRef.current;
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      if (bar && max > 0) bar.style.width = `${(window.scrollY / max) * 100}%`;
+      if (media && window.scrollY < 900) {
+        media.style.transform = `translateY(${Math.min(14, window.scrollY * 0.04)}px)`;
+      }
+    };
+    const onScroll = () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   // Intercept a nav click: show the logo overlay first (~950ms total), then
@@ -229,8 +342,10 @@ function LoginForm() {
         .sd-header-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
         .sd-wordmark { font-size: 1.4rem; font-weight: 800; color: #004d34; text-decoration: none; letter-spacing: -0.5px; }
         .sd-nav { display: flex; align-items: center; gap: 28px; }
-        .sd-nav a { color: #1c2b25; text-decoration: none; font-size: 0.95rem; font-weight: 500; }
+        .sd-nav a { color: #1c2b25; text-decoration: none; font-size: 0.95rem; font-weight: 500; position: relative; }
         .sd-nav a:hover { color: #007a4d; }
+        .sd-nav a:not(.sd-btn)::after { content: ''; position: absolute; left: 0; bottom: -4px; height: 2px; width: 100%; background: #007a4d; transform: scaleX(0); transform-origin: left; transition: transform 0.25s ease; }
+        .sd-nav a:not(.sd-btn):hover::after { transform: scaleX(1); }
         .sd-btn { display: inline-block; background: #007a4d; color: #ffffff; border: none; border-radius: 6px; padding: 11px 20px; font-weight: 700; font-size: 0.95rem; cursor: pointer; text-decoration: none; }
         .sd-btn:hover { background: #005c3a; color: #ffffff; }
         .sd-btn-outline { display: inline-block; background: #ffffff; color: #004d34; border: 1px solid #004d34; border-radius: 6px; padding: 11px 20px; font-weight: 700; font-size: 0.95rem; cursor: pointer; text-decoration: none; }
@@ -241,7 +356,10 @@ function LoginForm() {
         .sd-hero h1 { font-size: 3.1rem; font-weight: 800; line-height: 1.15; letter-spacing: -1px; margin: 0 0 20px 0; color: #123227; }
         .sd-hero p { font-size: 1.15rem; line-height: 1.7; color: #5a6b63; margin: 0 0 32px 0; }
         .sd-hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
-        .sd-hero img { width: 100%; height: 340px; object-fit: cover; border-radius: 16px; border: 1px solid #dce6df; display: block; }
+        .sd-hero-media { overflow: hidden; border-radius: 16px; border: 1px solid #dce6df; }
+        .sd-hero-media img { width: 100%; height: 340px; object-fit: cover; display: block; border: none; border-radius: 0; transform: scale(1.06); }
+        .sd-hero.is-in .sd-hero-media img { animation: sd-photo-settle 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        @keyframes sd-photo-settle { from { transform: scale(1.06); } to { transform: scale(1); } }
 
         /* Features */
         .sd-feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 40px; }
@@ -364,6 +482,23 @@ function LoginForm() {
         .sd-overlay-wordmark span { display: inline-block; opacity: 0; animation: sd-logo-letter-in 0.45s ease forwards; }
         .sd-overlay-bar { height: 2px; background: rgba(255, 255, 255, 0.65); width: 0; margin-top: 16px; animation: sd-overlay-bar 0.6s ease 0.25s forwards; }
 
+        /* Scroll progress bar (width set from JS; stays 0 without JS) */
+        .sd-progress { position: fixed; top: 64px; left: 0; height: 3px; width: 0; background: #007a4d; z-index: 101; }
+
+        /* ZRK-style text animations (PR #7). Hidden states only apply once
+           JS adds the sd-anim-* class, so text stays visible without JS.
+           All entrances are fast (<=0.8s per element) and run once. */
+        .sd-word { display: inline-block; white-space: nowrap; }
+        .sd-anim-letters .sd-ch { display: inline-block; opacity: 0; transform: translateY(0.55em); }
+        .sd-anim-letters.is-in .sd-ch { animation: sd-letter-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: var(--sd-d, 0ms); }
+        @keyframes sd-letter-in { from { opacity: 0; transform: translateY(0.55em); } to { opacity: 1; transform: translateY(0); } }
+        .sd-anim-words .sd-w { display: inline-block; opacity: 0; transform: translateY(8px); }
+        .sd-anim-words.is-in .sd-w { animation: sd-word-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: var(--sd-d, 0ms); }
+        @keyframes sd-word-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .sd-anim-cards > * { opacity: 0; transform: translateY(18px); }
+        .sd-anim-cards.is-in > * { animation: sd-card-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: calc(var(--sd-i, 0) * 90ms); }
+        @keyframes sd-card-in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+
         /* Scroll-reveal (classes added from JS; content stays visible without JS) */
         .sd-reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.7s ease, transform 0.7s ease; }
         .sd-reveal.is-visible { opacity: 1; transform: translateY(0); }
@@ -371,6 +506,10 @@ function LoginForm() {
           .sd-reveal { opacity: 1; transform: none; transition: none; }
           .sd-overlay-wordmark span { animation: none; opacity: 1; }
           .sd-overlay-bar { animation: none; width: 120px; }
+          .sd-anim-letters .sd-ch, .sd-anim-words .sd-w { opacity: 1; transform: none; animation: none; }
+          .sd-anim-cards > * { opacity: 1; transform: none; animation: none; }
+          .sd-hero-media img { transform: none; animation: none; }
+          .sd-progress { display: none; }
         }
 
         /* Footer */
@@ -386,7 +525,7 @@ function LoginForm() {
         @media (max-width: 900px) {
           .sd-hero { grid-template-columns: 1fr; gap: 32px; padding: 56px 0; }
           .sd-hero h1 { font-size: 2.1rem; }
-          .sd-hero img { height: 260px; }
+          .sd-hero-media img { height: 260px; }
           .sd-feature-grid { grid-template-columns: repeat(2, 1fr); }
           .sd-step-grid { grid-template-columns: 1fr; }
           .sd-section { padding: 64px 0; }
@@ -446,45 +585,49 @@ function LoginForm() {
           </div>
         </header>
 
+        <div className="sd-progress" ref={progressRef} aria-hidden="true" />
+
         <main>
           <section className="sd-wrap">
             <div className="sd-hero">
               <div>
-                <h1>Report cards in minutes, not weekends.</h1>
-                <p>SpringDrill helps Nigerian schools set CBT tests, mark them, auto-collate results and print report cards, generate lesson plans with AI, and give students JAMB practice.</p>
+                <h1 data-anim="letters" data-anim-hero><SplitLetters text="Report cards in minutes, not weekends." /></h1>
+                <p data-anim="words" data-anim-hero><SplitWords text="SpringDrill helps Nigerian schools set CBT tests, mark them, auto-collate results and print report cards, generate lesson plans with AI, and give students JAMB practice." /></p>
                 <div className="sd-hero-actions">
                   <a href="#signin" className="sd-btn" onClick={(e) => handleNavClick(e, '#signin')}>Sign in to your portal</a>
                   <a href="#how" className="sd-btn-outline" onClick={(e) => handleNavClick(e, '#how')}>See how it works</a>
                 </div>
               </div>
-              <img src="/springvalleyclass.jpg" alt="Students in a classroom" />
+              <div className="sd-hero-media" ref={heroMediaRef}>
+                <img src="/springvalleyclass.jpg" alt="Students in a classroom" />
+              </div>
             </div>
           </section>
 
           <section id="features" className="sd-section sd-section-soft">
             <div className="sd-wrap" data-reveal>
               <p className="sd-eyebrow">What SpringDrill does</p>
-              <h2 className="sd-h2">Everything a school needs to run exams and results.</h2>
-              <div className="sd-feature-grid">
+              <h2 className="sd-h2" data-anim="letters"><SplitLetters text="Everything a school needs to run exams and results." /></h2>
+              <div className="sd-feature-grid" data-anim="cards">
                 <div className="sd-feature">
                   <i className="fas fa-chart-line"></i>
                   <h3>Results &amp; report cards</h3>
-                  <p>Scores from class tests and exams are added up automatically into totals, averages and positions, and printed as report cards. No hand calculation, no spreadsheet wrangling.</p>
+                  <p data-anim="words"><SplitWords text="Scores from class tests and exams are added up automatically into totals, averages and positions, and printed as report cards. No hand calculation, no spreadsheet wrangling." /></p>
                 </div>
                 <div className="sd-feature">
                   <i className="fas fa-clipboard-check"></i>
                   <h3>CBT tests</h3>
-                  <p>Teachers set timed computer-based tests from the question bank. Students answer on screen, and scores are recorded straight away.</p>
+                  <p data-anim="words"><SplitWords text="Teachers set timed computer-based tests from the question bank. Students answer on screen, and scores are recorded straight away." /></p>
                 </div>
                 <div className="sd-feature">
                   <i className="fas fa-book-open"></i>
                   <h3>AI lesson plans</h3>
-                  <p>Teachers generate lesson plans with AI from the scheme of work, then edit them before use.</p>
+                  <p data-anim="words"><SplitWords text="Teachers generate lesson plans with AI from the scheme of work, then edit them before use." /></p>
                 </div>
                 <div className="sd-feature">
                   <i className="fas fa-graduation-cap"></i>
                   <h3>JAMB practice</h3>
-                  <p>Students practise with JAMB-style questions in the UTME Simulator and see their scores and progress over time.</p>
+                  <p data-anim="words"><SplitWords text="Students practise with JAMB-style questions in the UTME Simulator and see their scores and progress over time." /></p>
                 </div>
               </div>
             </div>
@@ -493,22 +636,22 @@ function LoginForm() {
           <section id="how" className="sd-section">
             <div className="sd-wrap" data-reveal>
               <p className="sd-eyebrow">How it works</p>
-              <h2 className="sd-h2">Three steps, from test to report card.</h2>
-              <div className="sd-step-grid">
+              <h2 className="sd-h2" data-anim="letters"><SplitLetters text="Three steps, from test to report card." /></h2>
+              <div className="sd-step-grid" data-anim="cards">
                 <div className="sd-step">
                   <div className="sd-step-num">1</div>
                   <h3>Teacher sets the test</h3>
-                  <p>A teacher picks a class and subject, sets questions from the bank, and opens the test.</p>
+                  <p data-anim="words"><SplitWords text="A teacher picks a class and subject, sets questions from the bank, and opens the test." /></p>
                 </div>
                 <div className="sd-step">
                   <div className="sd-step-num">2</div>
                   <h3>Students take it</h3>
-                  <p>Students log in, answer on screen, and submit. Scores are recorded immediately.</p>
+                  <p data-anim="words"><SplitWords text="Students log in, answer on screen, and submit. Scores are recorded immediately." /></p>
                 </div>
                 <div className="sd-step">
                   <div className="sd-step-num">3</div>
                   <h3>Results are ready</h3>
-                  <p>Totals, averages and positions are worked out automatically, and report cards print in minutes.</p>
+                  <p data-anim="words"><SplitWords text="Totals, averages and positions are worked out automatically, and report cards print in minutes." /></p>
                 </div>
               </div>
             </div>
@@ -517,34 +660,34 @@ function LoginForm() {
           <section id="schools" className="sd-section sd-section-soft">
             <div className="sd-wrap" data-reveal>
               <p className="sd-eyebrow">Who it is for</p>
-              <h2 className="sd-h2">Built for the whole school.</h2>
-              <div className="sd-audience-grid">
+              <h2 className="sd-h2" data-anim="letters"><SplitLetters text="Built for the whole school." /></h2>
+              <div className="sd-audience-grid" data-anim="cards">
                 <div className="sd-audience">
                   <i className="fas fa-school"></i>
                   <div>
                     <h3>Schools</h3>
-                    <p>Run exams, results and report cards from one portal.</p>
+                    <p data-anim="words"><SplitWords text="Run exams, results and report cards from one portal." /></p>
                   </div>
                 </div>
                 <div className="sd-audience">
                   <i className="fas fa-chalkboard-teacher"></i>
                   <div>
                     <h3>Teachers</h3>
-                    <p>Set tests, enter scores, and plan lessons without the paperwork.</p>
+                    <p data-anim="words"><SplitWords text="Set tests, enter scores, and plan lessons without the paperwork." /></p>
                   </div>
                 </div>
                 <div className="sd-audience">
                   <i className="fas fa-user-graduate"></i>
                   <div>
                     <h3>Students</h3>
-                    <p>Practise for JAMB and see your own results and progress.</p>
+                    <p data-anim="words"><SplitWords text="Practise for JAMB and see your own results and progress." /></p>
                   </div>
                 </div>
                 <div className="sd-audience">
                   <i className="fas fa-users"></i>
                   <div>
                     <h3>Parents</h3>
-                    <p>Follow your child&apos;s results and report cards through the parent portal.</p>
+                    <p data-anim="words"><SplitWords text="Follow your child's results and report cards through the parent portal." /></p>
                   </div>
                 </div>
               </div>
@@ -555,7 +698,7 @@ function LoginForm() {
             <div className="sd-wrap" data-reveal>
               <div className="sd-signin-card">
                 <div className="sd-signin-header">
-                  <h2>{authMode === 'reset' ? 'Set a new password' : 'Sign in to your portal'}</h2>
+                  <h2 data-anim="letters"><SplitLetters text={authMode === 'reset' ? 'Set a new password' : 'Sign in to your portal'} /></h2>
                   <p>{authMode === 'reset' ? 'Choose a new password for your account.' : 'Use the email and password your school gave you.'}</p>
                 </div>
 
