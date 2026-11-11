@@ -15,7 +15,7 @@
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        .sidebar { width: var(--sidebar-width); background: white; border-right: 1px solid #e0e0e0; height: 100vh; overflow-y: auto; flex-shrink: 0; padding-top: 20px;}
+        .sidebar { width: var(--sidebar-width); background: white; border-right: 1px solid #e0e0e0; height: 100vh; overflow-y: auto; flex-shrink: 0; padding-top: 20px; overscroll-behavior: contain; scrollbar-width: thin;}
         .sidebar-brand { display: flex; align-items: center; justify-content: center; margin-bottom: 30px; }
         .sidebar-brand img { max-height: 50px; }
         .nav-link { color: #555; padding: 12px 20px; font-weight: 500; display: flex; align-items: center; text-decoration: none; border-left: 4px solid transparent; }

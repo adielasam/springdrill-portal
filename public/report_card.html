@@ -10,7 +10,7 @@
         body { background-color: #f4f7fa; overflow-x: hidden; }
         
         /* Sidebar Styling (Hidden in Print) */
-        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding-top: 30px; z-index: 1000; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding-top: 30px; z-index: 1000; box-shadow: 4px 0 15px rgba(0,0,0,0.1); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin;}
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
         .sidebar-brand i { color: #3498db; font-size: 2.5rem; margin-bottom: 10px; }
         .nav-link { color: rgba(255,255,255,0.8); padding: 15px 25px; margin: 4px 15px; border-radius: 8px; text-decoration: none; display: flex; align-items: center; }
