@@ -64,6 +64,103 @@ function LogoMark({ variant = 'green', size = 32 }: { variant?: 'green' | 'white
   );
 }
 
+// Pencil cursor (PR #13): the pencil IS the cursor on fine-pointer devices.
+// It chases the pointer with a small lag, rotates in-plane to face the
+// travel direction about its graphite tip, and grows over links/buttons.
+// It mounts only with a fine pointer and no reduced-motion preference; on
+// touch devices, and with reduced motion, the OS cursor stays untouched.
+// No ripple, no trail, no particles — the template it learns from has none.
+function PencilCursor() {
+  const followerRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(false);
+
+  useEffect(() => {
+    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (finePointer && !reduceMotion) setActive(true);
+  }, []);
+
+  useEffect(() => {
+    if (!active) return;
+    const el = followerRef.current;
+    if (!el) return;
+    // The body class is what hides the OS arrow (see the CSS block) — it is
+    // only added while the follower is mounted, so a failed mount can never
+    // leave the user with no cursor at all.
+    document.body.classList.add('sd-pencil-cursor');
+    const W = 48, H = 14;
+    let tipX = 0, tipY = 0, targetX = 0, targetY = 0;
+    let angle = 0, scale = 1, targetScale = 1;
+    let placed = false;
+    let raf = 0;
+
+    const tick = () => {
+      raf = requestAnimationFrame(tick);
+      // The tip IS the click point, so the chase is tight (0.2/frame) — a
+      // bigger lag would make clicks feel off.
+      const dx = targetX - tipX, dy = targetY - tipY;
+      tipX += dx * 0.2; tipY += dy * 0.2;
+      // Face the travel direction. The angle only updates while the tip is
+      // actually moving, so the last travel angle persists at rest — the
+      // pencil never snaps back. Shortest-arc lerp keeps reversals smooth.
+      if (Math.hypot(dx, dy) > 1) {
+        const want = Math.atan2(dy, dx);
+        let diff = want - angle;
+        while (diff > Math.PI) diff -= 2 * Math.PI;
+        while (diff < -Math.PI) diff += 2 * Math.PI;
+        angle += diff * 0.3;
+      }
+      scale += (targetScale - scale) * 0.25;
+      el.style.transform = `translate3d(${tipX - W}px, ${tipY - H / 2}px, 0) rotate(${angle}rad) scale(${scale})`;
+    };
+
+    const onMove = (e: MouseEvent) => {
+      targetX = e.clientX; targetY = e.clientY;
+      // First sighting: place the tip on the pointer while still hidden, so
+      // it never sweeps in from a corner and never visibly teleports.
+      if (!placed) { tipX = targetX; tipY = targetY; placed = true; }
+      const t = e.target as Element | null;
+      const overText = !!t?.closest('input, textarea');
+      const overAction = !!t?.closest('a[href], button');
+      targetScale = overAction && !overText ? 1.35 : 1;
+      // Over text fields the follower hides and the normal text cursor
+      // returns (see the CSS block) — hiding the I-beam would hurt typing.
+      el.style.opacity = overText ? '0' : '1';
+    };
+    const onLeave = () => { el.style.opacity = '0'; };
+    const onEnter = () => { if (placed) el.style.opacity = '1'; };
+    const onOut = (e: MouseEvent) => { if (!e.relatedTarget) onLeave(); };
+
+    document.addEventListener('mousemove', onMove, { passive: true });
+    document.addEventListener('mouseleave', onLeave);
+    document.addEventListener('mouseenter', onEnter);
+    document.addEventListener('mouseout', onOut);
+    raf = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(raf);
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseleave', onLeave);
+      document.removeEventListener('mouseenter', onEnter);
+      document.removeEventListener('mouseout', onOut);
+      document.body.classList.remove('sd-pencil-cursor');
+    };
+  }, [active]);
+
+  if (!active) return null;
+  return (
+    <div ref={followerRef} className="sd-pencil" aria-hidden="true">
+      <svg width="48" height="14" viewBox="0 0 48 14" fill="none" aria-hidden="true">
+        <rect x="2" y="2" width="6" height="10" rx="1.5" fill="#f472b6" />
+        <rect x="8" y="2" width="2" height="10" fill="#c0c0c0" />
+        <rect x="10" y="2" width="28" height="10" fill="#f7c948" />
+        <polygon points="38,2 48,7 38,12" fill="#f5d6a0" />
+        <polygon points="43.5,4.75 48,7 43.5,9.25" fill="#2b2b2b" />
+        <path d="M3.5 2 H38 L48 7 L38 12 H3.5 Q2 12 2 10.5 V3.5 Q2 2 3.5 2 Z" stroke="#1c2b25" strokeWidth="0.75" fill="none" strokeLinejoin="round" />
+      </svg>
+    </div>
+  );
+}
+
 function LoginForm() {
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
@@ -674,6 +771,23 @@ function LoginForm() {
           .sd-progress { display: none; }
         }
 
+        /* Pencil cursor (PR #13): the pencil IS the cursor on fine pointers.
+           The follower is a fixed, transform-only element that never
+           intercepts clicks; it sits below the preloader/nav overlay
+           (99999) and above the sticky header. Rotation and scale pivot
+           about the graphite tip (right centre), so the tip stays glued
+           to the pointer. The soft drop-shadow keeps it readable on the
+           dark-green footer and overlay. */
+        .sd-pencil { position: fixed; left: 0; top: 0; width: 48px; height: 14px; z-index: 90000; pointer-events: none; opacity: 0; transition: opacity 0.15s ease; will-change: transform; transform-origin: 48px 7px; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35)); }
+        .sd-pencil svg { display: block; width: 48px; height: 14px; }
+        /* The OS arrow hides only while the follower is mounted (the body
+           class is added by the component), only on fine pointers, and
+           never with reduced motion. Text fields keep their text cursor. */
+        @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+          body.sd-pencil-cursor, body.sd-pencil-cursor * { cursor: none; }
+          body.sd-pencil-cursor input, body.sd-pencil-cursor textarea { cursor: text; }
+        }
+
         /* Footer */
         .sd-footer { background: #004d34; color: #ffffff; padding: 48px 0 32px 0; }
         .sd-footer-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
@@ -1026,6 +1140,8 @@ function LoginForm() {
           </div>
         </footer>
       </div>
+
+      <PencilCursor />
     </>
   );
 }
