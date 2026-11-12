@@ -3,6 +3,10 @@
 import { useEffect, useRef, useState, Suspense, Fragment } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
+import { LogoMark } from './components/LogoMark';
+import { SiteHeader } from './components/SiteHeader';
+import { SiteFooter } from './components/SiteFooter';
+import { SiteStyles } from './components/SiteStyles';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jmxyopohngslqvzknjnt.supabase.co';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_yGvqUxGlwiJuSkFN4VOpWw_nKYmo-vl';
@@ -50,25 +54,17 @@ function SplitWords({ text }: { text: string }) {
   );
 }
 
-// Logo mark: a green rounded square with a white check — "tests marked,
-// results ready". One component, reused in the header, preloader, nav
-// overlay and footer. Swap the SVG for a cap/book/"S" later if wanted.
-function LogoMark({ variant = 'green', size = 32 }: { variant?: 'green' | 'white'; size?: number }) {
-  const square = variant === 'white' ? '#ffffff' : '#007a4d';
-  const check = variant === 'white' ? '#007a4d' : '#ffffff';
-  return (
-    <svg className="sd-logo-mark" width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <rect width="32" height="32" rx="8" fill={square} />
-      <path d="M9 16.5 L13.8 21.3 L23.5 10.5" stroke={check} strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-// Pencil cursor (PR #13): the pencil IS the cursor on fine-pointer devices.
-// It chases the pointer with a small lag, rotates in-plane to face the
-// travel direction about its graphite tip, and grows over links/buttons.
-// It mounts only with a fine pointer and no reduced-motion preference; on
-// touch devices, and with reduced motion, the OS cursor stays untouched.
+// Cartoon pencil cursor: the user's pencil character image IS the cursor
+// on fine-pointer devices. The character stays upright — it has a face,
+// so full rotation to the travel direction would turn it upside down.
+// Instead it leans slightly toward the direction of travel (max ±18°),
+// eased, with the graphite tip leading the lean. The tip sits exactly on
+// the pointer when settled: the artwork was cropped to its solid pixels
+// (113x185, soft ground shadow removed) and the tip measured at cropped
+// pixel (41.5, 184.5) — 36.7% across, bottom edge — which is the
+// transform-origin in the CSS block below. It mounts only with a fine
+// pointer and no reduced-motion preference; on touch devices, and with
+// reduced motion, the OS cursor stays untouched.
 // No ripple, no trail, no particles — the template it learns from has none.
 function PencilCursor() {
   const followerRef = useRef<HTMLDivElement>(null);
@@ -88,9 +84,12 @@ function PencilCursor() {
     // only added while the follower is mounted, so a failed mount can never
     // leave the user with no cursor at all.
     document.body.classList.add('sd-pencil-cursor');
-    const W = 48, H = 14;
+    // Rendered sprite size (see .sd-pencil in the CSS block) and the tip
+    // offset within it: 36.7% of 36.6px wide, full 60px height.
+    const OX = 13.4, OY = 60;
+    const MAX_LEAN = (18 * Math.PI) / 180;
     let tipX = 0, tipY = 0, targetX = 0, targetY = 0;
-    let angle = 0, scale = 1, targetScale = 1;
+    let lean = 0, scale = 1, targetScale = 1;
     let placed = false;
     let raf = 0;
 
@@ -100,18 +99,17 @@ function PencilCursor() {
       // bigger lag would make clicks feel off.
       const dx = targetX - tipX, dy = targetY - tipY;
       tipX += dx * 0.2; tipY += dy * 0.2;
-      // Face the travel direction. The angle only updates while the tip is
-      // actually moving, so the last travel angle persists at rest — the
-      // pencil never snaps back. Shortest-arc lerp keeps reversals smooth.
-      if (Math.hypot(dx, dy) > 1) {
-        const want = Math.atan2(dy, dx);
-        let diff = want - angle;
-        while (diff > Math.PI) diff -= 2 * Math.PI;
-        while (diff < -Math.PI) diff += 2 * Math.PI;
-        angle += diff * 0.3;
+      // Lean toward the horizontal direction of travel: full lean moving
+      // sideways, upright moving straight up or down. The lean only
+      // updates while the tip is actually moving, so the last lean
+      // persists at rest — the pencil never snaps back.
+      const dist = Math.hypot(dx, dy);
+      if (dist > 1) {
+        const want = (dx / dist) * MAX_LEAN;
+        lean += (want - lean) * 0.3;
       }
       scale += (targetScale - scale) * 0.25;
-      el.style.transform = `translate3d(${tipX - W}px, ${tipY - H / 2}px, 0) rotate(${angle}rad) scale(${scale})`;
+      el.style.transform = `translate3d(${tipX - OX}px, ${tipY - OY}px, 0) rotate(${lean}rad) scale(${scale})`;
     };
 
     const onMove = (e: MouseEvent) => {
@@ -122,7 +120,7 @@ function PencilCursor() {
       const t = e.target as Element | null;
       const overText = !!t?.closest('input, textarea');
       const overAction = !!t?.closest('a[href], button');
-      targetScale = overAction && !overText ? 1.35 : 1;
+      targetScale = overAction && !overText ? 1.3 : 1;
       // Over text fields the follower hides and the normal text cursor
       // returns (see the CSS block) — hiding the I-beam would hurt typing.
       el.style.opacity = overText ? '0' : '1';
@@ -149,14 +147,7 @@ function PencilCursor() {
   if (!active) return null;
   return (
     <div ref={followerRef} className="sd-pencil" aria-hidden="true">
-      <svg width="48" height="14" viewBox="0 0 48 14" fill="none" aria-hidden="true">
-        <rect x="2" y="2" width="6" height="10" rx="1.5" fill="#f472b6" />
-        <rect x="8" y="2" width="2" height="10" fill="#c0c0c0" />
-        <rect x="10" y="2" width="28" height="10" fill="#f7c948" />
-        <polygon points="38,2 48,7 38,12" fill="#f5d6a0" />
-        <polygon points="43.5,4.75 48,7 43.5,9.25" fill="#2b2b2b" />
-        <path d="M3.5 2 H38 L48 7 L38 12 H3.5 Q2 12 2 10.5 V3.5 Q2 2 3.5 2 Z" stroke="#1c2b25" strokeWidth="0.75" fill="none" strokeLinejoin="round" />
-      </svg>
+      <img src="/pencil-cursor.png" alt="" draggable={false} />
     </div>
   );
 }
@@ -170,7 +161,6 @@ function LoginForm() {
   // Nav-click logo transition: a full-screen deep-green overlay shows the
   // wordmark animating in before the page scrolls to the clicked section.
   const [navOverlay, setNavOverlay] = useState<null | { leaving: boolean }>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
   const navTimers = useRef<number[]>([]);
   const progressRef = useRef<HTMLDivElement>(null);
   const heroMediaRef = useRef<HTMLDivElement>(null);
@@ -420,6 +410,23 @@ function LoginForm() {
     }
   }, []);
 
+  // Cross-page anchor landing (PR #14): arriving from /contact with a
+  // section hash (/#features, /#signin) must land on that section. The
+  // browser's native anchor jump is lost behind the 800ms preloader, so
+  // scroll to the target once the preloader has cleared. The recovery
+  // hash is excluded — it switches the auth form instead.
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (!hash || hash.includes('type=recovery')) return;
+    const id = hash.slice(1);
+    if (!id || !/^[A-Za-z][\w-]*$/.test(id)) return;
+    const t = window.setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'auto', block: 'start' });
+    }, 850);
+    return () => window.clearTimeout(t);
+  }, []);
+
   const fillDemoStudent = () => {
     setEmail('sam.john4331@springdrill.edu');
     setPassword('Spring7067!');
@@ -524,59 +531,43 @@ function LoginForm() {
 
   return (
     <>
+      <SiteStyles />
       <style>{`
         @keyframes preloader-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes sd-logo-letter-in { from { opacity: 0; transform: translateY(10px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
         @keyframes sd-overlay-bar { from { width: 0; } to { width: 120px; } }
 
-        html { scroll-behavior: smooth; }
+        /* Base, header, footer, contact and section styles are shared with
+           the contact page — they ship from <SiteStyles /> (rendered first
+           in this component). Only home-only rules live in this block. */
 
-        body, html {
-          margin: 0;
-          padding: 0;
-          font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        /* globals.css centres the body with flex; a full landing page needs normal flow. */
-        body { display: block; background: #ffffff; }
-
-        .sd-page { color: #1c2b25; background: #ffffff; }
-        .sd-wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
-        .sd-section { padding: 96px 0; scroll-margin-top: 80px; border-top: 1px solid #e6efe9; }
-        .sd-section-soft { background: #f3f7f4; }
-        .sd-eyebrow { font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #007a4d; margin: 0 0 12px 0; }
-        .sd-h2 { font-size: 1.9rem; font-weight: 800; line-height: 1.25; margin: 0 0 16px 0; color: #123227; }
-
-        /* Header — sticky with a frosted-glass blur so it reads as a modern menu */
-        .sd-header { position: sticky; top: 0; z-index: 100; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(220, 230, 223, 0.8); }
-        .sd-header-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-        .sd-wordmark { font-size: 1.4rem; font-weight: 800; color: #004d34; text-decoration: none; letter-spacing: -0.5px; }
-        .sd-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-        .sd-logo-mark { flex: none; display: block; }
-        .sd-footer-brand { display: flex; align-items: center; gap: 10px; }
-        .sd-menu-btn { display: none; background: none; border: none; padding: 8px; cursor: pointer; }
-        .sd-nav { display: flex; align-items: center; gap: 28px; }
-        .sd-nav a { color: #1c2b25; text-decoration: none; font-size: 0.95rem; font-weight: 500; position: relative; }
-        .sd-nav a:hover { color: #007a4d; }
-        .sd-nav a:not(.sd-btn)::after { content: ''; position: absolute; left: 0; bottom: -4px; height: 2px; width: 100%; background: #007a4d; transform: scaleX(0); transform-origin: left; transition: transform 0.25s ease; }
-        .sd-nav a:not(.sd-btn):hover::after { transform: scaleX(1); }
-        .sd-btn { display: inline-block; background: #007a4d; color: #ffffff; border: none; border-radius: 999px; padding: 11px 22px; font-weight: 700; font-size: 0.95rem; cursor: pointer; text-decoration: none; box-shadow: 0 2px 10px rgba(0, 122, 77, 0.25); transition: background 0.25s ease, translate 0.25s ease, box-shadow 0.25s ease; }
-        .sd-btn:hover { background: #005c3a; color: #ffffff; translate: 0 -1px; box-shadow: 0 6px 16px rgba(0, 122, 77, 0.30); }
-        /* The header button is an <a> inside .sd-nav, and .sd-nav a (higher
-           specificity) was beating .sd-btn and leaving dark text on the green
-           button — the low-contrast bug the user reported. This wins it back. */
-        .sd-nav a.sd-btn, .sd-nav a.sd-btn:hover { color: #ffffff; }
-        .sd-btn-outline { display: inline-block; background: #ffffff; color: #004d34; border: 1px solid #004d34; border-radius: 6px; padding: 11px 20px; font-weight: 700; font-size: 0.95rem; cursor: pointer; text-decoration: none; }
-        .sd-btn-outline:hover { background: #f3f7f4; color: #004d34; }
+        /* Hero background (magnific Template 1 "Back to School" format): a
+           diagonal pale-mint blob sweeping from the top-right to the
+           centre, green hills rising behind a dark-brown desk band that
+           grounds the bottom of the scene, white clouds, one paper plane
+           with a dashed trail, sparkles and scattered leaves. The scene
+           is decorative only — content sits above it. Floating doodles
+           live only in the mint area and empty spaces, never over the
+           headline, subtext, buttons, or the photo's focal area. */
+        .sd-hero-section { position: relative; overflow: hidden; }
+        .sd-hero-section .sd-wrap { position: relative; z-index: 1; }
+        .sd-hero-scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+        .sd-hero-scene-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+        .sd-doodle { position: absolute; pointer-events: none; line-height: 0; }
+        .sd-doodle svg { display: block; width: 100%; height: auto; }
+        @keyframes sd-doodle-float { from { transform: translateY(-5px); } to { transform: translateY(5px); } }
+        .sd-doodle-float { animation: sd-doodle-float 7s ease-in-out infinite alternate; }
 
         /* Hero */
         .sd-hero { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 48px; align-items: center; padding: 96px 0; }
-        .sd-hero h1 { font-size: 3.1rem; font-weight: 800; line-height: 1.15; letter-spacing: -1px; margin: 0 0 20px 0; color: #123227; }
+        /* Display heading in ChunkFive (single weight 400). */
+        .sd-hero h1 { font-family: var(--font-chunkfive, Georgia, 'Times New Roman', serif); font-size: 3.1rem; font-weight: 400; line-height: 1.15; letter-spacing: -1px; margin: 0 0 20px 0; color: #123227; }
         .sd-hero p { font-size: 1.15rem; line-height: 1.7; color: #5a6b63; margin: 0 0 32px 0; }
         .sd-hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
-        /* Premium frame for the one hero photo: green ring + soft outer glow +
-           deep shadow. Box-shadow (not a pseudo-element) so it survives the
-           wrapper's overflow: hidden and the parallax transform. */
+        /* Premium frame for the one hero photo: green ring + soft outer glow
+           + deep shadow, so the photo reads on the pale-mint scene.
+           Box-shadow (not a pseudo-element) so it survives the wrapper's
+           overflow: hidden and the parallax transform. */
         .sd-hero-media { overflow: hidden; border-radius: 16px; border: 2px solid #007a4d; box-shadow: 0 0 0 6px rgba(0, 122, 77, 0.12), 0 24px 48px rgba(18, 50, 39, 0.18); }
         .sd-hero-media img { width: 100%; height: 340px; object-fit: cover; display: block; border: none; border-radius: 0; transform: scale(1.06); }
         .sd-hero.is-in .sd-hero-media img { animation: sd-photo-settle 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
@@ -585,11 +576,6 @@ function LoginForm() {
         /* Features */
         .sd-feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 40px; }
         .sd-feature { border: 1px solid #dce6df; border-radius: 12px; padding: 28px 24px; background: #ffffff; }
-        /* Premium thin-line icons: hand-written inline SVG, stroke-based in
-           the site green. The icon rides the card entrance — it has no hidden
-           state of its own, so it can never end up stuck hidden. */
-        .sd-icon { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: rgba(0, 122, 77, 0.08); color: #007a4d; margin-bottom: 16px; }
-        .sd-icon svg { width: 24px; height: 24px; }
         .sd-feature h3 { font-size: 1.05rem; font-weight: 700; margin: 0 0 10px 0; color: #123227; }
         .sd-feature p { font-size: 0.95rem; line-height: 1.65; color: #5a6b63; margin: 0; }
 
@@ -621,7 +607,7 @@ function LoginForm() {
           box-sizing: border-box;
         }
         .sd-signin-header { text-align: center; margin-bottom: 28px; }
-        .sd-signin-header h2 { color: #123227; font-weight: 800; margin: 0; font-size: 1.5rem; }
+        .sd-signin-header h2 { font-family: var(--font-chunkfive, Georgia, 'Times New Roman', serif); color: #123227; font-weight: 400; margin: 0; font-size: 1.5rem; }
         .sd-signin-header p { color: #5a6b63; margin-top: 8px; font-size: 0.95rem; }
 
         .custom-input-group {
@@ -769,17 +755,19 @@ function LoginForm() {
           .sd-hero-media img { transform: none; animation: none; }
           .sd-hero-media img { transition: none; scale: none; }
           .sd-progress { display: none; }
+          .sd-doodle-float { animation: none; }
         }
 
-        /* Pencil cursor (PR #13): the pencil IS the cursor on fine pointers.
-           The follower is a fixed, transform-only element that never
-           intercepts clicks; it sits below the preloader/nav overlay
-           (99999) and above the sticky header. Rotation and scale pivot
-           about the graphite tip (right centre), so the tip stays glued
-           to the pointer. The soft drop-shadow keeps it readable on the
+        /* Pencil cursor: the user's cartoon pencil character IS the cursor
+           on fine pointers. The follower is a fixed, transform-only element
+           that never intercepts clicks; it sits below the preloader/nav
+           overlay (99999) and above the sticky header. The lean and scale
+           pivot about the graphite tip — measured at 36.7% across, bottom
+           edge of the cropped 113x185 artwork — so the tip stays glued to
+           the pointer. The soft drop-shadow keeps it readable on the
            dark-green footer and overlay. */
-        .sd-pencil { position: fixed; left: 0; top: 0; width: 48px; height: 14px; z-index: 90000; pointer-events: none; opacity: 0; transition: opacity 0.15s ease; will-change: transform; transform-origin: 48px 7px; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35)); }
-        .sd-pencil svg { display: block; width: 48px; height: 14px; }
+        .sd-pencil { position: fixed; left: 0; top: 0; width: 36.6px; height: 60px; z-index: 90000; pointer-events: none; opacity: 0; transition: opacity 0.15s ease; will-change: transform; transform-origin: 36.7% 100%; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35)); }
+        .sd-pencil img { display: block; width: 36.6px; height: 60px; }
         /* The OS arrow hides only while the follower is mounted (the body
            class is added by the component), only on fine pointers, and
            never with reduced motion. Text fields keep their text cursor. */
@@ -788,38 +776,27 @@ function LoginForm() {
           body.sd-pencil-cursor input, body.sd-pencil-cursor textarea { cursor: text; }
         }
 
-        /* Footer */
-        .sd-footer { background: #004d34; color: #ffffff; padding: 48px 0 32px 0; }
-        .sd-footer-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
-        .sd-footer h3 { margin: 0 0 10px 0; font-size: 1.25rem; font-weight: 800; }
-        .sd-footer p { margin: 0; font-size: 0.95rem; line-height: 1.65; color: rgba(255, 255, 255, 0.85); max-width: 420px; }
-        .sd-footer a { color: #ffffff; text-decoration: none; }
-        .sd-footer a:hover { text-decoration: underline; }
-        .sd-footer-contact p { margin-bottom: 6px; }
-        .sd-footer-copy { max-width: 1100px; margin: 32px auto 0 auto; padding: 24px 24px 0 24px; border-top: 1px solid rgba(255, 255, 255, 0.2); font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); text-align: center; }
-
         @media (max-width: 900px) {
           .sd-hero { grid-template-columns: 1fr; gap: 32px; padding: 56px 0; }
           .sd-hero h1 { font-size: 2.1rem; }
           .sd-hero-media img { height: 260px; }
+          /* The scene becomes a clean mint band behind the stacked photo;
+             the blob, hills, desk and floating doodles would crowd the
+             small band, so they switch off and the band stays clean. */
+          .sd-hero-scene { top: auto; left: 0; right: 0; bottom: 0; height: 340px; background: #C7EFEE; border-radius: 32px 32px 0 0; }
+          .sd-hero-scene-svg { display: none; }
+          .sd-hero-scene .sd-doodle { display: none; }
           .sd-feature-grid { grid-template-columns: repeat(2, 1fr); }
           .sd-step-grid { grid-template-columns: 1fr; }
-          .sd-section { padding: 64px 0; }
         }
 
         @media (max-width: 600px) {
-          .sd-nav a { display: none; }
-          .sd-menu-btn { display: flex; align-items: center; justify-content: center; }
-          .sd-mobile-menu { display: flex; flex-direction: column; gap: 4px; position: fixed; top: 64px; left: 0; right: 0; z-index: 90; background: #fff; border-bottom: 1px solid rgba(220, 230, 223, 0.9); padding: 12px 24px 16px; box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08); }
-          .sd-mobile-menu a { color: #1c2b25; text-decoration: none; font-size: 1rem; font-weight: 500; padding: 10px 0; }
-          .sd-mobile-menu a.sd-btn { color: #fff; text-align: center; margin-top: 8px; padding: 12px; }
           .sd-hero h1 { font-size: 1.8rem; }
           .sd-hero p { font-size: 1.05rem; }
           .sd-feature-grid { grid-template-columns: 1fr; }
           .sd-audience-grid { grid-template-columns: 1fr; }
           .sd-signin-card { padding: 28px 20px; }
           .demo-grid { flex-direction: column; }
-          .sd-h2 { font-size: 1.6rem; }
         }
       `}</style>
 
@@ -854,40 +831,45 @@ function LoginForm() {
       )}
 
       <div className="sd-page" id="top">
-        <header className="sd-header">
-          <div className="sd-header-inner">
-            <a href="#top" className="sd-brand" onClick={(e) => handleNavClick(e, '#top')}><LogoMark size={30} /><span className="sd-wordmark">SpringDrill</span></a>
-            <nav className="sd-nav">
-              <a href="#features" onClick={(e) => handleNavClick(e, '#features')}>Features</a>
-              <a href="#how" onClick={(e) => handleNavClick(e, '#how')}>How it works</a>
-              <a href="#schools" onClick={(e) => handleNavClick(e, '#schools')}>For schools</a>
-              <a href="#contact" onClick={(e) => handleNavClick(e, '#contact')}>Contact</a>
-              <a href="#signin" className="sd-btn" onClick={(e) => handleNavClick(e, '#signin')}>Portal sign-in</a>
-            </nav>
-            <button type="button" className="sd-menu-btn" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} aria-controls="sd-mobile-menu" onClick={() => setMenuOpen(!menuOpen)}>
-              {menuOpen ? (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12 M18 6L6 18" stroke="#004d34" strokeWidth="2" strokeLinecap="round" /></svg>
-              ) : (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16 M4 12h16 M4 17h16" stroke="#004d34" strokeWidth="2" strokeLinecap="round" /></svg>
-              )}
-            </button>
-          </div>
-        </header>
-
-        {menuOpen && (
-          <div className="sd-mobile-menu" id="sd-mobile-menu">
-            <a href="#features" onClick={(e) => { setMenuOpen(false); handleNavClick(e, '#features'); }}>Features</a>
-            <a href="#how" onClick={(e) => { setMenuOpen(false); handleNavClick(e, '#how'); }}>How it works</a>
-            <a href="#schools" onClick={(e) => { setMenuOpen(false); handleNavClick(e, '#schools'); }}>For schools</a>
-            <a href="#contact" onClick={(e) => { setMenuOpen(false); handleNavClick(e, '#contact'); }}>Contact</a>
-            <a href="#signin" className="sd-btn" onClick={(e) => { setMenuOpen(false); handleNavClick(e, '#signin'); }}>Portal sign-in</a>
-          </div>
-        )}
+        <SiteHeader variant="home" onNavClick={handleNavClick} />
 
         <div className="sd-progress" ref={progressRef} aria-hidden="true" />
 
         <main>
-          <section className="sd-wrap">
+          <section className="sd-hero-section">
+            <div className="sd-hero-scene" aria-hidden="true">
+              <svg className="sd-hero-scene-svg" viewBox="0 0 1200 600" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M 660 0 C 580 120, 500 250, 450 380 C 420 460, 405 530, 400 600 L 1200 600 L 1200 0 Z" fill="#C7EFEE" />
+                <path d="M 620 600 C 640 500, 740 450, 840 470 C 940 490, 1020 440, 1100 470 C 1150 488, 1180 520, 1200 540 L 1200 600 Z" fill="#4D9F5F" />
+                <path d="M 760 600 C 780 530, 880 500, 980 520 C 1060 536, 1130 520, 1200 540 L 1200 600 Z" fill="#3E8A4E" />
+                <rect x="560" y="556" width="640" height="44" fill="#512A2C" />
+              </svg>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '5%', right: '9%', width: 72, animationDuration: '7s' }}>
+                <svg viewBox="0 0 80 48" fill="none" aria-hidden="true"><g fill="#ffffff"><circle cx="26" cy="30" r="12" /><circle cx="42" cy="21" r="14" /><circle cx="58" cy="30" r="10" /><rect x="16" y="30" width="52" height="11" rx="5.5" /></g></svg>
+              </span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '15%', right: '3%', width: 44, opacity: 0.85, animationDuration: '8s', animationDelay: '-2s' }}>
+                <svg viewBox="0 0 80 48" fill="none" aria-hidden="true"><g fill="#ffffff"><circle cx="26" cy="30" r="12" /><circle cx="42" cy="21" r="14" /><circle cx="58" cy="30" r="10" /><rect x="16" y="30" width="52" height="11" rx="5.5" /></g></svg>
+              </span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '2%', right: '22%', width: 150, animationDuration: '8s', animationDelay: '-1.5s' }}>
+                <svg viewBox="0 0 140 70" fill="none" aria-hidden="true"><path d="M6 60C44 56 66 40 106 18" stroke="#512A2D" strokeWidth="2" strokeDasharray="5 6" strokeLinecap="round" /><path d="M102 8L136 16 106 26 111 16Z" fill="#ffffff" /></svg>
+              </span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '11%', right: '36%', width: 20, animationDuration: '6s', animationDelay: '-1s' }}>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z" fill="#ffffff" /></svg>
+              </span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '9%', right: '8%', width: 24, animationDuration: '7.5s', animationDelay: '-3s' }}>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z" fill="#FEC60D" /></svg>
+              </span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '22%', right: '28%', width: 16, opacity: 0.9, animationDuration: '6.5s', animationDelay: '-2s' }}>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z" fill="#ffffff" /></svg>
+              </span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '7%', right: '18%', width: 30, animationDuration: '7s', animationDelay: '-2.5s' }}>
+                <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><g transform="rotate(25 16 16)"><path d="M6 26C6 12 16 4 28 4c0 14-8 22-22 22z" fill="#2F7A3E" /><path d="M8 24C14 18 20 12 26 6" stroke="#1E5A2A" strokeWidth="1.5" strokeLinecap="round" /></g></svg>
+              </span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '18%', right: '4%', width: 24, animationDuration: '6.5s', animationDelay: '-0.5s' }}>
+                <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><g transform="rotate(-15 16 16)"><path d="M6 26C6 12 16 4 28 4c0 14-8 22-22 22z" fill="#7CB85C" /><path d="M8 24C14 18 20 12 26 6" stroke="#2F7A3E" strokeWidth="1.5" strokeLinecap="round" /></g></svg>
+              </span>
+            </div>
+            <div className="sd-wrap">
             <div className="sd-hero">
               <div>
                 <h1 data-anim="letters" data-anim-hero><SplitLetters text="Report cards in minutes, not weekends." /></h1>
@@ -901,9 +883,18 @@ function LoginForm() {
                 <img src="/hero-classroom.jpg" alt="Teacher guiding students at computers in a Nigerian classroom" />
               </div>
             </div>
+            </div>
           </section>
 
           <section id="features" className="sd-section sd-section-soft">
+            <div className="sd-corner-doodles" aria-hidden="true">
+              <span className="sd-corner-doodle" style={{ bottom: 30, left: 44, width: 26 }}>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z" fill="currentColor" /></svg>
+              </span>
+              <span className="sd-corner-doodle" style={{ bottom: 34, right: 52, width: 44 }}>
+                <svg viewBox="0 0 80 48" fill="none" aria-hidden="true"><g fill="currentColor"><circle cx="26" cy="30" r="12" /><circle cx="42" cy="21" r="14" /><circle cx="58" cy="30" r="10" /><rect x="16" y="30" width="52" height="11" rx="5.5" /></g></svg>
+              </span>
+            </div>
             <div className="sd-wrap" data-reveal>
               <p className="sd-eyebrow">What SpringDrill does</p>
               <h2 className="sd-h2" data-anim="letters"><SplitLetters text="Everything a school needs to run exams and results." /></h2>
@@ -960,6 +951,14 @@ function LoginForm() {
           </section>
 
           <section id="schools" className="sd-section sd-section-soft">
+            <div className="sd-corner-doodles" aria-hidden="true">
+              <span className="sd-corner-doodle" style={{ bottom: 30, left: 44, width: 30 }}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>
+              </span>
+              <span className="sd-corner-doodle" style={{ bottom: 32, right: 52, width: 24 }}>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z" fill="currentColor" /></svg>
+              </span>
+            </div>
             <div className="sd-wrap" data-reveal>
               <p className="sd-eyebrow">Who it is for</p>
               <h2 className="sd-h2" data-anim="letters"><SplitLetters text="Built for the whole school." /></h2>
@@ -1124,21 +1123,7 @@ function LoginForm() {
           </section>
         </main>
 
-        <footer id="contact" className="sd-footer">
-          <div className="sd-footer-inner">
-            <div>
-              <h3 className="sd-footer-brand"><LogoMark size={26} />SpringDrill</h3>
-              <p>CBT tests, results and report cards for Nigerian schools.</p>
-            </div>
-            <div className="sd-footer-contact">
-              <p>Phone: <a href="tel:+2348162337303">08162337303</a></p>
-              <p>Email: <a href="mailto:adielasam2015@gmail.com">adielasam2015@gmail.com</a></p>
-            </div>
-          </div>
-          <div className="sd-footer-copy">
-            Copyright &copy; 2026 <b>SpringDrill</b> | All Rights Reserved
-          </div>
-        </footer>
+        <SiteFooter />
       </div>
 
       <PencilCursor />
