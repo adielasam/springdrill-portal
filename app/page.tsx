@@ -54,17 +54,67 @@ function SplitWords({ text }: { text: string }) {
   );
 }
 
+// Full-colour Template 1 doodles for the section scenes below the hero.
+// Each renders one small inline SVG in the sample's flat cartoon style;
+// callers position them with .sd-doodle + inline styles. The hero keeps
+// its own inline copies (unchanged); these exist so the four section
+// scenes share one definition each instead of repeating SVG markup.
+function DoodleCloud({ fill }: { fill: string }) {
+  return (
+    <svg viewBox="0 0 80 48" fill="none" aria-hidden="true"><g fill={fill}><circle cx="26" cy="30" r="12" /><circle cx="42" cy="21" r="14" /><circle cx="58" cy="30" r="10" /><rect x="16" y="30" width="52" height="11" rx="5.5" /></g></svg>
+  );
+}
+
+function DoodleSparkle({ fill }: { fill: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z" fill={fill} /></svg>
+  );
+}
+
+function DoodleLeaf({ fill, stroke, rotate }: { fill: string; stroke: string; rotate: number }) {
+  return (
+    <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><g transform={`rotate(${rotate} 16 16)`}><path d="M6 26C6 12 16 4 28 4c0 14-8 22-22 22z" fill={fill} /><path d="M8 24C14 18 20 12 26 6" stroke={stroke} strokeWidth="1.5" strokeLinecap="round" /></g></svg>
+  );
+}
+
+function DoodleBooks() {
+  return (
+    <svg viewBox="0 0 90 60" fill="none" aria-hidden="true"><rect x="6" y="46" width="76" height="14" rx="3" fill="#2E7CC4" /><rect x="12" y="49.5" width="58" height="7" rx="2" fill="#EAF4FB" /><rect x="12" y="31" width="68" height="14" rx="3" fill="#FFFFFF" stroke="#2E7CC4" strokeWidth="2" /><rect x="18" y="34.5" width="50" height="7" rx="2" fill="#DCEBF8" /><rect x="20" y="16" width="56" height="14" rx="3" fill="#7FB3E0" /><rect x="26" y="19.5" width="38" height="7" rx="2" fill="#EAF4FB" /></svg>
+  );
+}
+
+function DoodleFlask() {
+  return (
+    <svg viewBox="0 0 48 64" fill="none" aria-hidden="true"><path d="M20 4h8v10l10 20c2.4 4.8 3.6 8 3.6 11a9.4 9.4 0 0 1-9.4 9.4H15.8A9.4 9.4 0 0 1 6.4 45c0-3 1.2-6.2 3.6-11L20 14V4z" fill="#FFFFFF" stroke="#512A2C" strokeWidth="2" strokeLinejoin="round" /><path d="M13 40h22l3.4 6.8c.8 1.6 1.2 3 1.2 4.4a6.4 6.4 0 0 1-6.4 6.4H14.8a6.4 6.4 0 0 1-6.4-6.4c0-1.4.4-2.8 1.2-4.4L13 40z" fill="#F59645" /><circle cx="20" cy="48" r="2.2" fill="#FDE3C8" /><circle cx="28" cy="52" r="1.6" fill="#FDE3C8" /><circle cx="25" cy="43" r="1.3" fill="#FDE3C8" /><rect x="18" y="2" width="12" height="5" rx="2" fill="#512A2C" /></svg>
+  );
+}
+
+function DoodlePencilFlat() {
+  return (
+    <svg viewBox="0 0 120 20" fill="none" aria-hidden="true" style={{ transform: 'rotate(-4deg)' }}><rect x="26" y="4" width="72" height="12" fill="#4D9F5F" /><rect x="26" y="4" width="72" height="3" fill="#6BBF7B" /><path d="M26 4L6 10l20 6V4z" fill="#F2D8A7" /><path d="M12 7.5L6 10l6 2.5V7.5z" fill="#2B2B2B" /><rect x="98" y="4" width="8" height="12" fill="#C0C7CE" /><rect x="106" y="4" width="10" height="12" rx="2" fill="#F472B6" /></svg>
+  );
+}
+
+function DoodlePlane() {
+  return (
+    <svg viewBox="0 0 140 70" fill="none" aria-hidden="true"><path d="M6 60C44 56 66 40 106 18" stroke="#512A2D" strokeWidth="2" strokeDasharray="5 6" strokeLinecap="round" /><path d="M102 8L136 16 106 26 111 16Z" fill="#ffffff" /></svg>
+  );
+}
+
 // Cartoon pencil cursor: the user's pencil character image IS the cursor
-// on fine-pointer devices. The character stays upright — it has a face,
-// so full rotation to the travel direction would turn it upside down.
-// Instead it leans slightly toward the direction of travel (max ±18°),
-// eased, with the graphite tip leading the lean. The tip sits exactly on
-// the pointer when settled: the artwork was cropped to its solid pixels
+// on fine-pointer devices, and appears under the fingertip on touch
+// devices — on tap or drag the tip sits on the touch point, the body
+// rising above the finger so it stays visible, following with the same
+// smoothing and lean as the mouse, then fading out shortly after the
+// finger lifts. The character stays upright — it has a face, so full
+// rotation to the travel direction would turn it upside down. Instead
+// it leans slightly toward the direction of travel (max ±18°), eased,
+// with the graphite tip leading the lean. The tip sits exactly on the
+// pointer when settled: the artwork was cropped to its solid pixels
 // (113x185, soft ground shadow removed) and the tip measured at cropped
 // pixel (41.5, 184.5) — 36.7% across, bottom edge — which is the
-// transform-origin in the CSS block below. It mounts only with a fine
-// pointer and no reduced-motion preference; on touch devices, and with
-// reduced motion, the OS cursor stays untouched.
+// transform-origin in the CSS block below. It mounts with a fine pointer
+// or touch capability, and never with a reduced-motion preference.
 // No ripple, no trail, no particles — the template it learns from has none.
 function PencilCursor() {
   const followerRef = useRef<HTMLDivElement>(null);
@@ -72,8 +122,9 @@ function PencilCursor() {
 
   useEffect(() => {
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const touchCapable = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (finePointer && !reduceMotion) setActive(true);
+    if ((finePointer || touchCapable) && !reduceMotion) setActive(true);
   }, []);
 
   useEffect(() => {
@@ -112,34 +163,78 @@ function PencilCursor() {
       el.style.transform = `translate3d(${tipX - OX}px, ${tipY - OY}px, 0) rotate(${lean}rad) scale(${scale})`;
     };
 
-    const onMove = (e: MouseEvent) => {
-      targetX = e.clientX; targetY = e.clientY;
-      // First sighting: place the tip on the pointer while still hidden, so
-      // it never sweeps in from a corner and never visibly teleports.
+    // Shared by mouse and touch: steer the tip to a point, grow over
+    // links/buttons, hide over text fields. The first sighting places
+    // the tip on the pointer while still hidden, so it never sweeps in
+    // from a corner and never visibly teleports.
+    const placeAt = (x: number, y: number, target: Element | null) => {
+      targetX = x; targetY = y;
       if (!placed) { tipX = targetX; tipY = targetY; placed = true; }
-      const t = e.target as Element | null;
-      const overText = !!t?.closest('input, textarea');
-      const overAction = !!t?.closest('a[href], button');
+      const overText = !!target?.closest('input, textarea');
+      const overAction = !!target?.closest('a[href], button');
       targetScale = overAction && !overText ? 1.3 : 1;
       // Over text fields the follower hides and the normal text cursor
       // returns (see the CSS block) — hiding the I-beam would hurt typing.
       el.style.opacity = overText ? '0' : '1';
     };
+    // Touch release: the pencil lingers briefly, then fades — it never
+    // vanishes instantly and never stays parked on screen. Any new
+    // input (touch or mouse) cancels the pending fade.
+    let fadeTimer = 0;
+    const cancelFade = () => { window.clearTimeout(fadeTimer); };
+    const scheduleFade = () => {
+      cancelFade();
+      fadeTimer = window.setTimeout(() => { el.style.opacity = '0'; }, 1100);
+    };
+
+    const onMove = (e: MouseEvent) => {
+      cancelFade();
+      placeAt(e.clientX, e.clientY, e.target as Element | null);
+    };
     const onLeave = () => { el.style.opacity = '0'; };
     const onEnter = () => { if (placed) el.style.opacity = '1'; };
     const onOut = (e: MouseEvent) => { if (!e.relatedTarget) onLeave(); };
+    // Touch: the pencil appears under the fingertip, tip on the touch
+    // point, following the finger through the same tick (same lerp and
+    // lean). Only the first touch is tracked. Listeners are passive and
+    // the element is pointer-events: none, so taps, links and scrolling
+    // are never intercepted and no preventDefault is ever called.
+    const onTouchStart = (e: TouchEvent) => {
+      cancelFade();
+      const t = e.touches[0];
+      if (t) placeAt(t.clientX, t.clientY, e.target as Element | null);
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      cancelFade();
+      const t = e.touches[0];
+      if (t) placeAt(t.clientX, t.clientY, e.target as Element | null);
+    };
+    const onTouchEnd = (e: TouchEvent) => {
+      // Only fade once every finger is up — a second finger still down
+      // keeps the pencil tracking.
+      if (e.touches.length === 0) scheduleFade();
+    };
 
     document.addEventListener('mousemove', onMove, { passive: true });
     document.addEventListener('mouseleave', onLeave);
     document.addEventListener('mouseenter', onEnter);
     document.addEventListener('mouseout', onOut);
+    document.addEventListener('touchstart', onTouchStart, { passive: true });
+    document.addEventListener('touchmove', onTouchMove, { passive: true });
+    document.addEventListener('touchend', onTouchEnd, { passive: true });
+    document.addEventListener('touchcancel', onTouchEnd, { passive: true });
     raf = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(raf);
+      cancelFade();
       document.removeEventListener('mousemove', onMove);
       document.removeEventListener('mouseleave', onLeave);
       document.removeEventListener('mouseenter', onEnter);
       document.removeEventListener('mouseout', onOut);
+      document.removeEventListener('touchstart', onTouchStart);
+      document.removeEventListener('touchmove', onTouchMove);
+      document.removeEventListener('touchend', onTouchEnd);
+      document.removeEventListener('touchcancel', onTouchEnd);
       document.body.classList.remove('sd-pencil-cursor');
     };
   }, [active]);
@@ -544,11 +639,15 @@ function LoginForm() {
         /* Hero background (magnific Template 1 "Back to School" format): a
            diagonal pale-mint blob sweeping from the top-right to the
            centre, green hills rising behind a dark-brown desk band that
-           grounds the bottom of the scene, white clouds, one paper plane
-           with a dashed trail, sparkles and scattered leaves. The scene
-           is decorative only — content sits above it. Floating doodles
-           live only in the mint area and empty spaces, never over the
-           headline, subtext, buttons, or the photo's focal area. */
+           spans the FULL width of the scene and grounds it, white clouds,
+           one paper plane with a dashed trail, sparkles and scattered
+           leaves. A stack of books, an Erlenmeyer flask and a pencil
+           lying on the desk rest on the band, and extra clouds, leaves
+           and sparkles fill the white left area. The scene is decorative
+           only — content sits above it. Floating doodles live in the
+           mint area, the top/bottom padding strips and the empty side
+           margins, never over the headline, subtext, buttons, or the
+           photo's focal area. */
         .sd-hero-section { position: relative; overflow: hidden; }
         .sd-hero-section .sd-wrap { position: relative; z-index: 1; }
         .sd-hero-scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
@@ -557,6 +656,16 @@ function LoginForm() {
         .sd-doodle svg { display: block; width: 100%; height: auto; }
         @keyframes sd-doodle-float { from { transform: translateY(-5px); } to { transform: translateY(5px); } }
         .sd-doodle-float { animation: sd-doodle-float 7s ease-in-out infinite alternate; }
+
+        /* Section scenes (below the hero): every home section carries its
+           own full-colour Template 1 scene — mint blob, hills, clouds,
+           leaves, sparkles and school motifs — behind the content, at
+           every width. The layer is clipped to the section, never
+           intercepts clicks, and sits below the content wrap (z-index 1
+           in SiteStyles), so decorations can never cover text, cards,
+           icons, buttons or form fields. */
+        .sd-scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .sd-scene-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
         /* Hero */
         .sd-hero { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 48px; align-items: center; padding: 96px 0; }
@@ -759,13 +868,14 @@ function LoginForm() {
         }
 
         /* Pencil cursor: the user's cartoon pencil character IS the cursor
-           on fine pointers. The follower is a fixed, transform-only element
-           that never intercepts clicks; it sits below the preloader/nav
-           overlay (99999) and above the sticky header. The lean and scale
-           pivot about the graphite tip — measured at 36.7% across, bottom
-           edge of the cropped 113x185 artwork — so the tip stays glued to
-           the pointer. The soft drop-shadow keeps it readable on the
-           dark-green footer and overlay. */
+           on fine pointers and appears under the fingertip on touch. The
+           follower is a fixed, transform-only element that never
+           intercepts clicks; it sits below the preloader/nav overlay
+           (99999) and above the sticky header. The lean and scale pivot
+           about the graphite tip — measured at 36.7% across, bottom
+           edge of the cropped 113x185 artwork — so the tip stays glued
+           to the pointer or fingertip. The soft drop-shadow keeps it
+           readable on the dark-green footer and overlay. */
         .sd-pencil { position: fixed; left: 0; top: 0; width: 36.6px; height: 60px; z-index: 90000; pointer-events: none; opacity: 0; transition: opacity 0.15s ease; will-change: transform; transform-origin: 36.7% 100%; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35)); }
         .sd-pencil img { display: block; width: 36.6px; height: 60px; }
         /* The OS arrow hides only while the follower is mounted (the body
@@ -776,16 +886,28 @@ function LoginForm() {
           body.sd-pencil-cursor input, body.sd-pencil-cursor textarea { cursor: text; }
         }
 
+        /* Wide-margin doodles live in the empty side margins. They stay
+           visible at every width (mobile parity): below ~1240px they
+           shrink slightly so they sit in the content gutter without
+           crowding the text. Nothing here hides artwork. */
+        @media (max-width: 1240px) {
+          .sd-doodle-wide { scale: 0.85; }
+        }
+
         @media (max-width: 900px) {
-          .sd-hero { grid-template-columns: 1fr; gap: 32px; padding: 56px 0; }
+          .sd-hero { grid-template-columns: 1fr; gap: 32px; padding: 56px 0 72px; }
           .sd-hero h1 { font-size: 2.1rem; }
           .sd-hero-media img { height: 260px; }
-          /* The scene becomes a clean mint band behind the stacked photo;
-             the blob, hills, desk and floating doodles would crowd the
-             small band, so they switch off and the band stays clean. */
-          .sd-hero-scene { top: auto; left: 0; right: 0; bottom: 0; height: 340px; background: #C7EFEE; border-radius: 32px 32px 0 0; }
-          .sd-hero-scene-svg { display: none; }
-          .sd-hero-scene .sd-doodle { display: none; }
+          /* Mobile parity: the FULL Template 1 hero scene stays visible
+             behind the stacked content — blob, hills, desk band, books,
+             flask, pencil, clouds, leaves, sparkles and paper plane, the
+             same artwork as desktop. The scene sits behind the content
+             (z-index 0), the photo is opaque, the pale mint wash keeps
+             the dark headline readable, and the extra bottom padding
+             leaves the desk band visible below the photo. Nothing here
+             hides artwork or animation. Section scenes shrink slightly
+             so side items stay in the content gutter. */
+          .sd-scene .sd-doodle { scale: 0.85; }
           .sd-feature-grid { grid-template-columns: repeat(2, 1fr); }
           .sd-step-grid { grid-template-columns: 1fr; }
         }
@@ -842,7 +964,7 @@ function LoginForm() {
                 <path d="M 660 0 C 580 120, 500 250, 450 380 C 420 460, 405 530, 400 600 L 1200 600 L 1200 0 Z" fill="#C7EFEE" />
                 <path d="M 620 600 C 640 500, 740 450, 840 470 C 940 490, 1020 440, 1100 470 C 1150 488, 1180 520, 1200 540 L 1200 600 Z" fill="#4D9F5F" />
                 <path d="M 760 600 C 780 530, 880 500, 980 520 C 1060 536, 1130 520, 1200 540 L 1200 600 Z" fill="#3E8A4E" />
-                <rect x="560" y="556" width="640" height="44" fill="#512A2C" />
+                <rect x="0" y="556" width="1200" height="44" fill="#512A2C" />
               </svg>
               <span className="sd-doodle sd-doodle-float" style={{ top: '5%', right: '9%', width: 72, animationDuration: '7s' }}>
                 <svg viewBox="0 0 80 48" fill="none" aria-hidden="true"><g fill="#ffffff"><circle cx="26" cy="30" r="12" /><circle cx="42" cy="21" r="14" /><circle cx="58" cy="30" r="10" /><rect x="16" y="30" width="52" height="11" rx="5.5" /></g></svg>
@@ -868,6 +990,47 @@ function LoginForm() {
               <span className="sd-doodle sd-doodle-float" style={{ bottom: '18%', right: '4%', width: 24, animationDuration: '6.5s', animationDelay: '-0.5s' }}>
                 <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><g transform="rotate(-15 16 16)"><path d="M6 26C6 12 16 4 28 4c0 14-8 22-22 22z" fill="#7CB85C" /><path d="M8 24C14 18 20 12 26 6" stroke="#2F7A3E" strokeWidth="1.5" strokeLinecap="round" /></g></svg>
               </span>
+              {/* White left area: the Template 1 sample carries its cartoon
+                  artifacts all round the scene, so the white space gets the
+                  same language. Clouds here use a pale mint fill so they
+                  read on white. Top-strip items stay above the headline;
+                  margin items (sd-doodle-wide) stay visible at every width
+                  (mobile parity) and shrink slightly below ~1240px. */}
+              <span className="sd-doodle sd-doodle-float" style={{ top: '3%', left: '5%', width: 64, animationDuration: '7s', animationDelay: '-1s' }}>
+                <svg viewBox="0 0 80 48" fill="none" aria-hidden="true"><g fill="#DDEDE8"><circle cx="26" cy="30" r="12" /><circle cx="42" cy="21" r="14" /><circle cx="58" cy="30" r="10" /><rect x="16" y="30" width="52" height="11" rx="5.5" /></g></svg>
+              </span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '8%', left: '15%', width: 40, opacity: 0.9, animationDuration: '8s', animationDelay: '-2s' }}>
+                <svg viewBox="0 0 80 48" fill="none" aria-hidden="true"><g fill="#E4F2EF"><circle cx="26" cy="30" r="12" /><circle cx="42" cy="21" r="14" /><circle cx="58" cy="30" r="10" /><rect x="16" y="30" width="52" height="11" rx="5.5" /></g></svg>
+              </span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '4%', left: '36%', width: 18, animationDuration: '6s', animationDelay: '-1s' }}>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z" fill="#FEC60D" /></svg>
+              </span>
+              <span className="sd-doodle sd-doodle-wide sd-doodle-float" style={{ top: '14%', left: '2.5%', width: 16, animationDuration: '6.5s', animationDelay: '-2s' }}>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z" fill="#8FD4CB" /></svg>
+              </span>
+              <span className="sd-doodle sd-doodle-wide sd-doodle-float" style={{ top: '38%', left: '1.8%', width: 26, animationDuration: '7s', animationDelay: '-2.5s' }}>
+                <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><g transform="rotate(25 16 16)"><path d="M6 26C6 12 16 4 28 4c0 14-8 22-22 22z" fill="#2F7A3E" /><path d="M8 24C14 18 20 12 26 6" stroke="#1E5A2A" strokeWidth="1.5" strokeLinecap="round" /></g></svg>
+              </span>
+              <span className="sd-doodle sd-doodle-wide sd-doodle-float" style={{ bottom: '24%', left: '3.5%', width: 20, animationDuration: '6.5s', animationDelay: '-0.5s' }}>
+                <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><g transform="rotate(-20 16 16)"><path d="M6 26C6 12 16 4 28 4c0 14-8 22-22 22z" fill="#7CB85C" /><path d="M8 24C14 18 20 12 26 6" stroke="#2F7A3E" strokeWidth="1.5" strokeLinecap="round" /></g></svg>
+              </span>
+              <span className="sd-doodle sd-doodle-wide sd-doodle-float" style={{ bottom: '30%', left: '6%', width: 14, animationDuration: '7.5s', animationDelay: '-3s' }}>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z" fill="#FEC60D" /></svg>
+              </span>
+              {/* Desk set (Template 1): a stack of three books, an
+                  Erlenmeyer flask with orange liquid, and a green pencil
+                  lying on the desk. They sit low on the band (bottom ~6%)
+                  so their bases overlap the desk's top edge and read as
+                  resting on it; the gentle float never lifts them clear. */}
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '6%', right: '2.5%', width: 78, animationDuration: '7s', animationDelay: '-1s' }}>
+                <svg viewBox="0 0 90 60" fill="none" aria-hidden="true"><rect x="6" y="46" width="76" height="14" rx="3" fill="#2E7CC4" /><rect x="12" y="49.5" width="58" height="7" rx="2" fill="#EAF4FB" /><rect x="12" y="31" width="68" height="14" rx="3" fill="#FFFFFF" stroke="#2E7CC4" strokeWidth="2" /><rect x="18" y="34.5" width="50" height="7" rx="2" fill="#DCEBF8" /><rect x="20" y="16" width="56" height="14" rx="3" fill="#7FB3E0" /><rect x="26" y="19.5" width="38" height="7" rx="2" fill="#EAF4FB" /></svg>
+              </span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '6%', right: '10.5%', width: 42, animationDuration: '8s', animationDelay: '-2s' }}>
+                <svg viewBox="0 0 48 64" fill="none" aria-hidden="true"><path d="M20 4h8v10l10 20c2.4 4.8 3.6 8 3.6 11a9.4 9.4 0 0 1-9.4 9.4H15.8A9.4 9.4 0 0 1 6.4 45c0-3 1.2-6.2 3.6-11L20 14V4z" fill="#FFFFFF" stroke="#512A2C" strokeWidth="2" strokeLinejoin="round" /><path d="M13 40h22l3.4 6.8c.8 1.6 1.2 3 1.2 4.4a6.4 6.4 0 0 1-6.4 6.4H14.8a6.4 6.4 0 0 1-6.4-6.4c0-1.4.4-2.8 1.2-4.4L13 40z" fill="#F59645" /><circle cx="20" cy="48" r="2.2" fill="#FDE3C8" /><circle cx="28" cy="52" r="1.6" fill="#FDE3C8" /><circle cx="25" cy="43" r="1.3" fill="#FDE3C8" /><rect x="18" y="2" width="12" height="5" rx="2" fill="#512A2C" /></svg>
+              </span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '6.2%', left: '3.5%', width: 96, animationDuration: '7s', animationDelay: '-1.5s' }}>
+                <svg viewBox="0 0 120 20" fill="none" aria-hidden="true" style={{ transform: 'rotate(-4deg)' }}><rect x="26" y="4" width="72" height="12" fill="#4D9F5F" /><rect x="26" y="4" width="72" height="3" fill="#6BBF7B" /><path d="M26 4L6 10l20 6V4z" fill="#F2D8A7" /><path d="M12 7.5L6 10l6 2.5V7.5z" fill="#2B2B2B" /><rect x="98" y="4" width="8" height="12" fill="#C0C7CE" /><rect x="106" y="4" width="10" height="12" rx="2" fill="#F472B6" /></svg>
+              </span>
             </div>
             <div className="sd-wrap">
             <div className="sd-hero">
@@ -887,13 +1050,26 @@ function LoginForm() {
           </section>
 
           <section id="features" className="sd-section sd-section-soft">
-            <div className="sd-corner-doodles" aria-hidden="true">
-              <span className="sd-corner-doodle" style={{ bottom: 30, left: 44, width: 26 }}>
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z" fill="currentColor" /></svg>
-              </span>
-              <span className="sd-corner-doodle" style={{ bottom: 34, right: 52, width: 44 }}>
-                <svg viewBox="0 0 80 48" fill="none" aria-hidden="true"><g fill="currentColor"><circle cx="26" cy="30" r="12" /><circle cx="42" cy="21" r="14" /><circle cx="58" cy="30" r="10" /><rect x="16" y="30" width="52" height="11" rx="5.5" /></g></svg>
-              </span>
+            {/* Full-colour Template 1 scene: mint blob, hills, clouds,
+                paper plane, leaves, sparkles, books and flask — behind
+                the content at every width. */}
+            <div className="sd-scene" aria-hidden="true">
+              <svg className="sd-scene-svg" viewBox="0 0 1200 600" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M 660 0 C 580 120, 500 250, 450 380 C 420 460, 405 530, 400 600 L 1200 600 L 1200 0 Z" fill="#C7EFEE" />
+                <path d="M 620 600 C 640 500, 740 450, 840 470 C 940 490, 1020 440, 1100 470 C 1150 488, 1180 520, 1200 540 L 1200 600 Z" fill="#4D9F5F" />
+                <path d="M 760 600 C 780 530, 880 500, 980 520 C 1060 536, 1130 520, 1200 540 L 1200 600 Z" fill="#3E8A4E" />
+              </svg>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '4%', left: '4%', width: 64, animationDuration: '7s', animationDelay: '-1s' }}><DoodleCloud fill="#DDEDE8" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '6%', left: '22%', width: 18, animationDuration: '6s', animationDelay: '-1s' }}><DoodleSparkle fill="#FEC60D" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '3%', right: '6%', width: 130, animationDuration: '8s', animationDelay: '-1.5s' }}><DoodlePlane /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '12%', right: '16%', width: 48, opacity: 0.9, animationDuration: '8s', animationDelay: '-2s' }}><DoodleCloud fill="#ffffff" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '20%', right: '30%', width: 16, animationDuration: '6.5s', animationDelay: '-2s' }}><DoodleSparkle fill="#ffffff" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '34%', left: '2%', width: 26, animationDuration: '7s', animationDelay: '-2.5s' }}><DoodleLeaf fill="#2F7A3E" stroke="#1E5A2A" rotate={25} /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '55%', right: '1.8%', width: 24, animationDuration: '6.5s', animationDelay: '-0.5s' }}><DoodleLeaf fill="#7CB85C" stroke="#2F7A3E" rotate={-15} /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '30%', left: '3%', width: 16, animationDuration: '6.5s', animationDelay: '-2s' }}><DoodleSparkle fill="#8FD4CB" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '5%', left: '3.5%', width: 42, animationDuration: '8s', animationDelay: '-2s' }}><DoodleFlask /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '5%', right: '2.5%', width: 78, animationDuration: '7s', animationDelay: '-1s' }}><DoodleBooks /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '14%', right: '12%', width: 20, animationDuration: '7.5s', animationDelay: '-3s' }}><DoodleSparkle fill="#FEC60D" /></span>
             </div>
             <div className="sd-wrap" data-reveal>
               <p className="sd-eyebrow">What SpringDrill does</p>
@@ -924,6 +1100,27 @@ function LoginForm() {
           </section>
 
           <section id="how" className="sd-section">
+            {/* Full-colour Template 1 scene, mirrored: mint blob sweeping
+                from the top-left, hills at the bottom-right, paper plane,
+                clouds, pencil, leaves and sparkles — behind the content
+                at every width. */}
+            <div className="sd-scene" aria-hidden="true">
+              <svg className="sd-scene-svg" viewBox="0 0 1200 600" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M 540 0 C 620 120, 700 250, 750 380 C 780 460, 795 530, 800 600 L 0 600 L 0 0 Z" fill="#C7EFEE" />
+                <path d="M 620 600 C 640 500, 740 450, 840 470 C 940 490, 1020 440, 1100 470 C 1150 488, 1180 520, 1200 540 L 1200 600 Z" fill="#4D9F5F" />
+                <path d="M 760 600 C 780 530, 880 500, 980 520 C 1060 536, 1130 520, 1200 540 L 1200 600 Z" fill="#3E8A4E" />
+              </svg>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '4%', left: '5%', width: 130, animationDuration: '8s', animationDelay: '-1.5s' }}><DoodlePlane /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '4%', right: '5%', width: 60, animationDuration: '7s', animationDelay: '-1s' }}><DoodleCloud fill="#DDEDE8" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '8%', right: '20%', width: 18, animationDuration: '6s', animationDelay: '-1s' }}><DoodleSparkle fill="#FEC60D" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '14%', left: '14%', width: 44, opacity: 0.9, animationDuration: '8s', animationDelay: '-2s' }}><DoodleCloud fill="#ffffff" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '30%', left: '2%', width: 16, animationDuration: '6.5s', animationDelay: '-2s' }}><DoodleSparkle fill="#8FD4CB" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '40%', right: '2%', width: 26, animationDuration: '7s', animationDelay: '-2.5s' }}><DoodleLeaf fill="#2F7A3E" stroke="#1E5A2A" rotate={-15} /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '32%', left: '2.5%', width: 22, animationDuration: '6.5s', animationDelay: '-0.5s' }}><DoodleLeaf fill="#7CB85C" stroke="#2F7A3E" rotate={25} /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '24%', right: '8%', width: 16, animationDuration: '6.5s', animationDelay: '-2s' }}><DoodleSparkle fill="#ffffff" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '6%', left: '3%', width: 96, animationDuration: '7s', animationDelay: '-1.5s' }}><DoodlePencilFlat /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '6%', right: '3%', width: 64, animationDuration: '7s', animationDelay: '-1s' }}><DoodleBooks /></span>
+            </div>
             <div className="sd-wrap" data-reveal>
               <p className="sd-eyebrow">How it works</p>
               <h2 className="sd-h2" data-anim="letters"><SplitLetters text="Three steps, from test to report card." /></h2>
@@ -951,13 +1148,27 @@ function LoginForm() {
           </section>
 
           <section id="schools" className="sd-section sd-section-soft">
-            <div className="sd-corner-doodles" aria-hidden="true">
-              <span className="sd-corner-doodle" style={{ bottom: 30, left: 44, width: 30 }}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>
-              </span>
-              <span className="sd-corner-doodle" style={{ bottom: 32, right: 52, width: 24 }}>
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z" fill="currentColor" /></svg>
-              </span>
+            {/* Full-colour Template 1 scene: mint blob rising from the
+                bottom-left, hills grounding the section, paper plane,
+                clouds, leaves, sparkles, books and flask — behind the
+                content at every width. */}
+            <div className="sd-scene" aria-hidden="true">
+              <svg className="sd-scene-svg" viewBox="0 0 1200 600" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M 0 600 L 0 320 C 130 280, 260 300, 340 390 C 400 460, 425 530, 435 600 Z" fill="#C7EFEE" />
+                <path d="M 0 600 L 0 545 C 90 515, 200 525, 290 555 C 350 575, 400 570, 440 585 L 440 600 Z" fill="#4D9F5F" />
+                <path d="M 620 600 C 640 500, 740 450, 840 470 C 940 490, 1020 440, 1100 470 C 1150 488, 1180 520, 1200 540 L 1200 600 Z" fill="#4D9F5F" />
+                <path d="M 760 600 C 780 530, 880 500, 980 520 C 1060 536, 1130 520, 1200 540 L 1200 600 Z" fill="#3E8A4E" />
+              </svg>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '3%', left: '4%', width: 120, animationDuration: '8s', animationDelay: '-1.5s' }}><DoodlePlane /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '4%', right: '6%', width: 64, animationDuration: '7s', animationDelay: '-1s' }}><DoodleCloud fill="#E4F2EF" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '6%', right: '24%', width: 18, animationDuration: '6s', animationDelay: '-1s' }}><DoodleSparkle fill="#FEC60D" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '10%', left: '10%', width: 44, opacity: 0.9, animationDuration: '8s', animationDelay: '-2s' }}><DoodleCloud fill="#DDEDE8" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '38%', right: '2%', width: 26, animationDuration: '7s', animationDelay: '-2.5s' }}><DoodleLeaf fill="#2F7A3E" stroke="#1E5A2A" rotate={-20} /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '55%', left: '2%', width: 24, animationDuration: '6.5s', animationDelay: '-0.5s' }}><DoodleLeaf fill="#7CB85C" stroke="#2F7A3E" rotate={25} /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '28%', left: '6%', width: 14, animationDuration: '7.5s', animationDelay: '-3s' }}><DoodleSparkle fill="#8FD4CB" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '20%', right: '10%', width: 16, animationDuration: '6.5s', animationDelay: '-2s' }}><DoodleSparkle fill="#ffffff" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '5%', left: '3%', width: 42, animationDuration: '8s', animationDelay: '-2s' }}><DoodleFlask /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '5%', right: '2.5%', width: 78, animationDuration: '7s', animationDelay: '-1s' }}><DoodleBooks /></span>
             </div>
             <div className="sd-wrap" data-reveal>
               <p className="sd-eyebrow">Who it is for</p>
@@ -996,6 +1207,29 @@ function LoginForm() {
           </section>
 
           <section id="signin" className="sd-section">
+            {/* Full-colour Template 1 scene: mint blobs in opposite
+                corners, a hills strip grounding the section, clouds,
+                paper plane, leaves, sparkles, books, pencil and flask —
+                behind the sign-in card and demo panel at every width. */}
+            <div className="sd-scene" aria-hidden="true">
+              <svg className="sd-scene-svg" viewBox="0 0 1200 600" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M 0 0 L 430 0 C 350 80, 280 150, 220 250 C 170 330, 80 370, 0 395 Z" fill="#C7EFEE" />
+                <path d="M 1200 600 L 770 600 C 850 510, 930 440, 990 340 C 1040 260, 1130 220, 1200 200 Z" fill="#C7EFEE" />
+                <path d="M 0 600 L 0 562 C 180 535, 360 570, 560 552 C 760 534, 980 570, 1200 548 L 1200 600 Z" fill="#4D9F5F" />
+                <path d="M 0 600 L 0 582 C 220 560, 480 590, 720 575 C 920 562, 1080 585, 1200 572 L 1200 600 Z" fill="#3E8A4E" />
+              </svg>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '3%', left: '5%', width: 60, animationDuration: '7s', animationDelay: '-1s' }}><DoodleCloud fill="#DDEDE8" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '4%', right: '5%', width: 52, animationDuration: '8s', animationDelay: '-2s' }}><DoodleCloud fill="#E4F2EF" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '2.5%', left: '16%', width: 120, animationDuration: '8s', animationDelay: '-1.5s' }}><DoodlePlane /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '5%', right: '22%', width: 18, animationDuration: '6s', animationDelay: '-1s' }}><DoodleSparkle fill="#FEC60D" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '30%', left: '2.5%', width: 26, animationDuration: '7s', animationDelay: '-2.5s' }}><DoodleLeaf fill="#2F7A3E" stroke="#1E5A2A" rotate={25} /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '42%', right: '2.5%', width: 24, animationDuration: '6.5s', animationDelay: '-0.5s' }}><DoodleLeaf fill="#7CB85C" stroke="#2F7A3E" rotate={-15} /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '55%', left: '3%', width: 16, animationDuration: '6.5s', animationDelay: '-2s' }}><DoodleSparkle fill="#8FD4CB" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '62%', right: '4%', width: 18, animationDuration: '7s', animationDelay: '-1s' }}><DoodleSparkle fill="#ffffff" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '4%', left: '3%', width: 72, animationDuration: '7s', animationDelay: '-1s' }}><DoodleBooks /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '4.5%', left: '46%', width: 88, animationDuration: '7s', animationDelay: '-1.5s' }}><DoodlePencilFlat /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '4%', right: '3%', width: 40, animationDuration: '8s', animationDelay: '-2s' }}><DoodleFlask /></span>
+            </div>
             <div className="sd-wrap" data-reveal>
               <div className="sd-signin-card">
                 <div className="sd-signin-header">

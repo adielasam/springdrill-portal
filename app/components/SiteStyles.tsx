@@ -23,15 +23,23 @@ export function SiteStyles() {
 
         .sd-page { color: #1c2b25; background: #ffffff; font-family: var(--font-metropolis, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif); }
         .sd-wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
-        .sd-section { padding: 96px 0; scroll-margin-top: 80px; border-top: 1px solid #e6efe9; }
-        .sd-section-soft { background: #f3f7f4; position: relative; }
-        /* Faint corner doodles on the soft sections only: two per section,
-           very low opacity, in the empty bottom padding strip — never near
-           text or cards. Static (no float): below the hero, calm wins. */
+        .sd-section { padding: 96px 0; scroll-margin-top: 80px; border-top: 1px solid #e6efe9; position: relative; }
+        .sd-section-soft { background: #f3f7f4; }
+        /* Subtle scattered artifacts at the edges of the contact page
+           (Template 1 cartoon language, kept faint): leaves, sparkles,
+           tiny clouds and small school motifs, very low opacity, in the
+           empty top/bottom padding strips — never near text, cards or
+           the form. A slow gentle drift keeps them alive without
+           competing with the content; it is off under reduced motion.
+           The home page uses full-colour .sd-scene artwork instead. */
         .sd-corner-doodles { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
-        .sd-section-soft .sd-wrap { position: relative; z-index: 1; }
-        .sd-corner-doodle { position: absolute; opacity: 0.12; color: #007a4d; line-height: 0; }
+        .sd-section .sd-wrap { position: relative; z-index: 1; }
+        .sd-corner-doodle { position: absolute; opacity: 0.12; color: #007a4d; line-height: 0; animation: sd-corner-float 7s ease-in-out infinite alternate; }
         .sd-corner-doodle svg { display: block; width: 100%; height: auto; }
+        @keyframes sd-corner-float { from { transform: translateY(-4px); } to { transform: translateY(4px); } }
+        @media (prefers-reduced-motion: reduce) {
+          .sd-corner-doodle { animation: none; }
+        }
         .sd-eyebrow { font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #007a4d; margin: 0 0 12px 0; }
         /* Display headings use ChunkFive (single weight 400 — a heavier
            weight would only be synthesised). Georgia is the fallback. */

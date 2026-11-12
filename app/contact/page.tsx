@@ -23,8 +23,17 @@ export default function ContactPage() {
         <main>
           <section className="sd-section sd-section-soft">
             <div className="sd-corner-doodles" aria-hidden="true">
+              <span className="sd-corner-doodle" style={{ top: 34, left: 60, width: 20 }}>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z" fill="currentColor" /></svg>
+              </span>
+              <span className="sd-corner-doodle" style={{ top: 30, right: 60, width: 26 }}>
+                <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><g transform="rotate(25 16 16)"><path d="M6 26C6 12 16 4 28 4c0 14-8 22-22 22z" fill="currentColor" /></g></svg>
+              </span>
               <span className="sd-corner-doodle" style={{ bottom: 30, left: 44, width: 24 }}>
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z" fill="currentColor" /></svg>
+              </span>
+              <span className="sd-corner-doodle" style={{ bottom: 30, left: 130, width: 46 }}>
+                <svg viewBox="0 0 90 60" fill="none" aria-hidden="true"><g fill="currentColor"><rect x="6" y="46" width="76" height="13" rx="3" /><rect x="12" y="30" width="68" height="13" rx="3" /><rect x="20" y="14" width="56" height="13" rx="3" /></g></svg>
               </span>
               <span className="sd-corner-doodle" style={{ bottom: 34, right: 52, width: 44 }}>
                 <svg viewBox="0 0 80 48" fill="none" aria-hidden="true"><g fill="currentColor"><circle cx="26" cy="30" r="12" /><circle cx="42" cy="21" r="14" /><circle cx="58" cy="30" r="10" /><rect x="16" y="30" width="52" height="11" rx="5.5" /></g></svg>
