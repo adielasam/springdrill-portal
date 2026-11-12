@@ -1,5 +1,31 @@
 import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
+
+// Self-hosted fonts for the landing pages only: the variables are defined
+// on <body> and consumed by the landing pages' own CSS. The static portal
+// pages in public/ never load this layout, so their fonts are untouched,
+// and globals.css is unchanged. Files live in app/fonts/ (see the README
+// there for sources and licences).
+// ChunkFive (The League of Moveable Type, OFL 1.1) — display headings.
+// Metropolis (Chris Simpson, Unlicense) — body and UI text.
+const chunkFive = localFont({
+  src: "./fonts/ChunkFive-Regular.otf",
+  variable: "--font-chunkfive",
+  display: "swap",
+});
+
+const metropolis = localFont({
+  src: [
+    { path: "./fonts/Metropolis-Regular.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/Metropolis-Medium.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/Metropolis-SemiBold.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/Metropolis-Bold.woff2", weight: "700", style: "normal" },
+    { path: "./fonts/Metropolis-ExtraBold.woff2", weight: "800", style: "normal" },
+  ],
+  variable: "--font-metropolis",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://springdrill-portal.vercel.app"),
@@ -59,7 +85,7 @@ export default function RootLayout({
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </head>
-      <body>{children}</body>
+      <body className={`${chunkFive.variable} ${metropolis.variable}`}>{children}</body>
     </html>
   );
 }
