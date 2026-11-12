@@ -1,8 +1,8 @@
-// Shared landing-page chrome styles: base, header, footer, contact blocks
-// and the responsive rules for them. Rendered by both the home page and
-// the contact page so the header/footer/contact styling stays identical.
-// Page-specific CSS (hero, animations, sign-in, pencil cursor) lives in
-// app/page.tsx. The static portal pages in public/ never load this.
+// Shared landing-page chrome styles: base, header, footer, contact blocks,
+// section scenes, pencil cursor and the responsive rules for them.
+// Rendered by both the home page and the contact page so the styling stays
+// identical. Page-specific CSS (hero, animations, sign-in, preloader)
+// lives in app/page.tsx. The static portal pages in public/ never load this.
 export function SiteStyles() {
   return (
     <style>{`
@@ -25,20 +25,54 @@ export function SiteStyles() {
         .sd-wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
         .sd-section { padding: 96px 0; scroll-margin-top: 80px; border-top: 1px solid #e6efe9; position: relative; }
         .sd-section-soft { background: #f3f7f4; }
-        /* Subtle scattered artifacts at the edges of the contact page
-           (Template 1 cartoon language, kept faint): leaves, sparkles,
-           tiny clouds and small school motifs, very low opacity, in the
-           empty top/bottom padding strips — never near text, cards or
-           the form. A slow gentle drift keeps them alive without
-           competing with the content; it is off under reduced motion.
-           The home page uses full-colour .sd-scene artwork instead. */
-        .sd-corner-doodles { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+        /* Section scenes: every landing section carries its own
+           full-colour Template 1 scene — mint blob, hills, clouds,
+           leaves, sparkles and school motifs — behind the content, at
+           every width. The layer is clipped to the section, never
+           intercepts clicks, and sits below the content wrap (z-index 1),
+           so decorations can never cover text, cards, icons, buttons or
+           form fields. Floating doodles drift gently; the drift is off
+           under reduced motion. Nothing here hides artwork at any width
+           (mobile parity). */
+        .sd-scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .sd-scene-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
         .sd-section .sd-wrap { position: relative; z-index: 1; }
-        .sd-corner-doodle { position: absolute; opacity: 0.12; color: #007a4d; line-height: 0; animation: sd-corner-float 7s ease-in-out infinite alternate; }
-        .sd-corner-doodle svg { display: block; width: 100%; height: auto; }
-        @keyframes sd-corner-float { from { transform: translateY(-4px); } to { transform: translateY(4px); } }
+        .sd-doodle { position: absolute; pointer-events: none; line-height: 0; }
+        .sd-doodle svg { display: block; width: 100%; height: auto; }
+        @keyframes sd-doodle-float { from { transform: translateY(-5px); } to { transform: translateY(5px); } }
+        .sd-doodle-float { animation: sd-doodle-float 7s ease-in-out infinite alternate; }
         @media (prefers-reduced-motion: reduce) {
-          .sd-corner-doodle { animation: none; }
+          .sd-doodle-float { animation: none; }
+        }
+
+        /* Pencil cursor: the user's cartoon pencil character IS the cursor
+           on fine pointers and appears under the fingertip on touch. The
+           follower is a fixed, transform-only element that never
+           intercepts clicks; it sits below the preloader/nav overlay
+           (99999) and above the sticky header. The lean and scale pivot
+           about the graphite tip — measured at 36.7% across, bottom
+           edge of the cropped 113x185 artwork — so the tip stays glued
+           to the pointer or fingertip. The soft drop-shadow keeps it
+           readable on the dark-green footer and overlay. */
+        .sd-pencil { position: fixed; left: 0; top: 0; width: 36.6px; height: 60px; z-index: 90000; pointer-events: none; opacity: 0; transition: opacity 0.15s ease; will-change: transform; transform-origin: 36.7% 100%; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35)); }
+        .sd-pencil-art { position: absolute; left: 0; bottom: 0; display: block; width: 36.6px; height: 60px; transition: opacity 0.18s ease, scale 0.18s ease; }
+        .sd-butterfly-art { position: absolute; left: 0; top: 0; display: block; width: 56px; height: 67px; opacity: 0; scale: 0.6; transform-origin: 67.9% 66%; transition: opacity 0.18s ease, scale 0.18s ease; }
+        /* Butterfly form (over the home sign-in section): the box grows
+           to the butterfly's footprint and the pivot moves to the centre
+           of its body (67.9% across, 66% down), so the pointer stays
+           glued to the body while the wings flutter. The morph is a
+           quick fade/scale crossfade; the pencil fades out with its tip
+           still on the pointer. */
+        .sd-pencil.is-butterfly { width: 56px; height: 67px; transform-origin: 67.9% 66%; }
+        .sd-pencil.is-butterfly .sd-pencil-art { left: calc(67.9% - 13.4px); top: calc(66% - 60px); bottom: auto; opacity: 0; scale: 0.7; }
+        .sd-pencil.is-butterfly .sd-butterfly-art { opacity: 1; scale: 1; animation: sd-butterfly-flutter 0.9s ease-in-out infinite; }
+        @keyframes sd-butterfly-flutter { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-3px) rotate(3deg); } }
+        /* The OS arrow hides only while the follower is mounted (the body
+           class is added by the component), only on fine pointers, and
+           never with reduced motion. Text fields keep their text cursor. */
+        @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+          body.sd-pencil-cursor, body.sd-pencil-cursor * { cursor: none; }
+          body.sd-pencil-cursor input, body.sd-pencil-cursor textarea { cursor: text; }
         }
         .sd-eyebrow { font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #007a4d; margin: 0 0 12px 0; }
         /* Display headings use ChunkFive (single weight 400 — a heavier
@@ -107,6 +141,9 @@ export function SiteStyles() {
         @media (max-width: 900px) {
           .sd-contact-grid { grid-template-columns: repeat(2, 1fr); }
           .sd-section { padding: 64px 0; }
+          /* Section scenes shrink slightly so side items stay in the
+             content gutter on phones. Nothing here hides artwork. */
+          .sd-scene .sd-doodle { scale: 0.85; }
         }
 
         @media (max-width: 600px) {
