@@ -1,14 +1,14 @@
-// Logo mark: a green rounded square with a white check — "tests marked,
-// results ready". One component, shared by the landing pages: header,
-// preloader, nav overlay and footer. Swap the SVG for a cap/book/"S"
-// later if wanted.
-export function LogoMark({ variant = 'green', size = 32 }: { variant?: 'green' | 'white'; size?: number }) {
-  const square = variant === 'white' ? '#ffffff' : '#007a4d';
-  const check = variant === 'white' ? '#007a4d' : '#ffffff';
+// Logo mark: the owner's actual SpringDrill emblem — the green circle
+// with a graduation cap and a hand holding a pen, cropped from the lockup
+// with a transparent background. The white disc inside the ring stays
+// opaque, so the mark sits cleanly on white headers AND the dark-green
+// footer/nav overlay with no white box. The adjacent wordmark text
+// carries the name, so the image is decorative (alt=""). The full
+// lockup lives at /springdrill-logo.png (its dark-green "Spring"
+// wordmark is a white-surface design); the preloader splits it into the
+// spinning emblem + a steady wordmark crop (/springdrill-wordmark.png).
+export function LogoMark({ size = 32 }: { size?: number }) {
   return (
-    <svg className="sd-logo-mark" width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <rect width="32" height="32" rx="8" fill={square} />
-      <path d="M9 16.5 L13.8 21.3 L23.5 10.5" stroke={check} strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <img className="sd-logo-mark" src="/springdrill-emblem.png" alt="" width={size} height={size} draggable={false} />
   );
 }

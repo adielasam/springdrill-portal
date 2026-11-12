@@ -4,6 +4,8 @@ import { useEffect, useRef, useState, Suspense, Fragment } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import { LogoMark } from './components/LogoMark';
+import { DoodleBooks, DoodleCloud, DoodleFlask, DoodleLeaf, DoodlePencilFlat, DoodlePlane, DoodleSparkle } from './components/Doodles';
+import { NAV_SETTLED_EVENT, PencilCursor } from './components/PencilCursor';
 import { SiteHeader } from './components/SiteHeader';
 import { SiteFooter } from './components/SiteFooter';
 import { SiteStyles } from './components/SiteStyles';
@@ -54,199 +56,6 @@ function SplitWords({ text }: { text: string }) {
   );
 }
 
-// Full-colour Template 1 doodles for the section scenes below the hero.
-// Each renders one small inline SVG in the sample's flat cartoon style;
-// callers position them with .sd-doodle + inline styles. The hero keeps
-// its own inline copies (unchanged); these exist so the four section
-// scenes share one definition each instead of repeating SVG markup.
-function DoodleCloud({ fill }: { fill: string }) {
-  return (
-    <svg viewBox="0 0 80 48" fill="none" aria-hidden="true"><g fill={fill}><circle cx="26" cy="30" r="12" /><circle cx="42" cy="21" r="14" /><circle cx="58" cy="30" r="10" /><rect x="16" y="30" width="52" height="11" rx="5.5" /></g></svg>
-  );
-}
-
-function DoodleSparkle({ fill }: { fill: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z" fill={fill} /></svg>
-  );
-}
-
-function DoodleLeaf({ fill, stroke, rotate }: { fill: string; stroke: string; rotate: number }) {
-  return (
-    <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><g transform={`rotate(${rotate} 16 16)`}><path d="M6 26C6 12 16 4 28 4c0 14-8 22-22 22z" fill={fill} /><path d="M8 24C14 18 20 12 26 6" stroke={stroke} strokeWidth="1.5" strokeLinecap="round" /></g></svg>
-  );
-}
-
-function DoodleBooks() {
-  return (
-    <svg viewBox="0 0 90 60" fill="none" aria-hidden="true"><rect x="6" y="46" width="76" height="14" rx="3" fill="#2E7CC4" /><rect x="12" y="49.5" width="58" height="7" rx="2" fill="#EAF4FB" /><rect x="12" y="31" width="68" height="14" rx="3" fill="#FFFFFF" stroke="#2E7CC4" strokeWidth="2" /><rect x="18" y="34.5" width="50" height="7" rx="2" fill="#DCEBF8" /><rect x="20" y="16" width="56" height="14" rx="3" fill="#7FB3E0" /><rect x="26" y="19.5" width="38" height="7" rx="2" fill="#EAF4FB" /></svg>
-  );
-}
-
-function DoodleFlask() {
-  return (
-    <svg viewBox="0 0 48 64" fill="none" aria-hidden="true"><path d="M20 4h8v10l10 20c2.4 4.8 3.6 8 3.6 11a9.4 9.4 0 0 1-9.4 9.4H15.8A9.4 9.4 0 0 1 6.4 45c0-3 1.2-6.2 3.6-11L20 14V4z" fill="#FFFFFF" stroke="#512A2C" strokeWidth="2" strokeLinejoin="round" /><path d="M13 40h22l3.4 6.8c.8 1.6 1.2 3 1.2 4.4a6.4 6.4 0 0 1-6.4 6.4H14.8a6.4 6.4 0 0 1-6.4-6.4c0-1.4.4-2.8 1.2-4.4L13 40z" fill="#F59645" /><circle cx="20" cy="48" r="2.2" fill="#FDE3C8" /><circle cx="28" cy="52" r="1.6" fill="#FDE3C8" /><circle cx="25" cy="43" r="1.3" fill="#FDE3C8" /><rect x="18" y="2" width="12" height="5" rx="2" fill="#512A2C" /></svg>
-  );
-}
-
-function DoodlePencilFlat() {
-  return (
-    <svg viewBox="0 0 120 20" fill="none" aria-hidden="true" style={{ transform: 'rotate(-4deg)' }}><rect x="26" y="4" width="72" height="12" fill="#4D9F5F" /><rect x="26" y="4" width="72" height="3" fill="#6BBF7B" /><path d="M26 4L6 10l20 6V4z" fill="#F2D8A7" /><path d="M12 7.5L6 10l6 2.5V7.5z" fill="#2B2B2B" /><rect x="98" y="4" width="8" height="12" fill="#C0C7CE" /><rect x="106" y="4" width="10" height="12" rx="2" fill="#F472B6" /></svg>
-  );
-}
-
-function DoodlePlane() {
-  return (
-    <svg viewBox="0 0 140 70" fill="none" aria-hidden="true"><path d="M6 60C44 56 66 40 106 18" stroke="#512A2D" strokeWidth="2" strokeDasharray="5 6" strokeLinecap="round" /><path d="M102 8L136 16 106 26 111 16Z" fill="#ffffff" /></svg>
-  );
-}
-
-// Cartoon pencil cursor: the user's pencil character image IS the cursor
-// on fine-pointer devices, and appears under the fingertip on touch
-// devices — on tap or drag the tip sits on the touch point, the body
-// rising above the finger so it stays visible, following with the same
-// smoothing and lean as the mouse, then fading out shortly after the
-// finger lifts. The character stays upright — it has a face, so full
-// rotation to the travel direction would turn it upside down. Instead
-// it leans slightly toward the direction of travel (max ±18°), eased,
-// with the graphite tip leading the lean. The tip sits exactly on the
-// pointer when settled: the artwork was cropped to its solid pixels
-// (113x185, soft ground shadow removed) and the tip measured at cropped
-// pixel (41.5, 184.5) — 36.7% across, bottom edge — which is the
-// transform-origin in the CSS block below. It mounts with a fine pointer
-// or touch capability, and never with a reduced-motion preference.
-// No ripple, no trail, no particles — the template it learns from has none.
-function PencilCursor() {
-  const followerRef = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(false);
-
-  useEffect(() => {
-    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    const touchCapable = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if ((finePointer || touchCapable) && !reduceMotion) setActive(true);
-  }, []);
-
-  useEffect(() => {
-    if (!active) return;
-    const el = followerRef.current;
-    if (!el) return;
-    // The body class is what hides the OS arrow (see the CSS block) — it is
-    // only added while the follower is mounted, so a failed mount can never
-    // leave the user with no cursor at all.
-    document.body.classList.add('sd-pencil-cursor');
-    // Rendered sprite size (see .sd-pencil in the CSS block) and the tip
-    // offset within it: 36.7% of 36.6px wide, full 60px height.
-    const OX = 13.4, OY = 60;
-    const MAX_LEAN = (18 * Math.PI) / 180;
-    let tipX = 0, tipY = 0, targetX = 0, targetY = 0;
-    let lean = 0, scale = 1, targetScale = 1;
-    let placed = false;
-    let raf = 0;
-
-    const tick = () => {
-      raf = requestAnimationFrame(tick);
-      // The tip IS the click point, so the chase is tight (0.2/frame) — a
-      // bigger lag would make clicks feel off.
-      const dx = targetX - tipX, dy = targetY - tipY;
-      tipX += dx * 0.2; tipY += dy * 0.2;
-      // Lean toward the horizontal direction of travel: full lean moving
-      // sideways, upright moving straight up or down. The lean only
-      // updates while the tip is actually moving, so the last lean
-      // persists at rest — the pencil never snaps back.
-      const dist = Math.hypot(dx, dy);
-      if (dist > 1) {
-        const want = (dx / dist) * MAX_LEAN;
-        lean += (want - lean) * 0.3;
-      }
-      scale += (targetScale - scale) * 0.25;
-      el.style.transform = `translate3d(${tipX - OX}px, ${tipY - OY}px, 0) rotate(${lean}rad) scale(${scale})`;
-    };
-
-    // Shared by mouse and touch: steer the tip to a point, grow over
-    // links/buttons, hide over text fields. The first sighting places
-    // the tip on the pointer while still hidden, so it never sweeps in
-    // from a corner and never visibly teleports.
-    const placeAt = (x: number, y: number, target: Element | null) => {
-      targetX = x; targetY = y;
-      if (!placed) { tipX = targetX; tipY = targetY; placed = true; }
-      const overText = !!target?.closest('input, textarea');
-      const overAction = !!target?.closest('a[href], button');
-      targetScale = overAction && !overText ? 1.3 : 1;
-      // Over text fields the follower hides and the normal text cursor
-      // returns (see the CSS block) — hiding the I-beam would hurt typing.
-      el.style.opacity = overText ? '0' : '1';
-    };
-    // Touch release: the pencil lingers briefly, then fades — it never
-    // vanishes instantly and never stays parked on screen. Any new
-    // input (touch or mouse) cancels the pending fade.
-    let fadeTimer = 0;
-    const cancelFade = () => { window.clearTimeout(fadeTimer); };
-    const scheduleFade = () => {
-      cancelFade();
-      fadeTimer = window.setTimeout(() => { el.style.opacity = '0'; }, 1100);
-    };
-
-    const onMove = (e: MouseEvent) => {
-      cancelFade();
-      placeAt(e.clientX, e.clientY, e.target as Element | null);
-    };
-    const onLeave = () => { el.style.opacity = '0'; };
-    const onEnter = () => { if (placed) el.style.opacity = '1'; };
-    const onOut = (e: MouseEvent) => { if (!e.relatedTarget) onLeave(); };
-    // Touch: the pencil appears under the fingertip, tip on the touch
-    // point, following the finger through the same tick (same lerp and
-    // lean). Only the first touch is tracked. Listeners are passive and
-    // the element is pointer-events: none, so taps, links and scrolling
-    // are never intercepted and no preventDefault is ever called.
-    const onTouchStart = (e: TouchEvent) => {
-      cancelFade();
-      const t = e.touches[0];
-      if (t) placeAt(t.clientX, t.clientY, e.target as Element | null);
-    };
-    const onTouchMove = (e: TouchEvent) => {
-      cancelFade();
-      const t = e.touches[0];
-      if (t) placeAt(t.clientX, t.clientY, e.target as Element | null);
-    };
-    const onTouchEnd = (e: TouchEvent) => {
-      // Only fade once every finger is up — a second finger still down
-      // keeps the pencil tracking.
-      if (e.touches.length === 0) scheduleFade();
-    };
-
-    document.addEventListener('mousemove', onMove, { passive: true });
-    document.addEventListener('mouseleave', onLeave);
-    document.addEventListener('mouseenter', onEnter);
-    document.addEventListener('mouseout', onOut);
-    document.addEventListener('touchstart', onTouchStart, { passive: true });
-    document.addEventListener('touchmove', onTouchMove, { passive: true });
-    document.addEventListener('touchend', onTouchEnd, { passive: true });
-    document.addEventListener('touchcancel', onTouchEnd, { passive: true });
-    raf = requestAnimationFrame(tick);
-    return () => {
-      cancelAnimationFrame(raf);
-      cancelFade();
-      document.removeEventListener('mousemove', onMove);
-      document.removeEventListener('mouseleave', onLeave);
-      document.removeEventListener('mouseenter', onEnter);
-      document.removeEventListener('mouseout', onOut);
-      document.removeEventListener('touchstart', onTouchStart);
-      document.removeEventListener('touchmove', onTouchMove);
-      document.removeEventListener('touchend', onTouchEnd);
-      document.removeEventListener('touchcancel', onTouchEnd);
-      document.body.classList.remove('sd-pencil-cursor');
-    };
-  }, [active]);
-
-  if (!active) return null;
-  return (
-    <div ref={followerRef} className="sd-pencil" aria-hidden="true">
-      <img src="/pencil-cursor.png" alt="" draggable={false} />
-    </div>
-  );
-}
-
 function LoginForm() {
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
@@ -271,8 +80,16 @@ function LoginForm() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  // Preloader: the owner's actual logo — spinning emblem, steady
+  // wordmark — with a galaxy ring + progress bar, shown for a full 3s
+  // (the user asked for at least 3 seconds, logo first). Reduced-motion
+  // users get a short 300ms static showing instead.
+  // COUPLED TIMINGS — the hero first-play timer (3150ms) and the
+  // cross-page hash-scroll (3050ms) below both wait for this preloader;
+  // keep them in step with PRELOADER_MS if it ever changes.
   useEffect(() => {
-    const t = setTimeout(() => setShowPreloader(false), 800);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const t = setTimeout(() => setShowPreloader(false), reduceMotion ? 300 : 3000);
     return () => clearTimeout(t);
   }, []);
 
@@ -348,8 +165,8 @@ function LoginForm() {
     // forth at a section edge never strobes the animation.
     const lastPlay = new Map<Element, number>();
     const RESET_COOLDOWN_MS = 1000;
-    // Hero text sits behind the ~800ms preloader on load, so its FIRST play
-    // still comes from a timer at 950ms; after that it joins the observer
+    // Hero text sits behind the ~3s preloader on load, so its FIRST play
+    // still comes from a timer at 3150ms; after that it joins the observer
     // and replays like everything else when the user scrolls back to top.
     const heroRoot = document.querySelector('.sd-hero');
     let heroReady = false;
@@ -362,7 +179,7 @@ function LoginForm() {
           el.classList.add('is-in');
           lastPlay.set(el, performance.now());
         });
-    }, 950);
+    }, 3150);
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         const el = entry.target;
@@ -488,7 +305,15 @@ function LoginForm() {
     if (reduceMotion || !el) { go(); return; }
     setNavOverlay({ leaving: false });
     navTimers.current.push(window.setTimeout(() => setNavOverlay({ leaving: true }), 650));
-    navTimers.current.push(window.setTimeout(() => { setNavOverlay(null); go(); }, 950));
+    navTimers.current.push(window.setTimeout(() => {
+      setNavOverlay(null);
+      go();
+      // Let the overlay unmount commit, then tell the pencil cursor the
+      // new section is showing so it re-shows at the last position (on
+      // touch it would otherwise stay faded from the tap that opened
+      // the transition — see PencilCursor).
+      navTimers.current.push(window.setTimeout(() => window.dispatchEvent(new Event(NAV_SETTLED_EVENT)), 60));
+    }, 950));
     navTimers.current.push(window.setTimeout(() => setNavOverlay(null), 2000));
   };
 
@@ -507,18 +332,20 @@ function LoginForm() {
 
   // Cross-page anchor landing (PR #14): arriving from /contact with a
   // section hash (/#features, /#signin) must land on that section. The
-  // browser's native anchor jump is lost behind the 800ms preloader, so
-  // scroll to the target once the preloader has cleared. The recovery
-  // hash is excluded — it switches the auth form instead.
+  // browser's native anchor jump is lost behind the ~3s preloader, so
+  // scroll to the target once the preloader has cleared (400ms under
+  // reduced motion, when the preloader itself clears at 300ms). The
+  // recovery hash is excluded — it switches the auth form instead.
   useEffect(() => {
     const hash = window.location.hash;
     if (!hash || hash.includes('type=recovery')) return;
     const id = hash.slice(1);
     if (!id || !/^[A-Za-z][\w-]*$/.test(id)) return;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const t = window.setTimeout(() => {
       const el = document.getElementById(id);
       if (el) el.scrollIntoView({ behavior: 'auto', block: 'start' });
-    }, 850);
+    }, reduceMotion ? 400 : 3050);
     return () => window.clearTimeout(t);
   }, []);
 
@@ -628,9 +455,35 @@ function LoginForm() {
     <>
       <SiteStyles />
       <style>{`
-        @keyframes preloader-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes sd-logo-letter-in { from { opacity: 0; transform: translateY(10px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
         @keyframes sd-overlay-bar { from { width: 0; } to { width: 120px; } }
+
+        /* Preloader: the owner's actual logo — the emblem spins (1.5s
+           per rotation, exactly 2 turns in the 3s showing, ending
+           upright) while the wordmark stays steady and readable — with
+           a galaxy ring (a dashed orbit carrying dots and sparkles,
+           rotating around the logo) plus two rings spreading outward,
+           and a progress bar filling beneath it across the full 3s.
+           The whole showing lasts 3s (see the timer above — the user
+           asked for at least 3 seconds, logo first). The emblem and
+           wordmark images are preloaded in the document head so they
+           render in the very first frame. Reduced motion: static logo,
+           full bar, no spin or pulse. */
+        .sd-preloader { position: fixed; inset: 0; background: #ffffff; z-index: 99999; display: flex; flex-direction: column; gap: 30px; align-items: center; justify-content: center; }
+        .sd-preloader-galaxy { position: relative; width: min(430px, 88vw); display: flex; align-items: center; justify-content: center; }
+        .sd-preloader-lockup { position: relative; z-index: 2; display: flex; align-items: center; gap: 14px; }
+        .sd-preloader-emblem { display: block; width: 118px; height: 118px; animation: sd-emblem-spin 1.5s linear infinite; }
+        @keyframes sd-emblem-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .sd-preloader-wordmark { display: block; height: 62px; width: auto; }
+        .sd-preloader-orbit { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1; width: 118%; height: auto; overflow: visible; pointer-events: none; }
+        .sd-galaxy-spin { transform-box: fill-box; transform-origin: center; animation: sd-galaxy-spin 9s linear infinite; }
+        @keyframes sd-galaxy-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .sd-preloader-pulse { position: absolute; inset: -32px -8px; border: 2px solid rgba(0, 122, 77, 0.35); border-radius: 50%; animation: sd-preloader-pulse 2.2s ease-out infinite; pointer-events: none; }
+        .sd-preloader-pulse-2 { animation-delay: 1.1s; }
+        @keyframes sd-preloader-pulse { 0% { transform: scale(0.72); opacity: 0.7; } 100% { transform: scale(1.14); opacity: 0; } }
+        .sd-preloader-bar { width: min(240px, 60vw); height: 6px; border-radius: 999px; background: #e6efe9; overflow: hidden; }
+        .sd-preloader-bar-fill { height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #007a4d, #4D9F5F); animation: sd-preloader-fill 3s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        @keyframes sd-preloader-fill { from { width: 0; } to { width: 100%; } }
 
         /* Base, header, footer, contact and section styles are shared with
            the contact page — they ship from <SiteStyles /> (rendered first
@@ -652,20 +505,8 @@ function LoginForm() {
         .sd-hero-section .sd-wrap { position: relative; z-index: 1; }
         .sd-hero-scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
         .sd-hero-scene-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-        .sd-doodle { position: absolute; pointer-events: none; line-height: 0; }
-        .sd-doodle svg { display: block; width: 100%; height: auto; }
-        @keyframes sd-doodle-float { from { transform: translateY(-5px); } to { transform: translateY(5px); } }
-        .sd-doodle-float { animation: sd-doodle-float 7s ease-in-out infinite alternate; }
-
-        /* Section scenes (below the hero): every home section carries its
-           own full-colour Template 1 scene — mint blob, hills, clouds,
-           leaves, sparkles and school motifs — behind the content, at
-           every width. The layer is clipped to the section, never
-           intercepts clicks, and sits below the content wrap (z-index 1
-           in SiteStyles), so decorations can never cover text, cards,
-           icons, buttons or form fields. */
-        .sd-scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-        .sd-scene-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+        /* Section scenes and floating doodles (.sd-scene, .sd-doodle)
+           ship from <SiteStyles /> — the contact page shares them. */
 
         /* Hero */
         .sd-hero { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 48px; align-items: center; padding: 96px 0; }
@@ -864,27 +705,14 @@ function LoginForm() {
           .sd-hero-media img { transform: none; animation: none; }
           .sd-hero-media img { transition: none; scale: none; }
           .sd-progress { display: none; }
-          .sd-doodle-float { animation: none; }
+          .sd-galaxy-spin { animation: none; }
+          .sd-preloader-emblem { animation: none; }
+          .sd-preloader-pulse { display: none; }
+          .sd-preloader-bar-fill { animation: none; width: 100%; }
         }
 
-        /* Pencil cursor: the user's cartoon pencil character IS the cursor
-           on fine pointers and appears under the fingertip on touch. The
-           follower is a fixed, transform-only element that never
-           intercepts clicks; it sits below the preloader/nav overlay
-           (99999) and above the sticky header. The lean and scale pivot
-           about the graphite tip — measured at 36.7% across, bottom
-           edge of the cropped 113x185 artwork — so the tip stays glued
-           to the pointer or fingertip. The soft drop-shadow keeps it
-           readable on the dark-green footer and overlay. */
-        .sd-pencil { position: fixed; left: 0; top: 0; width: 36.6px; height: 60px; z-index: 90000; pointer-events: none; opacity: 0; transition: opacity 0.15s ease; will-change: transform; transform-origin: 36.7% 100%; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35)); }
-        .sd-pencil img { display: block; width: 36.6px; height: 60px; }
-        /* The OS arrow hides only while the follower is mounted (the body
-           class is added by the component), only on fine pointers, and
-           never with reduced motion. Text fields keep their text cursor. */
-        @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-          body.sd-pencil-cursor, body.sd-pencil-cursor * { cursor: none; }
-          body.sd-pencil-cursor input, body.sd-pencil-cursor textarea { cursor: text; }
-        }
+        /* Pencil cursor styles ship from <SiteStyles /> — the contact
+           page shares the cursor. */
 
         /* Wide-margin doodles live in the empty side margins. They stay
            visible at every width (mobile parity): below ~1240px they
@@ -905,9 +733,7 @@ function LoginForm() {
              (z-index 0), the photo is opaque, the pale mint wash keeps
              the dark headline readable, and the extra bottom padding
              leaves the desk band visible below the photo. Nothing here
-             hides artwork or animation. Section scenes shrink slightly
-             so side items stay in the content gutter. */
-          .sd-scene .sd-doodle { scale: 0.85; }
+             hides artwork or animation. */
           .sd-feature-grid { grid-template-columns: repeat(2, 1fr); }
           .sd-step-grid { grid-template-columns: 1fr; }
         }
@@ -923,26 +749,37 @@ function LoginForm() {
       `}</style>
 
       {showPreloader && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-          background: '#ffffff', zIndex: 99999, display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center',
-          justifyContent: 'center', transition: 'opacity 0.5s ease-out'
-        }}>
-          <div style={{position: 'relative', width: 120, height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-            <div style={{
-              position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-              border: '4px solid #f3f3f3', borderTop: '4px solid #004d34', borderBottom: '4px solid #004d34',
-              borderRadius: '50%', animation: 'preloader-spin 1s linear infinite', zIndex: 1
-            }}></div>
-            <span style={{zIndex: 2, display: 'flex'}}><LogoMark size={52} /></span>
+        <div className="sd-preloader" aria-hidden="true">
+          <div className="sd-preloader-galaxy">
+            <div className="sd-preloader-pulse" />
+            <div className="sd-preloader-pulse sd-preloader-pulse-2" />
+            <svg className="sd-preloader-orbit" viewBox="0 0 380 200" fill="none" aria-hidden="true">
+              <g className="sd-galaxy-spin">
+                <ellipse cx="190" cy="100" rx="174" ry="78" stroke="#007a4d" strokeOpacity="0.45" strokeWidth="1.5" strokeDasharray="3 7" strokeLinecap="round" />
+                <circle cx="364" cy="100" r="4" fill="#007a4d" />
+                <circle cx="313" cy="155" r="3" fill="#FEC60D" />
+                <circle cx="190" cy="178" r="4.5" fill="#4D9F5F" />
+                <circle cx="67" cy="155" r="3" fill="#007a4d" />
+                <circle cx="16" cy="100" r="4" fill="#FEC60D" />
+                <circle cx="67" cy="45" r="3.5" fill="#4D9F5F" />
+                <circle cx="190" cy="22" r="4" fill="#007a4d" />
+                <circle cx="313" cy="45" r="3" fill="#FEC60D" />
+                <path d="M0 -9 L2.2 -2.2 L9 0 L2.2 2.2 L0 9 L-2.2 2.2 L-9 0 L-2.2 -2.2 Z" fill="#FEC60D" transform="translate(341 139)" />
+                <path d="M0 -9 L2.2 -2.2 L9 0 L2.2 2.2 L0 9 L-2.2 2.2 L-9 0 L-2.2 -2.2 Z" fill="#8FD4CB" transform="translate(39 61)" />
+              </g>
+            </svg>
+            <div className="sd-preloader-lockup">
+              <img className="sd-preloader-emblem" src="/springdrill-emblem.png" alt="" fetchPriority="high" draggable={false} />
+              <img className="sd-preloader-wordmark" src="/springdrill-wordmark.png" alt="SpringDrill" fetchPriority="high" draggable={false} />
+            </div>
           </div>
-          <span style={{fontSize: '1.4rem', fontWeight: 800, color: '#004d34'}}>SpringDrill</span>
+          <div className="sd-preloader-bar"><div className="sd-preloader-bar-fill" /></div>
         </div>
       )}
 
       {navOverlay && (
         <div className={`sd-nav-overlay${navOverlay.leaving ? ' sd-leaving' : ''}`} aria-hidden="true">
-          <LogoMark variant="white" size={44} />
+          <LogoMark size={44} />
           <div className="sd-overlay-wordmark">
             {'SpringDrill'.split('').map((letter, i) => (
               <span key={i} style={{ animationDelay: `${i * 45}ms` }}>{letter}</span>

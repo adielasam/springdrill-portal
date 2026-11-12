@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { SiteHeader } from "../components/SiteHeader";
 import { SiteFooter } from "../components/SiteFooter";
 import { SiteStyles } from "../components/SiteStyles";
+import { DoodleBooks, DoodleCloud, DoodleFlask, DoodleLeaf, DoodlePencilFlat, DoodlePlane, DoodleSparkle } from "../components/Doodles";
+import { PencilCursor } from "../components/PencilCursor";
 
 export const metadata: Metadata = {
   title: "Contact — SpringDrill",
@@ -22,22 +24,28 @@ export default function ContactPage() {
         <SiteHeader variant="contact" />
         <main>
           <section className="sd-section sd-section-soft">
-            <div className="sd-corner-doodles" aria-hidden="true">
-              <span className="sd-corner-doodle" style={{ top: 34, left: 60, width: 20 }}>
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z" fill="currentColor" /></svg>
-              </span>
-              <span className="sd-corner-doodle" style={{ top: 30, right: 60, width: 26 }}>
-                <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><g transform="rotate(25 16 16)"><path d="M6 26C6 12 16 4 28 4c0 14-8 22-22 22z" fill="currentColor" /></g></svg>
-              </span>
-              <span className="sd-corner-doodle" style={{ bottom: 30, left: 44, width: 24 }}>
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 0l2.4 9.6L24 12l-9.6 2.4L12 24l-2.4-9.6L0 12l9.6-2.4z" fill="currentColor" /></svg>
-              </span>
-              <span className="sd-corner-doodle" style={{ bottom: 30, left: 130, width: 46 }}>
-                <svg viewBox="0 0 90 60" fill="none" aria-hidden="true"><g fill="currentColor"><rect x="6" y="46" width="76" height="13" rx="3" /><rect x="12" y="30" width="68" height="13" rx="3" /><rect x="20" y="14" width="56" height="13" rx="3" /></g></svg>
-              </span>
-              <span className="sd-corner-doodle" style={{ bottom: 34, right: 52, width: 44 }}>
-                <svg viewBox="0 0 80 48" fill="none" aria-hidden="true"><g fill="currentColor"><circle cx="26" cy="30" r="12" /><circle cx="42" cy="21" r="14" /><circle cx="58" cy="30" r="10" /><rect x="16" y="30" width="52" height="11" rx="5.5" /></g></svg>
-              </span>
+            {/* Full-colour Template 1 scene, same language as the home
+                sections: mint blob, hills, clouds, paper plane, leaves,
+                sparkles, books, pencil and flask — behind the content at
+                every width. The cards stay opaque and fully clear. */}
+            <div className="sd-scene" aria-hidden="true">
+              <svg className="sd-scene-svg" viewBox="0 0 1200 600" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M 660 0 C 580 120, 500 250, 450 380 C 420 460, 405 530, 400 600 L 1200 600 L 1200 0 Z" fill="#C7EFEE" />
+                <path d="M 620 600 C 640 500, 740 450, 840 470 C 940 490, 1020 440, 1100 470 C 1150 488, 1180 520, 1200 540 L 1200 600 Z" fill="#4D9F5F" />
+                <path d="M 760 600 C 780 530, 880 500, 980 520 C 1060 536, 1130 520, 1200 540 L 1200 600 Z" fill="#3E8A4E" />
+              </svg>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '4%', left: '4%', width: 64, animationDuration: '7s', animationDelay: '-1s' }}><DoodleCloud fill="#DDEDE8" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '6%', left: '22%', width: 18, animationDuration: '6s', animationDelay: '-1s' }}><DoodleSparkle fill="#FEC60D" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '3%', right: '6%', width: 130, animationDuration: '8s', animationDelay: '-1.5s' }}><DoodlePlane /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '12%', right: '16%', width: 48, opacity: 0.9, animationDuration: '8s', animationDelay: '-2s' }}><DoodleCloud fill="#ffffff" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '20%', right: '30%', width: 16, animationDuration: '6.5s', animationDelay: '-2s' }}><DoodleSparkle fill="#ffffff" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '34%', left: '2%', width: 26, animationDuration: '7s', animationDelay: '-2.5s' }}><DoodleLeaf fill="#2F7A3E" stroke="#1E5A2A" rotate={25} /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ top: '55%', right: '1.8%', width: 24, animationDuration: '6.5s', animationDelay: '-0.5s' }}><DoodleLeaf fill="#7CB85C" stroke="#2F7A3E" rotate={-15} /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '30%', left: '3%', width: 16, animationDuration: '6.5s', animationDelay: '-2s' }}><DoodleSparkle fill="#8FD4CB" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '5%', left: '3.5%', width: 42, animationDuration: '8s', animationDelay: '-2s' }}><DoodleFlask /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '5%', right: '2.5%', width: 78, animationDuration: '7s', animationDelay: '-1s' }}><DoodleBooks /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '14%', right: '12%', width: 20, animationDuration: '7.5s', animationDelay: '-3s' }}><DoodleSparkle fill="#FEC60D" /></span>
+              <span className="sd-doodle sd-doodle-float" style={{ bottom: '6%', left: '46%', width: 88, animationDuration: '7s', animationDelay: '-1.5s' }}><DoodlePencilFlat /></span>
             </div>
             <div className="sd-wrap">
               <p className="sd-eyebrow">Contact us</p>
@@ -74,6 +82,7 @@ export default function ContactPage() {
         </main>
         <SiteFooter />
       </div>
+      <PencilCursor />
     </>
   );
 }

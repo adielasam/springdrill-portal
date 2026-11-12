@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     images: ["/og-image.jpg"],
   },
   robots: { index: true, follow: true },
-  icons: { icon: "/icon.svg", apple: "/apple-icon.png" },
+  icons: { icon: "/icon.png", apple: "/apple-icon.png" },
 };
 
 export const viewport: Viewport = {
@@ -62,7 +62,7 @@ const jsonLd = {
   "@type": "Organization",
   name: "SpringDrill",
   url: "https://springdrill-portal.vercel.app",
-  logo: "https://springdrill-portal.vercel.app/icon.svg",
+  logo: "https://springdrill-portal.vercel.app/springdrill-logo.png",
   description: "SpringDrill helps Nigerian schools set CBT tests, auto-collate results and print report cards, generate lesson plans with AI, and give students JAMB practice.",
   contactPoint: {
     "@type": "ContactPoint",
@@ -81,6 +81,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Preloader first frame: the logo assets are preloaded so the
+            spinning emblem + steady wordmark render in the very first
+            frame instead of popping in after the orbit/progress bar. */}
+        <link rel="preload" as="image" href="/springdrill-emblem.png" fetchPriority="high" />
+        <link rel="preload" as="image" href="/springdrill-wordmark.png" fetchPriority="high" />
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
