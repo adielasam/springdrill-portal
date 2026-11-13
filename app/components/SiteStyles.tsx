@@ -85,7 +85,6 @@ export function SiteStyles() {
         .sd-wordmark { font-size: 1.4rem; font-weight: 800; color: #004d34; text-decoration: none; letter-spacing: -0.5px; }
         .sd-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
         .sd-logo-mark { flex: none; display: block; }
-        .sd-footer-brand { display: flex; align-items: center; gap: 10px; }
         .sd-menu-btn { display: none; background: none; border: none; padding: 8px; cursor: pointer; }
         .sd-nav { display: flex; align-items: center; gap: 28px; }
         .sd-nav a { color: #1c2b25; text-decoration: none; font-size: 0.95rem; font-weight: 500; position: relative; }
@@ -121,16 +120,21 @@ export function SiteStyles() {
         .sd-contact-block a:hover { text-decoration: underline; }
         .sd-contact-cta { margin-top: 32px; }
 
-        /* Footer */
-        .sd-footer { background: #004d34; color: #ffffff; padding: 48px 0 32px 0; }
-        .sd-footer-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
-        .sd-footer h3 { margin: 0 0 10px 0; font-size: 1.25rem; font-weight: 800; }
-        .sd-footer p { margin: 0; font-size: 0.95rem; line-height: 1.65; color: rgba(255, 255, 255, 0.85); max-width: 420px; }
+        /* Footer: grouped link columns (Spotify/Udemy pattern) on the dark
+           brand-green band. Brand block first, then four columns; the
+           bottom row carries the Dorvas credit and the copyright line. */
+        .sd-footer { background: #004d34; color: #ffffff; padding: 56px 0 32px 0; }
+        .sd-footer-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr; gap: 32px; }
+        .sd-footer-brand { display: flex; align-items: center; gap: 10px; margin: 0 0 12px 0; font-family: var(--font-chunkfive, Georgia, 'Times New Roman', serif); font-size: 1.5rem; font-weight: 400; color: #ffffff; }
+        .sd-footer-brand-block p { margin: 0; font-size: 0.95rem; line-height: 1.65; color: rgba(255, 255, 255, 0.85); max-width: 280px; }
+        .sd-footer-col h3 { margin: 0 0 14px 0; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255, 255, 255, 0.6); }
+        .sd-footer-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
         .sd-footer a { color: #ffffff; text-decoration: none; }
-        .sd-footer a:hover { text-decoration: underline; }
-        .sd-footer-credit { align-self: center; }
-        .sd-footer-credit p { margin: 0; }
-        .sd-footer-copy { max-width: 1100px; margin: 32px auto 0 auto; padding: 24px 24px 0 24px; border-top: 1px solid rgba(255, 255, 255, 0.2); font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); text-align: center; }
+        .sd-footer-col a { font-size: 0.95rem; line-height: 1.5; }
+        .sd-footer a:hover { text-decoration: underline; color: #c9ecd9; }
+        .sd-footer-bottom { max-width: 1100px; margin: 40px auto 0 auto; padding: 24px 24px 0 24px; border-top: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; gap: 8px 24px; flex-wrap: wrap; font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); }
+        .sd-footer-bottom p { margin: 0; }
+        .sd-footer-bottom a { color: #ffffff; }
 
         /* Contact page: short page, so the column stretches and the footer
            sits at the bottom of tall viewports instead of floating mid-page. */
@@ -141,6 +145,9 @@ export function SiteStyles() {
         @media (max-width: 900px) {
           .sd-contact-grid { grid-template-columns: repeat(2, 1fr); }
           .sd-section { padding: 64px 0; }
+          /* Footer columns: brand spans the full width, link columns 2x2. */
+          .sd-footer-inner { grid-template-columns: repeat(2, 1fr); }
+          .sd-footer-brand-block { grid-column: 1 / -1; }
           /* Section scenes shrink slightly so side items stay in the
              content gutter on phones. Nothing here hides artwork. */
           .sd-scene .sd-doodle { scale: 0.85; }
@@ -154,6 +161,10 @@ export function SiteStyles() {
           .sd-mobile-menu a.sd-btn { color: #fff; text-align: center; margin-top: 8px; padding: 12px; }
           .sd-contact-grid { grid-template-columns: 1fr; }
           .sd-h2 { font-size: 1.6rem; }
+          /* Footer columns stack in one column on phones; nothing hidden,
+             every link full-width and tappable. */
+          .sd-footer-inner { grid-template-columns: 1fr; gap: 28px; }
+          .sd-footer-bottom { flex-direction: column; align-items: center; text-align: center; }
         }
       `}</style>
   );
