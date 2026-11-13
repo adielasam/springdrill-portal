@@ -1,0 +1,846 @@
+{
+ "subject": "Mathematics",
+ "version": 1,
+ "questions": [
+  {
+   "id": "mathematics-001",
+   "year": "2020",
+   "topic": "Number Bases",
+   "text": "Convert 1101₂ to base 10.",
+   "options": [
+    "11",
+    "13",
+    "15",
+    "12"
+   ],
+   "answer": 1,
+   "explanation": "1101₂ = 1×2³ + 1×2² + 0×2¹ + 1×2⁰ = 8 + 4 + 0 + 1 = 13."
+  },
+  {
+   "id": "mathematics-002",
+   "year": "2021",
+   "topic": "Number Bases",
+   "text": "Find the value of x if 23ₓ = 19₁₀.",
+   "options": [
+    "6",
+    "7",
+    "9",
+    "8"
+   ],
+   "answer": 3,
+   "explanation": "23ₓ = 2x + 3. So 2x + 3 = 19, 2x = 16, x = 8."
+  },
+  {
+   "id": "mathematics-003",
+   "year": "2022",
+   "topic": "Fractions and Percentages",
+   "text": "Simplify 2/3 + 1/4 − 1/6.",
+   "options": [
+    "3/4",
+    "5/12",
+    "7/12",
+    "2/3"
+   ],
+   "answer": 0,
+   "explanation": "With LCM 12: 2/3 + 1/4 − 1/6 = 8/12 + 3/12 − 2/12 = 9/12 = 3/4."
+  },
+  {
+   "id": "mathematics-004",
+   "year": "2023",
+   "topic": "Fractions and Percentages",
+   "text": "A trader bought an article for ₦800 and sold it for ₦920. Find the percentage profit.",
+   "options": [
+    "12%",
+    "20%",
+    "15%",
+    "25%"
+   ],
+   "answer": 2,
+   "explanation": "Profit = 920 − 800 = ₦120. Percentage profit = 120/800 × 100% = 15%."
+  },
+  {
+   "id": "mathematics-005",
+   "year": "2024",
+   "topic": "Fractions and Percentages",
+   "text": "Find the simple interest on ₦5,000 at 8% per annum for 3 years.",
+   "options": [
+    "₦1,200",
+    "₦1,000",
+    "₦1,500",
+    "₦800"
+   ],
+   "answer": 0,
+   "explanation": "I = PRT/100 = 5000 × 8 × 3 / 100 = ₦1,200."
+  },
+  {
+   "id": "mathematics-006",
+   "year": "2025",
+   "topic": "Indices and Logarithms",
+   "text": "Simplify 3² × 3⁴ ÷ 3³.",
+   "options": [
+    "9",
+    "81",
+    "3",
+    "27"
+   ],
+   "answer": 3,
+   "explanation": "3² × 3⁴ ÷ 3³ = 3^(2+4−3) = 3³ = 27."
+  },
+  {
+   "id": "mathematics-007",
+   "year": "2020",
+   "topic": "Indices and Logarithms",
+   "text": "If 2ˣ = 32, find x.",
+   "options": [
+    "4",
+    "5",
+    "6",
+    "16"
+   ],
+   "answer": 1,
+   "explanation": "32 = 2⁵, so 2ˣ = 2⁵ and x = 5."
+  },
+  {
+   "id": "mathematics-008",
+   "year": "2021",
+   "topic": "Surds",
+   "text": "Simplify √50 + √18.",
+   "options": [
+    "6√2",
+    "√68",
+    "8√2",
+    "4√2"
+   ],
+   "answer": 2,
+   "explanation": "√50 = 5√2 and √18 = 3√2, so √50 + √18 = 5√2 + 3√2 = 8√2."
+  },
+  {
+   "id": "mathematics-009",
+   "year": "2022",
+   "topic": "Surds",
+   "text": "Rationalize 1/√3.",
+   "options": [
+    "3/√3",
+    "√3/3",
+    "√3",
+    "1/3"
+   ],
+   "answer": 1,
+   "explanation": "Multiply top and bottom by √3: 1/√3 = √3/(√3×√3) = √3/3."
+  },
+  {
+   "id": "mathematics-010",
+   "year": "2023",
+   "topic": "Indices and Logarithms",
+   "text": "If log₁₀2 = 0.3010, find log₁₀8.",
+   "options": [
+    "0.6020",
+    "0.2408",
+    "0.1505",
+    "0.9030"
+   ],
+   "answer": 3,
+   "explanation": "log₁₀8 = log₁₀2³ = 3 × log₁₀2 = 3 × 0.3010 = 0.9030."
+  },
+  {
+   "id": "mathematics-011",
+   "year": "2024",
+   "topic": "Sets",
+   "text": "If U = {1, 2, 3, 4, 5, 6}, A = {1, 3, 5} and B = {2, 3, 4}, find A ∩ B.",
+   "options": [
+    "{3}",
+    "{1, 2, 3, 4, 5}",
+    "{2, 4}",
+    "{1, 5}"
+   ],
+   "answer": 0,
+   "explanation": "A ∩ B contains only the elements common to both sets: 3 is the only common element."
+  },
+  {
+   "id": "mathematics-012",
+   "year": "2025",
+   "topic": "Sets",
+   "text": "In a class of 40 students, 25 play football, 20 play basketball and 8 play both games. How many play neither game?",
+   "options": [
+    "5",
+    "8",
+    "3",
+    "11"
+   ],
+   "answer": 2,
+   "explanation": "Only football = 25 − 8 = 17; only basketball = 20 − 8 = 12. Playing at least one game = 17 + 12 + 8 = 37, so neither = 40 − 37 = 3."
+  },
+  {
+   "id": "mathematics-013",
+   "year": "2020",
+   "topic": "Sets",
+   "text": "If n(A) = 12, n(B) = 9 and n(A ∪ B) = 16, find n(A ∩ B).",
+   "options": [
+    "3",
+    "4",
+    "6",
+    "5"
+   ],
+   "answer": 3,
+   "explanation": "n(A ∪ B) = n(A) + n(B) − n(A ∩ B), so 16 = 12 + 9 − n(A ∩ B), giving n(A ∩ B) = 5."
+  },
+  {
+   "id": "mathematics-014",
+   "year": "2021",
+   "topic": "Polynomials",
+   "text": "Factorize x² − 5x + 6.",
+   "options": [
+    "(x − 2)(x − 3)",
+    "(x + 2)(x + 3)",
+    "(x − 1)(x − 6)",
+    "(x + 1)(x − 6)"
+   ],
+   "answer": 0,
+   "explanation": "Two numbers with product 6 and sum −5 are −2 and −3, so x² − 5x + 6 = (x − 2)(x − 3)."
+  },
+  {
+   "id": "mathematics-015",
+   "year": "2022",
+   "topic": "Polynomials",
+   "text": "If x + 2 is a factor of x² + kx + 6, find k.",
+   "options": [
+    "3",
+    "5",
+    "4",
+    "6"
+   ],
+   "answer": 1,
+   "explanation": "By the factor theorem, f(−2) = 0: 4 − 2k + 6 = 0, so 2k = 10 and k = 5."
+  },
+  {
+   "id": "mathematics-016",
+   "year": "2023",
+   "topic": "Polynomials",
+   "text": "Solve the simultaneous equations x + y = 7 and x − y = 3.",
+   "options": [
+    "x = 2, y = 5",
+    "x = 4, y = 3",
+    "x = 5, y = 2",
+    "x = 3, y = 4"
+   ],
+   "answer": 2,
+   "explanation": "Adding: 2x = 10, so x = 5. Substituting: 5 + y = 7, so y = 2."
+  },
+  {
+   "id": "mathematics-017",
+   "year": "2024",
+   "topic": "Polynomials",
+   "text": "Make r the subject of the formula V = πr²h.",
+   "options": [
+    "√(V/πh)",
+    "V/πh",
+    "√(πh/V)",
+    "V²/πh"
+   ],
+   "answer": 0,
+   "explanation": "Divide by πh: r² = V/πh, then take the square root: r = √(V/πh)."
+  },
+  {
+   "id": "mathematics-018",
+   "year": "2025",
+   "topic": "Variation",
+   "text": "If y varies directly as x and y = 12 when x = 4, find y when x = 9.",
+   "options": [
+    "21",
+    "24",
+    "36",
+    "27"
+   ],
+   "answer": 3,
+   "explanation": "y = kx gives 12 = 4k, so k = 3 and y = 3x. When x = 9, y = 27."
+  },
+  {
+   "id": "mathematics-019",
+   "year": "2020",
+   "topic": "Variation",
+   "text": "If p varies inversely as q and p = 6 when q = 4, find p when q = 8.",
+   "options": [
+    "2",
+    "4",
+    "3",
+    "12"
+   ],
+   "answer": 2,
+   "explanation": "pq = k, so k = 6 × 4 = 24. When q = 8, p = 24/8 = 3."
+  },
+  {
+   "id": "mathematics-020",
+   "year": "2021",
+   "topic": "Inequalities",
+   "text": "Solve 3x − 5 > 7.",
+   "options": [
+    "x < 4",
+    "x > 4",
+    "x > 2",
+    "x < 2"
+   ],
+   "answer": 1,
+   "explanation": "3x − 5 > 7 gives 3x > 12, so x > 4."
+  },
+  {
+   "id": "mathematics-021",
+   "year": "2022",
+   "topic": "Inequalities",
+   "text": "Find the range of values of x for which x² − 3x + 2 < 0.",
+   "options": [
+    "x < 1 or x > 2",
+    "x < 1",
+    "1 < x < 2",
+    "x > 2"
+   ],
+   "answer": 2,
+   "explanation": "x² − 3x + 2 = (x − 1)(x − 2). The product is negative when x lies between the roots: 1 < x < 2."
+  },
+  {
+   "id": "mathematics-022",
+   "year": "2023",
+   "topic": "Progression",
+   "text": "Find the 10th term of the arithmetic progression 3, 7, 11, ...",
+   "options": [
+    "35",
+    "39",
+    "43",
+    "47"
+   ],
+   "answer": 1,
+   "explanation": "a = 3, d = 4. The nth term is a + (n−1)d, so the 10th term is 3 + 9×4 = 39."
+  },
+  {
+   "id": "mathematics-023",
+   "year": "2024",
+   "topic": "Progression",
+   "text": "Find the sum of the first 8 terms of the geometric progression 2, 6, 18, ...",
+   "options": [
+    "3280",
+    "4374",
+    "2186",
+    "6560"
+   ],
+   "answer": 3,
+   "explanation": "a = 2, r = 3. S₈ = a(r⁸ − 1)/(r − 1) = 2(6561 − 1)/2 = 6560."
+  },
+  {
+   "id": "mathematics-024",
+   "year": "2025",
+   "topic": "Progression",
+   "text": "Find the sum to infinity of the geometric progression 12, 4, 4/3, ...",
+   "options": [
+    "18",
+    "16",
+    "20",
+    "24"
+   ],
+   "answer": 0,
+   "explanation": "a = 12, r = 1/3. S∞ = a/(1 − r) = 12/(1 − 1/3) = 12/(2/3) = 18."
+  },
+  {
+   "id": "mathematics-025",
+   "year": "2020",
+   "topic": "Binary Operations",
+   "text": "If a * b = a + b − ab, find 2 * 3.",
+   "options": [
+    "1",
+    "5",
+    "−1",
+    "−5"
+   ],
+   "answer": 2,
+   "explanation": "2 * 3 = 2 + 3 − (2 × 3) = 5 − 6 = −1."
+  },
+  {
+   "id": "mathematics-026",
+   "year": "2021",
+   "topic": "Binary Operations",
+   "text": "The operation Δ is defined by a Δ b = 2a + b. Find 3 Δ 4.",
+   "options": [
+    "10",
+    "8",
+    "12",
+    "14"
+   ],
+   "answer": 0,
+   "explanation": "3 Δ 4 = 2×3 + 4 = 6 + 4 = 10."
+  },
+  {
+   "id": "mathematics-027",
+   "year": "2022",
+   "topic": "Matrices and Determinants",
+   "text": "Find the determinant of the matrix [[3, 2], [1, 4]].",
+   "options": [
+    "14",
+    "10",
+    "12",
+    "8"
+   ],
+   "answer": 1,
+   "explanation": "The determinant is (3 × 4) − (2 × 1) = 12 − 2 = 10."
+  },
+  {
+   "id": "mathematics-028",
+   "year": "2023",
+   "topic": "Matrices and Determinants",
+   "text": "Find the inverse of the matrix [[5, 2], [3, 1]].",
+   "options": [
+    "[[1, -2], [-3, 5]]",
+    "[[5, -2], [-3, 1]]",
+    "[[-5, 2], [3, -1]]",
+    "[[-1, 2], [3, -5]]"
+   ],
+   "answer": 3,
+   "explanation": "The determinant is 5×1 − 2×3 = −1. The inverse is (1/−1) × [[1, −2], [−3, 5]] = [[−1, 2], [3, −5]]."
+  },
+  {
+   "id": "mathematics-029",
+   "year": "2024",
+   "topic": "Euclidean Geometry",
+   "text": "The sum of the interior angles of a polygon is 1260°. How many sides does it have?",
+   "options": [
+    "7",
+    "8",
+    "9",
+    "10"
+   ],
+   "answer": 2,
+   "explanation": "(n − 2) × 180° = 1260°, so n − 2 = 7 and n = 9."
+  },
+  {
+   "id": "mathematics-030",
+   "year": "2025",
+   "topic": "Euclidean Geometry",
+   "text": "In a circle, the angle at the centre subtended by a chord is 80°. Find the angle at the circumference subtended by the same chord.",
+   "options": [
+    "40°",
+    "160°",
+    "80°",
+    "20°"
+   ],
+   "answer": 0,
+   "explanation": "The angle at the centre is twice the angle at the circumference, so the angle is 80°/2 = 40°."
+  },
+  {
+   "id": "mathematics-031",
+   "year": "2020",
+   "topic": "Euclidean Geometry",
+   "text": "Each exterior angle of a regular polygon is 30°. How many sides does the polygon have?",
+   "options": [
+    "10",
+    "12",
+    "15",
+    "18"
+   ],
+   "answer": 1,
+   "explanation": "The exterior angles sum to 360°, so the number of sides is 360/30 = 12."
+  },
+  {
+   "id": "mathematics-032",
+   "year": "2021",
+   "topic": "Mensuration",
+   "text": "Find the volume of a cylinder of radius 7 cm and height 10 cm. (Take π = 22/7)",
+   "options": [
+    "440 cm³",
+    "2200 cm³",
+    "154 cm³",
+    "1540 cm³"
+   ],
+   "answer": 3,
+   "explanation": "V = πr²h = (22/7) × 7² × 10 = 22 × 7 × 10 = 1540 cm³."
+  },
+  {
+   "id": "mathematics-033",
+   "year": "2022",
+   "topic": "Mensuration",
+   "text": "Find the length of an arc of a circle of radius 21 cm subtended by an angle of 60° at the centre. (Take π = 22/7)",
+   "options": [
+    "44 cm",
+    "11 cm",
+    "22 cm",
+    "33 cm"
+   ],
+   "answer": 2,
+   "explanation": "Arc length = (θ/360) × 2πr = (60/360) × 2 × (22/7) × 21 = 22 cm."
+  },
+  {
+   "id": "mathematics-034",
+   "year": "2023",
+   "topic": "Mensuration",
+   "text": "Find the total surface area of a cuboid 6 cm by 4 cm by 3 cm.",
+   "options": [
+    "72 cm²",
+    "96 cm²",
+    "144 cm²",
+    "108 cm²"
+   ],
+   "answer": 3,
+   "explanation": "Surface area = 2(lb + lh + bh) = 2(6×4 + 6×3 + 4×3) = 2(24 + 18 + 12) = 108 cm²."
+  },
+  {
+   "id": "mathematics-035",
+   "year": "2024",
+   "topic": "Loci",
+   "text": "The locus of points equidistant from two fixed points A and B is the ___.",
+   "options": [
+    "perpendicular bisector of AB",
+    "angle bisector",
+    "circle with centre A",
+    "line parallel to AB"
+   ],
+   "answer": 0,
+   "explanation": "Points equidistant from A and B lie on the perpendicular bisector of the line joining them."
+  },
+  {
+   "id": "mathematics-036",
+   "year": "2025",
+   "topic": "Loci",
+   "text": "The locus of a point which moves so that its distance from a fixed point is always 5 cm is a ___.",
+   "options": [
+    "straight line",
+    "circle of radius 5 cm",
+    "parabola",
+    "perpendicular bisector"
+   ],
+   "answer": 1,
+   "explanation": "All points at a fixed distance from a fixed point form a circle with that radius."
+  },
+  {
+   "id": "mathematics-037",
+   "year": "2020",
+   "topic": "Coordinate Geometry",
+   "text": "Find the gradient of the line joining the points (2, 3) and (6, 11).",
+   "options": [
+    "1/2",
+    "4",
+    "8",
+    "2"
+   ],
+   "answer": 3,
+   "explanation": "Gradient = (11 − 3)/(6 − 2) = 8/4 = 2."
+  },
+  {
+   "id": "mathematics-038",
+   "year": "2021",
+   "topic": "Coordinate Geometry",
+   "text": "Find the distance between the points (1, 2) and (4, 6).",
+   "options": [
+    "5",
+    "3",
+    "4",
+    "7"
+   ],
+   "answer": 0,
+   "explanation": "Distance = √[(4−1)² + (6−2)²] = √(9 + 16) = √25 = 5."
+  },
+  {
+   "id": "mathematics-039",
+   "year": "2022",
+   "topic": "Coordinate Geometry",
+   "text": "Find the equation of the line with gradient 3 passing through the point (0, 2).",
+   "options": [
+    "y = 3x − 2",
+    "y = 2x + 3",
+    "y = 3x + 2",
+    "y = x + 5"
+   ],
+   "answer": 2,
+   "explanation": "Using y = mx + c with m = 3 and c = 2 gives y = 3x + 2."
+  },
+  {
+   "id": "mathematics-040",
+   "year": "2023",
+   "topic": "Trigonometry",
+   "text": "If sin θ = 3/5 and θ is acute, find cos θ.",
+   "options": [
+    "5/4",
+    "4/5",
+    "3/4",
+    "5/3"
+   ],
+   "answer": 1,
+   "explanation": "For a 3-4-5 right-angled triangle, the adjacent side is 4, so cos θ = 4/5."
+  },
+  {
+   "id": "mathematics-041",
+   "year": "2024",
+   "topic": "Trigonometry",
+   "text": "Evaluate tan 45° + sin 30°.",
+   "options": [
+    "3/2",
+    "1/2",
+    "2",
+    "1"
+   ],
+   "answer": 0,
+   "explanation": "tan 45° = 1 and sin 30° = 1/2, so the sum is 1 + 1/2 = 3/2."
+  },
+  {
+   "id": "mathematics-042",
+   "year": "2025",
+   "topic": "Trigonometry",
+   "text": "A ladder 10 m long leans against a wall, making an angle of 60° with the ground. How high up the wall does it reach?",
+   "options": [
+    "10√3 m",
+    "5√3 m",
+    "5 m",
+    "5√2 m"
+   ],
+   "answer": 1,
+   "explanation": "Height = 10 × sin 60° = 10 × (√3/2) = 5√3 m."
+  },
+  {
+   "id": "mathematics-043",
+   "year": "2020",
+   "topic": "Trigonometry",
+   "text": "Find the area of a triangle with sides 5 cm and 8 cm and included angle 30°.",
+   "options": [
+    "20 cm²",
+    "40 cm²",
+    "17.3 cm²",
+    "10 cm²"
+   ],
+   "answer": 3,
+   "explanation": "Area = ½ab sin C = ½ × 5 × 8 × sin 30° = 20 × 1/2 = 10 cm²."
+  },
+  {
+   "id": "mathematics-044",
+   "year": "2021",
+   "topic": "Differentiation",
+   "text": "Find dy/dx if y = 3x³ − 2x² + 5.",
+   "options": [
+    "9x² − 4x + 5",
+    "3x² − 2x",
+    "9x² − 4x",
+    "9x² + 4x"
+   ],
+   "answer": 2,
+   "explanation": "Differentiating term by term: d/dx(3x³) = 9x², d/dx(−2x²) = −4x, and the constant 5 differentiates to 0."
+  },
+  {
+   "id": "mathematics-045",
+   "year": "2022",
+   "topic": "Differentiation",
+   "text": "Differentiate y = sin 2x with respect to x.",
+   "options": [
+    "2 cos 2x",
+    "cos 2x",
+    "−2 cos 2x",
+    "2 sin 2x"
+   ],
+   "answer": 0,
+   "explanation": "By the chain rule, d/dx(sin 2x) = 2 cos 2x."
+  },
+  {
+   "id": "mathematics-046",
+   "year": "2023",
+   "topic": "Application of Differentiation",
+   "text": "Find the maximum value of y = −x² + 6x − 5.",
+   "options": [
+    "3",
+    "4",
+    "5",
+    "9"
+   ],
+   "answer": 1,
+   "explanation": "dy/dx = −2x + 6 = 0 gives x = 3. At x = 3, y = −9 + 18 − 5 = 4, and the second derivative is negative, so this is a maximum."
+  },
+  {
+   "id": "mathematics-047",
+   "year": "2024",
+   "topic": "Application of Differentiation",
+   "text": "A curve is given by y = x³ − 3x. Find the x-coordinates of its turning points.",
+   "options": [
+    "x = 3 only",
+    "x = 0",
+    "x = 1 only",
+    "x = 1 and x = −1"
+   ],
+   "answer": 3,
+   "explanation": "dy/dx = 3x² − 3. Setting this to zero gives x² = 1, so x = 1 or x = −1."
+  },
+  {
+   "id": "mathematics-048",
+   "year": "2025",
+   "topic": "Integration",
+   "text": "Evaluate ∫(2x + 3) dx.",
+   "options": [
+    "2x² + 3x + C",
+    "x² + 3 + C",
+    "x² + 3x + C",
+    "2 + C"
+   ],
+   "answer": 2,
+   "explanation": "∫2x dx = x² and ∫3 dx = 3x, so the integral is x² + 3x + C."
+  },
+  {
+   "id": "mathematics-049",
+   "year": "2020",
+   "topic": "Integration",
+   "text": "Evaluate ∫₀¹ (3x² + 2) dx.",
+   "options": [
+    "2",
+    "4",
+    "5",
+    "3"
+   ],
+   "answer": 3,
+   "explanation": "The integral is [x³ + 2x] from 0 to 1 = (1 + 2) − 0 = 3."
+  },
+  {
+   "id": "mathematics-050",
+   "year": "2021",
+   "topic": "Representation of Data",
+   "text": "In a pie chart, the sector representing 45 pupils out of 180 has an angle of ___.",
+   "options": [
+    "60°",
+    "120°",
+    "90°",
+    "45°"
+   ],
+   "answer": 2,
+   "explanation": "Angle = 45/180 × 360° = 90°."
+  },
+  {
+   "id": "mathematics-051",
+   "year": "2022",
+   "topic": "Representation of Data",
+   "text": "The table shows books read by 40 students: 0–4 books: 8 students; 5–9 books: 14 students; 10–14 books: 12 students; 15–19 books: 6 students. How many students read fewer than 10 books?",
+   "options": [
+    "20",
+    "22",
+    "26",
+    "30"
+   ],
+   "answer": 1,
+   "explanation": "Fewer than 10 books means the first two classes: 8 + 14 = 22 students."
+  },
+  {
+   "id": "mathematics-052",
+   "year": "2023",
+   "topic": "Measures of Location",
+   "text": "Find the mean of 4, 8, 9, 11 and 13.",
+   "options": [
+    "9",
+    "8",
+    "10",
+    "11"
+   ],
+   "answer": 0,
+   "explanation": "Mean = (4 + 8 + 9 + 11 + 13)/5 = 45/5 = 9."
+  },
+  {
+   "id": "mathematics-053",
+   "year": "2024",
+   "topic": "Measures of Location",
+   "text": "Find the median of 7, 3, 9, 5, 11 and 4.",
+   "options": [
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "answer": 1,
+   "explanation": "In order: 3, 4, 5, 7, 9, 11. The median is the average of the two middle values: (5 + 7)/2 = 6."
+  },
+  {
+   "id": "mathematics-054",
+   "year": "2025",
+   "topic": "Measures of Dispersion",
+   "text": "Find the range of 12, 7, 19, 5, 23 and 9.",
+   "options": [
+    "18",
+    "16",
+    "14",
+    "28"
+   ],
+   "answer": 0,
+   "explanation": "Range = highest − lowest = 23 − 5 = 18."
+  },
+  {
+   "id": "mathematics-055",
+   "year": "2020",
+   "topic": "Measures of Dispersion",
+   "text": "Find the standard deviation of 2, 4, 6 and 8.",
+   "options": [
+    "5",
+    "2",
+    "√5",
+    "√2"
+   ],
+   "answer": 2,
+   "explanation": "Mean = 5. Squared deviations: 9, 1, 1, 9, totalling 20. Variance = 20/4 = 5, so standard deviation = √5."
+  },
+  {
+   "id": "mathematics-056",
+   "year": "2021",
+   "topic": "Permutation and Combination",
+   "text": "In how many ways can 4 books be arranged on a shelf from a collection of 6 different books?",
+   "options": [
+    "120",
+    "30",
+    "720",
+    "360"
+   ],
+   "answer": 3,
+   "explanation": "⁶P₄ = 6 × 5 × 4 × 3 = 360."
+  },
+  {
+   "id": "mathematics-057",
+   "year": "2022",
+   "topic": "Permutation and Combination",
+   "text": "A committee of 3 is to be chosen from 7 people. In how many ways can this be done?",
+   "options": [
+    "21",
+    "42",
+    "35",
+    "210"
+   ],
+   "answer": 2,
+   "explanation": "⁷C₃ = 7!/(3! × 4!) = (7 × 6 × 5)/(3 × 2 × 1) = 35."
+  },
+  {
+   "id": "mathematics-058",
+   "year": "2023",
+   "topic": "Probability",
+   "text": "A fair die is thrown once. Find the probability of obtaining a prime number.",
+   "options": [
+    "1/3",
+    "2/3",
+    "1/6",
+    "1/2"
+   ],
+   "answer": 3,
+   "explanation": "The prime numbers on a die are 2, 3 and 5: 3 out of 6 outcomes, giving 3/6 = 1/2."
+  },
+  {
+   "id": "mathematics-059",
+   "year": "2024",
+   "topic": "Probability",
+   "text": "Two fair coins are tossed. Find the probability of obtaining two heads.",
+   "options": [
+    "1/4",
+    "1/2",
+    "3/4",
+    "1/3"
+   ],
+   "answer": 0,
+   "explanation": "There are 4 equally likely outcomes (HH, HT, TH, TT) and only one is two heads: 1/4."
+  },
+  {
+   "id": "mathematics-060",
+   "year": "2025",
+   "topic": "Probability",
+   "text": "A bag contains 5 red balls and 3 blue balls. One ball is drawn at random. Find the probability that it is red.",
+   "options": [
+    "3/8",
+    "5/8",
+    "5/3",
+    "1/2"
+   ],
+   "answer": 1,
+   "explanation": "There are 5 red balls out of 8 balls in total, so the probability is 5/8."
+  }
+ ]
+}
