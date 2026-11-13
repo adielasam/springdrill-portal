@@ -3,18 +3,21 @@
 import { useState } from 'react';
 import { LogoMark } from './LogoMark';
 
-// Shared site header for the landing pages. Two variants:
+// Shared site header for the landing pages. Three variants:
 // - 'home': in-page anchors play the nav-overlay transition via onNavClick
 //   (passed in by the home page, which owns the overlay); the Contact link
 //   is a plain link to /contact, since its target is another page.
 // - 'contact': every link is a plain cross-page link (no overlay — the
 //   transition only ever scrolls within the home page); Contact is the
 //   active item. The hamburger menu works identically on both pages.
+// - 'tool': same plain cross-page links as 'contact', but no menu item is
+//   marked active (tool pages are not in the menu).
 export type NavClickHandler = (e: React.MouseEvent<HTMLAnchorElement>, target: string) => void;
 
-export function SiteHeader({ variant, onNavClick }: { variant: 'home' | 'contact'; onNavClick?: NavClickHandler }) {
+export function SiteHeader({ variant, onNavClick }: { variant: 'home' | 'contact' | 'tool'; onNavClick?: NavClickHandler }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const isHome = variant === 'home';
+  const isContact = variant === 'contact';
 
   const links = isHome
     ? [
@@ -45,7 +48,7 @@ export function SiteHeader({ variant, onNavClick }: { variant: 'home' | 'contact
             {links.map((link) => (
               <a key={link.label} href={link.href} onClick={link.anchor ? anchorClick(link.anchor) : undefined}>{link.label}</a>
             ))}
-            <a href="/contact" className={isHome ? undefined : 'sd-active'} aria-current={isHome ? undefined : 'page'}>Contact</a>
+            <a href="/contact" className={isContact ? 'sd-active' : undefined} aria-current={isContact ? 'page' : undefined}>Contact</a>
             <a href={isHome ? '#signin' : '/#signin'} className="sd-btn" onClick={isHome ? anchorClick('#signin') : undefined}>Portal sign-in</a>
           </nav>
           <button type="button" className="sd-menu-btn" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} aria-controls="sd-mobile-menu" onClick={() => setMenuOpen(!menuOpen)}>
@@ -63,7 +66,7 @@ export function SiteHeader({ variant, onNavClick }: { variant: 'home' | 'contact
           {links.map((link) => (
             <a key={link.label} href={link.href} onClick={anchorClick(link.anchor)}>{link.label}</a>
           ))}
-          <a href="/contact" className={isHome ? undefined : 'sd-active'} aria-current={isHome ? undefined : 'page'} onClick={() => setMenuOpen(false)}>Contact</a>
+          <a href="/contact" className={isContact ? 'sd-active' : undefined} aria-current={isContact ? 'page' : undefined} onClick={() => setMenuOpen(false)}>Contact</a>
           <a href={isHome ? '#signin' : '/#signin'} className="sd-btn" onClick={anchorClick(isHome ? '#signin' : null)}>Portal sign-in</a>
         </div>
       )}

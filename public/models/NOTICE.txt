@@ -1,0 +1,38 @@
+Third-party notices for the SpringDrill background-removal tool
+===============================================================
+
+The background remover runs entirely in the visitor's browser. The files
+below are self-hosted from this site's own origin; no third-party CDN is
+used at runtime and no image is ever uploaded anywhere.
+
+1. U²-Net model weights — file: u2netp.onnx (4,574,861 bytes)
+   ---------------------------------------------------------
+   U²-Net: "U2-Net: Going Deeper with Nested U-Structure for Salient
+   Object Detection" — Xuebin Qin et al., Pattern Recognition 2020.
+   Copyright (c) 2020 Xuebin Qin.
+   Licence: Apache License, Version 2.0
+   Source: https://github.com/xuebinqin/U-2-Net
+
+   This file is the unmodified ONNX release of the small ("u2netp")
+   variant, redistributed by the rembg project (MIT licence):
+   https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2netp.onnx
+   SHA-256: 309c8469258dda742793dce0ebea8e6dd393174f89934733ecc8b14c76f4ddd8
+   MD5:     8e83ca70e441ab06c318d82300c84806
+
+   Attribution for the Apache-2.0 licence is also given on the tool page
+   itself (app/tools/remove-background/page.tsx) and in the pipeline
+   source (app/tools/remove-background/removeBackground.ts).
+
+2. ONNX Runtime Web — files: ../ort/ort-wasm-simd-threaded.mjs + .wasm
+   ------------------------------------------------------------------
+   ONNX Runtime Web, Copyright (c) Microsoft Corporation.
+   Licence: MIT Licence
+   Source: https://github.com/microsoft/onnxruntime
+   Version shipped: onnxruntime-web 1.31.1 (see package.json). The two
+   runtime files are copied unmodified from the npm package's dist/
+   directory and must stay version-matched with it.
+
+Deliberately NOT used (licensing):
+- @imgly/background-removal — AGPL-3.0 (copyleft), unsuitable for this
+  commercial product.
+- BRIA RMBG-1.4 weights — licensed for non-commercial use only.
