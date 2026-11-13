@@ -99,18 +99,9 @@ const TOOL_STYLES = `
   .sd-bg-result-note { font-size: 0.9rem; line-height: 1.6; color: #5a6b63; margin: 16px 0; }
   .sd-bg-actions { display: flex; flex-wrap: wrap; gap: 12px; }
   .sd-bg-download, .sd-bg-again { min-height: 48px; }
-  .sd-bg-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 28px; }
-  .sd-bg-step { border: 1px solid #dce6df; border-radius: 12px; padding: 22px; background: #ffffff; }
-  .sd-bg-step h3 { font-size: 1.05rem; font-weight: 700; margin: 0 0 8px 0; color: #123227; }
-  .sd-bg-step p { font-size: 0.95rem; line-height: 1.65; color: #5a6b63; margin: 0; }
-  .sd-bg-note { margin-top: 16px; border: 1px solid #dce6df; border-radius: 12px; padding: 22px; background: #ffffff; font-size: 0.95rem; line-height: 1.7; color: #5a6b63; }
-  .sd-bg-note strong { color: #123227; }
-  .sd-bg-note p { margin: 0 0 8px 0; }
-  .sd-bg-note p:last-child { margin-bottom: 0; }
   @media (max-width: 700px) {
     .sd-bg-tool { padding: 20px 16px; }
     .sd-bg-panels { grid-template-columns: 1fr; }
-    .sd-bg-steps { grid-template-columns: 1fr; }
     .sd-bg-download, .sd-bg-again, .sd-bg-remove, .sd-bg-change { width: 100%; text-align: center; }
   }
 `;
@@ -156,36 +147,6 @@ export default function RemoveBackgroundPage() {
                 and your photo never leaves your device.
               </p>
               <BackgroundRemover />
-              <div className="sd-bg-steps">
-                <div className="sd-bg-step">
-                  <h3>1. Choose a photo</h3>
-                  <p>Pick a PNG, JPG or WebP photo from your phone or computer, drag it in, or paste it. Portraits, products and single subjects work best.</p>
-                </div>
-                <div className="sd-bg-step">
-                  <h3>2. Remove the background</h3>
-                  <p>One tap runs the removal on your own device. The first use downloads the engine (about 20 MB) and saves it, so later photos are much faster.</p>
-                </div>
-                <div className="sd-bg-step">
-                  <h3>3. Download the PNG</h3>
-                  <p>Check the result against a transparent, white or green preview, then download the full-resolution transparent PNG — free, with no watermark.</p>
-                </div>
-              </div>
-              <div className="sd-bg-note">
-                <p>
-                  <strong>Private by design.</strong> This tool has no server and no API: the photo is processed
-                  entirely inside your browser and is never uploaded, stored or seen by anyone. Closing the page
-                  removes everything.
-                </p>
-                <p>
-                  <strong>Honest limits.</strong> Fine hair, glass and busy backgrounds can leave rough edges — the
-                  small, fast model in this first version trades a little quality for speed on phones. A
-                  higher-quality option is planned.
-                </p>
-                <p>
-                  Background removal runs on your device using the U²-Net model (Apache License 2.0, © 2020 Xuebin
-                  Qin) and ONNX Runtime Web (MIT licence). No account, no credits, no expiry.
-                </p>
-              </div>
             </div>
           </section>
         </main>
