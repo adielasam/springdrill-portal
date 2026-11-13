@@ -2,8 +2,11 @@
 
 on:
   schedule:
-    # Runs at 00:00 every 3 days (Supabase pauses after 7 days of inactivity)
-    - cron: '0 0 */3 * *'
+    # Runs daily at 00:00 UTC (Supabase pauses after 7 days of inactivity).
+    # Daily cadence + retries: the old every-3-days schedule failed twice in a
+    # row on 28 + 31 Oct 2026, opening a 7-day gap with no successful ping and
+    # pausing the project. Daily, even 3 straight failures leave only a 4-day gap.
+    - cron: '0 0 * * *'
   workflow_dispatch: # Allows manual trigger from GitHub UI
 
 jobs:
@@ -11,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping Next.js Keepalive API
-        run: curl -sSf https://springdrill-portal.vercel.app/api/keepalive
+        run: curl -sSf --retry 5 --retry-delay 30 --retry-all-errors https://springdrill-portal.vercel.app/api/keepalive
         
       - name: Log Success
         run: echo 'Ping successful! Supabase active timer reset.'
