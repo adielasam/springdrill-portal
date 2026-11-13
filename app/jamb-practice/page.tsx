@@ -9,7 +9,7 @@ import { PACK_SUBJECTS } from "./packs";
 export const metadata: Metadata = {
   title: "Free JAMB Practice — UTME CBT Questions With Answers | SpringDrill",
   description:
-    "Practise JAMB UTME questions free — English, Mathematics and Biology, with answers and explanations. No sign-up, works offline, and installs on your phone or Windows computer.",
+    "Practise JAMB UTME questions free — English, Mathematics, Biology and Digital Technology, with answers and explanations. No sign-up, works offline, and installs on your phone or Windows computer.",
   keywords: [
     "JAMB practice",
     "UTME practice questions",
@@ -20,6 +20,7 @@ export const metadata: Metadata = {
     "UTME English practice",
     "UTME Mathematics practice",
     "UTME Biology practice",
+    "UTME Digital Technology practice",
     "SpringDrill",
   ],
   alternates: { canonical: "/jamb-practice" },
@@ -55,14 +56,18 @@ const PRACTICE_JSON_LD = {
   applicationCategory: "EducationalApplication",
   operatingSystem: "Any (web browser)",
   description:
-    "Free JAMB UTME practice sets for English, Mathematics and Biology, with answers and explanations. No sign-up; works offline once loaded.",
+    "Free JAMB UTME practice sets for English, Mathematics, Biology and Digital Technology, with answers and explanations. No sign-up; works offline once loaded.",
   offers: { "@type": "Offer", price: "0", priceCurrency: "NGN" },
   isAccessibleForFree: true,
 };
 
 const PRACTICE_STYLES = `
+  /* Dashboard canvas: pale blue (#f0f6ff, the reference UI's canvas),
+     carrying the Template 1 scene and white cards. Brand green stays
+     the accent throughout; nothing here uses the reference's navy. */
+  .sd-section.sd-jp-section { background: #f0f6ff; border-top-color: #dbe7f5; }
   .sd-jp-intro { font-size: 1.05rem; line-height: 1.7; color: #5a6b63; max-width: 720px; margin: 0 0 28px 0; }
-  .sd-jp-card { background: #ffffff; border: 1px solid #dce6df; border-radius: 16px; padding: 28px; box-shadow: 0 10px 32px rgba(18, 50, 39, 0.10); }
+  .sd-jp-card { background: #ffffff; border: 1px solid #dce6df; border-radius: 20px; padding: 30px; box-shadow: 0 2px 6px rgba(18, 50, 39, 0.06), 0 18px 40px rgba(18, 50, 39, 0.10); }
   .sd-jp-status { font-size: 0.9rem; color: #5a6b63; margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .sd-jp-dot { width: 10px; height: 10px; border-radius: 50%; background: #007a4d; flex: none; }
   .sd-jp-dot-off { background: #d9930d; }
@@ -72,12 +77,12 @@ const PRACTICE_STYLES = `
   .sd-jp-card button:focus-visible { outline: 3px solid #fec60d; outline-offset: 2px; }
 
   /* Progress dashboard: honest stats from local history only. */
-  .sd-jp-dash { background: #123227; border-radius: 14px; padding: 22px 22px 18px; margin: 18px 0 24px 0; color: #ffffff; }
+  .sd-jp-dash { background: #123227; border-radius: 18px; padding: 24px 24px 20px; margin: 18px 0 24px 0; color: #ffffff; box-shadow: 0 12px 28px rgba(18, 50, 39, 0.18); }
   .sd-jp-dash-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
   .sd-jp-dash-title { font-family: var(--font-chunkfive, Georgia, 'Times New Roman', serif); font-size: 1.3rem; font-weight: 400; margin: 0; color: #ffffff; }
   .sd-jp-dash-sub { font-size: 0.85rem; color: #b9d8c9; }
   .sd-jp-dash-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-  .sd-jp-stat { background: #ffffff; border-radius: 12px; padding: 16px; color: #123227; }
+  .sd-jp-stat { background: #ffffff; border-radius: 14px; padding: 16px; color: #123227; box-shadow: 0 2px 8px rgba(18, 50, 39, 0.10); }
   .sd-jp-stat-num { display: block; font-family: var(--font-chunkfive, Georgia, 'Times New Roman', serif); font-size: 1.9rem; line-height: 1.1; color: #007a4d; }
   .sd-jp-stat-label { display: block; font-weight: 800; font-size: 0.95rem; margin-top: 4px; }
   .sd-jp-stat-sub { display: block; font-size: 0.8rem; color: #5a6b63; margin-top: 2px; line-height: 1.4; }
@@ -95,11 +100,11 @@ const PRACTICE_STYLES = `
   .sd-jp-features li { font-size: 0.85rem; font-weight: 700; color: #004d34; background: #eef6f1; border-radius: 999px; padding: 7px 13px; }
 
   /* Mode cards. */
-  .sd-jp-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 0 0 24px 0; }
-  .sd-jp-mode-card { text-align: left; background: #ffffff; border: 2px solid #dce6df; border-radius: 14px; padding: 20px; cursor: pointer; color: #123227; font-family: inherit; transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease; }
+  .sd-jp-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 0 0 24px 0; }
+  .sd-jp-mode-card { text-align: left; background: #ffffff; border: 2px solid #dce6df; border-radius: 18px; padding: 20px; cursor: pointer; color: #123227; font-family: inherit; transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease; }
   .sd-jp-mode-card:hover { border-color: #9dc3b1; box-shadow: 0 6px 18px rgba(18, 50, 39, 0.08); transform: translateY(-1px); }
   .sd-jp-mode-card-active { border-color: #007a4d; background: #f2faf5; box-shadow: 0 8px 22px rgba(0, 122, 77, 0.16); }
-  .sd-jp-mode-icon { width: 48px; height: 48px; border-radius: 12px; background: #123227; color: #fec60d; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+  .sd-jp-mode-icon { width: 48px; height: 48px; border-radius: 14px; background: #123227; color: #fec60d; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
   .sd-jp-mode-card-active .sd-jp-mode-icon { background: #007a4d; color: #ffffff; }
   .sd-jp-mode-name { display: block; font-family: var(--font-chunkfive, Georgia, 'Times New Roman', serif); font-size: 1.25rem; font-weight: 400; margin-bottom: 4px; }
   .sd-jp-mode-desc { display: block; font-size: 0.9rem; line-height: 1.55; color: #5a6b63; }
@@ -108,8 +113,8 @@ const PRACTICE_STYLES = `
 
   /* Subject cards: a responsive grid, so a growing subject list lays out
      gracefully instead of assuming a fixed number of subjects. */
-  .sd-jp-subjects { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0 0 4px 0; }
-  .sd-jp-subject-card { display: flex; align-items: center; gap: 14px; text-align: left; width: 100%; background: #ffffff; border: 2px solid #dce6df; border-radius: 12px; padding: 14px 16px; cursor: pointer; color: #123227; font-family: inherit; transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease; }
+  .sd-jp-subjects { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0 0 4px 0; }
+  .sd-jp-subject-card { display: flex; align-items: center; gap: 14px; text-align: left; width: 100%; background: #ffffff; border: 2px solid #dce6df; border-radius: 16px; padding: 16px; cursor: pointer; color: #123227; font-family: inherit; transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease; }
   .sd-jp-subject-card:hover { border-color: #9dc3b1; box-shadow: 0 6px 16px rgba(18, 50, 39, 0.08); transform: translateY(-1px); }
   .sd-jp-subject-card-active { border-color: #007a4d; background: #f2faf5; }
   .sd-jp-subject-mono { flex: none; width: 44px; height: 44px; border-radius: 50%; background: #eef6f1; color: #007a4d; font-weight: 800; font-size: 1.05rem; display: flex; align-items: center; justify-content: center; }
@@ -143,7 +148,7 @@ const PRACTICE_STYLES = `
 
   /* Quiz screen. The run header sticks under the sticky site header
      (64px) so the timer and Submit stay visible on long questions. */
-  .sd-jp-run-head { position: sticky; top: 72px; z-index: 50; display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; background: #ffffff; border-radius: 12px; padding: 10px 12px; box-shadow: 0 6px 18px rgba(18, 50, 39, 0.10); }
+  .sd-jp-run-head { position: sticky; top: 72px; z-index: 50; display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; background: #ffffff; border-radius: 16px; padding: 10px 12px; box-shadow: 0 2px 6px rgba(18, 50, 39, 0.06), 0 10px 24px rgba(18, 50, 39, 0.10); }
   .sd-jp-run-title { font-weight: 800; color: #123227; font-size: 1.05rem; }
   .sd-jp-run-tools { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .sd-jp-timer { font-variant-numeric: tabular-nums; font-weight: 800; font-size: 1.05rem; background: #123227; color: #ffffff; border-radius: 999px; padding: 9px 16px; }
@@ -163,18 +168,18 @@ const PRACTICE_STYLES = `
   .sd-jp-q-meta { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 10px 0; }
   .sd-jp-chip { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: #004d34; background: #eef6f1; border-radius: 999px; padding: 5px 11px; }
   .sd-jp-stem { font-size: 1.2rem; line-height: 1.65; font-weight: 700; color: #123227; margin: 0 0 20px 0; white-space: pre-wrap; overflow-wrap: break-word; }
-  .sd-jp-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .sd-jp-option { display: flex; align-items: flex-start; gap: 12px; text-align: left; min-height: 56px; padding: 16px; border-radius: 12px; border: 2px solid #dce6df; background: #ffffff; color: #123227; font-size: 1rem; line-height: 1.55; cursor: pointer; font-family: inherit; transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease; }
+  .sd-jp-options { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .sd-jp-option { display: flex; align-items: flex-start; gap: 12px; text-align: left; min-height: 56px; padding: 16px; border-radius: 16px; border: 2px solid #dce6df; background: #ffffff; color: #123227; font-size: 1rem; line-height: 1.55; cursor: pointer; font-family: inherit; transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease; }
   .sd-jp-option:hover:not(:disabled) { border-color: #9dc3b1; box-shadow: 0 4px 14px rgba(18, 50, 39, 0.08); transform: translateY(-1px); }
   .sd-jp-option:disabled { cursor: default; }
-  .sd-jp-option-letter { flex: none; width: 30px; height: 30px; border-radius: 8px; background: #eef6f1; color: #004d34; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+  .sd-jp-option-letter { flex: none; width: 30px; height: 30px; border-radius: 10px; background: #eef6f1; color: #004d34; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
   .sd-jp-option-picked { border-color: #007a4d; background: #e6f5ec; box-shadow: 0 4px 14px rgba(0, 122, 77, 0.14); }
   .sd-jp-option-picked .sd-jp-option-letter { background: #007a4d; color: #ffffff; }
   .sd-jp-option-correct { border-color: #007a4d !important; background: #e6f5ec !important; }
   .sd-jp-option-correct .sd-jp-option-letter { background: #007a4d; color: #ffffff; }
   .sd-jp-option-wrong { border-color: #d96a6a !important; background: #fdf2f2 !important; }
   .sd-jp-option-wrong .sd-jp-option-letter { background: #d96a6a; color: #ffffff; }
-  .sd-jp-feedback { margin-top: 16px; border-radius: 12px; padding: 16px 18px; font-size: 0.95rem; line-height: 1.65; }
+  .sd-jp-feedback { margin-top: 16px; border-radius: 14px; padding: 16px 18px; font-size: 0.95rem; line-height: 1.65; }
   .sd-jp-feedback p { margin: 0 0 6px 0; }
   .sd-jp-feedback p:last-child { margin-bottom: 0; }
   .sd-jp-feedback-good { background: #e6f5ec; border: 1px solid #9dc3b1; color: #123227; }
@@ -183,7 +188,7 @@ const PRACTICE_STYLES = `
   .sd-jp-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 26px; }
   .sd-jp-answered { font-weight: 800; color: #123227; font-size: 0.95rem; font-variant-numeric: tabular-nums; text-align: center; }
   .sd-jp-grid { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 18px; }
-  .sd-jp-grid-btn { width: 40px; height: 40px; border-radius: 10px; border: 1px solid #dce6df; background: #ffffff; color: #123227; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease; }
+  .sd-jp-grid-btn { width: 40px; height: 40px; border-radius: 12px; border: 1px solid #dce6df; background: #ffffff; color: #123227; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease; }
   .sd-jp-grid-btn:hover { border-color: #007a4d; }
   .sd-jp-grid-current { background: #007a4d !important; border-color: #007a4d !important; color: #ffffff !important; }
   .sd-jp-grid-answered { background: #e6f5ec; border-color: #007a4d; color: #004d34; }
@@ -191,14 +196,14 @@ const PRACTICE_STYLES = `
   .sd-jp-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
 
   /* Review screen. */
-  .sd-jp-score { background: linear-gradient(135deg, #123227 0%, #004d34 100%); border-radius: 14px; padding: 28px 26px; margin-bottom: 8px; color: #ffffff; text-align: center; scroll-margin-top: 80px; }
+  .sd-jp-score { background: linear-gradient(135deg, #123227 0%, #004d34 100%); border-radius: 20px; padding: 32px 26px; margin-bottom: 8px; color: #ffffff; text-align: center; scroll-margin-top: 80px; box-shadow: 0 12px 28px rgba(18, 50, 39, 0.18); }
   .sd-jp-score-pct { font-family: var(--font-chunkfive, Georgia, 'Times New Roman', serif); font-size: 3rem; line-height: 1; color: #fec60d; margin: 0 0 8px 0; }
   .sd-jp-score-big { font-size: 1.3rem; font-weight: 800; color: #ffffff; margin: 0 0 6px 0; }
   .sd-jp-score-meta { margin: 0; color: #d7ece1; font-size: 0.95rem; }
   .sd-jp-score-note { margin: 10px 0 0 0; color: #b9d8c9; font-size: 0.88rem; }
-  .sd-jp-review-q { border: 1px solid #dce6df; border-radius: 14px; padding: 22px; margin-top: 18px; background: #ffffff; }
+  .sd-jp-review-q { border: 1px solid #dce6df; border-radius: 18px; padding: 22px; margin-top: 18px; background: #ffffff; box-shadow: 0 4px 16px rgba(18, 50, 39, 0.07); }
   .sd-jp-review-options { list-style: none; margin: 0 0 12px 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .sd-jp-review-option { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; border-radius: 10px; border: 1px solid #dce6df; font-size: 0.98rem; line-height: 1.55; color: #123227; }
+  .sd-jp-review-option { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; border-radius: 12px; border: 1px solid #dce6df; font-size: 0.98rem; line-height: 1.55; color: #123227; }
   .sd-jp-review-option .sd-jp-badge { margin-left: auto; }
 
   @media (max-width: 700px) {
@@ -240,7 +245,7 @@ export default async function JambPracticePage({
       <div className="sd-page sd-contact-page" id="top">
         <SiteHeader variant="tool" />
         <main>
-          <section className="sd-section sd-section-soft">
+          <section className="sd-section sd-section-soft sd-jp-section">
             {/* Full-colour Template 1 scene, same language as the home and
                 tool pages — behind the content at every width. The
                 practice card stays opaque and fully clear. */}

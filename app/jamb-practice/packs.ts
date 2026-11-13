@@ -3,7 +3,7 @@
 // The packs are the verified CSVs converted losslessly to JSON; see
 // public/jamb-packs/. Content fixes land by replacing the JSON bundles.
 
-export type PackSubject = "english" | "mathematics" | "biology";
+export type PackSubject = "english" | "mathematics" | "biology" | "digital-technology";
 
 export interface PackQuestion {
   id: string;
@@ -37,6 +37,7 @@ export const PACK_SUBJECTS: { slug: PackSubject; label: string }[] = [
   { slug: "english", label: "English" },
   { slug: "mathematics", label: "Mathematics" },
   { slug: "biology", label: "Biology" },
+  { slug: "digital-technology", label: "Digital Technology" },
 ];
 
 export const PACK_YEARS = ["2020", "2021", "2022", "2023", "2024", "2025"];
@@ -101,7 +102,7 @@ export function buildRun(
   return { questions, available: pool.length };
 }
 
-// True when all three packs are already in a Cache Storage cache (i.e. the
+// True when all packs are already in a Cache Storage cache (i.e. the
 // service worker has saved them for offline use).
 export async function packsSavedForOffline(): Promise<boolean> {
   try {
