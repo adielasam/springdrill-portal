@@ -114,11 +114,17 @@
         let totalSeconds = parseInt(localStorage.getItem('UTME_EXAM_TIME')) || 7200; 
 
         async function fetchExamQuestions(subject, count, retries = 2) {
+            // The API route verifies the signed-in session: attach the
+            // access token as a Bearer token (sessions live in
+            // localStorage, so no cookie carries it).
+            const { data: { session } } = await supabase.auth.getSession();
+            const headers = { 'Content-Type': 'application/json' };
+            if (session?.access_token) headers['Authorization'] = `Bearer ${session.access_token}`;
             for (let attempt = 0; attempt <= retries; attempt++) {
                 try {
                     const res = await fetch('/api/generate-utme-questions', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: headers,
                         body: JSON.stringify({ subject: subject, count: count })
                     });
                     if (!res.ok) throw new Error("Failed to load questions from server.");

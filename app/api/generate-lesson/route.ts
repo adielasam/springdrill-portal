@@ -1,11 +1,39 @@
 import { NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 import { extractText } from 'unpdf';
 import mammoth from 'mammoth';
 
 export const maxDuration = 60;
 
+// Paid AI endpoint: only signed-in portal users may call it. Portal
+// sessions live in browser localStorage (see public/supabaseClient.js),
+// so the calling page sends its access token as a Bearer token; verify
+// that token against Supabase Auth here. Fail closed: any missing,
+// invalid, expired, or unverifiable token is rejected.
+async function requireSignedInUser(req: Request): Promise<boolean> {
+  try {
+    const header = req.headers.get('authorization');
+    if (!header || !header.toLowerCase().startsWith('bearer ')) return false;
+    const token = header.slice(7).trim();
+    if (!token) return false;
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { auth: { persistSession: false, autoRefreshToken: false } }
+    );
+    const { data, error } = await supabase.auth.getUser(token);
+    return !error && !!data.user;
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(req: Request) {
   try {
+    if (!(await requireSignedInUser(req))) {
+      return NextResponse.json({ error: 'Unauthorized: sign in to use this endpoint.' }, { status: 401 });
+    }
+
     const { targetClass, subject, topic, extra, fileUrl } = await req.json();
 
     const apiKey = process.env.OPENROUTER_API_KEY;
