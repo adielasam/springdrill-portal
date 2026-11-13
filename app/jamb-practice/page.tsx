@@ -9,7 +9,7 @@ import { PACK_SUBJECTS } from "./packs";
 export const metadata: Metadata = {
   title: "Free JAMB Practice — UTME CBT Questions With Answers | SpringDrill",
   description:
-    "Practise JAMB UTME questions free — English, Mathematics, Biology and Digital Technology, with answers and explanations. No sign-up, works offline, and installs on your phone or Windows computer.",
+    "Practise JAMB UTME questions free — English, Mathematics, Biology, Digital Technology, Physics, Chemistry, Economics and Government, with answers and explanations. No sign-up, works offline, and installs on your phone or Windows computer.",
   keywords: [
     "JAMB practice",
     "UTME practice questions",
@@ -21,6 +21,10 @@ export const metadata: Metadata = {
     "UTME Mathematics practice",
     "UTME Biology practice",
     "UTME Digital Technology practice",
+    "UTME Physics practice",
+    "UTME Chemistry practice",
+    "UTME Economics practice",
+    "UTME Government practice",
     "SpringDrill",
   ],
   alternates: { canonical: "/jamb-practice" },
@@ -56,7 +60,7 @@ const PRACTICE_JSON_LD = {
   applicationCategory: "EducationalApplication",
   operatingSystem: "Any (web browser)",
   description:
-    "Free JAMB UTME practice sets for English, Mathematics, Biology and Digital Technology, with answers and explanations. No sign-up; works offline once loaded.",
+    "Free JAMB UTME practice sets for English, Mathematics, Biology, Digital Technology, Physics, Chemistry, Economics and Government, with answers and explanations. No sign-up; works offline once loaded.",
   offers: { "@type": "Offer", price: "0", priceCurrency: "NGN" },
   isAccessibleForFree: true,
 };
@@ -206,9 +210,55 @@ const PRACTICE_STYLES = `
   .sd-jp-review-option { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; border-radius: 12px; border: 1px solid #dce6df; font-size: 0.98rem; line-height: 1.55; color: #123227; }
   .sd-jp-review-option .sd-jp-badge { margin-left: auto; }
 
+  /* Preparation-mode chooser: three big cards, one clear first step. */
+  .sd-jp-prep-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 0 0 24px 0; }
+  .sd-jp-back { background: transparent; border: none; padding: 0; margin: 0 0 20px 0; color: #007a4d; font-weight: 800; font-size: 0.95rem; cursor: pointer; font-family: inherit; }
+  .sd-jp-back:hover { text-decoration: underline; }
+
+  /* Sitting section tabs: one per subject, horizontally scrollable on
+     phones so all four stay reachable at every width. */
+  .sd-jp-section-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; }
+  .sd-jp-section-tab { flex: none; min-height: 44px; padding: 8px 16px; border-radius: 999px; border: 1px solid #9dc3b1; background: #ffffff; color: #004d34; font-weight: 700; font-size: 0.9rem; cursor: pointer; white-space: nowrap; }
+  .sd-jp-section-tab:hover { border-color: #007a4d; }
+  .sd-jp-section-tab-active { background: #007a4d !important; border-color: #007a4d !important; color: #ffffff !important; }
+  .sd-jp-grid-label { font-size: 0.9rem; font-weight: 700; color: #004d34; margin: 18px 0 10px 0; }
+
+  /* The locked English card in sitting setup: a fixed selection, kept
+     fully readable — never greyed out like a dead control. */
+  .sd-jp-subject-card:disabled { opacity: 1; cursor: default; color: #123227; }
+  .sd-jp-subject-card:disabled:hover { transform: none; box-shadow: none; border-color: #007a4d; }
+
+  /* Sitting score breakdown: one cell per subject inside the hero. */
+  .sd-jp-score-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 20px; text-align: left; }
+  .sd-jp-score-cell { background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 14px; padding: 14px; }
+  .sd-jp-score-cell-num { display: block; font-family: var(--font-chunkfive, Georgia, 'Times New Roman', serif); font-size: 1.6rem; line-height: 1.1; color: #fec60d; }
+  .sd-jp-score-cell-of { font-size: 1rem; color: #d7ece1; }
+  .sd-jp-score-cell-label { display: block; font-weight: 800; font-size: 0.95rem; color: #ffffff; margin-top: 4px; }
+  .sd-jp-score-cell-sub { display: block; font-size: 0.8rem; color: #d7ece1; margin-top: 2px; }
+  .sd-jp-review-section { font-family: var(--font-chunkfive, Georgia, 'Times New Roman', serif); font-size: 1.3rem; font-weight: 400; color: #123227; margin: 28px 0 0 0; }
+  .sd-jp-review-section-score { font-size: 0.95rem; font-weight: 700; color: #007a4d; }
+
+  /* Weak topics: ranked list + honest empty state. */
+  .sd-jp-weak-list { list-style: none; margin: 0; padding: 0; }
+  .sd-jp-weak-item { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 0; border-bottom: 1px solid #eef6f1; }
+  .sd-jp-weak-item:last-child { border-bottom: none; }
+  .sd-jp-weak-topic { font-weight: 800; color: #123227; font-size: 0.98rem; }
+  .sd-jp-weak-subject { font-weight: 400; color: #5a6b63; }
+  .sd-jp-weak-stat { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 700; color: #004d34; font-size: 0.9rem; white-space: nowrap; }
+  .sd-jp-empty { background: #eef6f1; border: 1px solid #dce6df; border-radius: 16px; padding: 22px; margin: 0 0 20px 0; }
+  .sd-jp-empty p { margin: 0 0 12px 0; font-size: 0.98rem; line-height: 1.65; color: #123227; }
+  .sd-jp-empty p:last-of-type { margin-bottom: 16px; }
+
+  /* Disabled primary buttons (sitting start before 3 picks): visibly
+     inactive, never a dead-looking control. */
+  .sd-jp-btn:disabled { opacity: 0.5; cursor: default; }
+  .sd-jp-btn:disabled:hover { background: #007a4d; box-shadow: none; }
+
   @media (max-width: 700px) {
     .sd-jp-card { padding: 20px 16px; }
     .sd-jp-modes { grid-template-columns: 1fr; }
+    .sd-jp-prep-grid { grid-template-columns: 1fr; }
+    .sd-jp-score-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .sd-jp-subjects { grid-template-columns: 1fr; }
     .sd-jp-options { grid-template-columns: 1fr; }
     .sd-jp-review-options { grid-template-columns: 1fr; }
@@ -272,7 +322,7 @@ export default async function JambPracticePage({
               <p className="sd-eyebrow">Free JAMB practice</p>
               <h1 className="sd-h2">Practise JAMB questions, free.</h1>
               <p className="sd-jp-intro">
-                Quick UTME sets with answers and explanations.
+                Quick UTME sets and full 180-question JAMB-standard sittings, with answers and explanations.
                 No sign-up, and it works offline once loaded.
               </p>
               <JambPractice initialSubject={initialSubject} />

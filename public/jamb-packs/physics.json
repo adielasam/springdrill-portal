@@ -1,0 +1,846 @@
+{
+ "subject": "Physics",
+ "version": 1,
+ "questions": [
+  {
+   "id": "physics-001",
+   "year": "2020",
+   "topic": "Measurements and Units",
+   "text": "Which of the following has the dimensions of pressure?",
+   "options": [
+    "MLT⁻²",
+    "ML²T⁻²",
+    "ML⁻¹T⁻²",
+    "ML⁻²T⁻²"
+   ],
+   "answer": 2,
+   "explanation": "Pressure = force/area = MLT⁻² ÷ L² = ML⁻¹T⁻². MLT⁻² is force and ML²T⁻² is energy."
+  },
+  {
+   "id": "physics-002",
+   "year": "2021",
+   "topic": "Scalars and Vectors",
+   "text": "Two perpendicular forces of 6 N and 8 N act on a body at a point. The magnitude of their resultant is",
+   "options": [
+    "14 N",
+    "10 N",
+    "2 N",
+    "7 N"
+   ],
+   "answer": 1,
+   "explanation": "For perpendicular forces, R = √(6² + 8²) = √100 = 10 N."
+  },
+  {
+   "id": "physics-003",
+   "year": "2022",
+   "topic": "Equilibrium of Forces",
+   "text": "A uniform metre rule is pivoted at its centre. An 8 N weight hung 20 cm from the pivot is balanced by a weight hung 40 cm from the pivot on the other side. The balancing weight is",
+   "options": [
+    "16 N",
+    "8 N",
+    "2 N",
+    "4 N"
+   ],
+   "answer": 3,
+   "explanation": "By the principle of moments, 8 × 20 = W × 40, so W = 160 ÷ 40 = 4 N."
+  },
+  {
+   "id": "physics-004",
+   "year": "2023",
+   "topic": "Motion",
+   "text": "The area under a velocity-time graph represents",
+   "options": [
+    "distance covered",
+    "momentum",
+    "acceleration",
+    "force"
+   ],
+   "answer": 0,
+   "explanation": "Area = velocity × time = distance. The gradient of the graph gives acceleration."
+  },
+  {
+   "id": "physics-005",
+   "year": "2024",
+   "topic": "Temperature Measurement",
+   "text": "A temperature of 77 °F is equivalent to",
+   "options": [
+    "20 °C",
+    "35 °C",
+    "25 °C",
+    "30 °C"
+   ],
+   "answer": 2,
+   "explanation": "C = (F − 32) × 5/9 = (77 − 32) × 5/9 = 45 × 5/9 = 25 °C."
+  },
+  {
+   "id": "physics-006",
+   "year": "2025",
+   "topic": "Motion",
+   "text": "A simple pendulum of length 1 m oscillates with a period of approximately [g = 10 m/s², π = 3.14]",
+   "options": [
+    "2.0 s",
+    "6.3 s",
+    "1.0 s",
+    "4.0 s"
+   ],
+   "answer": 0,
+   "explanation": "T = 2π√(L/g) = 2 × 3.14 × √(1/10) = 6.28 × 0.316 ≈ 1.99 s ≈ 2.0 s."
+  },
+  {
+   "id": "physics-007",
+   "year": "2020",
+   "topic": "Motion",
+   "text": "A car accelerates uniformly from rest at 2 m/s² for 5 s. The distance it covers is",
+   "options": [
+    "10 m",
+    "25 m",
+    "20 m",
+    "50 m"
+   ],
+   "answer": 1,
+   "explanation": "s = ut + ½at² = 0 + ½ × 2 × 25 = 25 m."
+  },
+  {
+   "id": "physics-008",
+   "year": "2021",
+   "topic": "Friction",
+   "text": "A block of mass 5 kg rests on a horizontal surface. If the coefficient of limiting friction is 0.4, the limiting frictional force is [g = 10 m/s²]",
+   "options": [
+    "12.5 N",
+    "200 N",
+    "2 N",
+    "20 N"
+   ],
+   "answer": 3,
+   "explanation": "F = μR = 0.4 × (5 × 10) = 0.4 × 50 = 20 N."
+  },
+  {
+   "id": "physics-009",
+   "year": "2022",
+   "topic": "Elasticity",
+   "text": "A spring extends by 4 cm when an 8 N load is hung on it. Assuming Hooke's law is obeyed, the extension produced by a 20 N load is",
+   "options": [
+    "10 cm",
+    "8 cm",
+    "12 cm",
+    "5 cm"
+   ],
+   "answer": 0,
+   "explanation": "Extension is proportional to load: e = 4 × 20 ÷ 8 = 10 cm."
+  },
+  {
+   "id": "physics-010",
+   "year": "2023",
+   "topic": "Work, Energy and Power",
+   "text": "A machine lifts a load of 50 kg through a vertical height of 4 m in 5 s. The power developed is [g = 10 m/s²]",
+   "options": [
+    "100 W",
+    "400 W",
+    "1000 W",
+    "200 W"
+   ],
+   "answer": 1,
+   "explanation": "Work = mgh = 50 × 10 × 4 = 2000 J; power = work/time = 2000 ÷ 5 = 400 W."
+  },
+  {
+   "id": "physics-011",
+   "year": "2024",
+   "topic": "Elasticity",
+   "text": "A wire 2 m long of cross-sectional area 1 mm² extends by 1 mm when a force of 200 N is applied. Young's modulus of the material is",
+   "options": [
+    "4.0 × 10¹⁰ Pa",
+    "2.0 × 10¹¹ Pa",
+    "4.0 × 10¹¹ Pa",
+    "4.0 × 10⁹ Pa"
+   ],
+   "answer": 2,
+   "explanation": "Stress = 200 ÷ 10⁻⁶ = 2 × 10⁸ Pa; strain = 10⁻³ ÷ 2 = 5 × 10⁻⁴; Y = stress/strain = 2 × 10⁸ ÷ 5 × 10⁻⁴ = 4.0 × 10¹¹ Pa."
+  },
+  {
+   "id": "physics-012",
+   "year": "2025",
+   "topic": "Pressure",
+   "text": "In a hydraulic press, the small piston has an area of 0.02 m² and the large piston an area of 0.4 m². A force of 50 N applied to the small piston lifts a load of",
+   "options": [
+    "10000 N",
+    "250 N",
+    "100 N",
+    "1000 N"
+   ],
+   "answer": 3,
+   "explanation": "Pressure is transmitted equally, so F₂ = F₁ × A₂/A₁ = 50 × 0.4 ÷ 0.02 = 1000 N."
+  },
+  {
+   "id": "physics-013",
+   "year": "2020",
+   "topic": "Work, Energy and Power",
+   "text": "A 2 kg mass falls freely from a height of 10 m. Its kinetic energy just before it hits the ground is [g = 10 m/s²]",
+   "options": [
+    "400 J",
+    "200 J",
+    "100 J",
+    "20 J"
+   ],
+   "answer": 1,
+   "explanation": "Loss of potential energy = gain in kinetic energy = mgh = 2 × 10 × 10 = 200 J."
+  },
+  {
+   "id": "physics-014",
+   "year": "2021",
+   "topic": "Pressure",
+   "text": "A force of 200 N acts uniformly on an area of 0.5 m². The pressure exerted is",
+   "options": [
+    "400 Pa",
+    "100 Pa",
+    "40 Pa",
+    "4000 Pa"
+   ],
+   "answer": 0,
+   "explanation": "P = F/A = 200 ÷ 0.5 = 400 Pa."
+  },
+  {
+   "id": "physics-015",
+   "year": "2022",
+   "topic": "Quantity of Heat",
+   "text": "The quantity of heat required to raise the temperature of 2 kg of water by 20 K is [specific heat capacity of water = 4200 J/kg K]",
+   "options": [
+    "42 kJ",
+    "336 kJ",
+    "168 kJ",
+    "84 kJ"
+   ],
+   "answer": 2,
+   "explanation": "Q = mcΔθ = 2 × 4200 × 20 = 168,000 J = 168 kJ."
+  },
+  {
+   "id": "physics-016",
+   "year": "2023",
+   "topic": "Pressure",
+   "text": "The pressure at a depth of 5 m below the surface of water of density 1000 kg/m³ is [g = 10 m/s²]",
+   "options": [
+    "5.0 × 10² Pa",
+    "5.0 × 10⁵ Pa",
+    "5.0 × 10³ Pa",
+    "5.0 × 10⁴ Pa"
+   ],
+   "answer": 3,
+   "explanation": "P = hρg = 5 × 1000 × 10 = 50,000 Pa = 5.0 × 10⁴ Pa."
+  },
+  {
+   "id": "physics-017",
+   "year": "2024",
+   "topic": "Vapours",
+   "text": "The saturated vapour pressure of a liquid depends only on its",
+   "options": [
+    "temperature",
+    "surface area",
+    "volume",
+    "mass"
+   ],
+   "answer": 0,
+   "explanation": "At a given temperature the saturated vapour pressure is fixed, whatever the volume or amount of liquid present, as long as liquid and vapour coexist."
+  },
+  {
+   "id": "physics-018",
+   "year": "2025",
+   "topic": "Quantity of Heat",
+   "text": "0.5 kg of water at 80 °C is mixed with 0.5 kg of water at 20 °C in an insulated container. Neglecting heat losses, the final temperature of the mixture is",
+   "options": [
+    "100 °C",
+    "50 °C",
+    "60 °C",
+    "40 °C"
+   ],
+   "answer": 1,
+   "explanation": "Equal masses of the same liquid reach the mean temperature: (80 + 20) ÷ 2 = 50 °C."
+  },
+  {
+   "id": "physics-019",
+   "year": "2020",
+   "topic": "Heat Transfer",
+   "text": "Heat can travel through a vacuum by",
+   "options": [
+    "convection only",
+    "conduction only",
+    "conduction and convection",
+    "radiation only"
+   ],
+   "answer": 3,
+   "explanation": "Conduction and convection need a material medium. Radiation is electromagnetic and travels through empty space, as heat from the Sun does."
+  },
+  {
+   "id": "physics-020",
+   "year": "2021",
+   "topic": "Thermal Expansion",
+   "text": "A steel rod 2 m long is heated through a temperature rise of 50 K. If the linear expansivity of steel is 1.2 × 10⁻⁵ K⁻¹, the increase in length is",
+   "options": [
+    "2.4 mm",
+    "0.6 mm",
+    "1.2 mm",
+    "12 mm"
+   ],
+   "answer": 2,
+   "explanation": "ΔL = LαΔθ = 2 × 1.2 × 10⁻⁵ × 50 = 1.2 × 10⁻³ m = 1.2 mm."
+  },
+  {
+   "id": "physics-021",
+   "year": "2022",
+   "topic": "Gas Laws",
+   "text": "A fixed mass of gas at 2 atm occupies 3 litres. If it is compressed isothermally to 1.5 litres, its new pressure is",
+   "options": [
+    "4 atm",
+    "6 atm",
+    "3 atm",
+    "1 atm"
+   ],
+   "answer": 0,
+   "explanation": "By Boyle's law, P₁V₁ = P₂V₂, so P₂ = 2 × 3 ÷ 1.5 = 4 atm."
+  },
+  {
+   "id": "physics-022",
+   "year": "2023",
+   "topic": "Change of State",
+   "text": "The quantity of heat needed to melt 0.5 kg of ice at 0 °C is [specific latent heat of fusion of ice = 3.34 × 10⁵ J/kg]",
+   "options": [
+    "3.34 × 10⁴ J",
+    "1.67 × 10⁵ J",
+    "1.67 × 10⁴ J",
+    "6.68 × 10⁵ J"
+   ],
+   "answer": 1,
+   "explanation": "Q = mL = 0.5 × 3.34 × 10⁵ = 1.67 × 10⁵ J. The temperature stays constant during melting."
+  },
+  {
+   "id": "physics-023",
+   "year": "2024",
+   "topic": "Characteristics of Sound",
+   "text": "The pitch of a musical note depends mainly on the",
+   "options": [
+    "speed of the sound wave",
+    "wavelength in air",
+    "frequency of the sound wave",
+    "amplitude of the sound wave"
+   ],
+   "answer": 2,
+   "explanation": "Pitch rises with frequency. Amplitude determines loudness, and speed in a given medium is constant."
+  },
+  {
+   "id": "physics-024",
+   "year": "2025",
+   "topic": "Waves",
+   "text": "The bending of waves around the edges of an obstacle is called",
+   "options": [
+    "refraction",
+    "polarisation",
+    "reflection",
+    "diffraction"
+   ],
+   "answer": 3,
+   "explanation": "Diffraction is the spreading of waves around obstacles and through openings. Refraction is bending due to a change of speed in a new medium."
+  },
+  {
+   "id": "physics-025",
+   "year": "2020",
+   "topic": "Waves",
+   "text": "A wave of frequency 50 Hz has a wavelength of 4 m. Its speed is",
+   "options": [
+    "46 m/s",
+    "12.5 m/s",
+    "200 m/s",
+    "54 m/s"
+   ],
+   "answer": 2,
+   "explanation": "v = fλ = 50 × 4 = 200 m/s."
+  },
+  {
+   "id": "physics-026",
+   "year": "2021",
+   "topic": "Sound Waves",
+   "text": "An echo is heard 0.4 s after a shout in front of a cliff. If the speed of sound in air is 340 m/s, the distance of the cliff from the observer is",
+   "options": [
+    "136 m",
+    "34 m",
+    "272 m",
+    "68 m"
+   ],
+   "answer": 3,
+   "explanation": "The sound travels to the cliff and back, so 2d = vt = 340 × 0.4 = 136 m, giving d = 68 m."
+  },
+  {
+   "id": "physics-027",
+   "year": "2022",
+   "topic": "Reflection of Light",
+   "text": "An object is placed 20 cm in front of a plane mirror. The distance between the object and its image is",
+   "options": [
+    "20 cm",
+    "40 cm",
+    "10 cm",
+    "80 cm"
+   ],
+   "answer": 1,
+   "explanation": "The image forms as far behind the mirror as the object is in front, so object-to-image distance is 20 + 20 = 40 cm."
+  },
+  {
+   "id": "physics-028",
+   "year": "2023",
+   "topic": "Refraction of Light",
+   "text": "A ray of light passes from air into glass of refractive index 1.5 at an angle of incidence of 60°. The angle of refraction is approximately [sin 60° = 0.866]",
+   "options": [
+    "35°",
+    "40°",
+    "25°",
+    "45°"
+   ],
+   "answer": 0,
+   "explanation": "By Snell's law, sin r = sin 60° ÷ 1.5 = 0.866 ÷ 1.5 = 0.577, so r = sin⁻¹(0.577) ≈ 35°."
+  },
+  {
+   "id": "physics-029",
+   "year": "2024",
+   "topic": "Optical Instruments",
+   "text": "Optical fibres transmit light signals by the principle of",
+   "options": [
+    "refraction at a plane surface",
+    "total internal reflection",
+    "diffraction",
+    "interference"
+   ],
+   "answer": 1,
+   "explanation": "Light inside the fibre strikes the core-cladding boundary at angles greater than the critical angle and is totally internally reflected along the fibre."
+  },
+  {
+   "id": "physics-030",
+   "year": "2025",
+   "topic": "Electromagnetic Spectrum",
+   "text": "Which of the following electromagnetic waves has the highest frequency?",
+   "options": [
+    "Ultraviolet rays",
+    "Visible light",
+    "Gamma rays",
+    "X-rays"
+   ],
+   "answer": 2,
+   "explanation": "In the electromagnetic spectrum, frequency increases from radio waves to gamma rays, which have the highest frequency and shortest wavelength."
+  },
+  {
+   "id": "physics-031",
+   "year": "2020",
+   "topic": "Electrostatics",
+   "text": "Two point charges of 2 μC and 3 μC are placed 0.3 m apart in air. The electrostatic force between them is [k = 9 × 10⁹ N m²/C²]",
+   "options": [
+    "0.6 N",
+    "0.06 N",
+    "60 N",
+    "6 N"
+   ],
+   "answer": 0,
+   "explanation": "F = kq₁q₂/r² = (9 × 10⁹ × 2 × 10⁻⁶ × 3 × 10⁻⁶) ÷ 0.09 = 0.054 ÷ 0.09 = 0.6 N, repulsive since the charges are alike."
+  },
+  {
+   "id": "physics-032",
+   "year": "2021",
+   "topic": "Capacitors",
+   "text": "Two 6 μF capacitors are connected in series. Their equivalent capacitance is",
+   "options": [
+    "12 μF",
+    "36 μF",
+    "1.5 μF",
+    "3 μF"
+   ],
+   "answer": 3,
+   "explanation": "1/C = 1/6 + 1/6 = 2/6, so C = 3 μF."
+  },
+  {
+   "id": "physics-033",
+   "year": "2022",
+   "topic": "Electrical Energy and Power",
+   "text": "A 100 W electric bulb is used for 5 hours. The electrical energy consumed is",
+   "options": [
+    "500 kWh",
+    "0.05 kWh",
+    "0.5 kWh",
+    "5 kWh"
+   ],
+   "answer": 2,
+   "explanation": "Energy = power × time = 0.1 kW × 5 h = 0.5 kWh."
+  },
+  {
+   "id": "physics-034",
+   "year": "2023",
+   "topic": "Refraction of Light",
+   "text": "A convex lens of focal length 10 cm forms an image of an object placed 30 cm from it. The image distance is",
+   "options": [
+    "15 cm",
+    "7.5 cm",
+    "20 cm",
+    "40 cm"
+   ],
+   "answer": 0,
+   "explanation": "1/v = 1/f − 1/u = 1/10 − 1/30 = 2/30, so v = 15 cm."
+  },
+  {
+   "id": "physics-035",
+   "year": "2024",
+   "topic": "Electromagnetic Induction",
+   "text": "Lenz's law, which states that an induced current opposes the change producing it, is a consequence of the law of conservation of",
+   "options": [
+    "momentum",
+    "energy",
+    "charge",
+    "mass"
+   ],
+   "answer": 1,
+   "explanation": "If the induced current aided the change, energy would be created. Lenz's law ensures the induced effects oppose the change, conserving energy."
+  },
+  {
+   "id": "physics-036",
+   "year": "2025",
+   "topic": "Elementary Modern Physics",
+   "text": "Cathode rays are streams of",
+   "options": [
+    "protons",
+    "neutrons",
+    "alpha particles",
+    "electrons"
+   ],
+   "answer": 3,
+   "explanation": "Cathode rays are fast-moving electrons emitted from the cathode of a discharge tube; they are deflected by electric and magnetic fields."
+  },
+  {
+   "id": "physics-037",
+   "year": "2020",
+   "topic": "Current Electricity",
+   "text": "A 3 Ω resistor and a 6 Ω resistor are connected in parallel. Their equivalent resistance is",
+   "options": [
+    "4.5 Ω",
+    "9 Ω",
+    "2 Ω",
+    "18 Ω"
+   ],
+   "answer": 2,
+   "explanation": "1/R = 1/3 + 1/6 = 3/6, so R = 2 Ω."
+  },
+  {
+   "id": "physics-038",
+   "year": "2021",
+   "topic": "Electric Cells",
+   "text": "A cell of e.m.f. 2 V and internal resistance 0.5 Ω is connected to an external resistor of 3.5 Ω. The current in the circuit is",
+   "options": [
+    "0.25 A",
+    "0.5 A",
+    "0.57 A",
+    "4 A"
+   ],
+   "answer": 1,
+   "explanation": "I = E/(R + r) = 2 ÷ (3.5 + 0.5) = 2 ÷ 4 = 0.5 A."
+  },
+  {
+   "id": "physics-039",
+   "year": "2022",
+   "topic": "Alternating Current",
+   "text": "An alternating voltage has a peak value of 282.8 V. Its root-mean-square value is",
+   "options": [
+    "141.4 V",
+    "400 V",
+    "282.8 V",
+    "200 V"
+   ],
+   "answer": 3,
+   "explanation": "Vrms = V₀/√2 = 282.8 ÷ 1.414 ≈ 200 V."
+  },
+  {
+   "id": "physics-040",
+   "year": "2023",
+   "topic": "Current Electricity",
+   "text": "A 12 V battery drives a current of 0.4 A through a resistor. The resistance of the resistor is",
+   "options": [
+    "30 Ω",
+    "48 Ω",
+    "12 Ω",
+    "4.8 Ω"
+   ],
+   "answer": 0,
+   "explanation": "By Ohm's law, R = V/I = 12 ÷ 0.4 = 30 Ω."
+  },
+  {
+   "id": "physics-041",
+   "year": "2024",
+   "topic": "Waves",
+   "text": "A closed organ pipe of length 0.85 m resonates in its fundamental mode. If the speed of sound in air is 340 m/s, the fundamental frequency is",
+   "options": [
+    "200 Hz",
+    "100 Hz",
+    "400 Hz",
+    "50 Hz"
+   ],
+   "answer": 1,
+   "explanation": "For a closed pipe, L = λ/4, so λ = 3.4 m and f = v/λ = 340 ÷ 3.4 = 100 Hz."
+  },
+  {
+   "id": "physics-042",
+   "year": "2025",
+   "topic": "Elasticity",
+   "text": "When a wire is stretched beyond its elastic limit, it will",
+   "options": [
+    "undergo permanent deformation",
+    "return to its original length",
+    "break immediately",
+    "obey Hooke's law exactly"
+   ],
+   "answer": 0,
+   "explanation": "Beyond the elastic limit the material deforms plastically and does not recover its original length when the load is removed."
+  },
+  {
+   "id": "physics-043",
+   "year": "2020",
+   "topic": "Magnets and Magnetic Fields",
+   "text": "The region around a magnet within which its magnetic influence can be felt is called the",
+   "options": [
+    "magnetic flux",
+    "magnetic domain",
+    "magnetic pole",
+    "magnetic field"
+   ],
+   "answer": 3,
+   "explanation": "The magnetic field is the space around a magnet where magnetic forces act. Flux is the total field passing through an area, and poles are the ends of the magnet."
+  },
+  {
+   "id": "physics-044",
+   "year": "2021",
+   "topic": "Electromagnetic Induction",
+   "text": "An ideal transformer has 2000 turns in its primary coil and 100 turns in its secondary coil. If the primary voltage is 220 V, the secondary voltage is",
+   "options": [
+    "22 V",
+    "4400 V",
+    "11 V",
+    "5.5 V"
+   ],
+   "answer": 2,
+   "explanation": "Vs/Vp = Ns/Np, so Vs = 220 × 100 ÷ 2000 = 11 V."
+  },
+  {
+   "id": "physics-045",
+   "year": "2022",
+   "topic": "Structure of Matter",
+   "text": "The random, haphazard movement of smoke particles in air provides evidence for",
+   "options": [
+    "the law of conservation of energy",
+    "the kinetic theory of matter",
+    "the wave theory of light",
+    "the principle of moments"
+   ],
+   "answer": 1,
+   "explanation": "Brownian movement shows that invisible air molecules are in constant random motion, colliding with the smoke particles, as the kinetic theory predicts."
+  },
+  {
+   "id": "physics-046",
+   "year": "2023",
+   "topic": "Dispersion",
+   "text": "When white light passes through a triangular glass prism, the colour that is deviated the most is",
+   "options": [
+    "green",
+    "yellow",
+    "red",
+    "violet"
+   ],
+   "answer": 3,
+   "explanation": "Violet light has the shortest wavelength and the highest refractive index in glass, so it bends most; red bends least."
+  },
+  {
+   "id": "physics-047",
+   "year": "2024",
+   "topic": "Gas Laws",
+   "text": "A fixed mass of gas at a pressure of 100 kPa and temperature 300 K is heated at constant volume to 600 K. Its new pressure is",
+   "options": [
+    "150 kPa",
+    "50 kPa",
+    "200 kPa",
+    "300 kPa"
+   ],
+   "answer": 2,
+   "explanation": "At constant volume, P/T is constant, so P₂ = 100 × 600 ÷ 300 = 200 kPa."
+  },
+  {
+   "id": "physics-048",
+   "year": "2025",
+   "topic": "Simple Harmonic Motion",
+   "text": "In simple harmonic motion, the acceleration of the oscillating body is greatest at",
+   "options": [
+    "the extremes of the motion",
+    "the equilibrium position",
+    "the midpoint of the swing",
+    "every point equally"
+   ],
+   "answer": 0,
+   "explanation": "Acceleration is proportional to displacement from equilibrium, so it is maximum where displacement is greatest, at the extremes."
+  },
+  {
+   "id": "physics-049",
+   "year": "2020",
+   "topic": "Elementary Modern Physics",
+   "text": "A radioactive sample has a half-life of 4 days. What fraction of the original sample remains after 12 days?",
+   "options": [
+    "1/3",
+    "1/16",
+    "1/8",
+    "1/4"
+   ],
+   "answer": 2,
+   "explanation": "12 days is 3 half-lives, so the fraction remaining is (1/2)³ = 1/8."
+  },
+  {
+   "id": "physics-050",
+   "year": "2021",
+   "topic": "Introductory Electronics",
+   "text": "A p-n junction diode conducts electric current appreciably only when it is",
+   "options": [
+    "earthed",
+    "forward-biased",
+    "reverse-biased",
+    "short-circuited"
+   ],
+   "answer": 1,
+   "explanation": "Forward bias lowers the potential barrier and allows a large current. Reverse bias widens the barrier and only a tiny leakage current flows."
+  },
+  {
+   "id": "physics-051",
+   "year": "2022",
+   "topic": "Momentum",
+   "text": "A 2 kg mass moving at 3 m/s collides with a stationary 4 kg mass and they move together afterwards. Their common velocity is",
+   "options": [
+    "1 m/s",
+    "1.5 m/s",
+    "2 m/s",
+    "3 m/s"
+   ],
+   "answer": 0,
+   "explanation": "By conservation of momentum, 2 × 3 = (2 + 4)v, so v = 6 ÷ 6 = 1 m/s."
+  },
+  {
+   "id": "physics-052",
+   "year": "2023",
+   "topic": "Elementary Modern Physics",
+   "text": "Light of photon energy 5 eV falls on a metal whose work function is 2 eV. The maximum kinetic energy of the emitted photoelectrons is",
+   "options": [
+    "2.5 eV",
+    "7 eV",
+    "10 eV",
+    "3 eV"
+   ],
+   "answer": 3,
+   "explanation": "By Einstein's photoelectric equation, KEmax = hf − W = 5 − 2 = 3 eV."
+  },
+  {
+   "id": "physics-053",
+   "year": "2024",
+   "topic": "Scalars and Vectors",
+   "text": "Which of the following is a scalar quantity?",
+   "options": [
+    "Velocity",
+    "Momentum",
+    "Speed",
+    "Acceleration"
+   ],
+   "answer": 2,
+   "explanation": "Speed has magnitude only. Velocity, acceleration and momentum have both magnitude and direction."
+  },
+  {
+   "id": "physics-054",
+   "year": "2025",
+   "topic": "Electric Cells",
+   "text": "The chemical energy in an electric cell is converted into electrical energy by",
+   "options": [
+    "the photoelectric effect",
+    "chemical action between the electrodes and the electrolyte",
+    "thermionic emission",
+    "electromagnetic induction"
+   ],
+   "answer": 1,
+   "explanation": "A cell produces e.m.f. through chemical reactions at its electrodes. Induction generates e.m.f. in generators, and the photoelectric effect involves light ejecting electrons."
+  },
+  {
+   "id": "physics-055",
+   "year": "2020",
+   "topic": "Simple Machines",
+   "text": "A machine has a velocity ratio of 5 and an efficiency of 80%. Its mechanical advantage is",
+   "options": [
+    "4",
+    "0.16",
+    "6.25",
+    "2.5"
+   ],
+   "answer": 0,
+   "explanation": "Efficiency = MA/VR, so MA = 0.80 × 5 = 4."
+  },
+  {
+   "id": "physics-056",
+   "year": "2021",
+   "topic": "Gravitational Field",
+   "text": "The weight of a 60 kg mass on the Moon, where the acceleration due to gravity is 1.6 m/s², is",
+   "options": [
+    "600 N",
+    "9.6 N",
+    "37.5 N",
+    "96 N"
+   ],
+   "answer": 3,
+   "explanation": "W = mg = 60 × 1.6 = 96 N. Mass stays 60 kg, but weight changes with g."
+  },
+  {
+   "id": "physics-057",
+   "year": "2022",
+   "topic": "Light Energy",
+   "text": "The formation of sharp shadows is evidence that light",
+   "options": [
+    "travels in straight lines",
+    "can be diffracted",
+    "is a form of energy",
+    "travels in curved paths"
+   ],
+   "answer": 0,
+   "explanation": "Shadows with sharp edges form because light travels in straight lines and cannot bend around the obstacle; this is rectilinear propagation."
+  },
+  {
+   "id": "physics-058",
+   "year": "2023",
+   "topic": "Circular Motion",
+   "text": "The force that keeps a body moving in a circular path, directed towards the centre of the circle, is the",
+   "options": [
+    "centrifugal force",
+    "centripetal force",
+    "gravitational force",
+    "frictional force"
+   ],
+   "answer": 1,
+   "explanation": "Centripetal force acts towards the centre and provides the inward acceleration. Centrifugal force is the apparent outward effect felt in the rotating frame."
+  },
+  {
+   "id": "physics-059",
+   "year": "2024",
+   "topic": "Newton's Laws",
+   "text": "A passenger in a car lurches forward when the driver brakes suddenly because of",
+   "options": [
+    "friction",
+    "momentum",
+    "inertia",
+    "gravity"
+   ],
+   "answer": 2,
+   "explanation": "By Newton's first law, the passenger's body tends to continue moving forward at the car's former speed until a force stops it; this tendency is inertia."
+  },
+  {
+   "id": "physics-060",
+   "year": "2025",
+   "topic": "Energy Conversion",
+   "text": "In a hydroelectric power station, the sequence of energy conversions is",
+   "options": [
+    "heat → kinetic → electrical",
+    "kinetic → potential → electrical",
+    "electrical → kinetic → potential",
+    "potential → kinetic → electrical"
+   ],
+   "answer": 3,
+   "explanation": "Water stored behind the dam has gravitational potential energy, which becomes kinetic energy as it falls and drives turbines that generate electricity."
+  }
+ ]
+}
