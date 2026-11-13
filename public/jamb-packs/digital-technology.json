@@ -1,0 +1,846 @@
+{
+ "subject": "Digital Technology",
+ "version": 1,
+ "questions": [
+  {
+   "id": "digital-technology-001",
+   "year": "2020",
+   "topic": "Evolution of Computing",
+   "text": "A computer built with integrated circuits but before the invention of the microprocessor belongs to which generation of computers?",
+   "options": [
+    "Second generation",
+    "Fourth generation",
+    "Third generation",
+    "First generation"
+   ],
+   "answer": 2,
+   "explanation": "The third generation (1964–1971) used integrated circuits. The first used vacuum tubes, the second transistors, and the fourth microprocessors."
+  },
+  {
+   "id": "digital-technology-002",
+   "year": "2021",
+   "topic": "Evolution of Computing",
+   "text": "Ada Lovelace is credited as the first programmer for her work on the notes describing",
+   "options": [
+    "the Hollerith tabulator",
+    "the Analytical Engine",
+    "the Pascaline",
+    "the ENIAC"
+   ],
+   "answer": 1,
+   "explanation": "Lovelace wrote notes on Charles Babbage's Analytical Engine, including an algorithm for computing Bernoulli numbers, making her the first programmer."
+  },
+  {
+   "id": "digital-technology-003",
+   "year": "2022",
+   "topic": "Classification of Computers",
+   "text": "Which class of computer is designed to serve many users at the same time and to handle very large databases for an organisation?",
+   "options": [
+    "Mainframe computer",
+    "Embedded system",
+    "Microcomputer",
+    "Workstation"
+   ],
+   "answer": 0,
+   "explanation": "Mainframes support hundreds of simultaneous users and huge transaction volumes. Microcomputers serve one user, workstations serve technical single users, and embedded systems control single devices."
+  },
+  {
+   "id": "digital-technology-004",
+   "year": "2023",
+   "topic": "Evolution of Computing",
+   "text": "The first commercially available general-purpose electronic computer was the",
+   "options": [
+    "EDVAC",
+    "ENIAC",
+    "EDSAC",
+    "UNIVAC I"
+   ],
+   "answer": 3,
+   "explanation": "UNIVAC I (1951) was the first computer sold commercially. ENIAC was earlier but built for the US Army, while EDVAC and EDSAC were experimental stored-program machines."
+  },
+  {
+   "id": "digital-technology-005",
+   "year": "2024",
+   "topic": "Evolution of Computing",
+   "text": "The abacus is best described as",
+   "options": [
+    "the first electronic computer",
+    "an early mechanical counting device",
+    "the first punched-card machine",
+    "the first stored-program computer"
+   ],
+   "answer": 1,
+   "explanation": "The abacus is a manual bead device used for counting and arithmetic for centuries, long before electronic computing."
+  },
+  {
+   "id": "digital-technology-006",
+   "year": "2025",
+   "topic": "Evolution of Computing",
+   "text": "Vacuum tubes were the main electronic component of computers of the",
+   "options": [
+    "first generation",
+    "fourth generation",
+    "second generation",
+    "third generation"
+   ],
+   "answer": 0,
+   "explanation": "First-generation computers (1940s–1950s) used vacuum tubes. The second generation used transistors, the third integrated circuits, and the fourth microprocessors."
+  },
+  {
+   "id": "digital-technology-007",
+   "year": "2020",
+   "topic": "Data Representation",
+   "text": "Convert 45₁₀ to binary.",
+   "options": [
+    "101110₂",
+    "110101₂",
+    "101011₂",
+    "101101₂"
+   ],
+   "answer": 3,
+   "explanation": "45 = 32 + 8 + 4 + 1 = 1×2⁵ + 0×2⁴ + 1×2³ + 1×2² + 0×2¹ + 1×2⁰ = 101101₂."
+  },
+  {
+   "id": "digital-technology-008",
+   "year": "2021",
+   "topic": "Data Representation",
+   "text": "How many distinct values can be represented using 8 bits?",
+   "options": [
+    "512",
+    "255",
+    "256",
+    "128"
+   ],
+   "answer": 2,
+   "explanation": "With 8 bits there are 2⁸ = 256 possible combinations, from 00000000 to 11111111. 255 is the largest unsigned value, not the count of values."
+  },
+  {
+   "id": "digital-technology-009",
+   "year": "2022",
+   "topic": "Data Representation",
+   "text": "Convert 2F₁₆ to decimal.",
+   "options": [
+    "47",
+    "45",
+    "46",
+    "61"
+   ],
+   "answer": 0,
+   "explanation": "2F₁₆ = 2 × 16 + 15 = 32 + 15 = 47. F in hexadecimal equals 15 in decimal."
+  },
+  {
+   "id": "digital-technology-010",
+   "year": "2023",
+   "topic": "Data Representation",
+   "text": "In 8-bit two's complement notation, the representation of −5 is",
+   "options": [
+    "00000101",
+    "11111010",
+    "11111011",
+    "10000101"
+   ],
+   "answer": 2,
+   "explanation": "5 is 00000101; inverting the bits gives 11111010 and adding 1 gives 11111011, the two's complement form of −5."
+  },
+  {
+   "id": "digital-technology-011",
+   "year": "2024",
+   "topic": "Data Representation",
+   "text": "One megabyte of storage is equal to",
+   "options": [
+    "1,000,000 bits",
+    "1024 kilobytes",
+    "1000 bytes",
+    "1024 bytes"
+   ],
+   "answer": 1,
+   "explanation": "In the binary convention used for memory, 1 MB = 1024 KB = 1,048,576 bytes."
+  },
+  {
+   "id": "digital-technology-012",
+   "year": "2025",
+   "topic": "Data Representation",
+   "text": "Convert 11010₂ to octal.",
+   "options": [
+    "26₈",
+    "62₈",
+    "31₈",
+    "32₈"
+   ],
+   "answer": 3,
+   "explanation": "Grouping the bits in threes from the right: 011 010 = 3 2, so 11010₂ = 32₈."
+  },
+  {
+   "id": "digital-technology-013",
+   "year": "2020",
+   "topic": "Computer Hardware",
+   "text": "Which register holds the memory address of the next instruction to be fetched for execution?",
+   "options": [
+    "Program counter",
+    "Accumulator",
+    "Memory address register",
+    "Memory data register"
+   ],
+   "answer": 0,
+   "explanation": "The program counter keeps the address of the next instruction. The accumulator holds data being processed, while the MAR holds the address of the location being accessed."
+  },
+  {
+   "id": "digital-technology-014",
+   "year": "2021",
+   "topic": "Computer Hardware",
+   "text": "Which printer type produces output by striking an inked ribbon against paper?",
+   "options": [
+    "Thermal printer",
+    "Laser printer",
+    "Dot-matrix printer",
+    "Inkjet printer"
+   ],
+   "answer": 2,
+   "explanation": "Dot-matrix printers are impact printers: pins strike a ribbon. Inkjet printers spray ink, laser printers use toner and heat, and thermal printers use heat-sensitive paper."
+  },
+  {
+   "id": "digital-technology-015",
+   "year": "2022",
+   "topic": "Memory",
+   "text": "A computer loses unsaved work during a power cut because the work was held in",
+   "options": [
+    "a flash drive",
+    "RAM",
+    "ROM",
+    "the hard disk"
+   ],
+   "answer": 1,
+   "explanation": "RAM is volatile, so its contents vanish when power fails. Hard disks, ROM and flash drives are non-volatile and retain data without power."
+  },
+  {
+   "id": "digital-technology-016",
+   "year": "2023",
+   "topic": "Computer Hardware",
+   "text": "The component of the CPU that carries out arithmetic calculations and logical comparisons is the",
+   "options": [
+    "cache memory",
+    "register",
+    "control unit",
+    "arithmetic and logic unit"
+   ],
+   "answer": 3,
+   "explanation": "The ALU performs arithmetic and logic. The control unit fetches and decodes instructions, registers hold data temporarily, and cache is fast memory."
+  },
+  {
+   "id": "digital-technology-017",
+   "year": "2024",
+   "topic": "Storage Devices",
+   "text": "Which storage device has no moving parts and stores data in flash memory chips?",
+   "options": [
+    "Magnetic tape",
+    "Solid-state drive",
+    "Hard disk drive",
+    "CD-ROM"
+   ],
+   "answer": 1,
+   "explanation": "An SSD uses flash memory with no moving parts, making it faster and more shock-resistant than a hard disk, tape or optical disc."
+  },
+  {
+   "id": "digital-technology-018",
+   "year": "2025",
+   "topic": "Computer Hardware",
+   "text": "Which bus carries memory addresses from the CPU to memory?",
+   "options": [
+    "Address bus",
+    "Control bus",
+    "Data bus",
+    "Expansion bus"
+   ],
+   "answer": 0,
+   "explanation": "The address bus carries the location being accessed. The data bus carries the data itself and the control bus carries control signals."
+  },
+  {
+   "id": "digital-technology-019",
+   "year": "2020",
+   "topic": "Operating Systems",
+   "text": "The operating system function that decides which process runs next on the CPU is known as",
+   "options": [
+    "spooling",
+    "defragmentation",
+    "paging",
+    "process scheduling"
+   ],
+   "answer": 3,
+   "explanation": "Process scheduling allocates CPU time among competing processes. Spooling queues print jobs, paging is a memory-management technique, and defragmentation reorganises disk files."
+  },
+  {
+   "id": "digital-technology-020",
+   "year": "2021",
+   "topic": "Computer Software",
+   "text": "Utility programs such as disk defragmenters and antivirus programs are classified as",
+   "options": [
+    "shareware",
+    "middleware",
+    "system software",
+    "application software"
+   ],
+   "answer": 2,
+   "explanation": "System software manages and maintains the computer itself. Application software serves end-user tasks, while shareware describes a licensing model, not a software class."
+  },
+  {
+   "id": "digital-technology-021",
+   "year": "2022",
+   "topic": "Input Devices",
+   "text": "Which input device is used to read pencil marks on multiple-choice answer sheets?",
+   "options": [
+    "Barcode reader",
+    "Magnetic ink character reader",
+    "Optical character reader",
+    "Optical mark reader"
+   ],
+   "answer": 3,
+   "explanation": "OMR detects marks in fixed positions on forms. OCR reads printed characters, MICR reads magnetic ink on cheques, and barcode readers read bar patterns."
+  },
+  {
+   "id": "digital-technology-022",
+   "year": "2023",
+   "topic": "Output Devices",
+   "text": "The resolution of a printer, which determines the sharpness of its output, is measured in",
+   "options": [
+    "pages per minute",
+    "hertz",
+    "dots per inch",
+    "bits per second"
+   ],
+   "answer": 2,
+   "explanation": "Dots per inch (dpi) measures print resolution. Pages per minute measures speed, bits per second measures data rate, and hertz measures frequency."
+  },
+  {
+   "id": "digital-technology-023",
+   "year": "2024",
+   "topic": "Operating Systems",
+   "text": "Which of the following operating systems is open-source software?",
+   "options": [
+    "Windows",
+    "Linux",
+    "iOS",
+    "macOS"
+   ],
+   "answer": 1,
+   "explanation": "Linux source code is freely available and modifiable. Windows, macOS and iOS are proprietary operating systems."
+  },
+  {
+   "id": "digital-technology-024",
+   "year": "2025",
+   "topic": "Computer Software",
+   "text": "Which of the following is an example of utility software?",
+   "options": [
+    "An antivirus program",
+    "A web browser",
+    "A word processor",
+    "A media player"
+   ],
+   "answer": 0,
+   "explanation": "An antivirus program maintains the system, so it is a utility. Word processors, browsers and media players are application software."
+  },
+  {
+   "id": "digital-technology-025",
+   "year": "2020",
+   "topic": "Application Packages",
+   "text": "In a spreadsheet, the formula =SUM(B2:B6) in cell B8 is copied to cell C8. The formula in C8 becomes",
+   "options": [
+    "=SUM(B3:B7)",
+    "=SUM(B2:B6)",
+    "=SUM(C2:C6)",
+    "=SUM(C3:C7)"
+   ],
+   "answer": 2,
+   "explanation": "Cell references are relative by default, so copying one column to the right shifts the column letters from B to C while the row numbers stay the same."
+  },
+  {
+   "id": "digital-technology-026",
+   "year": "2021",
+   "topic": "Databases",
+   "text": "In a relational database, the field that uniquely identifies each record in a table is the",
+   "options": [
+    "query",
+    "primary key",
+    "foreign key",
+    "form"
+   ],
+   "answer": 1,
+   "explanation": "A primary key value is unique for every record. A foreign key links tables, a query retrieves data, and a form is an input interface."
+  },
+  {
+   "id": "digital-technology-027",
+   "year": "2022",
+   "topic": "Application Packages",
+   "text": "In word processing, the feature that combines a standard letter with a list of names and addresses to produce personalised letters is",
+   "options": [
+    "mail merge",
+    "a template",
+    "a macro",
+    "a hyperlink"
+   ],
+   "answer": 0,
+   "explanation": "Mail merge joins a main document to a data source. A macro automates steps, a template is a reusable document format, and a hyperlink jumps to another location."
+  },
+  {
+   "id": "digital-technology-028",
+   "year": "2023",
+   "topic": "Application Packages",
+   "text": "In a spreadsheet, an absolute cell reference to cell A1 is written as",
+   "options": [
+    "A1",
+    "A$1",
+    "#A1",
+    "$A$1"
+   ],
+   "answer": 3,
+   "explanation": "Dollar signs fix both the column and the row, so $A$1 does not change when the formula is copied. A1 is relative and A$1 fixes only the row."
+  },
+  {
+   "id": "digital-technology-029",
+   "year": "2024",
+   "topic": "Internet",
+   "text": "In the email address ada@example.com, the part 'example.com' is the",
+   "options": [
+    "user name",
+    "protocol",
+    "domain name",
+    "password"
+   ],
+   "answer": 2,
+   "explanation": "An email address has the form username@domain. 'ada' is the user name and 'example.com' identifies the mail domain."
+  },
+  {
+   "id": "digital-technology-030",
+   "year": "2025",
+   "topic": "Computer Networks",
+   "text": "An IPv4 address is made up of how many bits?",
+   "options": [
+    "16 bits",
+    "32 bits",
+    "128 bits",
+    "64 bits"
+   ],
+   "answer": 1,
+   "explanation": "IPv4 addresses are 32-bit numbers, written as four decimal octets. IPv6 addresses are 128 bits."
+  },
+  {
+   "id": "digital-technology-031",
+   "year": "2020",
+   "topic": "Computer Networks",
+   "text": "In which network topology is every workstation connected to a central device, so that the failure of one cable affects only one workstation?",
+   "options": [
+    "Ring topology",
+    "Bus topology",
+    "Mesh topology",
+    "Star topology"
+   ],
+   "answer": 3,
+   "explanation": "In a star, each node has its own cable to a central switch or hub. In a bus or ring, a single cable fault can disrupt the whole network."
+  },
+  {
+   "id": "digital-technology-032",
+   "year": "2021",
+   "topic": "Internet",
+   "text": "Which protocol is used to transfer web pages from a web server to a browser?",
+   "options": [
+    "HTTP",
+    "SMTP",
+    "POP3",
+    "FTP"
+   ],
+   "answer": 0,
+   "explanation": "HTTP (HyperText Transfer Protocol) carries web pages. SMTP sends mail, POP3 retrieves mail, and FTP transfers files."
+  },
+  {
+   "id": "digital-technology-033",
+   "year": "2022",
+   "topic": "Computer Networks",
+   "text": "Which device forwards data packets between different networks using IP addresses?",
+   "options": [
+    "Hub",
+    "Repeater",
+    "Router",
+    "Switch"
+   ],
+   "answer": 2,
+   "explanation": "A router selects routes between networks using IP addresses. Switches and hubs operate within one network, and a repeater only regenerates signals."
+  },
+  {
+   "id": "digital-technology-034",
+   "year": "2023",
+   "topic": "Computer Networks",
+   "text": "Which type of network covers a city or a metropolitan area, larger than a LAN but smaller than a WAN?",
+   "options": [
+    "Wide Area Network",
+    "Personal Area Network",
+    "Local Area Network",
+    "Metropolitan Area Network"
+   ],
+   "answer": 3,
+   "explanation": "A MAN spans a city, e.g. a cable TV or city-wide network. A LAN covers one building, a WAN spans countries, and a PAN covers a few metres around a person."
+  },
+  {
+   "id": "digital-technology-035",
+   "year": "2024",
+   "topic": "Problem Solving",
+   "text": "The first step in solving a problem with a computer is to",
+   "options": [
+    "write the program code",
+    "understand and define the problem clearly",
+    "draw the flowchart",
+    "test the program"
+   ],
+   "answer": 1,
+   "explanation": "A problem must be understood and defined before an algorithm, flowchart or program can be designed correctly."
+  },
+  {
+   "id": "digital-technology-036",
+   "year": "2025",
+   "topic": "Programming",
+   "text": "A syntax error in a program is",
+   "options": [
+    "a violation of the grammar rules of the programming language",
+    "a crash caused by invalid data at run time",
+    "a failure of the computer hardware",
+    "an error in the logic of the algorithm"
+   ],
+   "answer": 0,
+   "explanation": "Syntax errors break language rules, e.g. a missing bracket, and are caught by the compiler. Logic errors produce wrong results without breaking rules."
+  },
+  {
+   "id": "digital-technology-037",
+   "year": "2020",
+   "topic": "Problem Solving",
+   "text": "In a flowchart, the symbol used to test a condition and branch the flow into two alternative paths is the",
+   "options": [
+    "rectangle",
+    "diamond",
+    "parallelogram",
+    "oval"
+   ],
+   "answer": 1,
+   "explanation": "The diamond represents a decision. The oval marks start/end, the rectangle a process, and the parallelogram input/output."
+  },
+  {
+   "id": "digital-technology-038",
+   "year": "2021",
+   "topic": "Programming",
+   "text": "A compiler differs from an interpreter in that a compiler",
+   "options": [
+    "requires no source code",
+    "translates the program one line at a time",
+    "translates the entire program before execution",
+    "runs only on mainframe computers"
+   ],
+   "answer": 2,
+   "explanation": "A compiler converts the whole source program into machine code first; an interpreter translates and executes one statement at a time."
+  },
+  {
+   "id": "digital-technology-039",
+   "year": "2022",
+   "topic": "Programming",
+   "text": "In pseudocode, which construct repeats a block of statements for as long as a stated condition remains true?",
+   "options": [
+    "WHILE loop",
+    "CASE statement",
+    "IF statement",
+    "Function call"
+   ],
+   "answer": 0,
+   "explanation": "A WHILE loop is a repetition construct controlled by a condition. IF and CASE make choices, and a function call runs a named subprogram once."
+  },
+  {
+   "id": "digital-technology-040",
+   "year": "2023",
+   "topic": "Programming Languages",
+   "text": "Which of the following is a low-level programming language?",
+   "options": [
+    "Python",
+    "Java",
+    "BASIC",
+    "Assembly language"
+   ],
+   "answer": 3,
+   "explanation": "Assembly language uses mnemonics close to machine code. Python, Java and BASIC are high-level languages, closer to human language."
+  },
+  {
+   "id": "digital-technology-041",
+   "year": "2024",
+   "topic": "Programming",
+   "text": "A variable in a computer program is best described as",
+   "options": [
+    "a named storage location whose value can change during execution",
+    "a single program instruction",
+    "an error message produced by the compiler",
+    "a fixed value that never changes"
+   ],
+   "answer": 0,
+   "explanation": "Variables hold values that may change while the program runs. Fixed values are constants."
+  },
+  {
+   "id": "digital-technology-042",
+   "year": "2025",
+   "topic": "Computer Security",
+   "text": "Encryption protects data by",
+   "options": [
+    "compressing it to a smaller size",
+    "deleting all other copies",
+    "converting it into a form that cannot be read without the decryption key",
+    "hiding the file name"
+   ],
+   "answer": 2,
+   "explanation": "Encryption scrambles data so only holders of the key can read it. Compression reduces size but does not protect secrecy."
+  },
+  {
+   "id": "digital-technology-043",
+   "year": "2020",
+   "topic": "Computer Security",
+   "text": "A malicious program that disguises itself as legitimate software but does not replicate itself is a",
+   "options": [
+    "virus",
+    "worm",
+    "ransomware",
+    "Trojan horse"
+   ],
+   "answer": 3,
+   "explanation": "A Trojan horse tricks the user into running it and does not self-replicate. Worms spread on their own, viruses attach to host files, and ransomware encrypts files for payment."
+  },
+  {
+   "id": "digital-technology-044",
+   "year": "2021",
+   "topic": "Computer Ethics",
+   "text": "Presenting another person's work obtained from the internet as one's own, without acknowledgement, is",
+   "options": [
+    "piracy",
+    "plagiarism",
+    "phishing",
+    "hacking"
+   ],
+   "answer": 1,
+   "explanation": "Plagiarism is taking credit for another's work. Piracy is unauthorised copying of software, hacking is unauthorised access, and phishing is fraudulent solicitation of data."
+  },
+  {
+   "id": "digital-technology-045",
+   "year": "2022",
+   "topic": "Computer Security",
+   "text": "A firewall protects a network primarily by",
+   "options": [
+    "backing up data automatically",
+    "removing viruses from email messages",
+    "encrypting all files on the network",
+    "controlling incoming and outgoing traffic according to security rules"
+   ],
+   "answer": 3,
+   "explanation": "A firewall inspects traffic against rules and blocks what is not allowed. Encryption, antivirus scanning and backup are separate security measures."
+  },
+  {
+   "id": "digital-technology-046",
+   "year": "2023",
+   "topic": "Computer Ethics",
+   "text": "Software piracy refers to the",
+   "options": [
+    "hacking into computer systems",
+    "writing of computer viruses",
+    "unauthorised copying or distribution of software",
+    "sending of unsolicited email"
+   ],
+   "answer": 2,
+   "explanation": "Piracy is the illegal duplication or sharing of software. Virus writing, hacking and spam are different forms of computer misuse."
+  },
+  {
+   "id": "digital-technology-047",
+   "year": "2024",
+   "topic": "Computer Security",
+   "text": "Phishing attacks aim primarily to",
+   "options": [
+    "slow down network traffic",
+    "trick users into revealing sensitive information",
+    "damage computer hardware",
+    "delete backup copies"
+   ],
+   "answer": 1,
+   "explanation": "Phishing uses fake messages or websites to harvest passwords and bank details. It targets people rather than hardware."
+  },
+  {
+   "id": "digital-technology-048",
+   "year": "2025",
+   "topic": "ICT Applications",
+   "text": "Which service allows voice telephone calls to be made over the internet?",
+   "options": [
+    "Voice over Internet Protocol",
+    "Simple Mail Transfer Protocol",
+    "HyperText Transfer Protocol",
+    "File Transfer Protocol"
+   ],
+   "answer": 0,
+   "explanation": "VoIP carries voice as data packets over IP networks. FTP transfers files, SMTP sends mail, and HTTP carries web pages."
+  },
+  {
+   "id": "digital-technology-049",
+   "year": "2020",
+   "topic": "Data Processing",
+   "text": "Which data processing method collects transactions into groups and processes them together at a scheduled time?",
+   "options": [
+    "Online processing",
+    "Batch processing",
+    "Interactive processing",
+    "Real-time processing"
+   ],
+   "answer": 1,
+   "explanation": "Batch processing accumulates similar transactions and runs them as a group, e.g. monthly payroll. Real-time and online processing handle each transaction immediately."
+  },
+  {
+   "id": "digital-technology-050",
+   "year": "2021",
+   "topic": "File Management",
+   "text": "Which backup type copies only the files that have changed since the last backup of any kind?",
+   "options": [
+    "Differential backup",
+    "Full backup",
+    "Mirror backup",
+    "Incremental backup"
+   ],
+   "answer": 3,
+   "explanation": "An incremental backup copies changes since the last backup (full or incremental). A differential backup copies changes since the last full backup."
+  },
+  {
+   "id": "digital-technology-051",
+   "year": "2022",
+   "topic": "ICT Applications",
+   "text": "Which of the following is an example of a cloud storage service?",
+   "options": [
+    "Google Drive",
+    "A hard disk drive",
+    "A DVD-ROM",
+    "A USB flash drive"
+   ],
+   "answer": 0,
+   "explanation": "Google Drive stores files on remote servers reached over the internet. Hard disks, DVD-ROMs and flash drives are local storage devices."
+  },
+  {
+   "id": "digital-technology-052",
+   "year": "2023",
+   "topic": "Databases",
+   "text": "In a database table, a single row of related data is also called a",
+   "options": [
+    "query",
+    "key",
+    "record",
+    "field"
+   ],
+   "answer": 2,
+   "explanation": "A row is a record about one entity, while a column is a field. A key identifies records and a query retrieves them."
+  },
+  {
+   "id": "digital-technology-053",
+   "year": "2024",
+   "topic": "File Management",
+   "text": "A file path specifies",
+   "options": [
+    "the author of a file",
+    "the location of a file within the directory structure",
+    "the size of a file in bytes",
+    "the date a file was created"
+   ],
+   "answer": 1,
+   "explanation": "A path lists the folders leading to a file, e.g. C:\\Users\\Ada\\report.docx. Size, author and date are file properties, not the path."
+  },
+  {
+   "id": "digital-technology-054",
+   "year": "2025",
+   "topic": "Computer Ethics",
+   "text": "The term 'digital divide' refers to",
+   "options": [
+    "a network topology",
+    "a type of computer virus",
+    "a programming error",
+    "the gap between those who have access to digital technology and those who do not"
+   ],
+   "answer": 3,
+   "explanation": "The digital divide describes unequal access to computers, the internet and digital skills between groups or regions."
+  },
+  {
+   "id": "digital-technology-055",
+   "year": "2020",
+   "topic": "Artificial Intelligence",
+   "text": "An artificial intelligence system that uses a knowledge base and inference rules to emulate the decision-making of a human expert is called",
+   "options": [
+    "an expert system",
+    "a neural network",
+    "a robotics controller",
+    "a genetic algorithm"
+   ],
+   "answer": 0,
+   "explanation": "Expert systems store human expertise as rules and facts and reason with them. Neural networks learn patterns from data, while robotics controllers drive physical machines."
+  },
+  {
+   "id": "digital-technology-056",
+   "year": "2021",
+   "topic": "Logic Circuits",
+   "text": "The output of an AND gate is 1 only when",
+   "options": [
+    "its inputs are different",
+    "any one of its inputs is 1",
+    "all its inputs are 1",
+    "all its inputs are 0"
+   ],
+   "answer": 2,
+   "explanation": "AND gives 1 only if every input is 1. OR gives 1 if any input is 1, and XOR gives 1 when inputs differ."
+  },
+  {
+   "id": "digital-technology-057",
+   "year": "2022",
+   "topic": "Computer Maintenance",
+   "text": "The main purpose of an uninterruptible power supply (UPS) is to",
+   "options": [
+    "provide temporary power during a mains failure",
+    "remove dust from the system unit",
+    "increase the processing speed of the CPU",
+    "cool the processor during heavy use"
+   ],
+   "answer": 0,
+   "explanation": "A UPS keeps the computer running briefly after a power cut so work can be saved and the system shut down safely. It does not speed up or cool the machine."
+  },
+  {
+   "id": "digital-technology-058",
+   "year": "2023",
+   "topic": "Robotics",
+   "text": "In a robot, the device that converts electrical signals into physical movement is called an",
+   "options": [
+    "controller",
+    "actuator",
+    "sensor",
+    "transducer"
+   ],
+   "answer": 1,
+   "explanation": "Actuators such as motors produce motion. Sensors detect conditions, the controller decides actions, and a transducer converts one form of energy to another."
+  },
+  {
+   "id": "digital-technology-059",
+   "year": "2024",
+   "topic": "Artificial Intelligence",
+   "text": "Machine learning is best described as a system that",
+   "options": [
+    "stores records in a database",
+    "routes packets across a network",
+    "improves its performance from data without being explicitly programmed for every case",
+    "assembles cars on a factory line"
+   ],
+   "answer": 2,
+   "explanation": "Machine learning algorithms find patterns in data and improve with experience, rather than following only fixed, pre-written rules."
+  },
+  {
+   "id": "digital-technology-060",
+   "year": "2025",
+   "topic": "Data Processing",
+   "text": "Verification of data differs from validation in that verification",
+   "options": [
+    "checks that data falls within an acceptable range",
+    "checks that data is of the correct type",
+    "checks that compulsory fields have been filled",
+    "confirms that data has been entered accurately, for example by double entry"
+   ],
+   "answer": 3,
+   "explanation": "Verification checks transcription accuracy, e.g. entering data twice and comparing. Range, type and presence checks are validation checks on reasonableness."
+  }
+ ]
+}

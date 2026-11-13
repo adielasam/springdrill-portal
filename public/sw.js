@@ -23,6 +23,7 @@ const PACK_URLS = [
   "/jamb-packs/english.json",
   "/jamb-packs/mathematics.json",
   "/jamb-packs/biology.json",
+  "/jamb-packs/digital-technology.json",
 ];
 
 const SHELL_URLS = [
