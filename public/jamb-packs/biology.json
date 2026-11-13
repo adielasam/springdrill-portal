@@ -1,0 +1,846 @@
+{
+ "subject": "Biology",
+ "version": 1,
+ "questions": [
+  {
+   "id": "biology-001",
+   "year": "2020",
+   "topic": "Living Organisms",
+   "text": "Which of the following is a characteristic of all living things?",
+   "options": [
+    "Movement from place to place",
+    "Irritability",
+    "Photosynthesis",
+    "Hibernation"
+   ],
+   "answer": 1,
+   "explanation": "All living things respond to stimuli (irritability). Movement, photosynthesis and hibernation are not shown by all living things."
+  },
+  {
+   "id": "biology-002",
+   "year": "2021",
+   "topic": "Living Organisms",
+   "text": "The organelle responsible for energy production in the cell is the ___.",
+   "options": [
+    "nucleus",
+    "ribosome",
+    "lysosome",
+    "mitochondrion"
+   ],
+   "answer": 3,
+   "explanation": "The mitochondrion is the site of aerobic respiration, which releases energy as ATP."
+  },
+  {
+   "id": "biology-003",
+   "year": "2022",
+   "topic": "Living Organisms",
+   "text": "Which of the following structures is found in plant cells but NOT in animal cells?",
+   "options": [
+    "Mitochondrion",
+    "Cell membrane",
+    "Chloroplast",
+    "Nucleus"
+   ],
+   "answer": 2,
+   "explanation": "Chloroplasts, which contain chlorophyll for photosynthesis, occur in plant cells but not in animal cells."
+  },
+  {
+   "id": "biology-004",
+   "year": "2023",
+   "topic": "Evolution Among Organisms",
+   "text": "Bacteria belong to the kingdom ___.",
+   "options": [
+    "Monera",
+    "Protista",
+    "Fungi",
+    "Plantae"
+   ],
+   "answer": 0,
+   "explanation": "In the five-kingdom classification, the prokaryotes (bacteria and blue-green algae) form the kingdom Monera."
+  },
+  {
+   "id": "biology-005",
+   "year": "2024",
+   "topic": "Evolution Among Organisms",
+   "text": "Which of the following organisms is a fungus?",
+   "options": [
+    "Spirogyra",
+    "Euglena",
+    "Paramecium",
+    "Rhizopus"
+   ],
+   "answer": 3,
+   "explanation": "Rhizopus (bread mould) is a fungus. Spirogyra is an alga, while Euglena and Paramecium are protists."
+  },
+  {
+   "id": "biology-006",
+   "year": "2025",
+   "topic": "Evolution Among Organisms",
+   "text": "The bryophytes are distinguished from the pteridophytes by the absence of ___.",
+   "options": [
+    "true vascular tissues",
+    "leaves",
+    "spores",
+    "chlorophyll"
+   ],
+   "answer": 0,
+   "explanation": "Mosses (bryophytes) lack true xylem and phloem, whereas ferns (pteridophytes) possess vascular tissues."
+  },
+  {
+   "id": "biology-007",
+   "year": "2020",
+   "topic": "Adaptations",
+   "text": "Countershading in fish is an adaptation for ___.",
+   "options": [
+    "faster swimming",
+    "protection from predators",
+    "finding food",
+    "reproduction"
+   ],
+   "answer": 1,
+   "explanation": "Countershading (dark above, light below) breaks up the fish's outline and camouflages it from predators."
+  },
+  {
+   "id": "biology-008",
+   "year": "2021",
+   "topic": "Adaptations",
+   "text": "In a termite colony, the caste responsible for reproduction is the ___.",
+   "options": [
+    "workers",
+    "soldiers",
+    "king and queen",
+    "nymphs"
+   ],
+   "answer": 2,
+   "explanation": "The king and queen are the reproductive caste; workers and soldiers are sterile."
+  },
+  {
+   "id": "biology-009",
+   "year": "2022",
+   "topic": "Internal Structure",
+   "text": "In a transverse section of a dicotyledonous stem, the vascular bundles are arranged in a ___.",
+   "options": [
+    "ring",
+    "scattered manner",
+    "single central column",
+    "star shape"
+   ],
+   "answer": 0,
+   "explanation": "In dicot stems the vascular bundles form a ring; in monocot stems they are scattered."
+  },
+  {
+   "id": "biology-010",
+   "year": "2023",
+   "topic": "Internal Structure",
+   "text": "The tissue that provides flexibility and support in young plant stems is ___.",
+   "options": [
+    "xylem",
+    "collenchyma",
+    "phloem",
+    "sclerenchyma"
+   ],
+   "answer": 1,
+   "explanation": "Collenchyma is a living supporting tissue that gives flexible strength; sclerenchyma is rigid and dead at maturity."
+  },
+  {
+   "id": "biology-011",
+   "year": "2024",
+   "topic": "Nutrition",
+   "text": "Photosynthesis takes place in the ___.",
+   "options": [
+    "mitochondrion",
+    "nucleus",
+    "chloroplast",
+    "vacuole"
+   ],
+   "answer": 2,
+   "explanation": "Photosynthesis occurs in the chloroplast, where chlorophyll traps sunlight."
+  },
+  {
+   "id": "biology-012",
+   "year": "2025",
+   "topic": "Nutrition",
+   "text": "Which of the following is a macro-element required by plants?",
+   "options": [
+    "Zinc",
+    "Boron",
+    "Copper",
+    "Nitrogen"
+   ],
+   "answer": 3,
+   "explanation": "Nitrogen is required in large amounts (a macro-element). Zinc, boron and copper are micro-elements needed in tiny amounts."
+  },
+  {
+   "id": "biology-013",
+   "year": "2020",
+   "topic": "Nutrition",
+   "text": "The food test for starch uses ___.",
+   "options": [
+    "iodine solution",
+    "Benedict's solution",
+    "Biuret reagent",
+    "Sudan III"
+   ],
+   "answer": 0,
+   "explanation": "Iodine solution turns blue-black in the presence of starch. Benedict's solution tests for reducing sugars."
+  },
+  {
+   "id": "biology-014",
+   "year": "2021",
+   "topic": "Nutrition",
+   "text": "The enzyme ptyalin in saliva acts on ___.",
+   "options": [
+    "proteins",
+    "starch",
+    "fats",
+    "vitamins"
+   ],
+   "answer": 1,
+   "explanation": "Ptyalin (salivary amylase) begins the digestion of starch, breaking it down to maltose."
+  },
+  {
+   "id": "biology-015",
+   "year": "2022",
+   "topic": "Transport",
+   "text": "In mammals, oxygenated blood is carried from the lungs to the heart by the ___.",
+   "options": [
+    "pulmonary artery",
+    "aorta",
+    "pulmonary vein",
+    "vena cava"
+   ],
+   "answer": 2,
+   "explanation": "The pulmonary vein is the only vein that carries oxygenated blood, from the lungs to the left atrium."
+  },
+  {
+   "id": "biology-016",
+   "year": "2023",
+   "topic": "Transport",
+   "text": "Water absorbed by the roots is transported to the leaves through the ___.",
+   "options": [
+    "phloem",
+    "cambium",
+    "epidermis",
+    "xylem"
+   ],
+   "answer": 3,
+   "explanation": "The xylem vessels carry water and mineral salts upwards; the phloem carries manufactured food."
+  },
+  {
+   "id": "biology-017",
+   "year": "2024",
+   "topic": "Transport",
+   "text": "The blood cells responsible for carrying oxygen are the ___.",
+   "options": [
+    "white blood cells",
+    "red blood cells",
+    "platelets",
+    "plasma cells"
+   ],
+   "answer": 1,
+   "explanation": "Red blood cells contain haemoglobin, which binds and carries oxygen."
+  },
+  {
+   "id": "biology-018",
+   "year": "2025",
+   "topic": "Transport",
+   "text": "The movement of water molecules from a dilute solution to a concentrated solution through a semi-permeable membrane is ___.",
+   "options": [
+    "diffusion",
+    "plasmolysis",
+    "osmosis",
+    "active transport"
+   ],
+   "answer": 2,
+   "explanation": "Osmosis is the movement of water molecules across a semi-permeable membrane from a dilute to a concentrated solution."
+  },
+  {
+   "id": "biology-019",
+   "year": "2020",
+   "topic": "Respiration",
+   "text": "The energy currency of the cell is ___.",
+   "options": [
+    "ATP",
+    "ADP",
+    "DNA",
+    "RNA"
+   ],
+   "answer": 0,
+   "explanation": "ATP (adenosine triphosphate) stores and supplies energy for cellular activities."
+  },
+  {
+   "id": "biology-020",
+   "year": "2021",
+   "topic": "Respiration",
+   "text": "Anaerobic respiration in yeast produces ___.",
+   "options": [
+    "lactic acid and energy",
+    "water and energy",
+    "oxygen and glucose",
+    "carbon dioxide, ethanol and energy"
+   ],
+   "answer": 3,
+   "explanation": "Yeast ferments glucose to ethanol and carbon dioxide, releasing energy, when oxygen is absent."
+  },
+  {
+   "id": "biology-021",
+   "year": "2022",
+   "topic": "Respiration",
+   "text": "Gaseous exchange in mammals takes place in the ___.",
+   "options": [
+    "bronchi",
+    "trachea",
+    "alveoli",
+    "diaphragm"
+   ],
+   "answer": 2,
+   "explanation": "The alveoli are the thin-walled air sacs where oxygen and carbon dioxide are exchanged with the blood."
+  },
+  {
+   "id": "biology-022",
+   "year": "2023",
+   "topic": "Excretion",
+   "text": "The functional unit of the mammalian kidney is the ___.",
+   "options": [
+    "neuron",
+    "alveolus",
+    "villus",
+    "nephron"
+   ],
+   "answer": 3,
+   "explanation": "The nephron is the structural and functional unit of the kidney, filtering blood and forming urine."
+  },
+  {
+   "id": "biology-023",
+   "year": "2024",
+   "topic": "Excretion",
+   "text": "The main nitrogenous waste product excreted by mammals is ___.",
+   "options": [
+    "ammonia",
+    "urea",
+    "uric acid",
+    "amino acid"
+   ],
+   "answer": 1,
+   "explanation": "Mammals convert toxic ammonia to urea in the liver and excrete it in urine."
+  },
+  {
+   "id": "biology-024",
+   "year": "2025",
+   "topic": "Support and Movement",
+   "text": "The movement of a plant shoot towards light is called ___.",
+   "options": [
+    "phototropism",
+    "geotropism",
+    "hydrotropism",
+    "thigmotropism"
+   ],
+   "answer": 0,
+   "explanation": "Phototropism is growth towards light; shoots are positively phototropic."
+  },
+  {
+   "id": "biology-025",
+   "year": "2020",
+   "topic": "Support and Movement",
+   "text": "The joint between the humerus and the radius and ulna (the elbow) is a ___ joint.",
+   "options": [
+    "ball-and-socket",
+    "pivot",
+    "gliding",
+    "hinge"
+   ],
+   "answer": 3,
+   "explanation": "The elbow is a hinge joint, allowing movement in one plane like a door hinge."
+  },
+  {
+   "id": "biology-026",
+   "year": "2021",
+   "topic": "Support and Movement",
+   "text": "The plant hormone mainly responsible for cell elongation in shoots is ___.",
+   "options": [
+    "auxin",
+    "gibberellin",
+    "cytokinin",
+    "abscisic acid"
+   ],
+   "answer": 0,
+   "explanation": "Auxins promote cell elongation in shoots and control tropic responses."
+  },
+  {
+   "id": "biology-027",
+   "year": "2022",
+   "topic": "Reproduction",
+   "text": "The transfer of pollen grains from the anther to the stigma of the same flower is ___.",
+   "options": [
+    "cross-pollination",
+    "self-pollination",
+    "fertilization",
+    "germination"
+   ],
+   "answer": 1,
+   "explanation": "Self-pollination is the transfer of pollen within the same flower (or the same plant)."
+  },
+  {
+   "id": "biology-028",
+   "year": "2023",
+   "topic": "Reproduction",
+   "text": "In flowering plants, double fertilization results in the formation of the ___.",
+   "options": [
+    "seed and fruit",
+    "pollen and ovule",
+    "zygote and endosperm",
+    "embryo and testa"
+   ],
+   "answer": 2,
+   "explanation": "One male gamete fuses with the egg to form the zygote, while the other fuses with the polar nuclei to form the endosperm."
+  },
+  {
+   "id": "biology-029",
+   "year": "2024",
+   "topic": "Reproduction",
+   "text": "Fertilization in mammals normally takes place in the ___.",
+   "options": [
+    "ovary",
+    "fallopian tube",
+    "uterus",
+    "vagina"
+   ],
+   "answer": 1,
+   "explanation": "The sperm meets and fertilizes the ovum in the fallopian tube (oviduct)."
+  },
+  {
+   "id": "biology-030",
+   "year": "2025",
+   "topic": "Reproduction",
+   "text": "Which of the following is a form of asexual reproduction in Hydra?",
+   "options": [
+    "Budding",
+    "Fission",
+    "Fragmentation",
+    "Spore formation"
+   ],
+   "answer": 0,
+   "explanation": "Hydra reproduces asexually by budding: a small outgrowth develops and detaches as a new individual."
+  },
+  {
+   "id": "biology-031",
+   "year": "2020",
+   "topic": "Growth",
+   "text": "Epigeal germination differs from hypogeal germination in that in epigeal germination the ___.",
+   "options": [
+    "cotyledons remain below the soil",
+    "radicle emerges first",
+    "plumule emerges first",
+    "cotyledons are carried above the soil"
+   ],
+   "answer": 3,
+   "explanation": "In epigeal germination the cotyledons are carried above the ground (e.g. beans); in hypogeal germination they stay below (e.g. maize)."
+  },
+  {
+   "id": "biology-032",
+   "year": "2021",
+   "topic": "Growth",
+   "text": "Which of the following conditions is NOT generally necessary for seed germination?",
+   "options": [
+    "Water",
+    "Oxygen",
+    "Light",
+    "Suitable temperature"
+   ],
+   "answer": 2,
+   "explanation": "Seeds generally require water, oxygen and a suitable temperature; light is not a general requirement for germination."
+  },
+  {
+   "id": "biology-033",
+   "year": "2022",
+   "topic": "Coordination and Control",
+   "text": "The part of the brain that controls balance and posture is the ___.",
+   "options": [
+    "cerebellum",
+    "cerebrum",
+    "medulla oblongata",
+    "hypothalamus"
+   ],
+   "answer": 0,
+   "explanation": "The cerebellum coordinates movement, balance and posture."
+  },
+  {
+   "id": "biology-034",
+   "year": "2023",
+   "topic": "Coordination and Control",
+   "text": "Insulin is produced by the ___.",
+   "options": [
+    "thyroid gland",
+    "adrenal gland",
+    "pituitary gland",
+    "islets of Langerhans in the pancreas"
+   ],
+   "answer": 3,
+   "explanation": "The beta cells of the islets of Langerhans in the pancreas secrete insulin, which lowers blood sugar."
+  },
+  {
+   "id": "biology-035",
+   "year": "2024",
+   "topic": "Coordination and Control",
+   "text": "A simple reflex action such as withdrawing the hand from a hot object is controlled by the ___.",
+   "options": [
+    "cerebrum",
+    "cerebellum",
+    "spinal cord",
+    "medulla"
+   ],
+   "answer": 2,
+   "explanation": "The reflex arc passes through the spinal cord, producing a rapid response without involving conscious thought."
+  },
+  {
+   "id": "biology-036",
+   "year": "2025",
+   "topic": "Factors Affecting Distribution",
+   "text": "The instrument used to measure the turbidity of water is the ___.",
+   "options": [
+    "rain gauge",
+    "secchi disc",
+    "thermometer",
+    "anemometer"
+   ],
+   "answer": 1,
+   "explanation": "The secchi disc is lowered into water to judge its clarity (turbidity)."
+  },
+  {
+   "id": "biology-037",
+   "year": "2020",
+   "topic": "Factors Affecting Distribution",
+   "text": "Which of the following is a biotic factor affecting the distribution of organisms?",
+   "options": [
+    "Temperature",
+    "Rainfall",
+    "Predation",
+    "Soil pH"
+   ],
+   "answer": 2,
+   "explanation": "Predation is a biotic (living) factor; temperature, rainfall and soil pH are abiotic factors."
+  },
+  {
+   "id": "biology-038",
+   "year": "2021",
+   "topic": "Symbiotic Interactions",
+   "text": "The association between a tick and a cow is an example of ___.",
+   "options": [
+    "mutualism",
+    "parasitism",
+    "commensalism",
+    "saprophytism"
+   ],
+   "answer": 1,
+   "explanation": "The tick benefits by feeding on the cow's blood while the cow is harmed, which is parasitism."
+  },
+  {
+   "id": "biology-039",
+   "year": "2022",
+   "topic": "Symbiotic Interactions",
+   "text": "In a food chain, green plants occupy the ___ trophic level.",
+   "options": [
+    "second",
+    "third",
+    "fourth",
+    "first"
+   ],
+   "answer": 3,
+   "explanation": "Green plants are producers and form the first trophic level, on which all other levels depend."
+  },
+  {
+   "id": "biology-040",
+   "year": "2023",
+   "topic": "Symbiotic Interactions",
+   "text": "The bacteria found in the root nodules of leguminous plants that fix atmospheric nitrogen are ___.",
+   "options": [
+    "nitrogen-fixing bacteria",
+    "denitrifying bacteria",
+    "putrefying bacteria",
+    "sulphur bacteria"
+   ],
+   "answer": 0,
+   "explanation": "Rhizobium bacteria in legume root nodules fix atmospheric nitrogen into forms plants can use."
+  },
+  {
+   "id": "biology-041",
+   "year": "2024",
+   "topic": "Natural Habitats",
+   "text": "Mangrove swamps are characterized by ___.",
+   "options": [
+    "fresh water only",
+    "waterlogged saline soils and stilt roots",
+    "dry sandy soils",
+    "permanent ice"
+   ],
+   "answer": 1,
+   "explanation": "Mangroves grow in waterlogged, salty coastal soils, and their trees have stilt roots and breathing roots."
+  },
+  {
+   "id": "biology-042",
+   "year": "2025",
+   "topic": "Natural Habitats",
+   "text": "Which of the following animals is adapted to arboreal life?",
+   "options": [
+    "Earthworm",
+    "Tilapia",
+    "Snail",
+    "Monkey"
+   ],
+   "answer": 3,
+   "explanation": "Monkeys live in trees (arboreal life), with grasping limbs and tails adapted for climbing."
+  },
+  {
+   "id": "biology-043",
+   "year": "2020",
+   "topic": "Local Biomes",
+   "text": "The natural vegetation of southern Nigeria is mainly ___.",
+   "options": [
+    "tropical rainforest",
+    "Sudan savanna",
+    "desert",
+    "montane forest"
+   ],
+   "answer": 0,
+   "explanation": "Southern Nigeria, with its high rainfall, is covered mainly by tropical rainforest."
+  },
+  {
+   "id": "biology-044",
+   "year": "2021",
+   "topic": "Local Biomes",
+   "text": "The Guinea savanna lies between the ___.",
+   "options": [
+    "desert and the rainforest",
+    "highlands and the coast",
+    "rainforest and the Sudan savanna",
+    "mangrove swamp and the desert"
+   ],
+   "answer": 2,
+   "explanation": "The Guinea savanna belt lies between the southern rainforest and the drier Sudan savanna to the north."
+  },
+  {
+   "id": "biology-045",
+   "year": "2022",
+   "topic": "Ecology of Populations",
+   "text": "Population density is defined as the number of individuals per unit ___.",
+   "options": [
+    "time",
+    "mass",
+    "birth rate",
+    "area or volume"
+   ],
+   "answer": 3,
+   "explanation": "Population density = number of individuals divided by the area (or volume) they occupy."
+  },
+  {
+   "id": "biology-046",
+   "year": "2023",
+   "topic": "Ecology of Populations",
+   "text": "The orderly and progressive replacement of one community by another until a stable climax community is reached is called ___.",
+   "options": [
+    "competition",
+    "migration",
+    "succession",
+    "adaptation"
+   ],
+   "answer": 2,
+   "explanation": "Ecological succession is the gradual change in community composition over time towards a stable climax."
+  },
+  {
+   "id": "biology-047",
+   "year": "2024",
+   "topic": "Soil",
+   "text": "Which soil type has the highest water-retaining capacity?",
+   "options": [
+    "Sandy soil",
+    "Clayey soil",
+    "Loamy soil",
+    "Gravelly soil"
+   ],
+   "answer": 1,
+   "explanation": "Clay particles are the smallest and pack closely, so clayey soil holds the most water."
+  },
+  {
+   "id": "biology-048",
+   "year": "2025",
+   "topic": "Soil",
+   "text": "The loss of soil nutrients by the downward movement of water through the soil is called ___.",
+   "options": [
+    "leaching",
+    "erosion",
+    "mulching",
+    "weathering"
+   ],
+   "answer": 0,
+   "explanation": "Leaching is the washing down of soluble nutrients below the reach of plant roots."
+  },
+  {
+   "id": "biology-049",
+   "year": "2020",
+   "topic": "Humans and Environment",
+   "text": "Cholera is caused by ___.",
+   "options": [
+    "a virus",
+    "a fungus",
+    "a protozoan",
+    "a bacterium"
+   ],
+   "answer": 3,
+   "explanation": "Cholera is caused by the bacterium Vibrio cholerae, spread through contaminated water and food."
+  },
+  {
+   "id": "biology-050",
+   "year": "2021",
+   "topic": "Humans and Environment",
+   "text": "The Anopheles mosquito is the vector of ___.",
+   "options": [
+    "cholera",
+    "tuberculosis",
+    "malaria",
+    "poliomyelitis"
+   ],
+   "answer": 2,
+   "explanation": "The female Anopheles mosquito transmits the Plasmodium parasite that causes malaria."
+  },
+  {
+   "id": "biology-051",
+   "year": "2022",
+   "topic": "Humans and Environment",
+   "text": "Which of the following is a method of conserving soil fertility?",
+   "options": [
+    "Crop rotation",
+    "Monoculture",
+    "Bush burning",
+    "Overgrazing"
+   ],
+   "answer": 0,
+   "explanation": "Crop rotation, especially including legumes, restores soil nutrients; the other practices deplete them."
+  },
+  {
+   "id": "biology-052",
+   "year": "2023",
+   "topic": "Variation in Population",
+   "text": "Height in humans is an example of ___ variation.",
+   "options": [
+    "discontinuous",
+    "continuous",
+    "physiological",
+    "environmental only"
+   ],
+   "answer": 1,
+   "explanation": "Height shows a continuous range of values influenced by many genes and the environment."
+  },
+  {
+   "id": "biology-053",
+   "year": "2024",
+   "topic": "Variation in Population",
+   "text": "A person with blood group O can donate red blood cells to a person with blood group ___.",
+   "options": [
+    "A, B, AB or O",
+    "O only",
+    "AB only",
+    "A only"
+   ],
+   "answer": 0,
+   "explanation": "Group O red cells carry no A or B antigens, so group O is the universal red-cell donor."
+  },
+  {
+   "id": "biology-054",
+   "year": "2025",
+   "topic": "Heredity",
+   "text": "The chromosome number in a normal human body cell is ___.",
+   "options": [
+    "23",
+    "44",
+    "48",
+    "46"
+   ],
+   "answer": 3,
+   "explanation": "Human body (somatic) cells contain 46 chromosomes in 23 pairs; gametes contain 23."
+  },
+  {
+   "id": "biology-055",
+   "year": "2020",
+   "topic": "Heredity",
+   "text": "In a cross between two heterozygous tall plants (Tt x Tt), the expected phenotypic ratio of tall to short offspring is ___.",
+   "options": [
+    "1:1",
+    "1:3",
+    "3:1",
+    "2:1"
+   ],
+   "answer": 2,
+   "explanation": "The cross gives TT, Tt, Tt and tt: three tall phenotypes to one short, a 3:1 ratio."
+  },
+  {
+   "id": "biology-056",
+   "year": "2021",
+   "topic": "Heredity",
+   "text": "Haemophilia is a ___.",
+   "options": [
+    "dominant autosomal disorder",
+    "sex-linked recessive disorder",
+    "sex-linked dominant disorder",
+    "non-heritable disease"
+   ],
+   "answer": 1,
+   "explanation": "Haemophilia is caused by a recessive gene carried on the X chromosome."
+  },
+  {
+   "id": "biology-057",
+   "year": "2022",
+   "topic": "Heredity",
+   "text": "The sex of a child is determined by the ___.",
+   "options": [
+    "father only",
+    "mother only",
+    "both parents equally",
+    "environment"
+   ],
+   "answer": 0,
+   "explanation": "The father's sperm carries either an X or a Y chromosome, which determines whether the child is female (XX) or male (XY)."
+  },
+  {
+   "id": "biology-058",
+   "year": "2023",
+   "topic": "Theories of Evolution",
+   "text": "The theory of evolution by natural selection was proposed by ___.",
+   "options": [
+    "Lamarck",
+    "Mendel",
+    "Linnaeus",
+    "Darwin"
+   ],
+   "answer": 3,
+   "explanation": "Charles Darwin proposed natural selection: organisms best adapted to their environment survive and reproduce."
+  },
+  {
+   "id": "biology-059",
+   "year": "2024",
+   "topic": "Theories of Evolution",
+   "text": "Lamarck's theory of evolution is based on the inheritance of ___.",
+   "options": [
+    "genetic mutations",
+    "natural selection",
+    "acquired characteristics",
+    "artificial selection"
+   ],
+   "answer": 2,
+   "explanation": "Lamarck proposed that characteristics acquired during an organism's lifetime could be inherited by its offspring."
+  },
+  {
+   "id": "biology-060",
+   "year": "2025",
+   "topic": "Evidence of Evolution",
+   "text": "The fossil record provides evidence for evolution by showing ___.",
+   "options": [
+    "that all organisms lived at the same time",
+    "the gradual changes in organisms over time",
+    "that evolution does not occur",
+    "the exact age of the earth"
+   ],
+   "answer": 1,
+   "explanation": "Fossils in successive rock layers show organisms changing gradually over geological time."
+  }
+ ]
+}

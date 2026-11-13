@@ -12,6 +12,7 @@ export function SiteFooter() {
         <div>
           <h3>Free tools</h3>
           <p><a href="/tools/remove-background">Background remover</a> — remove a photo background free, right in your browser. No sign-up, no watermark.</p>
+          <p><a href="/jamb-practice">JAMB practice</a> — free UTME practice sets with answers and explanations. No sign-up, works offline.</p>
         </div>
         <div className="sd-footer-credit">
           <p>SpringDrill is built by <a href="https://dorvastechnologies.vercel.app/">Dorvas Technologies</a></p>
