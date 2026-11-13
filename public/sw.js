@@ -24,6 +24,10 @@ const PACK_URLS = [
   "/jamb-packs/mathematics.json",
   "/jamb-packs/biology.json",
   "/jamb-packs/digital-technology.json",
+  "/jamb-packs/physics.json",
+  "/jamb-packs/chemistry.json",
+  "/jamb-packs/economics.json",
+  "/jamb-packs/government.json",
 ];
 
 const SHELL_URLS = [

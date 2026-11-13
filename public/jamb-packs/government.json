@@ -1,0 +1,846 @@
+{
+ "subject": "Government",
+ "version": 1,
+ "questions": [
+  {
+   "id": "government-001",
+   "year": "2020",
+   "topic": "Basic Concepts in Government",
+   "text": "Sovereignty is best defined as the",
+   "options": [
+    "right of citizens to vote",
+    "supreme and absolute power of the state",
+    "authority of the judiciary",
+    "power of the president"
+   ],
+   "answer": 1,
+   "explanation": "Sovereignty is the supreme, absolute and permanent power of the state over its territory, with no higher authority above it."
+  },
+  {
+   "id": "government-002",
+   "year": "2021",
+   "topic": "Basic Concepts in Government",
+   "text": "Legitimacy differs from power in that legitimacy refers to",
+   "options": [
+    "the control of the armed forces",
+    "the ability to use force",
+    "the possession of wealth",
+    "the acceptance of authority by the governed"
+   ],
+   "answer": 3,
+   "explanation": "Legitimacy is the recognised right to rule, accepted by the people. Power is the mere ability to compel obedience, with or without acceptance."
+  },
+  {
+   "id": "government-003",
+   "year": "2022",
+   "topic": "Basic Concepts in Government",
+   "text": "A nation differs from a state in that a nation is",
+   "options": [
+    "a government department",
+    "always independent, while a state is not",
+    "a people bound by common identity, while a state is a politically organised community with sovereignty",
+    "a larger political unit than a state"
+   ],
+   "answer": 2,
+   "explanation": "A nation is defined by shared culture, history or identity; a state adds territory, government and sovereignty. A nation may exist without a state of its own."
+  },
+  {
+   "id": "government-004",
+   "year": "2023",
+   "topic": "Basic Concepts in Government",
+   "text": "Political socialisation is the process by which citizens",
+   "options": [
+    "acquire political values, beliefs and attitudes",
+    "join political parties",
+    "contest elections",
+    "register to vote"
+   ],
+   "answer": 0,
+   "explanation": "Through family, school, peers and the media, individuals learn the political culture of their society. Voting, joining parties and contesting are forms of participation."
+  },
+  {
+   "id": "government-005",
+   "year": "2024",
+   "topic": "Basic Concepts in Government",
+   "text": "Authority differs from power because authority is",
+   "options": [
+    "power based on wealth",
+    "power that is recognised as legitimate",
+    "power without responsibility",
+    "power based on force alone"
+   ],
+   "answer": 1,
+   "explanation": "Authority is institutionalised, legitimate power that people accept as rightful. Raw power may rest on force or wealth without legitimacy."
+  },
+  {
+   "id": "government-006",
+   "year": "2025",
+   "topic": "Basic Concepts in Government",
+   "text": "The term 'state' in political science refers to",
+   "options": [
+    "the government of the day",
+    "a group of people with common ancestry",
+    "a province within a federation",
+    "a politically organised community with a definite territory, population, government and sovereignty"
+   ],
+   "answer": 3,
+   "explanation": "A state combines people, territory, government and sovereignty. A province is a sub-unit of a federation, and a government is only the machinery that runs the state."
+  },
+  {
+   "id": "government-007",
+   "year": "2020",
+   "topic": "Forms of Government",
+   "text": "A system of government in which power is held by a small group of wealthy or privileged people is known as",
+   "options": [
+    "democracy",
+    "theocracy",
+    "oligarchy",
+    "monarchy"
+   ],
+   "answer": 2,
+   "explanation": "Oligarchy is rule by a few. Democracy is rule by the people, monarchy is rule by a king or queen, and theocracy is rule by religious leaders."
+  },
+  {
+   "id": "government-008",
+   "year": "2021",
+   "topic": "Structures of Governance",
+   "text": "In a federal system of government, residual powers are exercised by the",
+   "options": [
+    "state or regional governments",
+    "central government only",
+    "judiciary",
+    "local governments only"
+   ],
+   "answer": 0,
+   "explanation": "Residual powers — matters not listed in the constitution — belong to the states in a federation such as Nigeria. Exclusive powers belong to the centre."
+  },
+  {
+   "id": "government-009",
+   "year": "2022",
+   "topic": "Forms of Government",
+   "text": "Rule by religious leaders in the name of a deity is known as",
+   "options": [
+    "aristocracy",
+    "republicanism",
+    "theocracy",
+    "autocracy"
+   ],
+   "answer": 2,
+   "explanation": "Theocracy is government by religious leaders claiming divine authority. Aristocracy is rule by nobles, autocracy by one absolute ruler, and republicanism by elected representatives."
+  },
+  {
+   "id": "government-010",
+   "year": "2023",
+   "topic": "Structures of Governance",
+   "text": "A confederal system of government is one in which",
+   "options": [
+    "the central government can override the states at will",
+    "sovereign states retain most powers and delegate only a few to a central body",
+    "all powers are held by the central government",
+    "powers are shared equally between centre and regions"
+   ],
+   "answer": 1,
+   "explanation": "In a confederation the component states are sovereign and the centre is weak, e.g. the former Senegambia. A unitary system concentrates power at the centre."
+  },
+  {
+   "id": "government-011",
+   "year": "2024",
+   "topic": "Systems of Governance",
+   "text": "In a presidential system of government, the president",
+   "options": [
+    "is chosen by the legislature",
+    "is a ceremonial head of state only",
+    "can be removed by a vote of no confidence",
+    "is both head of state and head of government"
+   ],
+   "answer": 3,
+   "explanation": "Nigeria's president combines both roles and is elected separately from the legislature for a fixed term, unlike a prime minister who depends on legislative confidence."
+  },
+  {
+   "id": "government-012",
+   "year": "2025",
+   "topic": "Forms of Government",
+   "text": "A republic is a state in which",
+   "options": [
+    "the head of state is elected and not a hereditary monarch",
+    "the military rules",
+    "one party controls all power",
+    "there is no written constitution"
+   ],
+   "answer": 0,
+   "explanation": "In a republic, sovereignty resides in the people and the head of state is chosen, usually by election, rather than inheriting the office."
+  },
+  {
+   "id": "government-013",
+   "year": "2020",
+   "topic": "Arms of Government",
+   "text": "The primary function of the legislature in a democratic state is to",
+   "options": [
+    "implement laws",
+    "interpret laws",
+    "enforce laws",
+    "make laws"
+   ],
+   "answer": 3,
+   "explanation": "The legislature makes laws, the executive implements them, and the judiciary interprets them."
+  },
+  {
+   "id": "government-014",
+   "year": "2021",
+   "topic": "Systems of Governance",
+   "text": "In a parliamentary system of government, the head of government is the",
+   "options": [
+    "president",
+    "prime minister",
+    "chief justice",
+    "speaker of parliament"
+   ],
+   "answer": 1,
+   "explanation": "The prime minister, drawn from the legislature, heads the government in a parliamentary system. A president heads the government in a presidential system."
+  },
+  {
+   "id": "government-015",
+   "year": "2022",
+   "topic": "Arms of Government",
+   "text": "The independence of the judiciary is best guaranteed by",
+   "options": [
+    "security of tenure and adequate remuneration of judges",
+    "appointment of judges by the president",
+    "control of the courts by the legislature",
+    "election of judges by the people"
+   ],
+   "answer": 0,
+   "explanation": "Judges who cannot be removed arbitrarily and are well paid can decide cases without fear or favour. Executive control over the courts undermines independence."
+  },
+  {
+   "id": "government-016",
+   "year": "2023",
+   "topic": "Political Ideologies",
+   "text": "The political ideology that advocates collective ownership of the means of production is",
+   "options": [
+    "capitalism",
+    "feudalism",
+    "socialism",
+    "fascism"
+   ],
+   "answer": 2,
+   "explanation": "Socialism places major means of production under public or collective ownership. Capitalism favours private ownership, feudalism is based on land and lordship, and fascism on extreme nationalism and dictatorship."
+  },
+  {
+   "id": "government-017",
+   "year": "2024",
+   "topic": "Constitution",
+   "text": "Which of the following is a source of a constitution?",
+   "options": [
+    "Judicial precedents",
+    "Political manifestos",
+    "Party constitutions",
+    "Newspaper editorials"
+   ],
+   "answer": 0,
+   "explanation": "Court decisions interpreting the law form part of constitutional sources, along with statutes, conventions and customs. Party constitutions and editorials are not sources of the national constitution."
+  },
+  {
+   "id": "government-018",
+   "year": "2025",
+   "topic": "Arms of Government",
+   "text": "The Nigerian National Assembly consists of the Senate and the",
+   "options": [
+    "House of Chiefs",
+    "Federal Executive Council",
+    "House of Representatives",
+    "Council of States"
+   ],
+   "answer": 2,
+   "explanation": "The National Assembly is bicameral: the Senate with 109 members and the House of Representatives with 360 members."
+  },
+  {
+   "id": "government-019",
+   "year": "2020",
+   "topic": "Constitutional Development in Nigeria",
+   "text": "The Clifford Constitution of 1922 is notable because it introduced",
+   "options": [
+    "regional government",
+    "a federal system",
+    "universal adult suffrage",
+    "the elective principle into Nigeria"
+   ],
+   "answer": 3,
+   "explanation": "The Clifford Constitution allowed the election of four members to the Legislative Council — three for Lagos and one for Calabar — the first elections in Nigeria."
+  },
+  {
+   "id": "government-020",
+   "year": "2021",
+   "topic": "Constitutional Development in Nigeria",
+   "text": "The Lyttleton Constitution of 1954 is significant because it",
+   "options": [
+    "created twelve states",
+    "established a true federal system in Nigeria",
+    "introduced the elective principle",
+    "granted independence to Nigeria"
+   ],
+   "answer": 1,
+   "explanation": "The 1954 Constitution made Nigeria a federation, with regional governments exercising residual powers and Lagos as a federal territory. Independence came in 1960."
+  },
+  {
+   "id": "government-021",
+   "year": "2022",
+   "topic": "Constitutional Development in Nigeria",
+   "text": "The Richards Constitution of 1946 was criticised mainly because it",
+   "options": [
+    "granted independence immediately",
+    "abolished the legislative council",
+    "was imposed without consulting Nigerians",
+    "introduced federalism too early"
+   ],
+   "answer": 2,
+   "explanation": "The Richards Constitution was drawn up in London with little Nigerian input, though it did introduce regional councils. It did not introduce federalism or independence."
+  },
+  {
+   "id": "government-022",
+   "year": "2023",
+   "topic": "Constitutional Development in Nigeria",
+   "text": "Nigeria became a republic in",
+   "options": [
+    "1960",
+    "1963",
+    "1966",
+    "1979"
+   ],
+   "answer": 1,
+   "explanation": "The 1963 Republican Constitution replaced the Queen with a Nigerian president as head of state. Independence was in 1960 and the first military coup in 1966."
+  },
+  {
+   "id": "government-023",
+   "year": "2024",
+   "topic": "Principles of Democratic Government",
+   "text": "The doctrine of separation of powers is best associated with",
+   "options": [
+    "Montesquieu",
+    "John Locke",
+    "Jean Bodin",
+    "Thomas Hobbes"
+   ],
+   "answer": 0,
+   "explanation": "Montesquieu's 'The Spirit of the Laws' (1748) argued for separating legislative, executive and judicial powers to prevent tyranny."
+  },
+  {
+   "id": "government-024",
+   "year": "2025",
+   "topic": "Constitutional Development in Nigeria",
+   "text": "The Macpherson Constitution of 1951 introduced",
+   "options": [
+    "an executive presidency",
+    "a true federal system",
+    "universal adult suffrage",
+    "regional legislatures and a central Council of Ministers"
+   ],
+   "answer": 3,
+   "explanation": "The 1951 Constitution created regional Houses of Assembly and a Council of Ministers at the centre, but retained a unitary framework; true federalism came in 1954."
+  },
+  {
+   "id": "government-025",
+   "year": "2020",
+   "topic": "Pre-colonial Polities",
+   "text": "The pre-colonial Igbo political system is best described as",
+   "options": [
+    "acephalous, with authority shared by village assemblies and age grades",
+    "highly centralised under a single king",
+    "a feudal system under emirs",
+    "a theocracy ruled by priests"
+   ],
+   "answer": 0,
+   "explanation": "Igbo society had no single centralised ruler; decisions were taken by the village assembly, council of elders, age grades and title holders."
+  },
+  {
+   "id": "government-026",
+   "year": "2021",
+   "topic": "Political Development in Nigeria",
+   "text": "The first military coup in Nigeria took place in",
+   "options": [
+    "1983",
+    "1966",
+    "1975",
+    "1960"
+   ],
+   "answer": 1,
+   "explanation": "The January 1966 coup led by Major Nzeogwu ended the First Republic. Later coups occurred in 1975, 1983, 1985 and 1993."
+  },
+  {
+   "id": "government-027",
+   "year": "2022",
+   "topic": "Pre-colonial Polities",
+   "text": "In the pre-colonial Yoruba political system, the body that could check the powers of the Alaafin of Oyo was the",
+   "options": [
+    "Village assembly",
+    "Age grade",
+    "Emirate council",
+    "Oyomesi"
+   ],
+   "answer": 3,
+   "explanation": "The Oyomesi, a council of seven chiefs led by the Bashorun, could reject the Alaafin's decisions and order his suicide, providing a real check on his power."
+  },
+  {
+   "id": "government-028",
+   "year": "2023",
+   "topic": "Federalism in Nigeria",
+   "text": "The principle that 13% of oil revenue should go directly to oil-producing states is known as",
+   "options": [
+    "equality of states",
+    "need",
+    "derivation",
+    "national interest"
+   ],
+   "answer": 2,
+   "explanation": "The derivation principle, in the 1999 Constitution, returns 13% of revenue from natural resources to the states where they are derived."
+  },
+  {
+   "id": "government-029",
+   "year": "2024",
+   "topic": "Constitutional Development in Nigeria",
+   "text": "The 1979 Constitution of Nigeria introduced",
+   "options": [
+    "the elective principle",
+    "the parliamentary system",
+    "a one-party system",
+    "the presidential system of government"
+   ],
+   "answer": 3,
+   "explanation": "The 1979 Constitution replaced the parliamentary system with an American-style executive presidency, an executive president and the federal character principle."
+  },
+  {
+   "id": "government-030",
+   "year": "2025",
+   "topic": "Federalism in Nigeria",
+   "text": "Under the 1999 Constitution, matters on the Exclusive Legislative List can be legislated upon only by the",
+   "options": [
+    "State Houses of Assembly",
+    "National Assembly",
+    "Supreme Court",
+    "local government councils"
+   ],
+   "answer": 1,
+   "explanation": "The Exclusive List — defence, currency, aviation, customs — is reserved to the federal legislature. State assemblies legislate on residual matters and share the Concurrent List."
+  },
+  {
+   "id": "government-031",
+   "year": "2020",
+   "topic": "Principles of Democratic Government",
+   "text": "The principle that no person is above the law and that all are equal before the law is known as",
+   "options": [
+    "federal character",
+    "popular sovereignty",
+    "the rule of law",
+    "separation of powers"
+   ],
+   "answer": 2,
+   "explanation": "The rule of law means laws apply equally to rulers and ruled. Separation of powers divides government functions, and federal character concerns fair representation."
+  },
+  {
+   "id": "government-032",
+   "year": "2021",
+   "topic": "Citizenship",
+   "text": "A Nigerian citizen by birth can acquire the citizenship of another country without losing Nigerian citizenship because the 1999 Constitution permits",
+   "options": [
+    "dual citizenship for citizens by birth",
+    "dual citizenship for all citizens",
+    "renunciation of citizenship",
+    "deprivation of citizenship"
+   ],
+   "answer": 0,
+   "explanation": "Section 28 of the 1999 Constitution allows a Nigerian by birth to hold dual citizenship; a citizen by registration or naturalisation who takes another citizenship forfeits Nigerian citizenship."
+  },
+  {
+   "id": "government-033",
+   "year": "2022",
+   "topic": "Constitution",
+   "text": "A constitution that can only be amended through a special and difficult procedure is described as",
+   "options": [
+    "flexible",
+    "rigid",
+    "unitary",
+    "unwritten"
+   ],
+   "answer": 1,
+   "explanation": "A rigid constitution requires special majorities or procedures for amendment, as with Nigeria's 1999 Constitution. A flexible constitution is amended like ordinary law."
+  },
+  {
+   "id": "government-034",
+   "year": "2023",
+   "topic": "Local Government",
+   "text": "The 1976 local government reform in Nigeria is significant because it",
+   "options": [
+    "abolished local government councils",
+    "gave local governments control of the police",
+    "introduced the presidential system",
+    "created a uniform system of local government throughout the federation"
+   ],
+   "answer": 3,
+   "explanation": "The 1976 reform standardised local government structure, functions and funding nationwide, recognising local government as a third tier of government."
+  },
+  {
+   "id": "government-035",
+   "year": "2024",
+   "topic": "Political Development in Nigeria",
+   "text": "The annulment of the 12 June 1993 presidential election, believed to have been won by Moshood Abiola, was carried out by the regime of",
+   "options": [
+    "General Muhammadu Buhari",
+    "General Sani Abacha",
+    "General Ibrahim Babangida",
+    "General Abdulsalami Abubakar"
+   ],
+   "answer": 2,
+   "explanation": "The Babangida regime annulled the 12 June 1993 election. Abacha later detained Abiola, and Abdulsalami conducted the transition to the Fourth Republic in 1999."
+  },
+  {
+   "id": "government-036",
+   "year": "2025",
+   "topic": "Political Development in Nigeria",
+   "text": "The creation of twelve states in Nigeria in 1967 was carried out by the regime of",
+   "options": [
+    "General Yakubu Gowon",
+    "General Murtala Mohammed",
+    "General Ibrahim Babangida",
+    "General Olusegun Obasanjo"
+   ],
+   "answer": 0,
+   "explanation": "Gowon replaced the four regions with twelve states in May 1967, on the eve of the civil war. Murtala created seven more states in 1976."
+  },
+  {
+   "id": "government-037",
+   "year": "2020",
+   "topic": "The Electoral Process",
+   "text": "The minimum voting age in Nigeria is",
+   "options": [
+    "21 years",
+    "16 years",
+    "25 years",
+    "18 years"
+   ],
+   "answer": 3,
+   "explanation": "Under the 1999 Constitution and the Electoral Act, every Nigerian citizen aged 18 and above is entitled to register and vote."
+  },
+  {
+   "id": "government-038",
+   "year": "2021",
+   "topic": "The Electoral Process",
+   "text": "The electoral system in which the candidate with the highest number of votes wins, even without an absolute majority, is the",
+   "options": [
+    "first-past-the-post system",
+    "second ballot system",
+    "alternative vote system",
+    "proportional representation system"
+   ],
+   "answer": 0,
+   "explanation": "First-past-the-post, used in Nigeria's legislative elections, awards the seat to the plurality winner. Proportional representation allocates seats by vote share."
+  },
+  {
+   "id": "government-039",
+   "year": "2022",
+   "topic": "Processes of Legislation",
+   "text": "Laws made by a body other than the legislature under powers delegated to it by the legislature are called",
+   "options": [
+    "decrees",
+    "delegated legislation",
+    "by-laws only",
+    "edicts"
+   ],
+   "answer": 1,
+   "explanation": "Delegated legislation includes regulations, orders and rules made by ministers or agencies under an enabling Act. Decrees are military laws and edicts are state military laws."
+  },
+  {
+   "id": "government-040",
+   "year": "2023",
+   "topic": "The Civil Service",
+   "text": "Which of the following is a characteristic of the civil service?",
+   "options": [
+    "Temporary tenure",
+    "Profit-making",
+    "Permanence",
+    "Partisanship"
+   ],
+   "answer": 2,
+   "explanation": "Civil servants remain in office despite changes of government, giving continuity. They are expected to be neutral, anonymous and expert, not partisan or profit-seeking."
+  },
+  {
+   "id": "government-041",
+   "year": "2024",
+   "topic": "Citizenship",
+   "text": "Citizenship by naturalisation in Nigeria requires, among other conditions, that the applicant must have",
+   "options": [
+    "been born in Nigeria",
+    "married a Nigerian citizen",
+    "served in the armed forces",
+    "resided in Nigeria for a continuous period of fifteen years"
+   ],
+   "answer": 3,
+   "explanation": "Under the 1999 Constitution, naturalisation requires fifteen years' continuous residence, good character, and willingness to renounce other citizenship and take an oath of allegiance."
+  },
+  {
+   "id": "government-042",
+   "year": "2025",
+   "topic": "Principles of Democratic Government",
+   "text": "The principle of checks and balances ensures that",
+   "options": [
+    "each arm of government can limit the powers of the others",
+    "the judiciary makes the laws",
+    "the executive controls the legislature",
+    "power is concentrated in one arm"
+   ],
+   "answer": 0,
+   "explanation": "Checks and balances let each arm restrain the others — e.g. the legislature approves budgets and the courts can declare laws unconstitutional."
+  },
+  {
+   "id": "government-043",
+   "year": "2020",
+   "topic": "Political Parties",
+   "text": "The first political party in Nigeria was the",
+   "options": [
+    "Northern People's Congress (NPC)",
+    "Nigerian National Democratic Party (NNDP)",
+    "National Council of Nigeria and the Cameroons (NCNC)",
+    "Action Group (AG)"
+   ],
+   "answer": 1,
+   "explanation": "The NNDP was founded by Herbert Macaulay in 1923, following the elective principle. The NCNC came in 1944, and the AG and NPC in 1951."
+  },
+  {
+   "id": "government-044",
+   "year": "2021",
+   "topic": "Pressure Groups",
+   "text": "The Nigeria Labour Congress (NLC) is best classified as",
+   "options": [
+    "a political party",
+    "an arm of government",
+    "a pressure group",
+    "a government agency"
+   ],
+   "answer": 2,
+   "explanation": "The NLC presses government on workers' interests without seeking political office itself, which is the defining feature of a pressure group."
+  },
+  {
+   "id": "government-045",
+   "year": "2022",
+   "topic": "Political Parties and Party Systems",
+   "text": "A one-party system is characterised by",
+   "options": [
+    "many parties competing freely",
+    "only one political party being legally permitted to operate",
+    "two dominant parties",
+    "the absence of elections"
+   ],
+   "answer": 1,
+   "explanation": "In a one-party system a single party is legally allowed, as in some post-independence African states. Two dominant parties make a two-party system."
+  },
+  {
+   "id": "government-046",
+   "year": "2023",
+   "topic": "Public Commissions",
+   "text": "The body responsible for conducting elections into federal and state offices in Nigeria is the",
+   "options": [
+    "Federal Character Commission",
+    "National Population Commission",
+    "Public Complaints Commission",
+    "Independent National Electoral Commission"
+   ],
+   "answer": 3,
+   "explanation": "INEC, established in 1998, conducts elections, registers voters and political parties, and delimits constituencies."
+  },
+  {
+   "id": "government-047",
+   "year": "2024",
+   "topic": "The Electoral Process",
+   "text": "The body that registered voters and conducted the 1979 general elections in Nigeria was the",
+   "options": [
+    "Federal Electoral Commission (FEDECO)",
+    "National Electoral Commission",
+    "Independent National Electoral Commission",
+    "State Electoral Commission"
+   ],
+   "answer": 0,
+   "explanation": "FEDECO ran the 1979 transition elections. INEC, created in 1998, runs elections in the Fourth Republic."
+  },
+  {
+   "id": "government-048",
+   "year": "2025",
+   "topic": "The Electoral Process",
+   "text": "For a candidate to win the Nigerian presidential election at the first ballot, the candidate must secure the highest number of votes and at least 25% of the votes in",
+   "options": [
+    "all 36 states",
+    "the six geo-political zones",
+    "two-thirds of the states and the Federal Capital Territory",
+    "half of the states"
+   ],
+   "answer": 2,
+   "explanation": "Section 134 of the 1999 Constitution requires the spread of 25% in at least two-thirds of the states and the FCT, ensuring broad national support."
+  },
+  {
+   "id": "government-049",
+   "year": "2020",
+   "topic": "International Organisations",
+   "text": "The headquarters of the African Union is situated in",
+   "options": [
+    "Abuja",
+    "Accra",
+    "Nairobi",
+    "Addis Ababa"
+   ],
+   "answer": 3,
+   "explanation": "The African Union, successor to the OAU in 2002, has its headquarters in Addis Ababa, Ethiopia. ECOWAS is headquartered in Abuja."
+  },
+  {
+   "id": "government-050",
+   "year": "2021",
+   "topic": "International Organisations",
+   "text": "The United Nations was founded in",
+   "options": [
+    "1960",
+    "1945",
+    "1963",
+    "1919"
+   ],
+   "answer": 1,
+   "explanation": "The UN was established in 1945 after the Second World War, replacing the League of Nations founded in 1919."
+  },
+  {
+   "id": "government-051",
+   "year": "2022",
+   "topic": "International Organisations",
+   "text": "ECOWAS was established by the Treaty of Lagos in",
+   "options": [
+    "1985",
+    "1963",
+    "1975",
+    "1960"
+   ],
+   "answer": 2,
+   "explanation": "The Economic Community of West African States was founded in 1975 to promote economic integration in West Africa."
+  },
+  {
+   "id": "government-052",
+   "year": "2023",
+   "topic": "International Organisations",
+   "text": "The headquarters of OPEC is located in",
+   "options": [
+    "Vienna",
+    "London",
+    "New York",
+    "Geneva"
+   ],
+   "answer": 0,
+   "explanation": "OPEC's secretariat is in Vienna, Austria. The UN headquarters is in New York and the Commonwealth secretariat in London."
+  },
+  {
+   "id": "government-053",
+   "year": "2024",
+   "topic": "International Organisations",
+   "text": "The five permanent members of the United Nations Security Council are the USA, UK, France, Russia and",
+   "options": [
+    "Japan",
+    "India",
+    "China",
+    "Germany"
+   ],
+   "answer": 2,
+   "explanation": "The five permanent members, each holding the veto, are the USA, UK, France, Russia and China."
+  },
+  {
+   "id": "government-054",
+   "year": "2025",
+   "topic": "International Organisations",
+   "text": "The Commonwealth of Nations is headed by the",
+   "options": [
+    "President of the USA",
+    "Secretary-General of the UN",
+    "Prime Minister of Canada",
+    "British monarch"
+   ],
+   "answer": 3,
+   "explanation": "The British monarch is the symbolic Head of the Commonwealth, a voluntary association of 56 states, most of them former British territories."
+  },
+  {
+   "id": "government-055",
+   "year": "2020",
+   "topic": "Foreign Policy",
+   "text": "The main focus of Nigeria's foreign policy since independence has been",
+   "options": [
+    "America-centred",
+    "Africa-centred",
+    "Europe-centred",
+    "Asia-centred"
+   ],
+   "answer": 1,
+   "explanation": "Nigeria's foreign policy has consistently placed Africa at its centre, supporting decolonisation, African unity and regional integration."
+  },
+  {
+   "id": "government-056",
+   "year": "2021",
+   "topic": "Foreign Policy",
+   "text": "Nigeria's membership of OPEC dates back to",
+   "options": [
+    "1971",
+    "1975",
+    "1985",
+    "1960"
+   ],
+   "answer": 0,
+   "explanation": "Nigeria joined the Organisation of the Petroleum Exporting Countries in 1971, eleven years after OPEC's founding in 1960."
+  },
+  {
+   "id": "government-057",
+   "year": "2022",
+   "topic": "Foreign Policy",
+   "text": "The principle of non-alignment in foreign policy means that a country",
+   "options": [
+    "avoids all foreign trade",
+    "has no foreign policy",
+    "refuses to join international organisations",
+    "does not formally align with any major power bloc"
+   ],
+   "answer": 3,
+   "explanation": "Non-alignment means independence of judgement in world affairs rather than loyalty to a bloc; Nigeria practised it while joining the UN, AU and Commonwealth."
+  },
+  {
+   "id": "government-058",
+   "year": "2023",
+   "topic": "Foreign Policy",
+   "text": "Nigeria's foreign policy objectives are stated in the 1999 Constitution under the",
+   "options": [
+    "Preamble only",
+    "Fundamental Human Rights chapter",
+    "Fundamental Objectives and Directive Principles of State Policy",
+    "Exclusive Legislative List"
+   ],
+   "answer": 2,
+   "explanation": "Section 19, in Chapter II of the 1999 Constitution, sets out foreign policy objectives including African unity, non-alignment and world peace."
+  },
+  {
+   "id": "government-059",
+   "year": "2024",
+   "topic": "Foreign Policy",
+   "text": "The ECOMOG military intervention force was established by",
+   "options": [
+    "ECOWAS",
+    "the United Nations",
+    "the African Union",
+    "the Commonwealth"
+   ],
+   "answer": 0,
+   "explanation": "ECOMOG, the ECOWAS Monitoring Group, intervened in Liberia and Sierra Leone in the 1990s to restore peace."
+  },
+  {
+   "id": "government-060",
+   "year": "2025",
+   "topic": "Foreign Policy",
+   "text": "Nigeria's Afrocentric foreign policy was most clearly demonstrated by its leading role in",
+   "options": [
+    "the Korean War",
+    "the liberation struggle in Southern Africa",
+    "the Suez crisis",
+    "the formation of NATO"
+   ],
+   "answer": 1,
+   "explanation": "Nigeria championed decolonisation and the anti-apartheid struggle, including the nationalisation of British Petroleum's Nigerian interests in 1979 and support for frontline states."
+  }
+ ]
+}

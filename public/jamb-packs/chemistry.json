@@ -1,0 +1,846 @@
+{
+ "subject": "Chemistry",
+ "version": 1,
+ "questions": [
+  {
+   "id": "chemistry-001",
+   "year": "2020",
+   "topic": "Chemical Combination",
+   "text": "How many moles are present in 8 g of oxygen gas, O₂? [O = 16]",
+   "options": [
+    "0.25 mol",
+    "2 mol",
+    "0.5 mol",
+    "4 mol"
+   ],
+   "answer": 0,
+   "explanation": "Molar mass of O₂ = 32 g/mol, so amount = 8 ÷ 32 = 0.25 mol."
+  },
+  {
+   "id": "chemistry-002",
+   "year": "2021",
+   "topic": "Chemical Combination",
+   "text": "A compound contains 40% carbon, 6.7% hydrogen and 53.3% oxygen by mass. Its empirical formula is [C = 12, H = 1, O = 16]",
+   "options": [
+    "CHO",
+    "C₂H₂O",
+    "CH₂O",
+    "C₂H₄O₂"
+   ],
+   "answer": 2,
+   "explanation": "Mole ratios: C = 40/12 = 3.33, H = 6.7/1 = 6.7, O = 53.3/16 = 3.33, giving the simplest ratio 1:2:1, i.e. CH₂O."
+  },
+  {
+   "id": "chemistry-003",
+   "year": "2022",
+   "topic": "Chemical Combination",
+   "text": "In the reaction 2H₂ + O₂ → 2H₂O, the mass of water formed from 4 g of hydrogen is [H = 1, O = 16]",
+   "options": [
+    "9 g",
+    "36 g",
+    "72 g",
+    "18 g"
+   ],
+   "answer": 1,
+   "explanation": "4 g of H₂ is 2 moles, which forms 2 moles of water: 2 × 18 = 36 g."
+  },
+  {
+   "id": "chemistry-004",
+   "year": "2023",
+   "topic": "Chemical Combination",
+   "text": "The volume occupied by 0.5 mole of carbon(IV) oxide at standard temperature and pressure is [molar volume = 22.4 dm³]",
+   "options": [
+    "22.4 dm³",
+    "44.8 dm³",
+    "5.6 dm³",
+    "11.2 dm³"
+   ],
+   "answer": 3,
+   "explanation": "Volume = 0.5 × 22.4 = 11.2 dm³ at s.t.p."
+  },
+  {
+   "id": "chemistry-005",
+   "year": "2024",
+   "topic": "Kinetic Theory and Gas Laws",
+   "text": "The vapour density of a gas is 22. Its relative molecular mass is",
+   "options": [
+    "22",
+    "44",
+    "11",
+    "88"
+   ],
+   "answer": 1,
+   "explanation": "Relative molecular mass = 2 × vapour density = 2 × 22 = 44."
+  },
+  {
+   "id": "chemistry-006",
+   "year": "2025",
+   "topic": "Kinetic Theory and Gas Laws",
+   "text": "Using the ideal gas equation PV = nRT, the volume occupied by 1 mole of an ideal gas at 273 K and 1 atm pressure is approximately [R = 0.0821 dm³ atm/mol K]",
+   "options": [
+    "11.2 dm³",
+    "24.0 dm³",
+    "2.24 dm³",
+    "22.4 dm³"
+   ],
+   "answer": 3,
+   "explanation": "V = nRT/P = 1 × 0.0821 × 273 ÷ 1 = 22.4 dm³, the molar volume at s.t.p."
+  },
+  {
+   "id": "chemistry-007",
+   "year": "2020",
+   "topic": "Atomic Structure and Bonding",
+   "text": "The electron configuration of an element with atomic number 17 is",
+   "options": [
+    "2, 8, 7",
+    "2, 7, 8",
+    "2, 8, 6",
+    "2, 8, 8"
+   ],
+   "answer": 0,
+   "explanation": "Chlorine has 17 electrons, arranged 2 in the first shell, 8 in the second and 7 in the third shell."
+  },
+  {
+   "id": "chemistry-008",
+   "year": "2021",
+   "topic": "Atomic Structure and Bonding",
+   "text": "The shape of the ammonia molecule, NH₃, is",
+   "options": [
+    "tetrahedral",
+    "trigonal planar",
+    "trigonal pyramidal",
+    "linear"
+   ],
+   "answer": 2,
+   "explanation": "NH₃ has three bonding pairs and one lone pair on nitrogen, giving a pyramidal shape with bond angles of about 107°."
+  },
+  {
+   "id": "chemistry-009",
+   "year": "2022",
+   "topic": "Periodic Table and Periodicity",
+   "text": "Across a period in the periodic table from left to right, the atomic radius generally",
+   "options": [
+    "increases",
+    "decreases",
+    "increases then decreases",
+    "remains constant"
+   ],
+   "answer": 1,
+   "explanation": "Increasing nuclear charge pulls the same shells closer to the nucleus, so atomic size decreases across a period."
+  },
+  {
+   "id": "chemistry-010",
+   "year": "2023",
+   "topic": "Atomic Structure and Bonding",
+   "text": "Isotopes of the same element differ in their number of",
+   "options": [
+    "electron shells",
+    "protons",
+    "neutrons",
+    "electrons"
+   ],
+   "answer": 2,
+   "explanation": "Isotopes have the same number of protons (same atomic number) but different numbers of neutrons, hence different mass numbers."
+  },
+  {
+   "id": "chemistry-011",
+   "year": "2024",
+   "topic": "Chemical Combination",
+   "text": "The mass of sodium hydroxide [NaOH = 40] in 250 cm³ of a 0.2 mol/dm³ solution is",
+   "options": [
+    "2 g",
+    "4 g",
+    "0.5 g",
+    "8 g"
+   ],
+   "answer": 0,
+   "explanation": "Amount = 0.2 × 0.25 = 0.05 mol; mass = 0.05 × 40 = 2 g."
+  },
+  {
+   "id": "chemistry-012",
+   "year": "2025",
+   "topic": "Chemical Combination",
+   "text": "The ionic equation for the neutralisation of sodium hydroxide by hydrochloric acid is",
+   "options": [
+    "Na⁺ + OH⁻ → NaOH",
+    "H⁺ + Cl⁻ → HCl",
+    "Na⁺ + Cl⁻ → NaCl",
+    "H⁺ + OH⁻ → H₂O"
+   ],
+   "answer": 3,
+   "explanation": "Only the hydrogen and hydroxide ions take part in the reaction; Na⁺ and Cl⁻ are spectator ions."
+  },
+  {
+   "id": "chemistry-013",
+   "year": "2020",
+   "topic": "Acids, Bases and Salts",
+   "text": "The pH of a 0.01 mol/dm³ solution of hydrochloric acid is",
+   "options": [
+    "11",
+    "1",
+    "2",
+    "12"
+   ],
+   "answer": 2,
+   "explanation": "HCl is a strong acid, so [H⁺] = 0.01 = 10⁻² mol/dm³ and pH = −log[H⁺] = 2."
+  },
+  {
+   "id": "chemistry-014",
+   "year": "2021",
+   "topic": "Oxidation and Reduction",
+   "text": "The oxidation number of sulphur in tetraoxosulphate(VI) acid, H₂SO₄, is",
+   "options": [
+    "+6",
+    "+4",
+    "−2",
+    "+2"
+   ],
+   "answer": 0,
+   "explanation": "With H = +1 and O = −2: 2(+1) + S + 4(−2) = 0, so S = +6."
+  },
+  {
+   "id": "chemistry-015",
+   "year": "2022",
+   "topic": "Acids, Bases and Salts",
+   "text": "Which of the following is a weak acid?",
+   "options": [
+    "Hydrochloric acid",
+    "Ethanoic acid",
+    "Tetraoxosulphate(VI) acid",
+    "Trioxonitrate(V) acid"
+   ],
+   "answer": 1,
+   "explanation": "Ethanoic acid only partially ionises in water. HCl, H₂SO₄ and HNO₃ are strong acids that ionise almost completely."
+  },
+  {
+   "id": "chemistry-016",
+   "year": "2023",
+   "topic": "Acids, Bases and Salts",
+   "text": "25 cm³ of 0.1 mol/dm³ sodium hydroxide neutralises 20 cm³ of hydrochloric acid. The concentration of the acid is",
+   "options": [
+    "0.08 mol/dm³",
+    "0.5 mol/dm³",
+    "0.2 mol/dm³",
+    "0.125 mol/dm³"
+   ],
+   "answer": 3,
+   "explanation": "For the 1:1 reaction, C₁V₁ = C₂V₂, so C = 25 × 0.1 ÷ 20 = 0.125 mol/dm³."
+  },
+  {
+   "id": "chemistry-017",
+   "year": "2024",
+   "topic": "Acids, Bases and Salts",
+   "text": "An aqueous solution of ammonium chloride is acidic because the salt undergoes",
+   "options": [
+    "hydrolysis to produce hydrogen ions",
+    "oxidation by air",
+    "precipitation of ammonia",
+    "dissociation into neutral ions"
+   ],
+   "answer": 0,
+   "explanation": "NH₄⁺ hydrolyses in water to give H₃O⁺ ions, making the solution acidic. Salts of strong acids and weak bases give acidic solutions."
+  },
+  {
+   "id": "chemistry-018",
+   "year": "2025",
+   "topic": "Acids, Bases and Salts",
+   "text": "Methyl orange indicator is yellow in an alkaline solution and",
+   "options": [
+    "pink in an acidic solution",
+    "red in an acidic solution",
+    "blue in an acidic solution",
+    "colourless in an acidic solution"
+   ],
+   "answer": 1,
+   "explanation": "Methyl orange turns red in acids and yellow in alkalis. Phenolphthalein, by contrast, is pink in alkalis and colourless in acids."
+  },
+  {
+   "id": "chemistry-019",
+   "year": "2020",
+   "topic": "Separation of Mixtures",
+   "text": "A mixture of sand and common salt is best separated by",
+   "options": [
+    "paper chromatography",
+    "fractional distillation",
+    "dissolving in water, filtering and evaporating",
+    "sublimation"
+   ],
+   "answer": 2,
+   "explanation": "Salt dissolves in water while sand does not; filtration removes the sand and evaporation recovers the salt."
+  },
+  {
+   "id": "chemistry-020",
+   "year": "2021",
+   "topic": "Solubility",
+   "text": "The solubility of a salt is 36 g per 100 g of water at 25 °C. The mass of the salt that will dissolve in 250 g of water at the same temperature is",
+   "options": [
+    "72 g",
+    "9 g",
+    "144 g",
+    "90 g"
+   ],
+   "answer": 3,
+   "explanation": "Mass = 36 × 250 ÷ 100 = 90 g."
+  },
+  {
+   "id": "chemistry-021",
+   "year": "2022",
+   "topic": "Chemical Equilibrium",
+   "text": "For the equilibrium N₂(g) + 3H₂(g) ⇌ 2NH₃(g), an increase in pressure will",
+   "options": [
+    "decrease the equilibrium constant",
+    "shift the equilibrium to the left",
+    "shift the equilibrium to the right",
+    "have no effect on the equilibrium"
+   ],
+   "answer": 2,
+   "explanation": "Higher pressure favours the side with fewer gas molecules — 2 moles of NH₃ against 4 moles of reactants — so the equilibrium shifts right."
+  },
+  {
+   "id": "chemistry-022",
+   "year": "2023",
+   "topic": "Oxidation and Reduction",
+   "text": "In the reaction Zn + Cu²⁺ → Zn²⁺ + Cu, the oxidising agent is",
+   "options": [
+    "Cu²⁺",
+    "Zn²⁺",
+    "Cu",
+    "Zn"
+   ],
+   "answer": 0,
+   "explanation": "Cu²⁺ gains electrons (is reduced) and causes zinc to be oxidised, so Cu²⁺ is the oxidising agent."
+  },
+  {
+   "id": "chemistry-023",
+   "year": "2024",
+   "topic": "Electrolysis",
+   "text": "At the cathode during the electrolysis of aqueous copper(II) tetraoxosulphate(VI) using copper electrodes, the product is",
+   "options": [
+    "sulphur",
+    "copper metal",
+    "hydrogen gas",
+    "oxygen gas"
+   ],
+   "answer": 1,
+   "explanation": "Cu²⁺ ions are discharged at the cathode as copper metal, while the copper anode dissolves, keeping the solution concentration constant."
+  },
+  {
+   "id": "chemistry-024",
+   "year": "2025",
+   "topic": "Non-metals and Their Compounds",
+   "text": "Hydrogen gas is tested in the laboratory by its",
+   "options": [
+    "bleaching damp litmus paper",
+    "turning limewater milky",
+    "relighting a glowing splint",
+    "burning with a 'pop' sound"
+   ],
+   "answer": 3,
+   "explanation": "A lighted splint held to hydrogen gives a characteristic pop. Oxygen relights a glowing splint and CO₂ turns limewater milky."
+  },
+  {
+   "id": "chemistry-025",
+   "year": "2020",
+   "topic": "Kinetic Theory and Gas Laws",
+   "text": "A fixed mass of gas occupies 200 cm³ at 300 K. If it is heated to 600 K at constant pressure, its new volume is",
+   "options": [
+    "400 cm³",
+    "600 cm³",
+    "100 cm³",
+    "300 cm³"
+   ],
+   "answer": 0,
+   "explanation": "By Charles's law, V/T is constant, so V₂ = 200 × 600 ÷ 300 = 400 cm³."
+  },
+  {
+   "id": "chemistry-026",
+   "year": "2021",
+   "topic": "Electrolysis",
+   "text": "The quantity of electricity required to deposit one mole of copper from copper(II) ions is",
+   "options": [
+    "48,250 C",
+    "96,500 C",
+    "193,000 C",
+    "386,000 C"
+   ],
+   "answer": 2,
+   "explanation": "Cu²⁺ + 2e⁻ → Cu, so 2 moles of electrons (2 faradays = 2 × 96,500 C) are needed per mole of copper."
+  },
+  {
+   "id": "chemistry-027",
+   "year": "2022",
+   "topic": "Energy Changes",
+   "text": "A reaction in which heat is given out to the surroundings is described as exothermic and has a ΔH value that is",
+   "options": [
+    "zero",
+    "negative",
+    "equal to the activation energy",
+    "positive"
+   ],
+   "answer": 1,
+   "explanation": "Exothermic reactions release heat, so the enthalpy change is negative. Endothermic reactions absorb heat and have positive ΔH."
+  },
+  {
+   "id": "chemistry-028",
+   "year": "2023",
+   "topic": "Non-metals and Their Compounds",
+   "text": "Tetraoxosulphate(VI) acid is manufactured industrially by the",
+   "options": [
+    "Solvay process",
+    "Haber process",
+    "Ostwald process",
+    "Contact process"
+   ],
+   "answer": 3,
+   "explanation": "The Contact process oxidises SO₂ to SO₃ over a vanadium(V) oxide catalyst and absorbs it to make H₂SO₄. The Ostwald process makes nitric acid."
+  },
+  {
+   "id": "chemistry-029",
+   "year": "2024",
+   "topic": "Non-metals and Their Compounds",
+   "text": "The gas that relights a glowing splint is",
+   "options": [
+    "nitrogen",
+    "hydrogen",
+    "oxygen",
+    "carbon(IV) oxide"
+   ],
+   "answer": 2,
+   "explanation": "Oxygen supports combustion and relights a glowing splint. Hydrogen burns with a pop, and CO₂ extinguishes a burning splint."
+  },
+  {
+   "id": "chemistry-030",
+   "year": "2025",
+   "topic": "Metals and Their Compounds",
+   "text": "Sodium metal is stored under oil or kerosene because it",
+   "options": [
+    "is denser than water",
+    "dissolves in water",
+    "is a good conductor of heat",
+    "reacts violently with air and water"
+   ],
+   "answer": 3,
+   "explanation": "Sodium reacts rapidly with oxygen and moisture in the air, so it is kept under an inert liquid to exclude both."
+  },
+  {
+   "id": "chemistry-031",
+   "year": "2020",
+   "topic": "Chemical Bonding",
+   "text": "Which of the following compounds contains both ionic and covalent bonds?",
+   "options": [
+    "Carbon(IV) oxide",
+    "Ammonium chloride",
+    "Calcium oxide",
+    "Sodium chloride"
+   ],
+   "answer": 1,
+   "explanation": "In NH₄Cl the bond between NH₄⁺ and Cl⁻ is ionic, while the N–H bonds within the ammonium ion are covalent."
+  },
+  {
+   "id": "chemistry-032",
+   "year": "2021",
+   "topic": "Water",
+   "text": "Temporary hardness of water is caused by the presence of",
+   "options": [
+    "calcium hydrogen trioxocarbonate(IV)",
+    "calcium tetraoxosulphate(VI)",
+    "magnesium chloride",
+    "sodium chloride"
+   ],
+   "answer": 0,
+   "explanation": "Dissolved Ca(HCO₃)₂ causes temporary hardness, removed by boiling. Calcium sulphate and magnesium chloride cause permanent hardness."
+  },
+  {
+   "id": "chemistry-033",
+   "year": "2022",
+   "topic": "Non-metals and Their Compounds",
+   "text": "Which allotrope of carbon conducts electricity?",
+   "options": [
+    "Coke",
+    "Coal",
+    "Graphite",
+    "Diamond"
+   ],
+   "answer": 2,
+   "explanation": "Graphite has delocalised electrons between its layers that carry current. Diamond's electrons are all fixed in covalent bonds, so it is an insulator."
+  },
+  {
+   "id": "chemistry-034",
+   "year": "2023",
+   "topic": "Metals and Their Compounds",
+   "text": "Iron is extracted from its oxide ores in the",
+   "options": [
+    "electrolytic cell",
+    "blast furnace",
+    "reverberatory furnace",
+    "Bessemer converter"
+   ],
+   "answer": 1,
+   "explanation": "The blast furnace reduces iron oxides with carbon monoxide at high temperature. Electrolysis is used for aluminium, and the Bessemer converter makes steel."
+  },
+  {
+   "id": "chemistry-035",
+   "year": "2024",
+   "topic": "Metals and Their Compounds",
+   "text": "Rusting of iron requires the presence of both",
+   "options": [
+    "oxygen and water",
+    "oxygen only",
+    "water only",
+    "carbon(IV) oxide and water"
+   ],
+   "answer": 0,
+   "explanation": "Iron rusts only when both oxygen and water are present; either alone does not cause rusting."
+  },
+  {
+   "id": "chemistry-036",
+   "year": "2025",
+   "topic": "Organic Compounds",
+   "text": "Saponification, the reaction of fats and oils with concentrated alkali, produces",
+   "options": [
+    "an alkanol and an acid",
+    "an ester and water",
+    "an alkane and carbon(IV) oxide",
+    "soap and glycerol"
+   ],
+   "answer": 3,
+   "explanation": "Alkaline hydrolysis of fats (triglycerides) gives salts of fatty acids — soap — and propane-1,2,3-triol (glycerol)."
+  },
+  {
+   "id": "chemistry-037",
+   "year": "2020",
+   "topic": "Air",
+   "text": "The approximate percentage by volume of oxygen in dry air is",
+   "options": [
+    "78%",
+    "1%",
+    "21%",
+    "0.03%"
+   ],
+   "answer": 2,
+   "explanation": "Air is about 78% nitrogen, 21% oxygen, 1% argon and 0.03% carbon(IV) oxide by volume."
+  },
+  {
+   "id": "chemistry-038",
+   "year": "2021",
+   "topic": "Rates of Reaction",
+   "text": "A catalyst increases the rate of a chemical reaction by",
+   "options": [
+    "shifting the equilibrium position",
+    "increasing the concentration of the reactants",
+    "raising the temperature of the reactants",
+    "lowering the activation energy"
+   ],
+   "answer": 3,
+   "explanation": "A catalyst provides an alternative reaction path with lower activation energy. It does not change the equilibrium position or the temperature."
+  },
+  {
+   "id": "chemistry-039",
+   "year": "2022",
+   "topic": "Metals and Their Compounds",
+   "text": "Brass is an alloy consisting of",
+   "options": [
+    "iron and carbon",
+    "copper and zinc",
+    "aluminium and copper",
+    "copper and tin"
+   ],
+   "answer": 1,
+   "explanation": "Brass is Cu + Zn. Copper and tin make bronze, iron and carbon make steel, and aluminium and copper make duralumin."
+  },
+  {
+   "id": "chemistry-040",
+   "year": "2023",
+   "topic": "Organic Compounds",
+   "text": "Ethanol, when oxidised under reflux with excess acidified potassium dichromate(VI), gives",
+   "options": [
+    "ethanoic acid",
+    "ethene",
+    "ethanal",
+    "ethane"
+   ],
+   "answer": 0,
+   "explanation": "Complete oxidation of a primary alkanol under reflux yields the alkanoic acid. Distilling off the product during oxidation stops at ethanal."
+  },
+  {
+   "id": "chemistry-041",
+   "year": "2024",
+   "topic": "Organic Compounds",
+   "text": "Esterification is the reaction between",
+   "options": [
+    "an alkene and water",
+    "an alkanol and sodium",
+    "an alkanoic acid and an alkanol",
+    "an acid and a base"
+   ],
+   "answer": 2,
+   "explanation": "An alkanoic acid reacts with an alkanol, with concentrated H₂SO₄ as catalyst, to form an ester and water."
+  },
+  {
+   "id": "chemistry-042",
+   "year": "2025",
+   "topic": "Chemistry and Industry",
+   "text": "The cracking of long-chain petroleum fractions produces mainly",
+   "options": [
+    "shorter-chain alkanes and alkenes",
+    "polymers only",
+    "longer-chain alkanes",
+    "aromatic compounds only"
+   ],
+   "answer": 0,
+   "explanation": "Cracking breaks large hydrocarbon molecules into smaller, more useful ones such as petrol-range alkanes and alkenes for petrochemicals."
+  },
+  {
+   "id": "chemistry-043",
+   "year": "2020",
+   "topic": "Organic Compounds",
+   "text": "The general formula of the alkenes is",
+   "options": [
+    "CₙH₂ₙ₊₁OH",
+    "CₙH₂ₙ",
+    "CₙH₂ₙ₊₂",
+    "CₙH₂ₙ₋₂"
+   ],
+   "answer": 1,
+   "explanation": "Alkenes contain one C=C double bond, giving CₙH₂ₙ. Alkanes are CₙH₂ₙ₊₂, alkynes CₙH₂ₙ₋₂, and alkanols CₙH₂ₙ₊₁OH."
+  },
+  {
+   "id": "chemistry-044",
+   "year": "2021",
+   "topic": "Non-metals and Their Compounds",
+   "text": "Ammonia is manufactured industrially by the",
+   "options": [
+    "Frasch process",
+    "Solvay process",
+    "Contact process",
+    "Haber process"
+   ],
+   "answer": 3,
+   "explanation": "The Haber process combines nitrogen and hydrogen at high pressure over an iron catalyst. The Contact process makes H₂SO₄ and the Solvay process makes Na₂CO₃."
+  },
+  {
+   "id": "chemistry-045",
+   "year": "2022",
+   "topic": "Electrolysis",
+   "text": "During the electrolysis of concentrated aqueous sodium chloride, the gas liberated at the anode is",
+   "options": [
+    "hydrogen",
+    "chlorine",
+    "sodium",
+    "oxygen"
+   ],
+   "answer": 1,
+   "explanation": "In concentrated brine, chloride ions are discharged at the anode in preference to hydroxide ions, giving chlorine gas. Hydrogen is liberated at the cathode."
+  },
+  {
+   "id": "chemistry-046",
+   "year": "2023",
+   "topic": "Solubility",
+   "text": "A solution that contains the maximum amount of solute that can dissolve at a given temperature is described as",
+   "options": [
+    "saturated",
+    "dilute",
+    "unsaturated",
+    "supersaturated"
+   ],
+   "answer": 0,
+   "explanation": "A saturated solution holds all the solute it can at that temperature. An unsaturated solution can dissolve more, and a supersaturated one holds more than the normal maximum."
+  },
+  {
+   "id": "chemistry-047",
+   "year": "2024",
+   "topic": "Chemical Combination",
+   "text": "The percentage by mass of oxygen in calcium trioxocarbonate(IV), CaCO₃, is [Ca = 40, C = 12, O = 16]",
+   "options": [
+    "40%",
+    "16%",
+    "48%",
+    "32%"
+   ],
+   "answer": 2,
+   "explanation": "Molar mass = 40 + 12 + 48 = 100; oxygen contributes 48, so the percentage is 48%."
+  },
+  {
+   "id": "chemistry-048",
+   "year": "2025",
+   "topic": "Separation of Mixtures",
+   "text": "Paper chromatography separates the components of a mixture because the components",
+   "options": [
+    "are magnetic",
+    "have different densities",
+    "have different boiling points",
+    "move at different rates over the paper"
+   ],
+   "answer": 3,
+   "explanation": "Separation depends on different solubilities in the solvent and different attractions to the paper, so components travel different distances."
+  },
+  {
+   "id": "chemistry-049",
+   "year": "2020",
+   "topic": "Metals and Their Compounds",
+   "text": "Which of the following metals is the most reactive?",
+   "options": [
+    "Potassium",
+    "Zinc",
+    "Calcium",
+    "Magnesium"
+   ],
+   "answer": 0,
+   "explanation": "In the reactivity series, potassium is above calcium, magnesium and zinc; it reacts violently with water."
+  },
+  {
+   "id": "chemistry-050",
+   "year": "2021",
+   "topic": "Organic Compounds",
+   "text": "Ethene decolourises bromine water because ethene",
+   "options": [
+    "is a saturated hydrocarbon",
+    "is unsaturated and undergoes an addition reaction",
+    "is acidic in nature",
+    "dissolves in water"
+   ],
+   "answer": 1,
+   "explanation": "The C=C double bond in ethene adds bromine across it, removing the bromine colour. Saturated alkanes do not react this way."
+  },
+  {
+   "id": "chemistry-051",
+   "year": "2022",
+   "topic": "Organic Compounds",
+   "text": "Which of the following is a natural polymer?",
+   "options": [
+    "Polythene",
+    "Polyvinyl chloride",
+    "Nylon",
+    "Starch"
+   ],
+   "answer": 3,
+   "explanation": "Starch is a natural polymer of glucose made by plants. Polythene, PVC and nylon are synthetic polymers."
+  },
+  {
+   "id": "chemistry-052",
+   "year": "2023",
+   "topic": "Chemical Combination",
+   "text": "The law of definite proportions states that a chemical compound always contains its constituent elements",
+   "options": [
+    "in equal masses",
+    "in whole-number atomic ratios only",
+    "in the same proportion by mass",
+    "in the same volume ratio"
+   ],
+   "answer": 2,
+   "explanation": "Pure water, for example, always contains hydrogen and oxygen in the mass ratio 1:8, whatever its source."
+  },
+  {
+   "id": "chemistry-053",
+   "year": "2024",
+   "topic": "Rates of Reaction",
+   "text": "Increasing the surface area of a solid reactant increases the reaction rate because it",
+   "options": [
+    "decreases the concentration",
+    "exposes more particles to collision",
+    "raises the activation energy",
+    "lowers the temperature"
+   ],
+   "answer": 1,
+   "explanation": "Powdered solids react faster than lumps because more reactant particles are exposed at the surface for collisions."
+  },
+  {
+   "id": "chemistry-054",
+   "year": "2025",
+   "topic": "Chemical Equilibrium",
+   "text": "A system is said to be in dynamic equilibrium when",
+   "options": [
+    "the forward and reverse reactions proceed at the same rate",
+    "the concentrations of all substances are equal",
+    "the reaction has stopped completely",
+    "all reactants have been used up"
+   ],
+   "answer": 0,
+   "explanation": "In dynamic equilibrium both reactions continue but at equal rates, so concentrations stay constant although the system is not static."
+  },
+  {
+   "id": "chemistry-055",
+   "year": "2020",
+   "topic": "Environmental Pollution",
+   "text": "Which of the following gases is a major cause of acid rain?",
+   "options": [
+    "Methane",
+    "Hydrogen",
+    "Sulphur(IV) oxide",
+    "Carbon(II) oxide"
+   ],
+   "answer": 2,
+   "explanation": "SO₂ dissolves in rainwater to form sulphurous and tetraoxosulphate(VI) acids. Oxides of nitrogen also contribute."
+  },
+  {
+   "id": "chemistry-056",
+   "year": "2021",
+   "topic": "Chemistry and Industry",
+   "text": "Cement is manufactured mainly from",
+   "options": [
+    "sand and soda ash",
+    "iron ore and coke",
+    "bauxite and cryolite",
+    "limestone and clay"
+   ],
+   "answer": 3,
+   "explanation": "Heating limestone (CaCO₃) with clay in a rotary kiln produces cement clinker. Sand and soda ash make glass, and bauxite yields aluminium."
+  },
+  {
+   "id": "chemistry-057",
+   "year": "2022",
+   "topic": "Kinetic Theory and Gas Laws",
+   "text": "Hydrogen gas diffuses four times as fast as oxygen gas under the same conditions because hydrogen has",
+   "options": [
+    "a higher density",
+    "a lower molar mass",
+    "a higher molar mass",
+    "stronger intermolecular forces"
+   ],
+   "answer": 1,
+   "explanation": "By Graham's law, rate ∝ 1/√M. The ratio is √(32/2) = 4, so hydrogen, with the lower molar mass, diffuses faster."
+  },
+  {
+   "id": "chemistry-058",
+   "year": "2023",
+   "topic": "Environmental Pollution",
+   "text": "Oil spillage on farmland causes soil pollution mainly because the oil",
+   "options": [
+    "coats soil particles and prevents air and water movement, killing plants and organisms",
+    "evaporates quickly into the air",
+    "adds nutrients to the soil",
+    "increases the acidity of rain"
+   ],
+   "answer": 0,
+   "explanation": "Oil films block pores in the soil, cut off oxygen and water, and poison soil organisms, so crops cannot grow."
+  },
+  {
+   "id": "chemistry-059",
+   "year": "2024",
+   "topic": "Atomic Structure and Bonding",
+   "text": "The two main types of chemical bonding between atoms are",
+   "options": [
+    "metallic and hydrogen bonding only",
+    "ionic and van der Waals bonding",
+    "electrovalent and covalent bonding",
+    "coordinate and dative bonding only"
+   ],
+   "answer": 2,
+   "explanation": "Atoms bond mainly by transfer of electrons (electrovalent/ionic) or sharing of electrons (covalent). Hydrogen, metallic and van der Waals forces are secondary or special types."
+  },
+  {
+   "id": "chemistry-060",
+   "year": "2025",
+   "topic": "Nuclear Chemistry",
+   "text": "Alpha particles emitted during radioactive decay are",
+   "options": [
+    "electromagnetic waves",
+    "protons",
+    "fast-moving electrons",
+    "helium nuclei"
+   ],
+   "answer": 3,
+   "explanation": "An alpha particle is a helium-4 nucleus (₂⁴He) with two protons and two neutrons. Beta particles are electrons and gamma rays are electromagnetic waves."
+  }
+ ]
+}

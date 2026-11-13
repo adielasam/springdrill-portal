@@ -1,0 +1,846 @@
+{
+ "subject": "Economics",
+ "version": 1,
+ "questions": [
+  {
+   "id": "economics-001",
+   "year": "2020",
+   "topic": "Economics as a Science",
+   "text": "The opportunity cost of a student choosing to attend university instead of taking a job paying ₦500,000 a year is",
+   "options": [
+    "zero, because education is free",
+    "₦500,000 a year",
+    "the student's total allowance",
+    "the cost of university fees"
+   ],
+   "answer": 1,
+   "explanation": "Opportunity cost is the value of the best alternative forgone — here the salary the student gives up by choosing university."
+  },
+  {
+   "id": "economics-002",
+   "year": "2021",
+   "topic": "Theory of Consumer Behaviour",
+   "text": "A consumer is willing to pay ₦500 for a good but actually pays ₦350. The consumer surplus is",
+   "options": [
+    "₦150",
+    "₦850",
+    "₦500",
+    "₦350"
+   ],
+   "answer": 0,
+   "explanation": "Consumer surplus = amount willing to pay − amount actually paid = 500 − 350 = ₦150."
+  },
+  {
+   "id": "economics-003",
+   "year": "2022",
+   "topic": "Economics as a Science",
+   "text": "Points lying outside a production possibility frontier are",
+   "options": [
+    "attainable and efficient",
+    "the result of unemployment",
+    "attainable but inefficient",
+    "unattainable with the available resources and technology"
+   ],
+   "answer": 3,
+   "explanation": "The PPF shows maximum attainable combinations; points beyond it cannot be reached unless resources or technology increase."
+  },
+  {
+   "id": "economics-004",
+   "year": "2023",
+   "topic": "Theory of Supply",
+   "text": "A fall in the cost of production will shift the supply curve to the",
+   "options": [
+    "centre",
+    "origin",
+    "right",
+    "left"
+   ],
+   "answer": 2,
+   "explanation": "Lower costs make producers willing to supply more at each price, shifting the supply curve rightwards. Higher costs shift it left."
+  },
+  {
+   "id": "economics-005",
+   "year": "2024",
+   "topic": "Methods and Tools of Economic Analysis",
+   "text": "The range of the data set 5, 9, 14, 20 and 27 is",
+   "options": [
+    "27",
+    "32",
+    "15",
+    "22"
+   ],
+   "answer": 3,
+   "explanation": "Range = highest value − lowest value = 27 − 5 = 22."
+  },
+  {
+   "id": "economics-006",
+   "year": "2025",
+   "topic": "Economics as a Science",
+   "text": "Positive economics is concerned with",
+   "options": [
+    "statements about what ought to be",
+    "statements about what is, based on facts",
+    "the study of government alone",
+    "moral judgements about policy"
+   ],
+   "answer": 1,
+   "explanation": "Positive statements are testable descriptions of economic reality. Normative statements express value judgements about what ought to be."
+  },
+  {
+   "id": "economics-007",
+   "year": "2020",
+   "topic": "Methods and Tools of Economic Analysis",
+   "text": "The mean of the numbers 4, 6, 8, 10 and 12 is",
+   "options": [
+    "8",
+    "6",
+    "40",
+    "10"
+   ],
+   "answer": 0,
+   "explanation": "Mean = (4 + 6 + 8 + 10 + 12) ÷ 5 = 40 ÷ 5 = 8."
+  },
+  {
+   "id": "economics-008",
+   "year": "2021",
+   "topic": "Theory of Costs and Revenue",
+   "text": "A firm's total fixed cost is ₦200 and its total variable cost is ₦300 when it produces 50 units. Its average cost is",
+   "options": [
+    "₦500",
+    "₦4",
+    "₦10",
+    "₦6"
+   ],
+   "answer": 2,
+   "explanation": "Total cost = 200 + 300 = ₦500; average cost = 500 ÷ 50 = ₦10."
+  },
+  {
+   "id": "economics-009",
+   "year": "2022",
+   "topic": "Methods and Tools of Economic Analysis",
+   "text": "The median of the set of numbers 3, 7, 9, 12, 15 and 18 is",
+   "options": [
+    "10.5",
+    "10",
+    "12",
+    "9"
+   ],
+   "answer": 0,
+   "explanation": "With six numbers, the median is the mean of the 3rd and 4th values: (9 + 12) ÷ 2 = 10.5."
+  },
+  {
+   "id": "economics-010",
+   "year": "2023",
+   "topic": "Theory of Price Determination",
+   "text": "A maximum price fixed below the equilibrium price will result in",
+   "options": [
+    "equilibrium in the market",
+    "a shortage of the commodity",
+    "a surplus of the commodity",
+    "a rise in the market price"
+   ],
+   "answer": 1,
+   "explanation": "At a price below equilibrium, quantity demanded exceeds quantity supplied, creating a shortage (excess demand)."
+  },
+  {
+   "id": "economics-011",
+   "year": "2024",
+   "topic": "Theory of Consumer Behaviour",
+   "text": "The law of diminishing marginal utility states that as a consumer takes more units of a good, the additional satisfaction from each extra unit",
+   "options": [
+    "becomes zero immediately",
+    "increases",
+    "decreases",
+    "remains constant"
+   ],
+   "answer": 2,
+   "explanation": "Each successive unit adds less extra satisfaction than the previous one, although total utility may still be rising."
+  },
+  {
+   "id": "economics-012",
+   "year": "2025",
+   "topic": "Theory of Price Determination",
+   "text": "A minimum wage fixed above the equilibrium wage in a labour market is likely to cause",
+   "options": [
+    "a fall in wages",
+    "full employment",
+    "a labour shortage",
+    "unemployment"
+   ],
+   "answer": 3,
+   "explanation": "At a wage above equilibrium, the supply of labour exceeds the demand for it, creating a surplus of labour — unemployment."
+  },
+  {
+   "id": "economics-013",
+   "year": "2020",
+   "topic": "Theory of Demand",
+   "text": "When the price of a good falls from ₦20 to ₦16, the quantity demanded rises from 100 to 140 units. The price elasticity of demand is",
+   "options": [
+    "1",
+    "2",
+    "4",
+    "0.5"
+   ],
+   "answer": 1,
+   "explanation": "Percentage change in quantity = 40%; percentage change in price = 20%; elasticity = 40 ÷ 20 = 2, so demand is elastic."
+  },
+  {
+   "id": "economics-014",
+   "year": "2021",
+   "topic": "Theory of Demand",
+   "text": "If a consumer's income rises by 10% and the quantity demanded of a good rises by 5%, the income elasticity of demand is",
+   "options": [
+    "5",
+    "0.2",
+    "2",
+    "0.5"
+   ],
+   "answer": 3,
+   "explanation": "Income elasticity = percentage change in quantity ÷ percentage change in income = 5 ÷ 10 = 0.5, so the good is a normal necessity."
+  },
+  {
+   "id": "economics-015",
+   "year": "2022",
+   "topic": "Theory of Demand",
+   "text": "An increase in the price of a substitute good will cause the demand for the good in question to",
+   "options": [
+    "increase",
+    "remain unchanged",
+    "become perfectly inelastic",
+    "decrease"
+   ],
+   "answer": 0,
+   "explanation": "Consumers switch away from the dearer substitute towards the good, so its demand rises at every price."
+  },
+  {
+   "id": "economics-016",
+   "year": "2023",
+   "topic": "Theory of Production",
+   "text": "Division of labour leads to higher productivity mainly because workers",
+   "options": [
+    "use more land",
+    "receive higher wages",
+    "acquire greater skill through specialisation",
+    "work longer hours"
+   ],
+   "answer": 2,
+   "explanation": "Specialisation lets each worker concentrate on one task, gaining skill and speed. Higher wages may follow, but they are not the cause of the productivity gain."
+  },
+  {
+   "id": "economics-017",
+   "year": "2024",
+   "topic": "National Income",
+   "text": "Which of the following is NOT included in the calculation of a country's gross domestic product?",
+   "options": [
+    "Business investment spending",
+    "Transfer payments such as pensions",
+    "Private consumption spending",
+    "Government spending on roads"
+   ],
+   "answer": 1,
+   "explanation": "Transfer payments involve no current production of goods or services, so they are excluded from GDP to avoid double counting."
+  },
+  {
+   "id": "economics-018",
+   "year": "2025",
+   "topic": "Theory of Production",
+   "text": "Bulk purchasing of raw materials at lower prices is an example of",
+   "options": [
+    "a technical economy of scale",
+    "an external diseconomy",
+    "a marketing economy of scale",
+    "a financial economy of scale"
+   ],
+   "answer": 2,
+   "explanation": "Buying in bulk is a marketing (commercial) economy of large-scale production. Technical economies come from better machinery and financial economies from cheaper borrowing."
+  },
+  {
+   "id": "economics-019",
+   "year": "2020",
+   "topic": "Theory of Price Determination",
+   "text": "Given the demand function Qd = 100 − 2P and the supply function Qs = 20 + 2P, the equilibrium price is",
+   "options": [
+    "₦20",
+    "₦10",
+    "₦40",
+    "₦30"
+   ],
+   "answer": 0,
+   "explanation": "At equilibrium Qd = Qs: 100 − 2P = 20 + 2P, so 4P = 80 and P = ₦20."
+  },
+  {
+   "id": "economics-020",
+   "year": "2021",
+   "topic": "Banking",
+   "text": "If the cash reserve ratio is 20%, the money multiplier is",
+   "options": [
+    "2",
+    "4",
+    "20",
+    "5"
+   ],
+   "answer": 3,
+   "explanation": "Money multiplier = 1 ÷ reserve ratio = 1 ÷ 0.2 = 5."
+  },
+  {
+   "id": "economics-021",
+   "year": "2022",
+   "topic": "Theory of Consumer Behaviour",
+   "text": "The total utility derived from consuming successive units of a good is 10, 18, 24 and 28 utils. The marginal utility of the third unit is",
+   "options": [
+    "8 utils",
+    "4 utils",
+    "6 utils",
+    "24 utils"
+   ],
+   "answer": 2,
+   "explanation": "Marginal utility = change in total utility = 24 − 18 = 6 utils."
+  },
+  {
+   "id": "economics-022",
+   "year": "2023",
+   "topic": "Theory of Costs and Revenue",
+   "text": "A firm sells 40 units of a product at ₦25 each. Its total revenue is",
+   "options": [
+    "₦65",
+    "₦15",
+    "₦625",
+    "₦1,000"
+   ],
+   "answer": 3,
+   "explanation": "Total revenue = price × quantity = 25 × 40 = ₦1,000."
+  },
+  {
+   "id": "economics-023",
+   "year": "2024",
+   "topic": "Public Finance",
+   "text": "Under a tax system in which the first ₦100,000 of income is taxed at 5% and the rest at 10%, the tax payable on an income of ₦300,000 is",
+   "options": [
+    "₦25,000",
+    "₦20,000",
+    "₦15,000",
+    "₦30,000"
+   ],
+   "answer": 0,
+   "explanation": "Tax = 5% × 100,000 + 10% × 200,000 = 5,000 + 20,000 = ₦25,000."
+  },
+  {
+   "id": "economics-024",
+   "year": "2025",
+   "topic": "Money and Inflation",
+   "text": "Money performs the function of a store of value when it",
+   "options": [
+    "is used to measure prices",
+    "preserves purchasing power over time",
+    "is used to buy goods",
+    "is lent at interest"
+   ],
+   "answer": 1,
+   "explanation": "As a store of value, money holds its worth so it can be saved and spent later. Buying goods is the medium-of-exchange function and measuring prices is the unit-of-account function."
+  },
+  {
+   "id": "economics-025",
+   "year": "2020",
+   "topic": "Theory of Production",
+   "text": "When the marginal product of labour is zero, the total product is",
+   "options": [
+    "falling",
+    "at its minimum",
+    "equal to the average product",
+    "at its maximum"
+   ],
+   "answer": 3,
+   "explanation": "Total product rises while marginal product is positive and is greatest at the point where marginal product reaches zero; beyond that, total product falls."
+  },
+  {
+   "id": "economics-026",
+   "year": "2021",
+   "topic": "Public Finance",
+   "text": "A tax system in which higher incomes are taxed at a higher proportion of income is described as",
+   "options": [
+    "regressive",
+    "progressive",
+    "indirect",
+    "proportional"
+   ],
+   "answer": 1,
+   "explanation": "A progressive tax takes a larger percentage from higher incomes. A regressive tax takes a larger percentage from lower incomes, and a proportional tax takes the same percentage from all."
+  },
+  {
+   "id": "economics-027",
+   "year": "2022",
+   "topic": "National Income",
+   "text": "If GNP is ₦900 billion and depreciation (capital consumption) is ₦100 billion, the net national product is",
+   "options": [
+    "₦700 billion",
+    "₦900 billion",
+    "₦800 billion",
+    "₦1000 billion"
+   ],
+   "answer": 2,
+   "explanation": "NNP = GNP − depreciation = 900 − 100 = ₦800 billion."
+  },
+  {
+   "id": "economics-028",
+   "year": "2023",
+   "topic": "Banking",
+   "text": "The Central Bank of Nigeria controls the money supply through all of the following EXCEPT",
+   "options": [
+    "collecting personal income tax",
+    "open market operations",
+    "the cash reserve requirement",
+    "the bank rate"
+   ],
+   "answer": 0,
+   "explanation": "Open market operations, reserve requirements and the bank rate are monetary policy tools. Income tax is a fiscal tool of government, not the central bank."
+  },
+  {
+   "id": "economics-029",
+   "year": "2024",
+   "topic": "Exchange Rates",
+   "text": "If the exchange rate is ₦1,500 to $1, the naira cost of goods valued at $200 is",
+   "options": [
+    "₦30,000",
+    "₦300,000",
+    "₦7,500",
+    "₦3,000,000"
+   ],
+   "answer": 1,
+   "explanation": "Cost = 200 × 1,500 = ₦300,000."
+  },
+  {
+   "id": "economics-030",
+   "year": "2025",
+   "topic": "Banking",
+   "text": "Which of the following is a function of a commercial bank?",
+   "options": [
+    "Issuing currency notes",
+    "Acting as lender of last resort",
+    "Accepting deposits and granting loans",
+    "Controlling the money supply"
+   ],
+   "answer": 2,
+   "explanation": "Commercial banks take deposits and lend to customers. Issuing currency, controlling money supply and acting as lender of last resort are central bank functions."
+  },
+  {
+   "id": "economics-031",
+   "year": "2020",
+   "topic": "National Income",
+   "text": "If a country's GDP is ₦800 billion and its net factor income from abroad is ₦50 billion, its GNP is",
+   "options": [
+    "₦850 billion",
+    "₦750 billion",
+    "₦900 billion",
+    "₦800 billion"
+   ],
+   "answer": 0,
+   "explanation": "GNP = GDP + net factor income from abroad = 800 + 50 = ₦850 billion."
+  },
+  {
+   "id": "economics-032",
+   "year": "2021",
+   "topic": "Theory of Supply",
+   "text": "If the price of a good rises by 20% and the quantity supplied rises by 30%, the price elasticity of supply is",
+   "options": [
+    "0.15",
+    "0.67",
+    "6",
+    "1.5"
+   ],
+   "answer": 3,
+   "explanation": "Elasticity of supply = 30 ÷ 20 = 1.5, so supply is elastic."
+  },
+  {
+   "id": "economics-033",
+   "year": "2022",
+   "topic": "Money and Inflation",
+   "text": "Demand-pull inflation is caused by",
+   "options": [
+    "a rise in production costs",
+    "a fall in consumer spending",
+    "excess aggregate demand over available supply",
+    "an increase in the money supply only"
+   ],
+   "answer": 2,
+   "explanation": "When total spending outruns the economy's capacity to produce, prices are pulled up. Cost-push inflation, by contrast, comes from rising costs."
+  },
+  {
+   "id": "economics-034",
+   "year": "2023",
+   "topic": "Money and Inflation",
+   "text": "A general and persistent fall in the prices of goods and services is known as",
+   "options": [
+    "stagflation",
+    "inflation",
+    "disinflation",
+    "deflation"
+   ],
+   "answer": 3,
+   "explanation": "Deflation is falling prices. Inflation is rising prices, stagflation combines inflation with stagnation, and disinflation is a slowing rate of inflation."
+  },
+  {
+   "id": "economics-035",
+   "year": "2024",
+   "topic": "Market Structures",
+   "text": "Product differentiation is a distinguishing feature of",
+   "options": [
+    "pure monopoly",
+    "monopolistic competition",
+    "oligopsony",
+    "perfect competition"
+   ],
+   "answer": 1,
+   "explanation": "In monopolistic competition many firms sell similar but differentiated products, using branding and advertising. Perfect competitors sell identical products."
+  },
+  {
+   "id": "economics-036",
+   "year": "2025",
+   "topic": "Public Finance",
+   "text": "Government spending on the construction of roads and hospitals is classified as",
+   "options": [
+    "capital expenditure",
+    "debt servicing",
+    "recurrent expenditure",
+    "transfer payment"
+   ],
+   "answer": 0,
+   "explanation": "Capital expenditure buys durable assets. Recurrent expenditure covers day-to-day running costs such as salaries, and transfer payments involve no goods in return."
+  },
+  {
+   "id": "economics-037",
+   "year": "2020",
+   "topic": "Money and Inflation",
+   "text": "If the consumer price index rises from 120 to 150, the rate of inflation is",
+   "options": [
+    "20%",
+    "125%",
+    "25%",
+    "30%"
+   ],
+   "answer": 2,
+   "explanation": "Inflation rate = (150 − 120) ÷ 120 × 100 = 25%."
+  },
+  {
+   "id": "economics-038",
+   "year": "2021",
+   "topic": "Economic Growth and Development",
+   "text": "Economic development differs from economic growth mainly because development includes",
+   "options": [
+    "improvements in living standards and welfare",
+    "a rise in population only",
+    "a rise in real GDP only",
+    "an increase in exports only"
+   ],
+   "answer": 0,
+   "explanation": "Growth is a rise in output; development adds better health, education, equality and quality of life to the increase in output."
+  },
+  {
+   "id": "economics-039",
+   "year": "2022",
+   "topic": "Market Structures",
+   "text": "The kinked demand curve model is used to explain price rigidity in",
+   "options": [
+    "monopolistic competition",
+    "monopoly",
+    "perfect competition",
+    "oligopoly"
+   ],
+   "answer": 3,
+   "explanation": "In an oligopoly, rivals match price cuts but not price rises, producing a kink at the ruling price and making prices sticky."
+  },
+  {
+   "id": "economics-040",
+   "year": "2023",
+   "topic": "Business Organisations",
+   "text": "A public limited company differs from a private limited company mainly because it can",
+   "options": [
+    "be owned by one person only",
+    "offer its shares for sale to the general public",
+    "operate without a board of directors",
+    "avoid publishing accounts"
+   ],
+   "answer": 1,
+   "explanation": "A public limited company may invite the public to subscribe to its shares, while a private limited company may not."
+  },
+  {
+   "id": "economics-041",
+   "year": "2024",
+   "topic": "Industry",
+   "text": "A firm that processes raw materials into finished goods belongs to the",
+   "options": [
+    "secondary sector",
+    "primary sector",
+    "quaternary sector",
+    "tertiary sector"
+   ],
+   "answer": 0,
+   "explanation": "The secondary sector covers manufacturing and processing. The primary sector extracts raw materials and the tertiary sector provides services."
+  },
+  {
+   "id": "economics-042",
+   "year": "2025",
+   "topic": "Population",
+   "text": "The labour force of a country consists of",
+   "options": [
+    "only those in paid employment",
+    "all adults above 18 years",
+    "all citizens of the country",
+    "the employed plus the unemployed who are willing and able to work"
+   ],
+   "answer": 3,
+   "explanation": "The labour force includes everyone of working age who is working or actively seeking work; children, retirees and those not seeking work are excluded."
+  },
+  {
+   "id": "economics-043",
+   "year": "2020",
+   "topic": "Market Structures",
+   "text": "In a perfectly competitive market, an individual firm is a",
+   "options": [
+    "monopolist",
+    "price discriminator",
+    "price taker",
+    "price maker"
+   ],
+   "answer": 2,
+   "explanation": "Each firm is too small to influence the market price, so it accepts the price set by the forces of demand and supply."
+  },
+  {
+   "id": "economics-044",
+   "year": "2021",
+   "topic": "Factors of Production",
+   "text": "The reward for the factor of production known as entrepreneurship is",
+   "options": [
+    "rent",
+    "profit",
+    "wages",
+    "interest"
+   ],
+   "answer": 1,
+   "explanation": "The entrepreneur bears risk and organises production, receiving profit. Land earns rent, labour earns wages and capital earns interest."
+  },
+  {
+   "id": "economics-045",
+   "year": "2022",
+   "topic": "Public Finance",
+   "text": "A budget deficit occurs when government",
+   "options": [
+    "revenue equals expenditure",
+    "revenue exceeds expenditure",
+    "expenditure exceeds revenue",
+    "borrowing is zero"
+   ],
+   "answer": 2,
+   "explanation": "A deficit means spending more than is collected in a period; the gap is financed by borrowing. Revenue above spending is a surplus."
+  },
+  {
+   "id": "economics-046",
+   "year": "2023",
+   "topic": "International Trade",
+   "text": "A country's balance of trade is in surplus when its",
+   "options": [
+    "total payments equal total receipts",
+    "visible imports exceed visible exports",
+    "invisible exports exceed invisible imports",
+    "visible exports exceed visible imports"
+   ],
+   "answer": 3,
+   "explanation": "The balance of trade covers visible goods only; a surplus means exports of goods exceed imports of goods."
+  },
+  {
+   "id": "economics-047",
+   "year": "2024",
+   "topic": "International Economic Organisations",
+   "text": "The Economic Community of West African States (ECOWAS) was established primarily to promote",
+   "options": [
+    "a single West African religion",
+    "economic integration among West African states",
+    "political union of West African states",
+    "a common West African army"
+   ],
+   "answer": 1,
+   "explanation": "ECOWAS, founded by the Treaty of Lagos in 1975, aims at economic cooperation and integration, including free movement of goods and people."
+  },
+  {
+   "id": "economics-048",
+   "year": "2025",
+   "topic": "International Trade",
+   "text": "A country is said to have a comparative advantage in producing a good when it can produce the good",
+   "options": [
+    "at a lower opportunity cost than other countries",
+    "using fewer resources than other countries",
+    "at a higher total cost",
+    "without any imports"
+   ],
+   "answer": 0,
+   "explanation": "Comparative advantage depends on relative opportunity cost, not on using fewer resources, which is absolute advantage."
+  },
+  {
+   "id": "economics-049",
+   "year": "2020",
+   "topic": "Economic Systems",
+   "text": "In a mixed economy, resources are allocated by",
+   "options": [
+    "the price mechanism alone",
+    "both the price mechanism and the government",
+    "tradition and custom alone",
+    "central planning alone"
+   ],
+   "answer": 1,
+   "explanation": "A mixed economy combines market forces with government intervention to correct market failures and provide public goods."
+  },
+  {
+   "id": "economics-050",
+   "year": "2021",
+   "topic": "Population",
+   "text": "A country with a population of 200 million growing at 2.5% per year adds how many people per year?",
+   "options": [
+    "5 million",
+    "2.5 million",
+    "50 million",
+    "8 million"
+   ],
+   "answer": 0,
+   "explanation": "Annual increase = 2.5% × 200 million = 5 million people."
+  },
+  {
+   "id": "economics-051",
+   "year": "2022",
+   "topic": "Agriculture",
+   "text": "Subsistence farming is characterised mainly by",
+   "options": [
+    "heavy use of hired labour",
+    "production mainly for export",
+    "large-scale use of machinery",
+    "production mainly for family consumption"
+   ],
+   "answer": 3,
+   "explanation": "Subsistence farmers grow food chiefly to feed their own households, using simple tools and family labour."
+  },
+  {
+   "id": "economics-052",
+   "year": "2023",
+   "topic": "Labour Market",
+   "text": "Seasonal unemployment occurs mainly in",
+   "options": [
+    "manufacturing",
+    "civil service",
+    "agriculture and tourism",
+    "banking and insurance"
+   ],
+   "answer": 2,
+   "explanation": "Work in farming and tourism varies with the seasons, so workers are idle out of season. Banking, the civil service and manufacturing employ workers more steadily."
+  },
+  {
+   "id": "economics-053",
+   "year": "2024",
+   "topic": "Factors of Production",
+   "text": "The reward for land as a factor of production is",
+   "options": [
+    "interest",
+    "rent",
+    "profit",
+    "wages"
+   ],
+   "answer": 1,
+   "explanation": "Land earns rent, labour earns wages, capital earns interest and entrepreneurship earns profit."
+  },
+  {
+   "id": "economics-054",
+   "year": "2025",
+   "topic": "Theory of Supply",
+   "text": "Joint supply occurs when two goods",
+   "options": [
+    "compete for the same resources",
+    "are substitutes in consumption",
+    "are produced together from the same process",
+    "are used together by consumers"
+   ],
+   "answer": 2,
+   "explanation": "Joint supply means goods come from one process, e.g. petrol and kerosene from crude oil. Goods used together are in joint demand, and goods competing for resources are in competitive supply."
+  },
+  {
+   "id": "economics-055",
+   "year": "2020",
+   "topic": "International Trade",
+   "text": "A tax imposed on imported goods is known as a",
+   "options": [
+    "tariff",
+    "quota",
+    "subsidy",
+    "embargo"
+   ],
+   "answer": 0,
+   "explanation": "A tariff is a duty charged on imports. A quota limits quantity, a subsidy supports producers, and an embargo bans trade altogether."
+  },
+  {
+   "id": "economics-056",
+   "year": "2021",
+   "topic": "International Economic Organisations",
+   "text": "OPEC is an organisation of countries that are major exporters of",
+   "options": [
+    "minerals",
+    "manufactured goods",
+    "agricultural products",
+    "petroleum"
+   ],
+   "answer": 3,
+   "explanation": "The Organisation of the Petroleum Exporting Countries coordinates petroleum policies among its member states, including Nigeria."
+  },
+  {
+   "id": "economics-057",
+   "year": "2022",
+   "topic": "International Trade",
+   "text": "If the naira depreciates against the dollar, imported goods in Nigeria will become",
+   "options": [
+    "free of duty",
+    "unchanged in price",
+    "more expensive",
+    "cheaper"
+   ],
+   "answer": 2,
+   "explanation": "Depreciation means more naira are needed to buy each dollar, so the naira price of imports rises."
+  },
+  {
+   "id": "economics-058",
+   "year": "2023",
+   "topic": "Economic Systems",
+   "text": "The economic problem of what to produce is solved in a free enterprise economy mainly by",
+   "options": [
+    "government decree",
+    "the price mechanism",
+    "tradition and custom",
+    "the central planning board"
+   ],
+   "answer": 1,
+   "explanation": "In a market economy, consumer demand and prices signal what firms should produce. Central planning and tradition solve the problem in other systems."
+  },
+  {
+   "id": "economics-059",
+   "year": "2024",
+   "topic": "Theory of Demand",
+   "text": "A good whose demand falls as consumers' incomes rise is called",
+   "options": [
+    "an inferior good",
+    "a complementary good",
+    "a luxury good",
+    "a normal good"
+   ],
+   "answer": 0,
+   "explanation": "Inferior goods, such as low-quality staples, are bought less as incomes rise and consumers switch to better alternatives."
+  },
+  {
+   "id": "economics-060",
+   "year": "2025",
+   "topic": "Economic Growth and Development",
+   "text": "Which of the following is an obstacle to economic development in Nigeria?",
+   "options": [
+    "A growing service sector",
+    "A large population",
+    "Abundant natural resources",
+    "Over-dependence on crude oil exports"
+   ],
+   "answer": 3,
+   "explanation": "Heavy reliance on one export makes the economy vulnerable to oil price shocks. A large population and natural resources are potential assets, not obstacles in themselves."
+  }
+ ]
+}
