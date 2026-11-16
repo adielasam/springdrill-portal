@@ -39,6 +39,10 @@
         .affective-grid label { font-size: 11px; color: var(--gray-500); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
         .affective-grid select { width: 84px; padding: 3px 6px; font-size: 12px; }
         textarea.remark-input { min-height: 56px; font-size: 13px; resize: vertical; }
+        textarea.obs-input { min-height: 44px; font-size: 12px; resize: vertical; }
+        .affective-grid select.ai-suggested { border: 2px solid #059669; background: #ecfdf5; }
+        .ai-reasons { font-size: 12px; line-height: 1.5; }
+        .ai-suggest-btn { font-size: 12px; font-weight: 600; }
         #loadingOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: 0.3s; }
     </style>
     <link rel="stylesheet" href="mobile_responsive.css">
@@ -79,7 +83,7 @@
 
         <div class="page-header">
             <h1>Term Comments &amp; Affective Keys</h1>
-            <p id="roleHint">Write the Supervisor's remark and score the 7 affective traits for each student. These appear on the printed report card.</p>
+            <p id="roleHint">Write the Supervisor's remark and score the 7 affective traits for each student. These appear on the printed report card. You can also write short observations per student and let AI suggest the scores — every suggestion stays yours to review before saving.</p>
         </div>
 
         <div id="alertBox" class="alert d-none shadow-sm mb-4" role="alert" style="font-size: 13px; font-weight: 500;"></div>
@@ -193,7 +197,7 @@
                     const sb = $('sidebar');
                     sb.setAttribute('data-role', 'admin');
                     if (typeof window.renderSidebar === 'function') window.renderSidebar();
-                    $('roleHint').textContent = 'As admin you can write both the Supervisor\'s and the Principal\'s remarks, and score the 7 affective traits. These appear on the printed report card.';
+                    $('roleHint').textContent = 'As admin you can write both the Supervisor\'s and the Principal\'s remarks, and score the 7 affective traits. These appear on the printed report card. You can also write short observations per student and let AI suggest the scores — every suggestion stays yours to review before saving.';
                 }
                 R.TERMS.forEach(t => $('filterTerm').add(new Option(t, t)));
                 R.SUB_TERMS.forEach(t => $('filterSubTerm').add(new Option(t, t)));
@@ -335,7 +339,12 @@
                         <textarea class="form-control remark-input principal-remark" data-student="${s.id}" placeholder="${isAdmin ? "Principal's remark..." : 'Principal\'s remark — admin only'}" ${isAdmin ? '' : 'disabled'}>${R.escapeHtml(row.principal_remark || '')}</textarea>
                         ${isAdmin ? '' : '<div class="text-muted small mt-1">Only the admin/principal can write this remark.</div>'}
                     </td>
-                    <td><div class="affective-grid">${traitHtml}</div></td>
+                    <td>
+                        <div class="affective-grid">${traitHtml}</div>
+                        <textarea class="form-control obs-input mt-2" data-student="${s.id}" rows="2" placeholder="Observations about this student — e.g. always neat, arrives early, helps classmates... (not saved; only used to suggest scores)"></textarea>
+                        <button class="btn btn-sm btn-outline-success mt-1 ai-suggest-btn" data-student="${s.id}"><i class="fas fa-wand-magic-sparkles me-1"></i>Suggest with AI</button>
+                        <div class="ai-reasons small text-muted mt-1" data-student="${s.id}" style="display:none;"></div>
+                    </td>
                 </tr>`;
             }).join('');
         }
@@ -394,9 +403,82 @@
             }
         }
 
+        // AI suggestion for one student's affective traits. The teacher's
+        // own observations are the only evidence sent; the server returns
+        // a score only for traits the observations support, and null for
+        // the rest. Suggestions fill the selects (highlighted green) with
+        // their reasons shown underneath — nothing is saved until the
+        // teacher clicks Save Comments, and any suggestion can be changed
+        // by hand first. If the AI call fails, manual scoring still works.
+        async function suggestAffective(studentId, btn) {
+            const obsEl = document.querySelector(`.obs-input[data-student="${studentId}"]`);
+            const observations = (obsEl ? obsEl.value : '').trim();
+            const reasonsEl = document.querySelector(`.ai-reasons[data-student="${studentId}"]`);
+            if (observations.length < 10) {
+                showAlert('warning', 'Write a few observations about the student first — a sentence or two is enough. AI only suggests from what you write.');
+                // Show the same note under the button, so the feedback is
+                // visible right where the teacher clicked.
+                reasonsEl.innerHTML = '<div class="text-warning fw-bold">Write a few observations first — AI only suggests from what you write.</div>';
+                reasonsEl.style.display = 'block';
+                return;
+            }
+            btn.disabled = true;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Suggesting...';
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                const headers = { 'Content-Type': 'application/json' };
+                if (session?.access_token) headers['Authorization'] = `Bearer ${session.access_token}`;
+                const res = await fetch('/api/suggest-affective', {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({ observations })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error((data && data.error) || ('Request failed (' + res.status + ')'));
+                const suggestions = data.suggestions || {};
+                let filled = 0;
+                R.AFFECTIVE_TRAITS.forEach(t => {
+                    const sel = document.querySelector(`.affective-select[data-student="${studentId}"][data-trait="${t}"]`);
+                    const sug = suggestions[t];
+                    if (!sel) return;
+                    if (sug && Number.isInteger(sug.score) && sug.score >= 1 && sug.score <= 5) {
+                        sel.value = String(sug.score);
+                        sel.classList.add('ai-suggested');
+                        filled++;
+                    }
+                });
+                const lines = R.AFFECTIVE_TRAITS.map(t => {
+                    const sug = suggestions[t];
+                    if (sug && Number.isInteger(sug.score)) return `<div><strong>${R.escapeHtml(t)} ${sug.score}:</strong> ${R.escapeHtml(sug.reason || '')}</div>`;
+                    return `<div><strong>${R.escapeHtml(t)}:</strong> no evidence in your observations — left for you to score.</div>`;
+                }).join('');
+                reasonsEl.innerHTML = '<div class="fw-bold text-success mb-1"><i class="fas fa-wand-magic-sparkles me-1"></i>AI suggestion — review every score before saving.</div>' + lines;
+                reasonsEl.style.display = 'block';
+                if (filled === 0) showAlert('warning', 'AI could not score any trait from those observations. Add more detail about behaviour, or score the traits by hand.');
+            } catch (err) {
+                console.error(err);
+                showAlert('danger', 'AI suggestions are unavailable right now (' + R.escapeHtml(err.message) + '). You can still score the traits by hand.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
         $('filterSession').addEventListener('change', loadClasses);
         $('loadBtn').addEventListener('click', loadStudents);
         $('saveBtn').addEventListener('click', saveComments);
+        // Rows are re-rendered on every load, so the AI buttons and the
+        // suggestion highlight are handled by delegation on the tbody.
+        $('studentsTbody').addEventListener('click', (e) => {
+            const btn = e.target.closest('.ai-suggest-btn');
+            if (btn) suggestAffective(btn.dataset.student, btn);
+        });
+        $('studentsTbody').addEventListener('change', (e) => {
+            if (e.target.classList && e.target.classList.contains('affective-select')) {
+                e.target.classList.remove('ai-suggested');
+            }
+        });
         $('logoutBtn').addEventListener('click', async (e) => {
             e.preventDefault();
             await supabase.auth.signOut();
