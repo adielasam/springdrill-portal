@@ -53,6 +53,10 @@
         .rc-footer { display: flex; justify-content: space-between; margin-top: 50px; }
         .rc-signature { text-align: center; width: 250px; border-top: 2px solid #333; padding-top: 10px; font-weight: bold; }
 
+        /* Flattened while html2pdf captures the card: box-shadow renders
+           badly to canvas, and the PDF page supplies its own margins. */
+        .report-card-container.pdf-export { box-shadow: none; border-radius: 0; }
+
         @media print {
             body { background: white; margin: 0; padding: 0; }
             .sidebar, .controls-card, .mobile-menu-toggle, .sidebar-overlay { display: none !important; }
@@ -138,6 +142,7 @@
             <div>
                 <button class="btn btn-success fw-bold px-4" id="viewReportBtn"><i class="fas fa-search me-2"></i> View Report</button>
                 <button class="btn btn-outline-secondary fw-bold px-4 ms-2" onclick="window.print()" id="printBtn" disabled><i class="fas fa-print me-2"></i> Print</button>
+                <button class="btn btn-danger fw-bold px-4 ms-2" id="downloadPdfBtn" disabled><i class="fas fa-file-download me-2"></i> Download PDF</button>
             </div>
         </div>
 
@@ -222,6 +227,7 @@
     </div>
 
     <script src="resultsEngine.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
@@ -352,6 +358,7 @@
                     document.getElementById('rcPrincipalRemark').innerText = 'No remark recorded yet.';
                     renderAffective({});
                     document.getElementById('printBtn').disabled = true;
+                    document.getElementById('downloadPdfBtn').disabled = true;
                 } else {
                     let rowsHtml = '';
 
@@ -464,6 +471,7 @@
                     document.getElementById('rcPrincipalRemark').innerText = (remarkRow && remarkRow.principal_remark) || 'No remark recorded yet.';
                     renderAffective(remarkRow && remarkRow.affective && typeof remarkRow.affective === 'object' ? remarkRow.affective : {});
                     document.getElementById('printBtn').disabled = false;
+                    document.getElementById('downloadPdfBtn').disabled = false;
                 }
 
                 // Show Document
@@ -475,6 +483,49 @@
             } finally {
                 document.getElementById('viewReportBtn').innerHTML = '<i class="fas fa-search me-2"></i> View Report';
                 document.getElementById('viewReportBtn').disabled = false;
+            }
+        });
+
+        // One-tap PDF download of the loaded report card (html2pdf.js from
+        // CDN: renders the card to canvas, saves an A4 PDF). If the library
+        // or the render fails — offline, blocked CDN, or an unrenderable
+        // image — fall back to the browser print dialog, which can still
+        // save the card as a PDF, and say so in the page alert.
+        document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('downloadPdfBtn');
+            const doc = document.getElementById('reportDocument');
+            if (typeof window.html2pdf === 'undefined') {
+                showCardAlert('warning', 'The PDF download needs an internet connection to load its helper. Opening the print dialog instead — choose "Save as PDF" there.');
+                window.print();
+                return;
+            }
+            const name = (document.getElementById('rcStudentName').innerText || 'Student').trim();
+            const term = document.getElementById('termSelect').value;
+            const subTerm = document.getElementById('subTermSelect').value;
+            const session = document.getElementById('sessionSelect').value;
+            const slug = (s) => s.replace(/[^A-Za-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+            const filename = [slug(name), slug(term), slug(subTerm), slug(session), 'Report-Card'].filter(Boolean).join('_') + '.pdf';
+            btn.disabled = true;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Preparing PDF...';
+            doc.classList.add('pdf-export');
+            try {
+                await window.html2pdf().set({
+                    margin: 10,
+                    filename: filename,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: ['css', 'legacy'] }
+                }).from(doc).save();
+            } catch (err) {
+                console.error(err);
+                showCardAlert('warning', 'The PDF download did not complete. Opening the print dialog instead — choose "Save as PDF" there.');
+                window.print();
+            } finally {
+                doc.classList.remove('pdf-export');
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
             }
         });
 
