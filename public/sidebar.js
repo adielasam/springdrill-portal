@@ -37,15 +37,14 @@
  * DELIBERATELY REMOVED (dead links — no page exists for them yet).
  * These return when the feature is built; do NOT re-add them as
  * href="#" — the repo rule is "no dead links".
- * - Admin Reports: Report Setup, Reports View, Process Reports,
- *   Report Entry, Promotion Manager, Transfer Manager (both Junior
- *   and High School sections). Only Approve Reports and Publish
- *   Report have pages today. The rest arrive with the results
- *   engine (Phase 1 of the Spring Drill additions proposal).
- * - Teacher: Make Report (pointed at /high/result/make — an Educare
- *   path that does not exist on Spring Drill), Teacher Reports,
- *   Teacher Comments, BehaviourTracker, TimeTable, Photo Journals.
- *   These were onclick="alert('... coming soon')" placeholders.
+ * - Admin Reports: Process Reports, Report Entry, Transfer Manager
+ *   (both Junior and High School sections). Report Setup, Reports
+ *   View, Promotion Manager and Term Comments arrived with the
+ *   results engine (Phase 1 of the Spring Drill additions proposal).
+ * - Teacher: Teacher Reports, BehaviourTracker, TimeTable,
+ *   Photo Journals. Make Report and Teacher Comments arrived with
+ *   the results engine (Phase 1). The rest were
+ *   "coming soon" onclick placeholders.
  * - Student sidebar is NOT touched by this file (it is already
  *   consistent across student pages). Pages with no sidebar at all
  *   (report/print/exam flows such as take_test.html,
@@ -82,8 +81,13 @@
                 { label: 'Publish Report', href: 'admin_publish_reports.html' }
             ]},
             { label: 'High School Report', icon: 'fas fa-file-alt', id: 'highReportMenu', children: [
+                { label: 'Report Setup', href: 'admin_assessment_setup.html' },
+                { label: 'Reports View', href: 'admin_broadsheet.html' },
                 { label: 'Approve Reports', href: 'admin_approve_reports.html' },
-                { label: 'Publish Report', href: 'admin_publish_reports.html' }
+                { label: 'Publish Report', href: 'admin_publish_reports.html' },
+                { label: 'Bulk Print Cards', href: 'admin_report_cards.html' },
+                { label: 'Promotion Manager', href: 'admin_promotion.html' },
+                { label: 'Term Comments', href: 'teacher_comments.html' }
             ]},
             { heading: 'Operations' },
             { label: 'Admissions', href: 'admin_admissions.html', icon: 'fas fa-graduation-cap' },
@@ -119,6 +123,8 @@
                 { label: 'JAMB Q-Bank', href: 'jamb_question_bank.html', icon: 'fas fa-book' }
             ]},
             { label: 'Reports', icon: 'fas fa-file-alt', id: 'reportsMenu', children: [
+                { label: 'Make Report', href: 'teacher_make_report.html', icon: 'fas fa-edit' },
+                { label: 'Teacher Comments', href: 'teacher_comments.html', icon: 'fas fa-comment' },
                 { label: 'Report Scores', href: 'report_scores.html', icon: 'fas fa-chart-bar' },
                 { label: 'Print Report Cards', href: 'report_card.html', icon: 'fas fa-print' }
             ]},
@@ -236,4 +242,10 @@
     } else {
         init();
     }
+
+    // Pages shared by both roles (e.g. teacher_comments.html, linked from
+    // both menus) re-render after switching #sidebar's data-role once the
+    // signed-in user's role is known. Re-running init() is safe: it
+    // rebuilds the markup, re-marks the active page and re-wires logout.
+    window.renderSidebar = init;
 })();

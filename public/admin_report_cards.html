@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPRINGDRILL - Bulk Print Report Cards</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --brand-600: #059669; --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-500: #6b7280; --gray-900: #111827;
+            --bg-color: var(--gray-50); --card-bg: #ffffff; --text-main: var(--gray-900); --text-muted: var(--gray-500);
+            --border-color: var(--gray-200); --input-bg: var(--gray-100);
+            --radius: 12px; --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; }
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); padding: 32px 16px; z-index: 1050; transition: transform 0.3s ease; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+        .sidebar-brand h4 { font-weight: 800; margin: 0; font-size: 20px; letter-spacing: -0.5px; }
+        .sidebar-heading { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 16px 12px 8px; margin-top: 8px; }
+        .nav-link { color: var(--text-muted); padding: 10px 12px; margin: 2px 0; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; }
+        .nav-link:hover { background: var(--input-bg); color: var(--text-main); }
+        .nav-link.active { background: var(--brand-600); color: white; font-weight: 600; box-shadow: var(--shadow-sm); }
+        .main-content { margin-left: 280px; padding: 32px 48px; min-height: 100vh; }
+        .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .breadcrumb { margin: 0; font-size: 14px; font-weight: 500; color: var(--text-muted); }
+        .breadcrumb span { color: var(--text-main); font-weight: 600; }
+        .page-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.5px; }
+        .page-header p { font-size: 14px; color: var(--text-muted); margin: 0; }
+        .premium-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
+        .card-header-green { background: #007a4d; color: white; padding: 12px 20px; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+        .form-label { font-size: 12px; font-weight: 600; color: var(--gray-500); margin-bottom: 4px; }
+        .form-select { font-size: 13px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg); }
+
+        /* A4 card */
+        .report-card { background: white; width: 210mm; max-width: 100%; min-height: 280mm; margin: 0 auto 32px; padding: 16mm; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 5px; }
+        .rc-header { text-align: center; border-bottom: 4px double #1a3c34; padding-bottom: 14px; margin-bottom: 20px; }
+        .rc-school-name { font-size: 26px; font-weight: 900; color: #1a3c34; text-transform: uppercase; letter-spacing: 2px; margin: 0; }
+        .rc-title { font-size: 16px; font-weight: bold; background: #1a3c34; color: white; display: inline-block; padding: 4px 18px; border-radius: 20px; margin-top: 10px; }
+        .rc-student-info { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 20px; border: 1px solid #dee2e6; padding: 14px; border-radius: 10px; background: #fdfdfd; }
+        .rc-passport { width: 96px; height: 96px; border: 2px solid #1a3c34; border-radius: 10px; object-fit: cover; }
+        .rc-table th { background-color: #f4f7fa !important; color: #1a3c34; border-bottom: 2px solid #1a3c34; font-size: 12px; }
+        .rc-table td { font-size: 13px; font-weight: 600; }
+        .rc-remark-box { border: 1px solid #dee2e6; border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; }
+        .rc-remark-box h6 { font-size: 13px; font-weight: 700; text-decoration: underline; margin-bottom: 6px; }
+        .rc-remark-box p { font-style: italic; margin: 0; font-size: 13px; }
+        .rc-affective td, .rc-affective th { font-size: 12px; padding: 6px 10px; }
+        .rc-footer { display: flex; justify-content: space-between; margin-top: 36px; }
+        .rc-signature { text-align: center; width: 220px; border-top: 2px solid #333; padding-top: 8px; font-weight: bold; font-size: 13px; }
+        .rc-grade-key { font-size: 11px; color: #6b7280; margin-top: 16px; }
+        #loadingOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: 0.3s; }
+
+        @media print {
+            body { background: white; margin: 0; padding: 0; }
+            .sidebar, .sidebar-overlay, .mobile-menu-toggle, .no-print { display: none !important; }
+            .main-content { margin: 0; padding: 0; }
+            .report-card { width: 100%; box-shadow: none; border-radius: 0; padding: 0; margin: 0; min-height: auto; page-break-after: always; }
+            .report-card:last-child { page-break-after: auto; }
+            .rc-table th { background-color: #f4f7fa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .rc-title { background: #1a3c34 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            @page { margin: 1cm; size: A4 portrait; }
+        }
+        @media (max-width: 992px) {
+            .main-content { margin-left: 0; padding: 15px; }
+            .rc-student-info { flex-direction: column-reverse; }
+        }
+    </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
+</head>
+<body>
+    <div id="loadingOverlay">
+        <i data-lucide="loader-2" class="lucide-spin" style="width: 48px; height: 48px; color: var(--brand-600); margin-bottom: 16px;"></i>
+        <h5 style="font-weight: 600; color: var(--text-muted); font-size: 16px;">Loading Report Cards...</h5>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar" data-role="admin">
+        <!-- Shared sidebar: rendered by sidebar.js (one menu for all admin/teacher pages). -->
+    </div>
+    <script src="sidebar.js"></script>
+
+    <div class="main-content">
+        <div class="top-navbar no-print">
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle me-2" onclick="toggleSidebar()" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
+                <div class="breadcrumb">SpringDrill / Reports / <span>Bulk Print Report Cards</span></div>
+            </div>
+            <div class="dropdown">
+                <div class="topbar-profile" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 4px 8px; border-radius: 8px;">
+                    <div class="info" style="text-align: right;">
+                        <div class="name" id="navAdminName" style="font-weight: 600; font-size: 14px;">Admin</div>
+                        <div class="role" style="font-size: 12px; color: var(--text-muted);">Workspace Owner</div>
+                    </div>
+                    <div class="avatar" id="navAvatar" style="overflow: hidden; width: 40px; height: 40px; border-radius: 50%; background: #d1fae5; color: #059669; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">AD</div>
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border: 1px solid var(--border-color); border-radius: 8px;">
+                    <li><a class="dropdown-item" href="admin_settings.html" style="font-size: 13px; font-weight: 500;">My Profile</a></li>
+                    <li><a class="dropdown-item" href="admin_settings.html" style="font-size: 13px; font-weight: 500;">Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#" id="logoutBtn" style="font-size: 13px; font-weight: 500;">Log Out</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="page-header no-print">
+            <h1>Bulk Print Report Cards</h1>
+            <p>One card per student for the whole class. Print (or save as PDF from the print dialog). Cards show approved &amp; published results by default.</p>
+        </div>
+
+        <div id="alertBox" class="alert d-none shadow-sm mb-4 no-print" role="alert" style="font-size: 13px; font-weight: 500;"></div>
+
+        <div id="setupBanner" class="alert alert-warning d-none shadow-sm mb-4 no-print" role="alert" style="font-size: 13px;">
+            <strong><i class="fas fa-database me-2"></i>Database setup required.</strong>
+            The results tables need the Phase 1 setup before cards can load. Ask the administrator to run
+            <code>supabase/migrations/phase1-results-engine.sql</code> once in the Supabase SQL editor, then reload this page.
+            <span id="setupDetail" class="d-block mt-1 text-muted"></span>
+        </div>
+
+        <div class="premium-card mb-4 no-print">
+            <div class="card-header-green"><i data-lucide="filter" style="width:16px; height:16px;"></i> Select Class &amp; Term</div>
+            <div class="p-4" style="background: white;">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-2">
+                        <label class="form-label">Session</label>
+                        <select id="filterSession" class="form-select"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Term</label>
+                        <select id="filterTerm" class="form-select"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Sub-Term</label>
+                        <select id="filterSubTerm" class="form-select"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Class</label>
+                        <select id="filterClass" class="form-select"><option value="">Select Class</option></select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Results Shown</label>
+                        <select id="filterStatus" class="form-select">
+                            <option value="approved" selected>Approved &amp; published only</option>
+                            <option value="all">All results (any status)</option>
+                            <option value="published">Published only</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button id="loadBtn" class="btn w-100" style="background: #007a4d; color: white; font-weight: 600; font-size: 13px; padding: 10px; border-radius: 6px;"><i data-lucide="search" style="width:16px; height:16px; margin-right:4px;"></i> Load Cards</button>
+                    </div>
+                    <div class="col-md-2">
+                        <button id="printBtn" class="btn btn-outline-dark w-100 fw-bold" disabled><i class="fas fa-print me-2"></i>Print All</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="cardsHost">
+            <div class="text-center py-5 text-muted no-print">
+                <i class="fas fa-id-card fa-4x opacity-25 mb-3"></i>
+                <h5 class="fw-bold">Select filters and click Load Cards</h5>
+                <p class="small">Remarks and affective scores are entered on the Term Comments page.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="resultsEngine.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        const R = window.ResultsEngine;
+        let sessions = [];
+        const $ = (id) => document.getElementById(id);
+
+        function showAlert(type, msg) {
+            const box = $('alertBox');
+            box.className = `alert alert-${type} shadow-sm mb-4 no-print`;
+            box.innerHTML = msg;
+            box.classList.remove('d-none');
+            setTimeout(() => box.classList.add('d-none'), 6000);
+        }
+
+        function isSetupError(err) {
+            const m = (err && err.message ? err.message : '') + ' ' + (err && err.code ? err.code : '');
+            return /session|does not exist|42703|PGRST204/i.test(m);
+        }
+
+        async function init() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = '/';
+                const { data: profile } = await supabase.from('users').select('name, avatar_url, role').eq('id', session.user.id).single();
+                if (profile && profile.role !== 'admin') return window.location.href = '/';
+                if (profile) {
+                    $('navAdminName').innerText = profile.name || 'Admin';
+                    const av = $('navAvatar');
+                    if (profile.avatar_url) { av.style.background = `url('${profile.avatar_url}') center/cover`; av.innerText = ''; }
+                    else av.innerText = (profile.name || 'AD').substring(0, 2).toUpperCase();
+                }
+                R.TERMS.forEach(t => $('filterTerm').add(new Option(t, t)));
+                R.SUB_TERMS.forEach(t => $('filterSubTerm').add(new Option(t, t)));
+                const { data: sessData } = await supabase.from('academic_sessions').select('id, name').order('name', { ascending: false });
+                sessions = sessData || [];
+                if (sessions.length === 0) {
+                    $('filterSession').add(new Option('2026/2027', '2026/2027'));
+                    sessions = [{ id: null, name: '2026/2027' }];
+                } else {
+                    sessions.forEach(s => $('filterSession').add(new Option(s.name, s.id)));
+                }
+                const { data: clsData } = await supabase.from('classes').select('id, name').order('name');
+                (clsData || []).forEach(c => $('filterClass').add(new Option(c.name, c.id)));
+                lucide.createIcons();
+                $('loadingOverlay').style.opacity = '0';
+                setTimeout(() => $('loadingOverlay').style.display = 'none', 300);
+            } catch (err) {
+                console.error(err);
+                $('loadingOverlay').style.display = 'none';
+            }
+        }
+
+        function selection() {
+            const sessionId = $('filterSession').value;
+            const sessionRow = sessions.find(s => String(s.id) === String(sessionId)) || sessions[0];
+            return {
+                sessionName: sessionRow ? sessionRow.name : '',
+                term: $('filterTerm').value,
+                subTerm: $('filterSubTerm').value,
+                classId: $('filterClass').value,
+                statusMode: $('filterStatus').value
+            };
+        }
+
+        function statusFilter(rows, mode) {
+            if (mode === 'approved') return rows.filter(r => r.status === 'approved' || r.status === 'published');
+            if (mode === 'published') return rows.filter(r => r.status === 'published');
+            return rows;
+        }
+
+        async function loadCards() {
+            const sel = selection();
+            if (!sel.term || !sel.subTerm || !sel.classId) {
+                showAlert('warning', 'Please select Term, Sub-Term and Class first.');
+                return;
+            }
+            const btn = $('loadBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            try {
+                const [{ data: studData, error: studErr }, { data: rows, error: rowsErr }, { data: subjData }] = await Promise.all([
+                    supabase.from('students').select('id, user_id, first_name, surname, reg_number, passport_url').eq('class_id', sel.classId).eq('approved', true).order('surname').order('first_name'),
+                    supabase.from('term_results').select('*').eq('class_id', sel.classId).eq('term', sel.term).eq('sub_term', sel.subTerm).or('session.eq."' + sel.sessionName + '",session.is.null'),
+                    supabase.from('subjects').select('id, name')
+                ]);
+                if (studErr) throw studErr;
+                if (rowsErr) throw rowsErr;
+
+                // Join subject/user names with plain queries (no relation
+                // embeds: the live DB has no term_results -> subjects FK).
+                const subjById = {};
+                (subjData || []).forEach(s => { subjById[String(s.id)] = s; });
+                (rows || []).forEach(r => { r.subjects = subjById[String(r.subject_id)] || null; });
+                const userIds = [...new Set((studData || []).map(s => s.user_id).filter(Boolean))];
+                if (userIds.length) {
+                    const { data: userData } = await supabase.from('users').select('id, name').in('id', userIds);
+                    const userById = {};
+                    (userData || []).forEach(u => { userById[String(u.id)] = u; });
+                    (studData || []).forEach(s => { s.users = userById[String(s.user_id)] || null; });
+                }
+
+                // Remarks are optional: if the table is missing (migration not
+                // run), cards still render — remarks show as not recorded.
+                let remarksByStudent = {};
+                let remarksAvailable = true;
+                try {
+                    const { data: remarks, error: remErr } = await supabase
+                        .from('report_remarks')
+                        .select('*')
+                        .eq('class_id', sel.classId).eq('term', sel.term).eq('sub_term', sel.subTerm).eq('session', sel.sessionName);
+                    if (remErr) throw remErr;
+                    (remarks || []).forEach(r => { remarksByStudent[String(r.student_id)] = r; });
+                } catch (remErr) {
+                    console.warn('Remarks unavailable:', remErr.message);
+                    remarksAvailable = false;
+                }
+
+                const filtered = statusFilter(rows || [], sel.statusMode);
+                const summaries = (studData || []).map(s => {
+                    const sRows = filtered.filter(r => String(r.student_id) === String(s.id));
+                    return { student: s, rows: sRows, average: R.averageOf(sRows) };
+                });
+                const positions = R.assignPositions(summaries.map(s => ({ key: String(s.student.id), average: s.average })));
+                summaries.forEach(s => { s.position = positions[String(s.student.id)]; });
+
+                renderCards(sel, summaries, remarksByStudent, remarksAvailable);
+                $('printBtn').disabled = summaries.length === 0;
+            } catch (err) {
+                console.error(err);
+                if (isSetupError(err)) {
+                    $('setupDetail').textContent = 'Technical detail: ' + err.message;
+                    $('setupBanner').classList.remove('d-none');
+                    showAlert('warning', 'Cards cannot load until the Phase 1 database setup has been run (see the banner above).');
+                } else {
+                    showAlert('danger', 'Failed to load cards: ' + R.escapeHtml(err.message));
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i data-lucide="search" style="width:16px; height:16px; margin-right:4px;"></i> Load Cards';
+                lucide.createIcons();
+            }
+        }
+
+        function renderCards(sel, summaries, remarksByStudent, remarksAvailable) {
+            const host = $('cardsHost');
+            const className = $('filterClass').options[$('filterClass').selectedIndex].text;
+            if (summaries.length === 0) {
+                host.innerHTML = '<div class="text-center py-5 text-muted"><h5 class="fw-bold">No approved students in this class.</h5></div>';
+                return;
+            }
+            host.innerHTML = summaries.map(s => {
+                const st = s.student;
+                const name = R.escapeHtml(`${st.first_name || ''} ${st.surname || ''}`.trim() || (st.users && st.users.name) || 'Unnamed Student');
+                const photo = st.passport_url || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&size=150&background=1a3c34&color=fff');
+                const regNo = R.escapeHtml(st.reg_number || ('SD-' + String(st.id)));
+                const remark = remarksByStudent[String(st.id)] || null;
+
+                const subjectRows = s.rows.slice().sort((a, b) => (a.subjects?.name || '').localeCompare(b.subjects?.name || '')).map(r => {
+                    const total = R.subjectTotal(r);
+                    const band = R.ssceGrade(total);
+                    const cell = (v) => v == null ? '--' : R.num(v);
+                    return `<tr>
+                        <td>${R.escapeHtml(r.subjects?.name || 'Unknown Subject')}</td>
+                        <td class="text-center">${cell(r.first_cat)}</td>
+                        <td class="text-center">${cell(r.second_cat)}</td>
+                        <td class="text-center">${cell(r.exam)}</td>
+                        <td class="text-center fw-bold">${R.hasAnyScore(r) ? total : '--'}</td>
+                        <td class="text-center fw-bold">${R.hasAnyScore(r) ? band.letter : '--'}</td>
+                        <td class="text-center small">${R.hasAnyScore(r) ? band.remark : '--'}</td>
+                    </tr>`;
+                }).join('') || '<tr><td colspan="7" class="text-center text-muted py-3">No results recorded for this term.</td></tr>';
+
+                const avg = s.average == null ? '--' : s.average.toFixed(1);
+                const pos = s.position == null ? '--' : R.ordinal(s.position) + ' in Class';
+                const supervisorRemark = remark && remark.supervisor_remark ? R.escapeHtml(remark.supervisor_remark) : 'No remark recorded yet.';
+                const principalRemark = remark && remark.principal_remark ? R.escapeHtml(remark.principal_remark) : 'No remark recorded yet.';
+                const affective = (remark && remark.affective && typeof remark.affective === 'object') ? remark.affective : {};
+                const affectiveRows = R.AFFECTIVE_TRAITS.map(t => {
+                    const v = affective[t];
+                    const label = v == null ? '--' : `${v} — ${R.AFFECTIVE_KEYS[v] || ''}`;
+                    return `<tr><td>${t}</td><td class="text-center fw-bold">${label}</td></tr>`;
+                }).join('');
+                const gradeKey = R.SSCE_BANDS.map(b => `${b.min}–${b.letter === 'A1' ? 100 : R.SSCE_BANDS[R.SSCE_BANDS.indexOf(b) - 1].min - 1} ${b.letter}`).join(' &nbsp;|&nbsp; ');
+
+                return `<div class="report-card">
+                    <div class="rc-header">
+                        <h1 class="rc-school-name">SpringDrill Academy</h1>
+                        <p class="mb-0 text-muted fw-bold small">Excellence in Knowledge and Character</p>
+                        <div class="rc-title">STUDENT ACADEMIC REPORT — ${R.escapeHtml(sel.term.toUpperCase())} (${R.escapeHtml(sel.subTerm.toUpperCase())})</div>
+                    </div>
+                    <div class="rc-student-info">
+                        <table class="table table-borderless table-sm mb-0">
+                            <tr><td class="text-muted text-end">Student Name:</td><td class="fw-bold fs-5 text-uppercase">${name}</td></tr>
+                            <tr><td class="text-muted text-end">Reg Number:</td><td class="fw-bold">${regNo}</td></tr>
+                            <tr><td class="text-muted text-end">Class:</td><td class="fw-bold">${R.escapeHtml(className)}</td></tr>
+                            <tr><td class="text-muted text-end">Session:</td><td class="fw-bold">${R.escapeHtml(sel.sessionName)}</td></tr>
+                        </table>
+                        <div><img src="${R.escapeHtml(photo)}" alt="Student Photo" class="rc-passport"></div>
+                    </div>
+                    <table class="table table-bordered rc-table mb-3">
+                        <thead><tr>
+                            <th width="28%">SUBJECT</th><th class="text-center">1ST CAT (20)</th><th class="text-center">2ND CAT (20)</th><th class="text-center">EXAM (60)</th><th class="text-center">TOTAL (100)</th><th class="text-center">GRADE</th><th class="text-center">REMARK</th>
+                        </tr></thead>
+                        <tbody>${subjectRows}</tbody>
+                        <tfoot><tr class="table-light border-top border-dark border-2">
+                            <td class="fw-bold text-end" colspan="4">OVERALL AVERAGE:</td>
+                            <td class="text-center fw-bold fs-5" colspan="3">${avg}% &nbsp;·&nbsp; Position: ${pos}</td>
+                        </tr></tfoot>
+                    </table>
+                    <div class="rc-remark-box"><h6>Supervisor's Remark:</h6><p>${supervisorRemark}</p></div>
+                    <div class="rc-remark-box"><h6>Principal's Remark:</h6><p>${principalRemark}</p></div>
+                    <h6 class="fw-bold mt-4 mb-2" style="font-size:13px;">AFFECTIVE KEYS (5 = Excellent, 4 = Good, 3 = Satisfactory, 2 = Fair, 1 = Poor)</h6>
+                    <table class="table table-bordered rc-affective mb-2"><tbody>${affectiveRows}</tbody></table>
+                    ${remarksAvailable ? '' : '<p class="text-muted small">Remarks and affective scores are unavailable — the Phase 1 database setup has not been run yet.</p>'}
+                    <p class="rc-grade-key"><strong>SSCE Grading:</strong> ${gradeKey}</p>
+                    <div class="rc-footer">
+                        <div class="rc-signature">Class Teacher's Signature</div>
+                        <div class="rc-signature">Principal's Signature &amp; Stamp</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        $('loadBtn').addEventListener('click', loadCards);
+        $('printBtn').addEventListener('click', () => window.print());
+        $('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = '/';
+        });
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+    <script src="mobile_nav.js"></script>
+</body>
+</html>

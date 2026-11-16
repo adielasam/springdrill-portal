@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPRINGDRILL - Promotion Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --brand-600: #059669; --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-500: #6b7280; --gray-900: #111827;
+            --bg-color: var(--gray-50); --card-bg: #ffffff; --text-main: var(--gray-900); --text-muted: var(--gray-500);
+            --border-color: var(--gray-200); --input-bg: var(--gray-100);
+            --radius: 12px; --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; }
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); padding: 32px 16px; z-index: 1050; transition: transform 0.3s ease; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+        .sidebar-brand h4 { font-weight: 800; margin: 0; font-size: 20px; letter-spacing: -0.5px; }
+        .sidebar-heading { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 16px 12px 8px; margin-top: 8px; }
+        .nav-link { color: var(--text-muted); padding: 10px 12px; margin: 2px 0; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; }
+        .nav-link:hover { background: var(--input-bg); color: var(--text-main); }
+        .nav-link.active { background: var(--brand-600); color: white; font-weight: 600; box-shadow: var(--shadow-sm); }
+        .main-content { margin-left: 280px; padding: 32px 48px; min-height: 100vh; }
+        .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .breadcrumb { margin: 0; font-size: 14px; font-weight: 500; color: var(--text-muted); }
+        .breadcrumb span { color: var(--text-main); font-weight: 600; }
+        .page-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.5px; }
+        .page-header p { font-size: 14px; color: var(--text-muted); margin: 0; }
+        .premium-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
+        .card-header-green { background: #007a4d; color: white; padding: 12px 20px; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+        .form-label { font-size: 12px; font-weight: 600; color: var(--gray-500); margin-bottom: 4px; }
+        .form-select { font-size: 13px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg); }
+        .sv-table th { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--gray-500); letter-spacing: 0.5px; padding: 12px 16px; border-bottom: 1px solid var(--border-color); background: var(--gray-50); white-space: nowrap; }
+        .sv-table td { font-size: 13px; padding: 12px 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; white-space: nowrap; }
+        .student-photo { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #e5e7eb; }
+        #loadingOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: 0.3s; }
+    </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
+</head>
+<body>
+    <div id="loadingOverlay">
+        <i data-lucide="loader-2" class="lucide-spin" style="width: 48px; height: 48px; color: var(--brand-600); margin-bottom: 16px;"></i>
+        <h5 style="font-weight: 600; color: var(--text-muted); font-size: 16px;">Loading Promotion Manager...</h5>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar" data-role="admin">
+        <!-- Shared sidebar: rendered by sidebar.js (one menu for all admin/teacher pages). -->
+    </div>
+    <script src="sidebar.js"></script>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle me-2" onclick="toggleSidebar()" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
+                <div class="breadcrumb">SpringDrill / Reports / <span>Promotion Manager</span></div>
+            </div>
+            <div class="dropdown">
+                <div class="topbar-profile" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 4px 8px; border-radius: 8px;">
+                    <div class="info" style="text-align: right;">
+                        <div class="name" id="navAdminName" style="font-weight: 600; font-size: 14px;">Admin</div>
+                        <div class="role" style="font-size: 12px; color: var(--text-muted);">Workspace Owner</div>
+                    </div>
+                    <div class="avatar" id="navAvatar" style="overflow: hidden; width: 40px; height: 40px; border-radius: 50%; background: #d1fae5; color: #059669; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">AD</div>
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border: 1px solid var(--border-color); border-radius: 8px;">
+                    <li><a class="dropdown-item" href="admin_settings.html" style="font-size: 13px; font-weight: 500;">My Profile</a></li>
+                    <li><a class="dropdown-item" href="admin_settings.html" style="font-size: 13px; font-weight: 500;">Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#" id="logoutBtn" style="font-size: 13px; font-weight: 500;">Log Out</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="page-header">
+            <h1>Promote Students</h1>
+            <p>Promotion is manual, one student at a time — there is no automatic pass mark or rule. Pick the year group, then choose each student's new class. An optional automatic rule (promote if the average reaches a threshold) is a follow-up, not part of this page.</p>
+        </div>
+
+        <div id="alertBox" class="alert d-none shadow-sm mb-4" role="alert" style="font-size: 13px; font-weight: 500;"></div>
+
+        <div class="premium-card mb-4">
+            <div class="card-header-green"><i data-lucide="filter" style="width:16px; height:16px;"></i> Select Year Group</div>
+            <div class="p-4" style="background: white;">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label">Year Group</label>
+                        <select id="yearGroupSelect" class="form-select">
+                            <option value="">Select Year Group</option>
+                            <option value="7">Year 7</option>
+                            <option value="8">Year 8</option>
+                            <option value="9">Year 9</option>
+                            <option value="10">Year 10</option>
+                            <option value="11">Year 11</option>
+                            <option value="12">Year 12</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button id="loadBtn" class="btn w-100" style="background: #007a4d; color: white; font-weight: 600; font-size: 13px; padding: 10px; border-radius: 6px;"><i data-lucide="search" style="width:16px; height:16px; margin-right:4px;"></i> Load Students</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="premium-card">
+            <div class="card-header-green" id="tableTitle"><i data-lucide="users" style="width:16px; height:16px;"></i> Students</div>
+            <div class="p-0">
+                <div class="table-responsive m-0" style="min-height: 200px;">
+                    <table class="table table-hover align-middle m-0 sv-table">
+                        <thead>
+                            <tr>
+                                <th>Photo</th>
+                                <th>Full Name</th>
+                                <th>Reg Number</th>
+                                <th>Current Level</th>
+                                <th>Promote To</th>
+                                <th>Select New Class</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTbody">
+                            <tr><td colspan="7" class="text-center py-5 text-muted" style="font-size:13px;">Select a year group and click Load Students.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="resultsEngine.js"></script>
+    <script src="sd-confirm.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        const R = window.ResultsEngine;
+        let allClasses = [];
+        let yearStudents = [];
+        const $ = (id) => document.getElementById(id);
+
+        const YEAR_GROUPS = ['Year 7', 'Year 8', 'Year 9', 'Year 10', 'Year 11', 'Year 12'];
+
+        function showAlert(type, msg) {
+            const box = $('alertBox');
+            box.className = `alert alert-${type} shadow-sm mb-4`;
+            box.innerHTML = msg;
+            box.classList.remove('d-none');
+            setTimeout(() => box.classList.add('d-none'), 6000);
+        }
+
+        function classMatchesYear(className, year) {
+            const n = (className || '').toLowerCase();
+            return n.includes('year ' + year) || n.includes('year' + year);
+        }
+
+        async function init() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = '/';
+                const { data: profile } = await supabase.from('users').select('name, avatar_url, role').eq('id', session.user.id).single();
+                if (profile && profile.role !== 'admin') return window.location.href = '/';
+                if (profile) {
+                    $('navAdminName').innerText = profile.name || 'Admin';
+                    const av = $('navAvatar');
+                    if (profile.avatar_url) { av.style.background = `url('${profile.avatar_url}') center/cover`; av.innerText = ''; }
+                    else av.innerText = (profile.name || 'AD').substring(0, 2).toUpperCase();
+                }
+                const { data: clsData } = await supabase.from('classes').select('id, name').order('name');
+                allClasses = clsData || [];
+                lucide.createIcons();
+                $('loadingOverlay').style.opacity = '0';
+                setTimeout(() => $('loadingOverlay').style.display = 'none', 300);
+            } catch (err) {
+                console.error(err);
+                $('loadingOverlay').style.display = 'none';
+            }
+        }
+
+        async function loadStudents() {
+            const year = $('yearGroupSelect').value;
+            if (!year) { showAlert('warning', 'Please select a year group first.'); return; }
+            const tbody = $('studentsTbody');
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>Loading students...</td></tr>';
+            try {
+                const { data, error } = await supabase
+                    .from('students')
+                    .select('id, first_name, surname, reg_number, passport_url, class_id')
+                    .order('surname').order('first_name');
+                if (error) throw error;
+                // Join class names with a plain query instead of a relation
+                // embed (plain queries work with or without a foreign key).
+                const { data: classData } = await supabase.from('classes').select('id, name');
+                const classById = {};
+                (classData || []).forEach(c => { classById[String(c.id)] = c; });
+                (data || []).forEach(s => { s.classes = classById[String(s.class_id)] || null; });
+                yearStudents = (data || []).filter(s => classMatchesYear(s.classes?.name, year));
+                $('tableTitle').innerHTML = `<i data-lucide="users" style="width:16px; height:16px;"></i> Year ${year} — ${yearStudents.length} student(s)`;
+                lucide.createIcons();
+                if (yearStudents.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted" style="font-size:13px;">No students found in this year group.</td></tr>';
+                    return;
+                }
+                const defaultTarget = Math.min(parseInt(year, 10) + 1, 12);
+                tbody.innerHTML = yearStudents.map(s => {
+                    const name = `${s.first_name || ''} ${s.surname || ''}`.trim() || 'Unnamed Student';
+                    const photo = s.passport_url || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&size=80&background=1a3c34&color=fff');
+                    const promoteOptions = YEAR_GROUPS.map(g => {
+                        const y = g.replace('Year ', '');
+                        return `<option value="${y}" ${parseInt(y, 10) === defaultTarget ? 'selected' : ''}>${g}</option>`;
+                    }).join('') + '<option value="WITHDRAW">WITHDRAW</option>';
+                    return `<tr>
+                        <td><img src="${R.escapeHtml(photo)}" class="student-photo" alt=""></td>
+                        <td class="fw-bold">${R.escapeHtml(name)}</td>
+                        <td>${R.escapeHtml(s.reg_number || '')}</td>
+                        <td>${R.escapeHtml(s.classes?.name || 'Unassigned')}</td>
+                        <td><select class="form-select form-select-sm promote-to" data-student="${s.id}">${promoteOptions}</select></td>
+                        <td><select class="form-select form-select-sm new-class" data-student="${s.id}"></select></td>
+                        <td class="text-end"><button class="btn btn-sm btn-success fw-bold promote-btn" data-student="${s.id}" data-name="${R.escapeHtml(name)}">Promote</button></td>
+                    </tr>`;
+                }).join('');
+
+                const refreshNewClass = (studentId) => {
+                    const toSel = document.querySelector(`.promote-to[data-student="${studentId}"]`);
+                    const classSel = document.querySelector(`.new-class[data-student="${studentId}"]`);
+                    const target = toSel.value;
+                    if (target === 'WITHDRAW') {
+                        classSel.innerHTML = '<option value="">—</option>';
+                        classSel.disabled = true;
+                        return;
+                    }
+                    classSel.disabled = false;
+                    const matches = allClasses.filter(c => classMatchesYear(c.name, target));
+                    classSel.innerHTML = matches.length
+                        ? matches.map(c => `<option value="${c.id}">${R.escapeHtml(c.name)}</option>`).join('')
+                        : '<option value="">No class in that year group</option>';
+                };
+                document.querySelectorAll('.promote-to').forEach(sel => {
+                    refreshNewClass(sel.dataset.student);
+                    sel.addEventListener('change', () => refreshNewClass(sel.dataset.student));
+                });
+                document.querySelectorAll('.promote-btn').forEach(btn => {
+                    btn.addEventListener('click', () => promoteStudent(btn.dataset.student, btn.dataset.name, btn));
+                });
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-danger">Failed to load students: ' + R.escapeHtml(err.message) + '</td></tr>';
+            }
+        }
+
+        async function promoteStudent(studentId, studentName, btn) {
+            const toSel = document.querySelector(`.promote-to[data-student="${studentId}"]`);
+            const classSel = document.querySelector(`.new-class[data-student="${studentId}"]`);
+            const target = toSel.value;
+            if (target === 'WITHDRAW') {
+                const ok = await window.sdConfirm({
+                    title: 'Withdraw student?',
+                    message: `${studentName} will be marked as withdrawn (unapproved) and will no longer appear in class lists. This can be reversed from Approvals.`,
+                    confirmLabel: 'Withdraw',
+                    cancelLabel: 'Cancel',
+                    danger: true
+                });
+                if (!ok) return;
+                btn.disabled = true;
+                const { error } = await supabase.from('students').update({ approved: false }).eq('id', studentId);
+                btn.disabled = false;
+                if (error) { showAlert('danger', 'Withdrawal failed: ' + R.escapeHtml(error.message)); return; }
+                showAlert('success', `${R.escapeHtml(studentName)} has been withdrawn. Reverse it from Approvals if needed.`);
+                loadStudents();
+                return;
+            }
+            const newClassId = classSel.value;
+            if (!newClassId) { showAlert('warning', 'There is no class in the selected year group to promote into. Create the class first.'); return; }
+            const newClassName = classSel.options[classSel.selectedIndex].text;
+            const ok = await window.sdConfirm({
+                title: 'Promote student?',
+                message: `Move ${studentName} to ${newClassName}? Their past results stay attached to the old class and term.`,
+                confirmLabel: 'Promote',
+                cancelLabel: 'Cancel'
+            });
+            if (!ok) return;
+            btn.disabled = true;
+            const { error } = await supabase.from('students').update({ class_id: parseInt(newClassId, 10) }).eq('id', studentId);
+            btn.disabled = false;
+            if (error) { showAlert('danger', 'Promotion failed: ' + R.escapeHtml(error.message)); return; }
+            showAlert('success', `${R.escapeHtml(studentName)} has been promoted to ${R.escapeHtml(newClassName)}.`);
+            loadStudents();
+        }
+
+        $('loadBtn').addEventListener('click', loadStudents);
+        $('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = '/';
+        });
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+    <script src="mobile_nav.js"></script>
+</body>
+</html>

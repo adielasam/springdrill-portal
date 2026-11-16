@@ -25,7 +25,7 @@
 
         .main-content { margin-left: 260px; padding: 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
         
-        .controls-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; border-left: 5px solid #004d34; display: flex; gap: 15px; align-items:flex-end;}
+        .controls-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; border-left: 5px solid #004d34; display: flex; flex-wrap: wrap; gap: 15px; align-items:flex-end;}
 
         /* A4 Report Card Styling */
         .report-card-container {
@@ -113,20 +113,26 @@
 
         <h3 class="fw-bold mb-4" style="color: var(--text-color);"><i class="fas fa-file-pdf text-danger me-2"></i> Official Term Reports</h3>
 
+        <div id="cardAlert" class="alert d-none" role="alert" style="font-size: 14px;"></div>
+
         <div class="controls-card">
-            <div style="flex: 1;">
+            <div style="flex: 1; min-width: 140px;">
+                <label class="form-label fw-bold text-muted small text-uppercase">Session</label>
+                <select id="sessionSelect" class="form-select border-success"></select>
+            </div>
+            <div style="flex: 1; min-width: 140px;">
                 <label class="form-label fw-bold text-muted small text-uppercase">Academic Term</label>
                 <select id="termSelect" class="form-select border-success">
-                    <option value="1">First Term</option>
-                    <option value="2">Second Term</option>
-                    <option value="3">Third Term</option>
+                    <option value="First Term">First Term</option>
+                    <option value="Second Term">Second Term</option>
+                    <option value="Third Term">Third Term</option>
                 </select>
             </div>
-            <div style="flex: 1;">
+            <div style="flex: 1; min-width: 140px;">
                 <label class="form-label fw-bold text-muted small text-uppercase">Assessment Type</label>
                 <select id="subTermSelect" class="form-select border-success">
-                    <option value="mid_term">Mid Term</option>
-                    <option value="end_term">End of Term</option>
+                    <option value="Half Term">Half Term</option>
+                    <option value="Full Term">Full Term</option>
                 </select>
             </div>
             <div>
@@ -176,15 +182,29 @@
                     <tr class="table-light border-top border-dark border-2">
                         <td class="fw-bold text-end">OVERALL AVERAGE:</td>
                         <td class="text-center fw-bold fs-5" id="rcTotalAvg">--%</td>
-                        <td colspan="5"></td>
+                        <td class="fw-bold text-end" colspan="2">POSITION IN CLASS:</td>
+                        <td class="text-center fw-bold fs-5" id="rcPosition" colspan="3">--</td>
                     </tr>
                 </tfoot>
             </table>
 
-            <div class="alert alert-light border border-dark rounded-0 p-3 mb-5">
-                <h6 class="fw-bold mb-2 text-decoration-underline">Principal's Comment:</h6>
-                <p class="fst-italic mb-0" id="rcComment">--</p>
+            <p class="text-muted small mb-4" id="rcCumulative" style="display: none;"></p>
+
+            <div class="alert alert-light border border-dark rounded-0 p-3 mb-3">
+                <h6 class="fw-bold mb-2 text-decoration-underline">Supervisor's Remark:</h6>
+                <p class="fst-italic mb-0" id="rcSupervisorRemark">--</p>
             </div>
+
+            <div class="alert alert-light border border-dark rounded-0 p-3 mb-4">
+                <h6 class="fw-bold mb-2 text-decoration-underline">Principal's Remark:</h6>
+                <p class="fst-italic mb-0" id="rcPrincipalRemark">--</p>
+            </div>
+
+            <h6 class="fw-bold mb-2" style="font-size: 13px;">AFFECTIVE KEYS (5 = Excellent, 4 = Good, 3 = Satisfactory, 2 = Fair, 1 = Poor)</h6>
+            <table class="table table-bordered mb-5" style="font-size: 13px;">
+                <tbody id="rcAffectiveTbody">
+                </tbody>
+            </table>
 
             <div class="rc-footer">
                 <div class="rc-signature">
@@ -199,8 +219,11 @@
 
     </div>
 
+    <script src="resultsEngine.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
+
+        const R = window.ResultsEngine;
 
         window.toggleSidebar = () => {
             document.getElementById('sidebar').classList.toggle('mobile-open');
@@ -208,11 +231,38 @@
             overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
         };
 
+        function showCardAlert(type, msg) {
+            const box = document.getElementById('cardAlert');
+            box.className = 'alert alert-' + type;
+            box.textContent = msg;
+            box.classList.remove('d-none');
+        }
+
+        function hideCardAlert() {
+            document.getElementById('cardAlert').classList.add('d-none');
+        }
+
+        function renderAffective(affective) {
+            document.getElementById('rcAffectiveTbody').innerHTML = R.AFFECTIVE_TRAITS.map(t => {
+                const v = affective[t];
+                const label = v == null ? '--' : v + ' — ' + (R.AFFECTIVE_KEYS[v] || '');
+                return '<tr><td>' + R.escapeHtml(t) + '</td><td class="text-center fw-bold">' + R.escapeHtml(label) + '</td></tr>';
+            }).join('');
+        }
+
         async function initializePage() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = '/';
                 window.currentUser = session.user;
+                const sel = document.getElementById('sessionSelect');
+                const { data: sessData } = await supabase.from('academic_sessions').select('id, name').order('name', { ascending: false });
+                const sessions = sessData || [];
+                if (sessions.length === 0) {
+                    sel.add(new Option('2026/2027', '2026/2027'));
+                } else {
+                    sessions.forEach(s => sel.add(new Option(s.name, s.name)));
+                }
                 document.getElementById('loadingOverlay').style.display = 'none';
             } catch (err) {
                 console.error(err);
@@ -223,6 +273,7 @@
 
         document.getElementById('viewReportBtn').addEventListener('click', async () => {
             const studentId = window.currentUser.id;
+            hideCardAlert();
             
             // Show loading state
             document.getElementById('viewReportBtn').innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Loading...';
@@ -232,18 +283,27 @@
                 // 1. Get Student Info
                 const { data: studentInfo } = await supabase
                     .from('students')
-                    .select('id, passport_url, classes(name), users(name)')
+                    .select('id, user_id, class_id, reg_number, passport_url')
                     .eq('user_id', studentId)
                     .single();
                 
                 if (!studentInfo) {
-                    alert("Student profile not found.");
+                    showCardAlert('danger', 'Student profile not found. Please contact the school administrator.');
                     return;
                 }
 
+                // Join class/user names with plain queries instead of relation
+                // embeds (plain queries work with or without a foreign key).
+                const [classRes, userRes] = await Promise.all([
+                    studentInfo.class_id ? supabase.from('classes').select('name').eq('id', studentInfo.class_id).single() : Promise.resolve({ data: null }),
+                    studentInfo.user_id ? supabase.from('users').select('name').eq('id', studentInfo.user_id).single() : Promise.resolve({ data: null })
+                ]);
+                studentInfo.classes = classRes.data ? { name: classRes.data.name } : null;
+                studentInfo.users = userRes.data ? { name: userRes.data.name } : null;
+
                 document.getElementById('rcStudentName').innerText = studentInfo.users?.name || 'Unknown';
                 document.getElementById('rcClass').innerText = studentInfo.classes?.name || 'N/A';
-                document.getElementById('rcRegNo').innerText = "SD-" + studentId.substring(0, 8).toUpperCase();
+                document.getElementById('rcRegNo').innerText = studentInfo.reg_number || ("SD-" + studentId.substring(0, 8).toUpperCase());
                 
                 if (studentInfo.passport_url) {
                     document.getElementById('rcPassport').src = studentInfo.passport_url;
@@ -252,49 +312,59 @@
                 }
 
                 // 2. Get Published Grades
+                const sessionName = document.getElementById('sessionSelect').value;
                 const termId = document.getElementById('termSelect').value;
                 const subTermId = document.getElementById('subTermSelect').value;
 
-                document.getElementById('rcDocumentTitle').innerText = `${termId.toUpperCase()} TERM - ${subTermId.replace('_', ' ').toUpperCase()} REPORT`;
+                document.getElementById('rcDocumentTitle').innerText = termId.toUpperCase() + ' — ' + subTermId.toUpperCase() + ' REPORT';
 
                 const { data: results, error } = await supabase
                     .from('term_results')
-                    .select('first_cat, second_cat, exam, status, subjects(name)')
+                    .select('subject_id, first_cat, second_cat, exam, status')
                     .eq('student_id', studentInfo.id)
                     .eq('term', termId)
                     .eq('sub_term', subTermId)
+                    // Legacy rows predate the session column (session IS NULL): include them, or the page reports "New" and a save hits the unique_term_result constraint.
+                    .or('session.eq."' + sessionName + '",session.is.null')
                     .eq('status', 'published');
 
                 const tbody = document.getElementById('rcGradesTbody');
                 
                 if (error) throw error;
 
+                // Join subject names with a plain query (no relation embed:
+                // the live DB has no term_results -> subjects FK).
+                const { data: subjData } = await supabase.from('subjects').select('id, name');
+                const subjMap = {};
+                (subjData || []).forEach(s => { subjMap[String(s.id)] = s; });
+                (results || []).forEach(r => { r.subjects = subjMap[String(r.subject_id)] || null; });
+
                 if (!results || results.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger fw-bold py-5"><i class="fas fa-lock fs-2 mb-2 d-block"></i>No published report card found for this term.<br><small class="fw-normal">It may not be released yet by the Admin.</small></td></tr>`;
-                    document.getElementById('rcTotalAvg').innerText = '0%';
-                    document.getElementById('rcComment').innerText = "-";
+                    document.getElementById('rcTotalAvg').innerText = '--%';
+                    document.getElementById('rcPosition').innerText = '--';
+                    document.getElementById('rcCumulative').style.display = 'none';
+                    document.getElementById('rcSupervisorRemark').innerText = 'No remark recorded yet.';
+                    document.getElementById('rcPrincipalRemark').innerText = 'No remark recorded yet.';
+                    renderAffective({});
                     document.getElementById('printBtn').disabled = true;
                 } else {
-                    let totalSum = 0;
-                    let subCount = 0;
                     let rowsHtml = '';
 
                     results.forEach(r => {
                         const subj = r.subjects ? r.subjects.name : 'Unknown Subject';
-                        const cat1 = Number(r.first_cat) || 0;
-                        const cat2 = Number(r.second_cat) || 0;
-                        const exam = Number(r.exam) || 0;
-                        const total = cat1 + cat2 + exam;
-                        totalSum += total;
-                        subCount++;
-
-                        let grade = 'F';
-                        let remark = 'FAIL';
+                        const cat1 = R.num(r.first_cat);
+                        const cat2 = R.num(r.second_cat);
+                        const exam = R.num(r.exam);
+                        const total = R.subjectTotal(r);
+                        const scored = R.hasAnyScore(r);
+                        const band = R.ssceGrade(total);
+                        const grade = scored ? band.letter : '--';
+                        const remark = scored ? band.remark : '--';
                         let color = 'text-danger';
-                        if (total >= 70) { grade = 'A'; remark = 'EXCELLENT'; color = 'text-success'; }
-                        else if (total >= 60) { grade = 'B'; remark = 'VERY GOOD'; color = 'text-primary'; }
-                        else if (total >= 50) { grade = 'C'; remark = 'GOOD'; color = 'text-warning'; }
-                        else if (total >= 40) { grade = 'P'; remark = 'PASS'; color = 'text-dark'; }
+                        if (grade === 'A1' || grade === 'B2') color = 'text-success';
+                        else if (['B3', 'C4', 'C5', 'C6'].includes(grade)) color = 'text-primary';
+                        else if (grade === 'D7' || grade === 'E8') color = 'text-dark';
 
                         rowsHtml += `
                             <tr>
@@ -302,7 +372,7 @@
                                 <td class="text-center">${r.first_cat !== null ? cat1 : '-'}</td>
                                 <td class="text-center">${r.second_cat !== null ? cat2 : '-'}</td>
                                 <td class="text-center">${r.exam !== null ? exam : '-'}</td>
-                                <td class="text-center fw-bold text-primary">${total}</td>
+                                <td class="text-center fw-bold text-primary">${scored ? total : '--'}</td>
                                 <td class="text-center fw-bold ${color}">${grade}</td>
                                 <td class="text-center" style="font-size:12px;">${remark}</td>
                             </tr>
@@ -310,16 +380,84 @@
                     });
 
                     tbody.innerHTML = rowsHtml;
-                    const finalAvg = subCount > 0 ? (totalSum / subCount).toFixed(1) : 0;
-                    document.getElementById('rcTotalAvg').innerText = finalAvg + '%';
+                    const avg = R.averageOf(results);
+                    document.getElementById('rcTotalAvg').innerText = (avg == null ? '--' : avg.toFixed(1)) + '%';
 
-                    // Dynamic Comment
-                    let finalComment = "Requires urgent academic intervention and focus.";
-                    if (finalAvg >= 70) finalComment = "An outstanding academic performance. Keep up the excellent work!";
-                    else if (finalAvg >= 60) finalComment = "A good result with room for continued improvement.";
-                    else if (finalAvg >= 50) finalComment = "An average performance. More effort is needed next session.";
-                    
-                    document.getElementById('rcComment').innerText = finalComment;
+                    // Position in class: computed from every published row
+                    // for the whole class, same session/term/sub-term.
+                    let positionText = '--';
+                    try {
+                        const { data: classRows } = await supabase.from('term_results')
+                            .select('student_id, first_cat, second_cat, exam')
+                            .eq('class_id', studentInfo.class_id)
+                            .eq('term', termId)
+                            .eq('sub_term', subTermId)
+                            .or('session.eq."' + sessionName + '",session.is.null')
+                            .eq('status', 'published');
+                        const byStudent = {};
+                        (classRows || []).forEach(cr => {
+                            (byStudent[cr.student_id] = byStudent[cr.student_id] || []).push(cr);
+                        });
+                        const entries = Object.keys(byStudent).map(k => ({ key: k, average: R.averageOf(byStudent[k]) }));
+                        const positions = R.assignPositions(entries);
+                        const pos = positions[String(studentInfo.id)];
+                        if (pos != null) positionText = R.ordinal(pos);
+                    } catch (posErr) {
+                        console.warn('Position unavailable:', posErr.message);
+                    }
+                    document.getElementById('rcPosition').innerText = positionText;
+
+                    // Cumulative averages: only shown when every contributing
+                    // term has published results (same session + sub-term).
+                    try {
+                        const { data: allTerms } = await supabase.from('term_results')
+                            .select('term, first_cat, second_cat, exam')
+                            .eq('student_id', studentInfo.id)
+                            .eq('sub_term', subTermId)
+                            .or('session.eq."' + sessionName + '",session.is.null')
+                            .eq('status', 'published');
+                        const termAvgs = {};
+                        ['First Term', 'Second Term', 'Third Term'].forEach(t => {
+                            termAvgs[t] = R.averageOf((allTerms || []).filter(r => r.term === t));
+                        });
+                        const parts = [];
+                        if (termAvgs['First Term'] != null && termAvgs['Second Term'] != null) {
+                            parts.push('2-Term Average: ' + R.cumulativeAverage([termAvgs['First Term'], termAvgs['Second Term']]).toFixed(1) + '%');
+                        }
+                        if (termAvgs['First Term'] != null && termAvgs['Second Term'] != null && termAvgs['Third Term'] != null) {
+                            parts.push('3-Term Average: ' + R.cumulativeAverage([termAvgs['First Term'], termAvgs['Second Term'], termAvgs['Third Term']]).toFixed(1) + '%');
+                        }
+                        const cumEl = document.getElementById('rcCumulative');
+                        if (parts.length) {
+                            cumEl.textContent = 'Cumulative — ' + parts.join('  ·  ');
+                            cumEl.style.display = 'block';
+                        } else {
+                            cumEl.style.display = 'none';
+                        }
+                    } catch (cumErr) {
+                        console.warn('Cumulative averages unavailable:', cumErr.message);
+                    }
+
+                    // Stored remarks + affective scores (Term Comments page).
+                    // If the remarks table is missing (migration not run),
+                    // the card still renders with "No remark recorded yet."
+                    let remarkRow = null;
+                    try {
+                        const { data: rem } = await supabase.from('report_remarks')
+                            .select('*')
+                            .eq('student_id', studentInfo.id)
+                            .eq('class_id', studentInfo.class_id)
+                            .eq('term', termId)
+                            .eq('sub_term', subTermId)
+                            .eq('session', sessionName)
+                            .maybeSingle();
+                        remarkRow = rem;
+                    } catch (remErr) {
+                        console.warn('Remarks unavailable:', remErr.message);
+                    }
+                    document.getElementById('rcSupervisorRemark').innerText = (remarkRow && remarkRow.supervisor_remark) || 'No remark recorded yet.';
+                    document.getElementById('rcPrincipalRemark').innerText = (remarkRow && remarkRow.principal_remark) || 'No remark recorded yet.';
+                    renderAffective(remarkRow && remarkRow.affective && typeof remarkRow.affective === 'object' ? remarkRow.affective : {});
                     document.getElementById('printBtn').disabled = false;
                 }
 
@@ -328,7 +466,7 @@
 
             } catch (err) {
                 console.error(err);
-                alert("Error generating report card.");
+                showCardAlert('danger', 'Error generating report card: ' + err.message);
             } finally {
                 document.getElementById('viewReportBtn').innerHTML = '<i class="fas fa-search me-2"></i> View Report';
                 document.getElementById('viewReportBtn').disabled = false;

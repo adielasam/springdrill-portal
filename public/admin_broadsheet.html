@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPRINGDRILL - Reports View (Broadsheet)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --brand-50: #ecfdf5; --brand-100: #d1fae5; --brand-500: #10b981; --brand-600: #059669;
+            --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-500: #6b7280; --gray-600: #4b5563; --gray-900: #111827;
+            --bg-color: var(--gray-50); --card-bg: #ffffff; --text-main: var(--gray-900); --text-muted: var(--gray-500);
+            --border-color: var(--gray-200); --input-bg: var(--gray-100);
+            --radius: 12px; --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; }
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); padding: 32px 16px; z-index: 1050; transition: transform 0.3s ease; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+        .sidebar-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 12px; }
+        .sidebar-brand h4 { font-weight: 800; margin: 0; font-size: 20px; letter-spacing: -0.5px; }
+        .sidebar-heading { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 16px 12px 8px; margin-top: 8px; }
+        .nav-link { color: var(--text-muted); padding: 10px 12px; margin: 2px 0; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; }
+        .nav-link:hover { background: var(--input-bg); color: var(--text-main); }
+        .nav-link.active { background: var(--brand-600); color: white; font-weight: 600; box-shadow: var(--shadow-sm); }
+        .main-content { margin-left: 280px; padding: 32px 48px; min-height: 100vh; }
+        .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .breadcrumb { margin: 0; font-size: 14px; font-weight: 500; color: var(--text-muted); }
+        .breadcrumb span { color: var(--text-main); font-weight: 600; }
+        .page-header { margin-bottom: 32px; }
+        .page-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.5px; }
+        .page-header p { font-size: 14px; color: var(--text-muted); margin: 0; }
+        .premium-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
+        .card-header-green { background: #007a4d; color: white; padding: 12px 20px; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+        .form-label { font-size: 12px; font-weight: 600; color: var(--gray-500); margin-bottom: 4px; }
+        .form-select, .form-control { font-size: 13px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg); }
+        .sv-table th { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--gray-500); letter-spacing: 0.5px; padding: 12px 16px; border-bottom: 1px solid var(--border-color); background: var(--gray-50); white-space: nowrap; text-align: center; }
+        .sv-table th:first-child, .sv-table td:first-child { text-align: left; }
+        .sv-table td { font-size: 13px; padding: 12px 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; white-space: nowrap; text-align: center; }
+        .sv-table td.student-cell { text-align: left; font-weight: 600; }
+        .sv-table td.empty-cell { color: #cbd5e1; }
+        .nav-tabs .nav-link { color: var(--text-muted); font-weight: 600; font-size: 13px; border: none; }
+        .nav-tabs .nav-link.active { color: #007a4d; background: none; border-bottom: 3px solid #007a4d; }
+        #loadingOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: 0.3s; }
+    </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
+</head>
+<body>
+    <div id="loadingOverlay">
+        <i data-lucide="loader-2" class="lucide-spin" style="width: 48px; height: 48px; color: var(--brand-500); margin-bottom: 16px;"></i>
+        <h5 style="font-weight: 600; color: var(--text-muted); font-size: 16px;">Loading Reports View...</h5>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar" data-role="admin">
+        <!-- Shared sidebar: rendered by sidebar.js (one menu for all admin/teacher pages). -->
+    </div>
+    <script src="sidebar.js"></script>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle me-2" onclick="toggleSidebar()" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
+                <div class="breadcrumb">SpringDrill / Reports / <span>Reports View</span></div>
+            </div>
+            <div class="dropdown">
+                <div class="topbar-profile" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 4px 8px; border-radius: 8px;">
+                    <div class="info" style="text-align: right;">
+                        <div class="name" id="navAdminName" style="font-weight: 600; font-size: 14px;">Admin</div>
+                        <div class="role" style="font-size: 12px; color: var(--text-muted);">Workspace Owner</div>
+                    </div>
+                    <div class="avatar" id="navAvatar" style="overflow: hidden; width: 40px; height: 40px; border-radius: 50%; background: var(--brand-100); color: var(--brand-600); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">AD</div>
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border: 1px solid var(--border-color); border-radius: 8px;">
+                    <li><a class="dropdown-item" href="admin_settings.html" style="font-size: 13px; font-weight: 500;">My Profile</a></li>
+                    <li><a class="dropdown-item" href="admin_settings.html" style="font-size: 13px; font-weight: 500;">Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#" id="logoutBtn" style="font-size: 13px; font-weight: 500;">Log Out</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="page-header">
+            <h1>Reports View</h1>
+            <p>Broadsheet, Result Insight and cumulative averages. Averages and positions are computed live from stored scores — no separate Process run.</p>
+        </div>
+
+        <div id="alertBox" class="alert d-none shadow-sm mb-4" role="alert" style="font-size: 13px; font-weight: 500;"></div>
+
+        <div id="setupBanner" class="alert alert-warning d-none shadow-sm mb-4" role="alert" style="font-size: 13px;">
+            <strong><i class="fas fa-database me-2"></i>Database setup required.</strong>
+            The results tables need the Phase 1 setup before this view can load. Ask the administrator to run
+            <code>supabase/migrations/phase1-results-engine.sql</code> once in the Supabase SQL editor, then reload this page.
+            <span id="setupDetail" class="d-block mt-1 text-muted"></span>
+        </div>
+
+        <!-- FILTER CARD -->
+        <div class="premium-card mb-4">
+            <div class="card-header-green"><i data-lucide="filter" style="width:16px; height:16px;"></i> Select Result to View</div>
+            <div class="p-4" style="background: white;">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-2">
+                        <label class="form-label">Session</label>
+                        <select id="filterSession" class="form-select"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Term</label>
+                        <select id="filterTerm" class="form-select"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Sub-Term</label>
+                        <select id="filterSubTerm" class="form-select"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Class</label>
+                        <select id="filterClass" class="form-select"><option value="">Select Class</option></select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Results Shown</label>
+                        <select id="filterStatus" class="form-select">
+                            <option value="all">All results (any status)</option>
+                            <option value="approved">Approved &amp; published only</option>
+                            <option value="published">Published only</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button id="loadBtn" class="btn w-100" style="background: #007a4d; color: white; font-weight: 600; font-size: 13px; padding: 10px; border-radius: 6px;"><i data-lucide="search" style="width:16px; height:16px; margin-right:4px;"></i> Load View</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <ul class="nav nav-tabs mb-3" id="viewTabs" role="tablist">
+            <li class="nav-item" role="presentation"><button class="nav-link active" id="tab-broadsheet" data-bs-toggle="tab" data-bs-target="#pane-broadsheet" type="button" role="tab">Result Broadsheet</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link" id="tab-insight" data-bs-toggle="tab" data-bs-target="#pane-insight" type="button" role="tab">Result Insight</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link" id="tab-cumulative" data-bs-toggle="tab" data-bs-target="#pane-cumulative" type="button" role="tab">Cumulative Averages</button></li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- BROADSHEET -->
+            <div class="tab-pane fade show active" id="pane-broadsheet" role="tabpanel">
+                <div class="premium-card">
+                    <div class="card-header-green" id="broadsheetTitle"><i data-lucide="table" style="width:16px; height:16px;"></i> Broadsheet</div>
+                    <div class="p-0">
+                        <div class="table-responsive m-0" style="min-height: 200px;">
+                            <table class="table table-hover align-middle m-0 sv-table" id="broadsheetTable">
+                                <thead id="broadsheetThead"></thead>
+                                <tbody id="broadsheetTbody">
+                                    <tr><td class="text-center py-5 text-muted" style="font-size:13px;">Select filters and click Load View.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="p-3 d-flex justify-content-between align-items-center flex-wrap gap-2" style="background: white;">
+                        <span class="text-muted small">Grade = SSCE grade of the average. Position uses competition ranking: tied averages share a position and the next position is skipped.</span>
+                        <button id="exportBtn" class="btn btn-outline-dark fw-bold" disabled><i class="fas fa-file-csv me-2"></i>Export Broadsheet (CSV)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INSIGHT -->
+            <div class="tab-pane fade" id="pane-insight" role="tabpanel">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="premium-card p-4" style="background: white;">
+                            <h6 class="fw-bold mb-3">Class Average by Subject</h6>
+                            <div style="position: relative; height: 300px;"><canvas id="subjectChart"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="premium-card p-4" style="background: white;">
+                            <h6 class="fw-bold mb-3">Grade Distribution (SSCE bands, subject totals)</h6>
+                            <div style="position: relative; height: 300px;"><canvas id="gradeChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="premium-card mt-4">
+                    <div class="card-header-green"><i data-lucide="trophy" style="width:16px; height:16px;"></i> Top 5 &amp; Bottom 5 by Average</div>
+                    <div class="p-3" style="background: white;" id="topBottomBox">
+                        <span class="text-muted" style="font-size:13px;">Load a view to see rankings.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CUMULATIVE -->
+            <div class="tab-pane fade" id="pane-cumulative" role="tabpanel">
+                <div class="premium-card">
+                    <div class="card-header-green"><i data-lucide="layers" style="width:16px; height:16px;"></i> Cumulative Averages (same session, same sub-term)</div>
+                    <div class="p-0">
+                        <div class="table-responsive m-0" style="min-height: 200px;">
+                            <table class="table table-hover align-middle m-0 sv-table">
+                                <thead>
+                                    <tr>
+                                        <th>S/N</th>
+                                        <th style="text-align:left;">Student</th>
+                                        <th>First Term Avg</th>
+                                        <th>Second Term Avg</th>
+                                        <th>Third Term Avg</th>
+                                        <th>2-Term Average</th>
+                                        <th>3-Term Average</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cumulativeTbody">
+                                    <tr><td colspan="7" class="text-center py-5 text-muted" style="font-size:13px;">Select filters and click Load View.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="p-3" style="background: white;">
+                        <span class="text-muted small">2-Term Average = mean of the First and Second Term averages. 3-Term Average = mean of all three term averages. A term with no scores is left out of the mean and shown as "--".</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="resultsEngine.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        const R = window.ResultsEngine;
+        let sessions = [];
+        let currentRows = [];      // term_results rows for the loaded selection
+        let currentStudents = [];  // students rows for the loaded class
+        let currentSubjects = [];  // subjects shown as columns
+        let currentSummary = [];   // per-student {student, rows, average}
+        let subjectChart = null;
+        let gradeChart = null;
+
+        const $ = (id) => document.getElementById(id);
+
+        function showAlert(type, msg) {
+            const box = $('alertBox');
+            box.className = `alert alert-${type} shadow-sm mb-4`;
+            box.innerHTML = msg;
+            box.classList.remove('d-none');
+            setTimeout(() => box.classList.add('d-none'), 6000);
+        }
+
+        function isSetupError(err) {
+            const m = (err && err.message ? err.message : '') + ' ' + (err && err.code ? err.code : '');
+            return /session|does not exist|42703|PGRST204/i.test(m);
+        }
+
+        async function init() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = '/';
+                const { data: profile } = await supabase.from('users').select('name, avatar_url, role').eq('id', session.user.id).single();
+                if (profile && profile.role !== 'admin') return window.location.href = '/';
+                if (profile) {
+                    $('navAdminName').innerText = profile.name || 'Admin';
+                    const av = $('navAvatar');
+                    if (profile.avatar_url) { av.style.background = `url('${profile.avatar_url}') center/cover`; av.innerText = ''; }
+                    else av.innerText = (profile.name || 'AD').substring(0, 2).toUpperCase();
+                }
+                R.TERMS.forEach(t => $('filterTerm').add(new Option(t, t)));
+                R.SUB_TERMS.forEach(t => $('filterSubTerm').add(new Option(t, t)));
+                const { data: sessData } = await supabase.from('academic_sessions').select('id, name').order('name', { ascending: false });
+                sessions = sessData || [];
+                if (sessions.length === 0) {
+                    $('filterSession').add(new Option('2026/2027', '2026/2027'));
+                    sessions = [{ id: null, name: '2026/2027' }];
+                } else {
+                    sessions.forEach(s => $('filterSession').add(new Option(s.name, s.id)));
+                }
+                const { data: clsData } = await supabase.from('classes').select('id, name').order('name');
+                (clsData || []).forEach(c => $('filterClass').add(new Option(c.name, c.id)));
+                lucide.createIcons();
+                $('loadingOverlay').style.opacity = '0';
+                setTimeout(() => $('loadingOverlay').style.display = 'none', 300);
+            } catch (err) {
+                console.error(err);
+                $('loadingOverlay').style.display = 'none';
+            }
+        }
+
+        function selection() {
+            const sessionId = $('filterSession').value;
+            const sessionRow = sessions.find(s => String(s.id) === String(sessionId)) || sessions[0];
+            return {
+                sessionName: sessionRow ? sessionRow.name : '',
+                term: $('filterTerm').value,
+                subTerm: $('filterSubTerm').value,
+                classId: $('filterClass').value,
+                statusMode: $('filterStatus').value
+            };
+        }
+
+        function statusFilter(rows, mode) {
+            if (mode === 'approved') return rows.filter(r => r.status === 'approved' || r.status === 'published');
+            if (mode === 'published') return rows.filter(r => r.status === 'published');
+            return rows;
+        }
+
+        async function loadView() {
+            const sel = selection();
+            if (!sel.term || !sel.subTerm || !sel.classId) {
+                showAlert('warning', 'Please select Term, Sub-Term and Class first.');
+                return;
+            }
+            const btn = $('loadBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            try {
+                const [{ data: studData, error: studErr }, { data: rows, error: rowsErr }, { data: csData }, { data: subjData }] = await Promise.all([
+                    supabase.from('students').select('id, first_name, surname, reg_number').eq('class_id', sel.classId).eq('approved', true).order('surname').order('first_name'),
+                    supabase.from('term_results').select('*').eq('class_id', sel.classId).eq('term', sel.term).eq('sub_term', sel.subTerm).or('session.eq."' + sel.sessionName + '",session.is.null'),
+                    supabase.from('class_subjects').select('subject_id').eq('class_id', sel.classId),
+                    supabase.from('subjects').select('id, name')
+                ]);
+                if (studErr) throw studErr;
+                if (rowsErr) throw rowsErr;
+
+                // Join subject names with a plain query (no relation embeds:
+                // the live DB has no term_results -> subjects FK).
+                const subjById = {};
+                (subjData || []).forEach(s => { subjById[String(s.id)] = s; });
+                (csData || []).forEach(d => { d.subjects = subjById[String(d.subject_id)] || null; });
+                (rows || []).forEach(r => { r.subjects = subjById[String(r.subject_id)] || null; });
+
+                currentStudents = studData || [];
+                const filtered = statusFilter(rows || [], sel.statusMode);
+                currentRows = filtered;
+
+                // Subject columns: subjects assigned to the class, plus any
+                // subject that has rows (so unassigned-but-entered subjects
+                // still show). Ordered by name.
+                const subjectMap = {};
+                (csData || []).forEach(d => { if (d.subjects) subjectMap[d.subjects.id] = d.subjects; });
+                filtered.forEach(r => { if (r.subjects) subjectMap[r.subjects.id] = r.subjects; });
+                currentSubjects = Object.values(subjectMap).sort((a, b) => a.name.localeCompare(b.name));
+
+                currentSummary = currentStudents.map(s => {
+                    const sRows = filtered.filter(r => String(r.student_id) === String(s.id));
+                    return { student: s, rows: sRows, average: R.averageOf(sRows) };
+                });
+
+                renderBroadsheet(sel);
+                renderInsight();
+                await renderCumulative(sel);
+                $('exportBtn').disabled = false;
+            } catch (err) {
+                console.error(err);
+                if (isSetupError(err)) {
+                    $('setupDetail').textContent = 'Technical detail: ' + err.message;
+                    $('setupBanner').classList.remove('d-none');
+                    showAlert('warning', 'This view cannot load until the Phase 1 database setup has been run (see the banner above).');
+                } else {
+                    showAlert('danger', 'Failed to load view: ' + R.escapeHtml(err.message));
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i data-lucide="search" style="width:16px; height:16px; margin-right:4px;"></i> Load View';
+                lucide.createIcons();
+            }
+        }
+
+        function renderBroadsheet(sel) {
+            const className = $('filterClass').options[$('filterClass').selectedIndex].text;
+            $('broadsheetTitle').innerHTML = `<i data-lucide="table" style="width:16px; height:16px;"></i> Broadsheet — ${R.escapeHtml(className)} (${R.escapeHtml(sel.term)}, ${R.escapeHtml(sel.subTerm)})`;
+            lucide.createIcons();
+
+            const positions = R.assignPositions(currentSummary.map(s => ({ key: String(s.student.id), average: s.average })));
+            currentSummary.forEach(s => { s.position = positions[String(s.student.id)]; });
+
+            let head = '<tr><th>S/N</th><th style="text-align:left;">Student</th>';
+            currentSubjects.forEach(sub => { head += `<th>${R.escapeHtml(sub.name)}</th>`; });
+            head += '<th>Average</th><th>Grade</th><th>Position</th></tr>';
+            $('broadsheetThead').innerHTML = head;
+
+            if (currentStudents.length === 0) {
+                $('broadsheetTbody').innerHTML = '<tr><td colspan="20" class="text-center py-5 text-muted" style="font-size:13px;">No approved students in this class.</td></tr>';
+                return;
+            }
+            $('broadsheetTbody').innerHTML = currentSummary.map((s, i) => {
+                const name = `${s.student.first_name || ''} ${s.student.surname || ''}`.trim() || 'Unnamed Student';
+                let cells = `<td>${i + 1}</td><td class="student-cell">${R.escapeHtml(name)}<div class="text-muted fw-normal" style="font-size:11px;">${R.escapeHtml(s.student.reg_number || '')}</div></td>`;
+                currentSubjects.forEach(sub => {
+                    const row = s.rows.find(r => String(r.subject_id) === String(sub.id));
+                    if (!row || !R.hasAnyScore(row)) {
+                        cells += '<td class="empty-cell">--</td>';
+                    } else {
+                        cells += `<td class="fw-bold">${R.subjectTotal(row)}</td>`;
+                    }
+                });
+                const avg = s.average == null ? '--' : s.average.toFixed(1);
+                const grade = s.average == null ? '--' : R.ssceGrade(s.average).letter;
+                const pos = s.position == null ? '--' : R.ordinal(s.position);
+                cells += `<td class="fw-bold">${avg}</td><td class="fw-bold" style="color:#007a4d;">${grade}</td><td class="fw-bold">${pos}</td>`;
+                return `<tr>${cells}</tr>`;
+            }).join('');
+        }
+
+        function renderInsight() {
+            // Subject averages
+            const subjectAvgs = currentSubjects.map(sub => {
+                const totals = [];
+                currentSummary.forEach(s => {
+                    const row = s.rows.find(r => String(r.subject_id) === String(sub.id));
+                    if (row && R.hasAnyScore(row)) totals.push(R.subjectTotal(row));
+                });
+                return { name: sub.name, avg: totals.length ? R.round2(totals.reduce((a, b) => a + b, 0) / totals.length) : null, count: totals.length };
+            });
+            const sCtx = $('subjectChart').getContext('2d');
+            if (subjectChart) subjectChart.destroy();
+            subjectChart = new Chart(sCtx, {
+                type: 'bar',
+                data: {
+                    labels: subjectAvgs.map(s => s.name),
+                    datasets: [{ label: 'Class average', data: subjectAvgs.map(s => s.avg), backgroundColor: '#007a4d' }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } }, plugins: { legend: { display: false } } }
+            });
+
+            // Grade distribution across subject totals
+            const counts = {};
+            R.SSCE_BANDS.forEach(b => { counts[b.letter] = 0; });
+            currentRows.forEach(r => {
+                if (R.hasAnyScore(r)) counts[R.ssceGrade(R.subjectTotal(r)).letter]++;
+            });
+            const gCtx = $('gradeChart').getContext('2d');
+            if (gradeChart) gradeChart.destroy();
+            gradeChart = new Chart(gCtx, {
+                type: 'bar',
+                data: {
+                    labels: R.SSCE_BANDS.map(b => b.letter),
+                    datasets: [{ label: 'Subject totals', data: R.SSCE_BANDS.map(b => counts[b.letter]), backgroundColor: '#059669' }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false } } }
+            });
+
+            // Top / bottom 5
+            const ranked = currentSummary.filter(s => s.average != null).slice().sort((a, b) => b.average - a.average);
+            const nameOf = (s) => R.escapeHtml(`${s.student.first_name || ''} ${s.student.surname || ''}`.trim());
+            const row = (s) => `<tr><td class="fw-bold">${nameOf(s)}</td><td class="text-center">${s.average.toFixed(1)}</td><td class="text-center fw-bold">${R.ordinal(s.position)}</td></tr>`;
+            const top = ranked.slice(0, 5).map(row).join('') || '<tr><td colspan="3" class="text-center text-muted">No averages yet.</td></tr>';
+            const bottom = ranked.slice(-5).reverse().map(row).join('') || '<tr><td colspan="3" class="text-center text-muted">No averages yet.</td></tr>';
+            $('topBottomBox').innerHTML = `
+                <div class="row g-4">
+                    <div class="col-md-6"><h6 class="fw-bold mb-2">Top 5</h6><table class="table table-sm m-0"><tbody>${top}</tbody></table></div>
+                    <div class="col-md-6"><h6 class="fw-bold mb-2">Bottom 5</h6><table class="table table-sm m-0"><tbody>${bottom}</tbody></table></div>
+                </div>`;
+        }
+
+        async function renderCumulative(sel) {
+            const tbody = $('cumulativeTbody');
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>Loading term averages...</td></tr>';
+            try {
+                const { data, error } = await supabase
+                    .from('term_results')
+                    .select('student_id, term, first_cat, second_cat, exam, status')
+                    .eq('class_id', sel.classId)
+                    .eq('sub_term', sel.subTerm)
+                    // Legacy rows predate the session column (session IS NULL): include them, or the page reports "New" and a save hits the unique_term_result constraint.
+                    .or('session.eq."' + sel.sessionName + '",session.is.null')
+                    .in('term', ['First Term', 'Second Term', 'Third Term']);
+                if (error) throw error;
+                const filtered = statusFilter(data || [], sel.statusMode);
+                const termNames = ['First Term', 'Second Term', 'Third Term'];
+                tbody.innerHTML = currentStudents.map((s, i) => {
+                    const avgs = termNames.map(t => R.averageOf(filtered.filter(r => String(r.student_id) === String(s.id) && r.term === t)));
+                    const two = R.cumulativeAverage([avgs[0], avgs[1]]);
+                    const three = R.cumulativeAverage(avgs);
+                    const fmt = (a) => a == null ? '--' : a.toFixed(1);
+                    const name = `${s.first_name || ''} ${s.surname || ''}`.trim() || 'Unnamed Student';
+                    return `<tr><td>${i + 1}</td><td class="student-cell">${R.escapeHtml(name)}</td><td>${fmt(avgs[0])}</td><td>${fmt(avgs[1])}</td><td>${fmt(avgs[2])}</td><td class="fw-bold">${fmt(two)}</td><td class="fw-bold" style="color:#007a4d;">${fmt(three)}</td></tr>`;
+                }).join('') || '<tr><td colspan="7" class="text-center py-4 text-muted">No students in this class.</td></tr>';
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-danger">Failed to load cumulative averages: ' + R.escapeHtml(err.message) + '</td></tr>';
+            }
+        }
+
+        function exportCsv() {
+            const sel = selection();
+            const headers = ['S/N', 'Student', 'Admission No'].concat(currentSubjects.map(s => s.name), ['Average', 'Grade', 'Position']);
+            const rows = currentSummary.map((s, i) => {
+                const name = `${s.student.first_name || ''} ${s.student.surname || ''}`.trim();
+                const cells = [i + 1, name, s.student.reg_number || ''];
+                currentSubjects.forEach(sub => {
+                    const row = s.rows.find(r => String(r.subject_id) === String(sub.id));
+                    cells.push(row && R.hasAnyScore(row) ? R.subjectTotal(row) : '');
+                });
+                cells.push(s.average == null ? '' : s.average.toFixed(1));
+                cells.push(s.average == null ? '' : R.ssceGrade(s.average).letter);
+                cells.push(s.position == null ? '' : s.position);
+                return cells;
+            });
+            const className = $('filterClass').options[$('filterClass').selectedIndex].text.replace(/[^A-Za-z0-9]+/g, '-');
+            R.downloadCsv(`broadsheet-${className}-${sel.term}-${sel.subTerm}.csv`, R.toCsv(headers, rows));
+        }
+
+        $('loadBtn').addEventListener('click', loadView);
+        $('exportBtn').addEventListener('click', exportCsv);
+        $('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = '/';
+        });
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+    <script src="mobile_nav.js"></script>
+</body>
+</html>

@@ -3,74 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SPRINGDRILL - Approve Reports</title>
+    <title>SPRINGDRILL - Publish Reports</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root { 
+        :root {
             --brand-50: #ecfdf5; --brand-100: #d1fae5; --brand-500: #10b981; --brand-600: #059669;
             --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-300: #d1d5db;
             --gray-400: #9ca3af; --gray-500: #6b7280; --gray-600: #4b5563; --gray-800: #1f2937; --gray-900: #111827;
-            --bg-color: var(--gray-50); --card-bg: #ffffff; --text-main: var(--gray-900); --text-muted: var(--gray-500); 
-            --border-color: var(--gray-200); --input-bg: var(--gray-100); 
+            --bg-color: var(--gray-50); --card-bg: #ffffff; --text-main: var(--gray-900); --text-muted: var(--gray-500);
+            --border-color: var(--gray-200); --input-bg: var(--gray-100);
             --radius: 12px; --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
-        
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; }
-        
-        /* SIDEBAR */
-        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); padding: 32px 16px; z-index: 1050; transition: transform 0.3s ease; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin;}
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); padding: 32px 16px; z-index: 1050; transition: transform 0.3s ease; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
         .sidebar-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 12px; }
         .sidebar-brand h4 { font-weight: 800; margin: 0; font-size: 20px; letter-spacing: -0.5px; }
-        
         .sidebar-heading { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 16px 12px 8px; margin-top: 8px; }
-        
         .nav-link { color: var(--text-muted); padding: 10px 12px; margin: 2px 0; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; }
-        .nav-link svg { width: 18px; height: 18px; stroke-width: 2; }
         .nav-link:hover { background: var(--input-bg); color: var(--text-main); }
         .nav-link.active { background: var(--brand-600); color: white; font-weight: 600; box-shadow: var(--shadow-sm); }
-        
-        
-        /* MAIN CONTENT */
         .main-content { margin-left: 280px; padding: 32px 48px; min-height: 100vh; }
         .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
         .breadcrumb { margin: 0; font-size: 14px; font-weight: 500; color: var(--text-muted); }
         .breadcrumb span { color: var(--text-main); font-weight: 600; }
-        
-        /* HEADER */
         .page-header { margin-bottom: 32px; }
-        .page-header h1 { font-size: 24px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; letter-spacing: -0.5px; }
+        .page-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.5px; }
         .page-header p { font-size: 14px; color: var(--text-muted); margin: 0; }
-
         .premium-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
         .card-header-green { background: #007a4d; color: white; padding: 12px 20px; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
-        
-        /* FORM CONTROLS */
         .form-label { font-size: 12px; font-weight: 600; color: var(--gray-500); margin-bottom: 4px; }
         .form-select, .form-control { font-size: 13px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg); }
-        .form-select:focus, .form-control:focus { border-color: var(--brand-500); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
-        
-        /* TABLE */
-        .table-responsive { overflow-x: auto; margin-top: 20px; }
-        .table th { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--gray-500); letter-spacing: 0.5px; padding: 12px 16px; border-bottom: 1px solid var(--border-color); background: var(--gray-50); white-space: nowrap; }
-        .table td { font-size: 13px; padding: 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; white-space: nowrap; }
-        
-        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-        .status-draft { background: var(--gray-100); color: var(--gray-600); }
-        .status-final { background: #fef08a; color: #854d0e; } /* Pending Approval */
-        .status-approved { background: #d1fae5; color: #065f46; }
-        .status-rejected { background: #fee2e2; color: #991b1b; }
-
-        .action-btn { padding: 6px 12px; font-size: 11px; font-weight: 600; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: none; transition: 0.2s; text-decoration: none; }
-        .btn-approve { background: #007a4d; color: white; }
-        .btn-approve:hover { background: #00603c; color: white; }
-        .btn-reject { background: #ef4444; color: white; }
-        .btn-reject:hover { background: #dc2626; color: white; }
-        .btn-view { background: #f3f4f6; color: #111827; border: 1px solid #d1d5db; }
-        .btn-view:hover { background: #e5e7eb; color: #111827; }
-
-        /* PRELOADER */
+        .sv-table th { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--gray-500); letter-spacing: 0.5px; padding: 12px 16px; border-bottom: 1px solid var(--border-color); background: var(--gray-50); white-space: nowrap; }
+        .sv-table td { font-size: 13px; padding: 12px 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; white-space: nowrap; }
+        .count-cell { text-align: center; font-weight: 700; }
+        .status-pill { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .pill-published { background: #d1fae5; color: #065f46; }
+        .pill-approved { background: #dbeafe; color: #1e40af; }
+        .pill-pending { background: #fef08a; color: #854d0e; }
+        .pill-none { background: var(--gray-100); color: var(--gray-600); }
         #loadingOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: 0.3s; }
     </style>
     <link rel="stylesheet" href="mobile_responsive.css">
@@ -78,75 +51,72 @@
 <body>
     <div id="loadingOverlay">
         <i data-lucide="loader-2" class="lucide-spin" style="width: 48px; height: 48px; color: var(--brand-500); margin-bottom: 16px;"></i>
-        <h5 style="font-weight: 600; color: var(--text-muted); font-size: 16px;">Loading Reports...</h5>
+        <h5 style="font-weight: 600; color: var(--text-muted); font-size: 16px;">Loading Publish Status...</h5>
     </div>
 
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-<!-- SIDEBAR -->
     <div class="sidebar" id="sidebar" data-role="admin">
-    <!-- Shared sidebar: rendered by sidebar.js (one menu for all admin/teacher pages). -->
-</div>
+        <!-- Shared sidebar: rendered by sidebar.js (one menu for all admin/teacher pages). -->
+    </div>
     <script src="sidebar.js"></script>
 
-    
     <div class="main-content">
-        <!-- TOPBAR -->
         <div class="top-navbar">
             <div class="d-flex align-items-center">
                 <button class="mobile-menu-toggle me-2" onclick="toggleSidebar()" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
-                <div class="breadcrumb">
-                SpringDrill / Reports / <span>Publish Reports</span>
+                <div class="breadcrumb">SpringDrill / Reports / <span>Publish Reports</span></div>
             </div>
-            </div>
-            
             <div class="dropdown">
                 <div class="topbar-profile" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 4px 8px; border-radius: 8px;">
                     <div class="info" style="text-align: right;">
-                        <div class="name" id="navAdminName" style="font-weight: 600; font-size: 14px; color: var(--text-main);">Admin</div>
+                        <div class="name" id="navAdminName" style="font-weight: 600; font-size: 14px;">Admin</div>
                         <div class="role" style="font-size: 12px; color: var(--text-muted);">Workspace Owner</div>
                     </div>
                     <div class="avatar" id="navAvatar" style="overflow: hidden; width: 40px; height: 40px; border-radius: 50%; background: var(--brand-100); color: var(--brand-600); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">AD</div>
                 </div>
                 <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border: 1px solid var(--border-color); border-radius: 8px;">
-                    <li><a class="dropdown-item" href="admin_settings.html" style="font-size: 13px; font-weight: 500;"><i data-lucide="user" class="me-2" style="width:16px; height:16px;"></i> My Profile</a></li>
-                    <li><a class="dropdown-item" href="admin_settings.html" style="font-size: 13px; font-weight: 500;"><i data-lucide="settings" class="me-2" style="width:16px; height:16px;"></i> Settings</a></li>
+                    <li><a class="dropdown-item" href="admin_settings.html" style="font-size: 13px; font-weight: 500;">My Profile</a></li>
+                    <li><a class="dropdown-item" href="admin_settings.html" style="font-size: 13px; font-weight: 500;">Settings</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="#" id="logoutBtn" style="font-size: 13px; font-weight: 500;"><i data-lucide="log-out" class="me-2" style="width:16px; height:16px;"></i> Log Out</a></li>
+                    <li><a class="dropdown-item text-danger" href="#" id="logoutBtn" style="font-size: 13px; font-weight: 500;">Log Out</a></li>
                 </ul>
             </div>
         </div>
 
         <div class="page-header">
-            <h1>Result Approval</h1>
-            <p>Review submitted results from teachers and approve them for final report cards.</p>
+            <h1>Publish Reports</h1>
+            <p>Publishing is the last step: only <strong>approved</strong> results can be published, and only published results appear on the student's report card. Publishing sends each affected student an in-portal message. Unpublish returns published results to approved so corrections can be made.</p>
         </div>
 
-        <!-- NOTIFICATION ALERTS -->
         <div id="alertBox" class="alert d-none shadow-sm mb-4" role="alert" style="font-size: 13px; font-weight: 500;"></div>
 
-        <!-- FILTER CARD -->
+        <div id="setupBanner" class="alert alert-warning d-none shadow-sm mb-4" role="alert" style="font-size: 13px;">
+            <strong><i class="fas fa-database me-2"></i>Database setup required.</strong>
+            The results tables need the Phase 1 setup before publish status can load. Ask the administrator to run
+            <code>supabase/migrations/phase1-results-engine.sql</code> once in the Supabase SQL editor, then reload this page.
+            <span id="setupDetail" class="d-block mt-1 text-muted"></span>
+        </div>
+
         <div class="premium-card mb-4">
-            <div class="card-header-green">
-                <i data-lucide="filter" style="width:16px; height:16px;"></i> Select Result to View
-            </div>
+            <div class="card-header-green"><i data-lucide="filter" style="width:16px; height:16px;"></i> Select Session, Term &amp; Classes</div>
             <div class="p-4" style="background: white;">
-                <div class="row g-4 align-items-end">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-2">
+                        <label class="form-label">Session</label>
+                        <select id="filterSession" class="form-select"></select>
+                    </div>
                     <div class="col-md-2">
                         <label class="form-label">Term</label>
-                        <select id="filterTerm" class="form-select">
-                            <option value="">Select Term</option>
-                        </select>
+                        <select id="filterTerm" class="form-select"></select>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label">Sub-Term</label>
-                        <select id="filterSubTerm" class="form-select">
-                            <option value="">Select Sub-Term</option>
-                        </select>
+                        <select id="filterSubTerm" class="form-select"></select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label class="form-label">Year Group</label>
                         <select id="filterYearGroup" class="form-select">
-                            <option value="">Select Year Group</option>
+                            <option value="">All Year Groups</option>
                             <option value="7">Year 7</option>
                             <option value="8">Year 8</option>
                             <option value="9">Year 9</option>
@@ -155,234 +125,327 @@
                             <option value="12">Year 12</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Class</label>
-                        <select id="filterClass" class="form-select">
-                            <option value="">Select Class</option>
-                        </select>
+                    <div class="col-md-2">
+                        <label class="form-label">Class (optional)</label>
+                        <select id="filterClass" class="form-select"><option value="">All Classes</option></select>
                     </div>
                     <div class="col-md-2">
-                        <button id="loadBtn" class="btn w-100" style="background: #007a4d; color: white; font-weight: 600; font-size: 13px; padding: 10px; border-radius: 6px;"><i data-lucide="search" style="width:16px; height:16px; margin-right:4px;"></i> Load Results</button>
+                        <button id="loadBtn" class="btn w-100" style="background: #007a4d; color: white; font-weight: 600; font-size: 13px; padding: 10px; border-radius: 6px;"><i data-lucide="search" style="width:16px; height:16px; margin-right:4px;"></i> Load Status</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- RESULTS TABLE -->
+        <div id="summaryBar" class="alert alert-light d-none shadow-sm mb-4" role="alert" style="font-size: 13px; border: 1px solid var(--border-color);"></div>
+
         <div class="premium-card">
-            <div class="card-header-green" id="tableHeaderLabel">
-                <i data-lucide="list" style="width:16px; height:16px;"></i> Result Approval List
-            </div>
+            <div class="card-header-green" id="tableTitle"><i data-lucide="list" style="width:16px; height:16px;"></i> Publish Status by Class</div>
             <div class="p-0">
                 <div class="table-responsive m-0" style="min-height: 200px;">
-                    <table class="table table-hover align-middle m-0" id="reportsTable">
-                        <thead style="background: #f8fafc;">
+                    <table class="table table-hover align-middle m-0 sv-table">
+                        <thead>
                             <tr>
-                                <th>Date Submitted</th>
                                 <th>Class</th>
-                                <th>Subject</th>
-                                <th>Teacher Name</th>
-                                <th>Status</th>
-                                <th class="text-end">Action</th>
+                                <th class="text-center">Students</th>
+                                <th class="text-center">Draft</th>
+                                <th class="text-center">Submitted</th>
+                                <th class="text-center">Approved</th>
+                                <th class="text-center">Published</th>
+                                <th class="text-center">Rejected</th>
+                                <th>Overall</th>
+                                <th class="text-end">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="reportsTableBody">
-                            <tr><td colspan="6" class="text-center py-5 text-muted" style="font-size:13px;">Please select filters and click Load Results</td></tr>
+                        <tbody id="statusTbody">
+                            <tr><td colspan="9" class="text-center py-5 text-muted" style="font-size:13px;">Select filters and click Load Status.</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
-
-    </div>
-
-    <!-- REJECT MODAL -->
-    <div class="modal fade" id="rejectModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border: none; border-radius: 12px; overflow: hidden;">
-                <div class="modal-header" style="background: #ef4444; color: white; border: none;">
-                    <h5 class="modal-title" style="font-size: 15px; font-weight: 600;"><i data-lucide="alert-triangle" class="me-2" style="width:18px; height:18px;"></i> Reject Result</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Are you sure you want to reject this result? The teacher will be able to edit and resubmit it.</p>
-                    <input type="hidden" id="rejectData">
-                    <div class="d-flex justify-content-end gap-2 mt-2">
-                        <button class="btn btn-light" data-bs-dismiss="modal" style="font-size:13px; font-weight:600;">Cancel</button>
-                        <button class="btn btn-danger" id="confirmRejectBtn" style="font-size:13px; font-weight:600;">Yes, Reject Result</button>
-                    </div>
-                </div>
+            <div class="p-3 d-flex justify-content-end" style="background: white; border-top: 1px solid var(--border-color);">
+                <button id="publishAllBtn" class="btn btn-success fw-bold" style="font-size: 13px; padding: 10px 20px; border-radius: 6px;" disabled><i class="fas fa-paper-plane me-2"></i>Publish All Approved in View</button>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="resultsEngine.js"></script>
+    <script src="sd-confirm.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
-        lucide.createIcons();
 
+        const R = window.ResultsEngine;
+        let currentUserId = null;
         let allClasses = [];
+        let sessions = [];
+        let lastRows = [];
+        const $ = (id) => document.getElementById(id);
+
+        function showAlert(type, msg) {
+            const box = $('alertBox');
+            box.className = `alert alert-${type} shadow-sm mb-4`;
+            box.innerHTML = msg;
+            box.classList.remove('d-none');
+            setTimeout(() => box.classList.add('d-none'), 8000);
+        }
+
+        function isSetupError(err) {
+            const m = (err && err.message ? err.message : '') + ' ' + (err && err.code ? err.code : '');
+            return /session|does not exist|42703|PGRST204/i.test(m);
+        }
+
+        function classMatchesYear(className, year) {
+            const n = (className || '').toLowerCase();
+            return n.includes('year ' + year) || n.includes('year' + year);
+        }
 
         async function init() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = '/';
-
-                const { data: profile } = await supabase.from('users').select('name, avatar_url, role').eq('id', session.user.id).single();
-                if(profile && profile.role !== 'admin') return window.location.href = '/'; // Admin only
-
-                
-                document.getElementById('navAdminName').innerText = profile.name || 'Admin';
-                const avatarContainer = document.getElementById('navAvatar');
-                if(avatarContainer) {
-                    const avatarHtml = profile.avatar_url 
-                        ? `<img src="${profile.avatar_url}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` 
-                        : `<div style="width:100%; height:100%; background: #059669; color: white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:14px;">${profile.name.substring(0,2).toUpperCase()}</div>`;
-                    avatarContainer.innerHTML = avatarHtml;
+                currentUserId = session.user.id;
+                const { data: profile } = await supabase.from('users').select('name, avatar_url, role').eq('id', currentUserId).single();
+                if (profile && profile.role !== 'admin') return window.location.href = '/';
+                if (profile) {
+                    $('navAdminName').innerText = profile.name || 'Admin';
+                    const av = $('navAvatar');
+                    if (profile.avatar_url) { av.style.background = `url('${profile.avatar_url}') center/cover`; av.innerText = ''; }
+                    else av.innerText = (profile.name || 'AD').substring(0, 2).toUpperCase();
                 }
-
-
-                // Load filters
-                await Promise.all([
-                    fetchTerms(),
-                    fetchSubTerms(),
-                    fetchClasses()
-                ]);
-                document.getElementById('loadingOverlay').style.display = 'none';
-            } catch (err) {
-                console.error(err);
-                document.getElementById('loadingOverlay').style.display = 'none';
-            }
-        }
-
-        async function fetchTerms() {
-            const select = document.getElementById('filterTerm');
-            const terms = ['First Term', 'Second Term', 'Third Term', 'Ember Term', 'Lent Term', 'Trinity Term'];
-            terms.forEach(t => select.add(new Option(t, t)));
-        }
-
-        async function fetchSubTerms() {
-            const select = document.getElementById('filterSubTerm');
-            const subTerms = ['Half Term', 'Full Term'];
-            subTerms.forEach(t => select.add(new Option(t, t)));
-        }
-
-        async function fetchClasses() {
-            const { data } = await supabase.from('classes').select('*').order('name');
-            if (data) {
-                allClasses = data;
-                const select = document.getElementById('filterClass');
-                data.forEach(c => select.add(new Option(c.name, c.id)));
-            }
-        }
-
-        // Hook up Year Group filter dynamically
-        document.getElementById('filterYearGroup').addEventListener('change', (e) => {
-            const y = e.target.value;
-            const select = document.getElementById('filterClass');
-            select.innerHTML = '<option value="">Select Class</option>';
-            let filtered = allClasses;
-            if (y) {
-                filtered = allClasses.filter(c => c.name.toLowerCase().includes(`year ${y}`) || c.name.toLowerCase().includes(`year${y}`));
-            }
-            filtered.forEach(c => select.add(new Option(c.name, c.id)));
-        });
-
-        document.addEventListener('DOMContentLoaded', init);
-
-        // Bind the Load Results button to fetchReports
-        document.getElementById('loadBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            loadReports();
-        });
-
-        window.loadReports = async function() {
-            const term = document.getElementById('filterTerm').value;
-            const subTerm = document.getElementById('filterSubTerm').value;
-            const classId = document.getElementById('filterClass').value;
-
-            if (!term || !subTerm) {
-                alert("Please select Term and Sub-Term to search for reports.");
-                return;
-            }
-            document.getElementById('loadingOverlay').style.display = 'flex';
-
-            try {
-                let query = supabase.from('term_results').select('id, student_id, term, sub_term, class_id, status').eq('term', term).eq('sub_term', subTerm).eq('status', 'approved');
-                if (classId) {
-                    query = query.eq('class_id', classId);
-                }
-
-                const { data, error } = await query;
-                if (error) throw error;
-
-                const tbody = document.getElementById('reportsTableBody');
-                if (!data || data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5 text-muted" style="font-size:13px;">No approved reports found ready to be published for this selection. Note: Subject Results must be Approved by the Admin first before they can be published.</td></tr>';
-                    document.getElementById('publishBtnContainer').innerHTML = '';
+                R.TERMS.forEach(t => $('filterTerm').add(new Option(t, t)));
+                R.SUB_TERMS.forEach(t => $('filterSubTerm').add(new Option(t, t)));
+                const { data: sessData } = await supabase.from('academic_sessions').select('id, name').order('name', { ascending: false });
+                sessions = sessData || [];
+                if (sessions.length === 0) {
+                    $('filterSession').add(new Option('2026/2027', '2026/2027'));
+                    sessions = [{ id: null, name: '2026/2027' }];
                 } else {
-                    // Group by student
-                    const uniqueStudents = new Set(data.map(d => d.student_id)).size;
-                    
-                    tbody.innerHTML = `<tr>
-                        <td colspan="6" class="text-center py-5">
-                            <i data-lucide="check-circle" class="text-success mb-2" style="width:48px; height:48px;"></i>
-                            <h4 class="text-success fw-bold">${data.length} Subject Results Approved!</h4>
-                            <p class="text-muted mb-0">Found across ${uniqueStudents} student(s) in the selected term.</p>
-                        </td>
-                    </tr>`;
-                    lucide.createIcons();
-
-                    document.getElementById('publishBtnContainer').innerHTML = `
-                        <button class="btn btn-success fw-bold px-4 py-2" onclick="publishAllReports()">
-                            <i class="fas fa-paper-plane me-2"></i> Publish Reports to Students
-                        </button>
-                    `;
-                    window.pendingPublishData = { term, subTerm, classId };
+                    sessions.forEach(s => $('filterSession').add(new Option(s.name, s.id)));
                 }
+                const { data: clsData } = await supabase.from('classes').select('id, name').order('name');
+                allClasses = clsData || [];
+                refreshClassOptions();
+                lucide.createIcons();
+                $('loadingOverlay').style.opacity = '0';
+                setTimeout(() => $('loadingOverlay').style.display = 'none', 300);
             } catch (err) {
                 console.error(err);
-                alert("Failed to load reports");
-            } finally {
-                document.getElementById('loadingOverlay').style.display = 'none';
+                $('loadingOverlay').style.display = 'none';
             }
         }
 
-        window.publishAllReports = async function() {
-            if (!window.pendingPublishData) return;
-            const { term, subTerm, classId } = window.pendingPublishData;
+        function refreshClassOptions() {
+            const y = $('filterYearGroup').value;
+            const sel = $('filterClass');
+            sel.innerHTML = '<option value="">All Classes</option>';
+            allClasses.filter(c => !y || classMatchesYear(c.name, y)).forEach(c => sel.add(new Option(c.name, c.id)));
+        }
 
-            if (!confirm(`Are you sure you want to PUBLISH all approved reports for ${term} - ${subTerm}? Students will immediately see their results on their portal.`)) return;
+        function selection() {
+            const sessionId = $('filterSession').value;
+            const sessionRow = sessions.find(s => String(s.id) === String(sessionId)) || sessions[0];
+            return {
+                sessionName: sessionRow ? sessionRow.name : '',
+                term: $('filterTerm').value,
+                subTerm: $('filterSubTerm').value,
+                yearGroup: $('filterYearGroup').value,
+                classId: $('filterClass').value
+            };
+        }
 
-            document.getElementById('loadingOverlay').style.display = 'flex';
+        function visibleClasses(sel) {
+            return allClasses.filter(c => {
+                if (sel.classId) return String(c.id) === String(sel.classId);
+                if (sel.yearGroup) return classMatchesYear(c.name, sel.yearGroup);
+                return true;
+            });
+        }
+
+        async function loadStatus() {
+            const sel = selection();
+            if (!sel.term || !sel.subTerm) { showAlert('warning', 'Please select Term and Sub-Term first.'); return; }
+            const tbody = $('statusTbody');
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>Loading publish status...</td></tr>';
+            try {
+                const { data, error } = await supabase
+                    .from('term_results')
+                    .select('id, student_id, class_id, status')
+                    // Legacy rows predate the session column (session IS NULL): include them, or the page reports "New" and a save hits the unique_term_result constraint.
+                    .eq('term', sel.term).eq('sub_term', sel.subTerm).or('session.eq."' + sel.sessionName + '",session.is.null');
+                if (error) throw error;
+                lastRows = data || [];
+                renderStatus(sel);
+            } catch (err) {
+                console.error(err);
+                if (isSetupError(err)) {
+                    $('setupDetail').textContent = 'Technical detail: ' + err.message;
+                    $('setupBanner').classList.remove('d-none');
+                    tbody.innerHTML = '<tr><td colspan="9" class="text-center py-5 text-muted" style="font-size:13px;">Publish status cannot load until the Phase 1 database setup has been run (see the banner above).</td></tr>';
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-danger">Failed to load status: ' + R.escapeHtml(err.message) + '</td></tr>';
+                }
+            }
+        }
+
+        function renderStatus(sel) {
+            const classes = visibleClasses(sel);
+            const tbody = $('statusTbody');
+            const totals = { draft: 0, submitted: 0, approved: 0, published: 0, rejected: 0 };
+            const rowsHtml = classes.map(c => {
+                const rows = lastRows.filter(r => String(r.class_id) === String(c.id));
+                const counts = { draft: 0, submitted: 0, approved: 0, published: 0, rejected: 0 };
+                rows.forEach(r => {
+                    const s = r.status === 'final' ? 'submitted' : r.status;
+                    if (counts[s] !== undefined) counts[s]++;
+                    if (totals[s] !== undefined) totals[s]++;
+                });
+                const students = new Set(rows.map(r => r.student_id)).size;
+                let overall;
+                if (rows.length === 0) overall = '<span class="status-pill pill-none">No results</span>';
+                else if (counts.published === rows.length) overall = '<span class="status-pill pill-published">Published</span>';
+                else if (counts.approved > 0) overall = '<span class="status-pill pill-approved">Ready to publish</span>';
+                else overall = '<span class="status-pill pill-pending">Awaiting approval</span>';
+                const publishDisabled = counts.approved === 0 ? 'disabled' : '';
+                const unpublishDisabled = counts.published === 0 ? 'disabled' : '';
+                return `<tr>
+                    <td class="fw-bold">${R.escapeHtml(c.name)}</td>
+                    <td class="count-cell">${students}</td>
+                    <td class="count-cell">${counts.draft}</td>
+                    <td class="count-cell">${counts.submitted}</td>
+                    <td class="count-cell">${counts.approved}</td>
+                    <td class="count-cell">${counts.published}</td>
+                    <td class="count-cell">${counts.rejected}</td>
+                    <td>${overall}</td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-success fw-bold me-1 publish-class-btn" data-class="${c.id}" data-name="${R.escapeHtml(c.name)}" ${publishDisabled}><i class="fas fa-paper-plane me-1"></i>Publish</button>
+                        <button class="btn btn-sm btn-outline-danger fw-bold unpublish-class-btn" data-class="${c.id}" data-name="${R.escapeHtml(c.name)}" ${unpublishDisabled}>Unpublish</button>
+                    </td>
+                </tr>`;
+            }).join('');
+            tbody.innerHTML = rowsHtml || '<tr><td colspan="9" class="text-center py-5 text-muted" style="font-size:13px;">No classes match this selection.</td></tr>';
+            const bar = $('summaryBar');
+            bar.classList.remove('d-none');
+            bar.innerHTML = `<strong>${R.escapeHtml(sel.sessionName)} · ${R.escapeHtml(sel.term)} (${R.escapeHtml(sel.subTerm)})</strong> — ${totals.draft} draft · ${totals.submitted} submitted · ${totals.approved} approved · ${totals.published} published · ${totals.rejected} rejected subject results across ${classes.length} class(es).`;
+            $('publishAllBtn').disabled = totals.approved === 0;
+            document.querySelectorAll('.publish-class-btn').forEach(b => b.addEventListener('click', () => publishClass(b.dataset.class, b.dataset.name, b)));
+            document.querySelectorAll('.unpublish-class-btn').forEach(b => b.addEventListener('click', () => unpublishClass(b.dataset.class, b.dataset.name, b)));
+        }
+
+        async function notifyStudents(classIds, sel) {
+            // In-portal notification via the existing messages table. A
+            // failure here must never undo a successful publish.
+            try {
+                const { data: students, error } = await supabase
+                    .from('students').select('user_id').in('class_id', classIds).eq('approved', true);
+                if (error) throw error;
+                const receivers = [...new Set((students || []).map(s => s.user_id).filter(Boolean))];
+                if (receivers.length === 0) return 0;
+                const classNames = allClasses.filter(c => classIds.includes(String(c.id))).map(c => c.name).join(', ');
+                const payload = receivers.map(uid => ({
+                    sender_id: currentUserId,
+                    receiver_id: uid,
+                    subject: `Results published — ${sel.term} (${sel.subTerm})`,
+                    body: `Your ${sel.term} (${sel.subTerm}) results for ${classNames || 'your class'} (${sel.sessionName} session) have been published. Open your report card to view and download them.`
+                }));
+                const { error: insertErr } = await supabase.from('messages').insert(payload);
+                if (insertErr) throw insertErr;
+                return receivers.length;
+            } catch (err) {
+                console.warn('Publish notifications failed:', err.message);
+                return -1;
+            }
+        }
+
+        async function publishClass(classId, className, btn) {
+            const sel = selection();
+            const ok = await window.sdConfirm({
+                title: 'Publish results?',
+                message: `Publish all approved results for ${className} — ${sel.term} (${sel.subTerm})? Students will immediately see their report cards, and each student will receive an in-portal message.`,
+                confirmLabel: 'Publish',
+                cancelLabel: 'Cancel'
+            });
+            if (!ok) return;
+            btn.disabled = true;
+            try {
+                const { error } = await supabase.from('term_results').update({ status: 'published' })
+                    .eq('term', sel.term).eq('sub_term', sel.subTerm).or('session.eq."' + sel.sessionName + '",session.is.null')
+                    .eq('class_id', classId).eq('status', 'approved');
+                if (error) throw error;
+                const notified = await notifyStudents([String(classId)], sel);
+                showAlert('success', `Results published for ${R.escapeHtml(className)}.` + (notified >= 0 ? ` ${notified} student(s) notified in-portal.` : ' Publish succeeded, but the in-portal notifications could not be sent.'));
+                loadStatus();
+            } catch (err) {
+                console.error(err);
+                showAlert('danger', 'Publish failed: ' + R.escapeHtml(err.message));
+                btn.disabled = false;
+            }
+        }
+
+        async function unpublishClass(classId, className, btn) {
+            const sel = selection();
+            const ok = await window.sdConfirm({
+                title: 'Unpublish results?',
+                message: `Return all published results for ${className} — ${sel.term} (${sel.subTerm}) to approved? Students will no longer see these report cards until you publish again. Use this only to correct mistakes.`,
+                confirmLabel: 'Unpublish',
+                cancelLabel: 'Cancel',
+                danger: true
+            });
+            if (!ok) return;
+            btn.disabled = true;
+            try {
+                const { error } = await supabase.from('term_results').update({ status: 'approved' })
+                    .eq('term', sel.term).eq('sub_term', sel.subTerm).or('session.eq."' + sel.sessionName + '",session.is.null')
+                    .eq('class_id', classId).eq('status', 'published');
+                if (error) throw error;
+                showAlert('success', `Results for ${R.escapeHtml(className)} returned to approved. Re-publish when the corrections are done.`);
+                loadStatus();
+            } catch (err) {
+                console.error(err);
+                showAlert('danger', 'Unpublish failed: ' + R.escapeHtml(err.message));
+                btn.disabled = false;
+            }
+        }
+
+        async function publishAll() {
+            const sel = selection();
+            const classes = visibleClasses(sel);
+            const ok = await window.sdConfirm({
+                title: 'Publish all approved results in view?',
+                message: `Publish every approved result for ${sel.term} (${sel.subTerm}) across ${classes.length} class(es)? Students will immediately see their report cards, and each student will receive an in-portal message.`,
+                confirmLabel: 'Publish All',
+                cancelLabel: 'Cancel'
+            });
+            if (!ok) return;
+            const btn = $('publishAllBtn');
+            btn.disabled = true;
             try {
                 let query = supabase.from('term_results').update({ status: 'published' })
-                    .eq('term', term)
-                    .eq('sub_term', subTerm)
+                    .eq('term', sel.term).eq('sub_term', sel.subTerm).or('session.eq."' + sel.sessionName + '",session.is.null')
                     .eq('status', 'approved');
-                
-                if (classId) {
-                    query = query.eq('class_id', classId);
-                }
-
+                if (sel.classId) query = query.eq('class_id', sel.classId);
+                else if (classes.length) query = query.in('class_id', classes.map(c => c.id));
                 const { error } = await query;
                 if (error) throw error;
-
-                alert("Reports successfully published! Students can now view their report cards.");
-                loadReports(); // Refresh view
+                const notified = await notifyStudents(classes.map(c => String(c.id)), sel);
+                showAlert('success', 'All approved results in view have been published.' + (notified >= 0 ? ` ${notified} student(s) notified in-portal.` : ' Publish succeeded, but the in-portal notifications could not be sent.'));
+                loadStatus();
             } catch (err) {
                 console.error(err);
-                alert("An error occurred while publishing.");
-            } finally {
-                document.getElementById('loadingOverlay').style.display = 'none';
+                showAlert('danger', 'Publish failed: ' + R.escapeHtml(err.message));
+                btn.disabled = false;
             }
         }
 
-        document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
+        $('filterYearGroup').addEventListener('change', refreshClassOptions);
+        $('loadBtn').addEventListener('click', loadStatus);
+        $('publishAllBtn').addEventListener('click', publishAll);
+        $('logoutBtn').addEventListener('click', async (e) => {
             e.preventDefault();
             await supabase.auth.signOut();
             window.location.href = '/';
         });
+
+        document.addEventListener('DOMContentLoaded', init);
     </script>
     <script src="mobile_nav.js"></script>
 </body>
