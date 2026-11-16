@@ -150,14 +150,35 @@ const PRACTICE_STYLES = `
   .sd-jp-history-item:last-child { border-bottom: none; }
   .sd-jp-badge { font-size: 0.8rem; font-weight: 700; color: #004d34; background: #eef6f1; border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
 
+  /* Pre-quiz instruction modal: a dark overlay dims the setup
+     dashboard behind it, and a white floating card carries the quiz
+     title, intro and rules. The card scrolls internally on short
+     screens so the Start button is always reachable. */
+  .sd-jp-modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(18, 50, 39, 0.62); display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+  .sd-jp-modal-card { position: relative; width: 100%; max-width: 560px; max-height: calc(100dvh - 40px); overflow-y: auto; background: #ffffff; border-radius: 24px; padding: 32px 30px 26px; box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35); margin: auto; }
+  .sd-jp-modal-title { font-size: 1.6rem; line-height: 1.25; font-weight: 800; color: #123227; margin: 0 0 10px 0; }
+  .sd-jp-modal-intro { font-size: 1rem; line-height: 1.65; color: #3c4a44; margin: 0 0 18px 0; }
+  .sd-jp-modal-rules { list-style: disc; margin: 0 0 24px 0; padding: 0 0 0 22px; text-align: left; }
+  .sd-jp-modal-rules li { font-size: 0.98rem; line-height: 1.65; color: #123227; margin-bottom: 8px; }
+  .sd-jp-modal-rules li::marker { color: #007a4d; }
+  .sd-jp-modal-start { width: 100%; font-size: 1.1rem; min-height: 54px; }
+  .sd-jp-modal-start:hover { background: #00603d; box-shadow: 0 0 0 4px rgba(0, 122, 77, 0.18), 0 10px 24px rgba(0, 122, 77, 0.30); transform: scale(1.02); }
+  .sd-jp-modal-back { display: block; margin: 14px auto 0; background: transparent; border: none; padding: 8px 12px; color: #007a4d; font-weight: 700; font-size: 0.92rem; cursor: pointer; font-family: inherit; }
+  .sd-jp-modal-back:hover { text-decoration: underline; }
+
   /* Quiz screen. The run header sticks under the sticky site header
      (64px) so the timer and Submit stay visible on long questions. */
   .sd-jp-run-head { position: sticky; top: 72px; z-index: 50; display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; background: #ffffff; border-radius: 16px; padding: 10px 12px; box-shadow: 0 2px 6px rgba(18, 50, 39, 0.06), 0 10px 24px rgba(18, 50, 39, 0.10); }
   .sd-jp-run-title { font-weight: 800; color: #123227; font-size: 1.05rem; }
   .sd-jp-run-tools { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .sd-jp-timer { font-variant-numeric: tabular-nums; font-weight: 800; font-size: 1.05rem; background: #123227; color: #ffffff; border-radius: 999px; padding: 9px 16px; }
-  .sd-jp-timer-low { background: #b3372f; }
-  .sd-jp-btn-submit { min-height: 44px; padding: 10px 20px; font-size: 0.95rem; }
+  /* Timer pill: a sleek bordered pill — green border and text on white,
+     never a filled highlight. Low time turns the border and text red. */
+  .sd-jp-timer { font-variant-numeric: tabular-nums; font-weight: 800; font-size: 1.02rem; background: #ffffff; color: #004d34; border: 2px solid #007a4d; border-radius: 999px; padding: 8px 16px; white-space: nowrap; }
+  .sd-jp-timer-low { border-color: #b3372f; color: #b3372f; }
+  /* Submit stays quiet next to the questions: an outline button, white
+     background with green text and border. */
+  .sd-jp-btn-submit { min-height: 44px; padding: 10px 20px; font-size: 0.95rem; background: #ffffff; color: #007a4d; border: 2px solid #007a4d; }
+  .sd-jp-btn-submit:hover { background: #eef6f1; box-shadow: none; }
   .sd-jp-progress-row { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
   .sd-jp-progress-track { flex: 1; height: 10px; border-radius: 999px; background: #e6efe9; overflow: hidden; }
   .sd-jp-progress-fill { height: 100%; background: #007a4d; border-radius: 999px; transition: width 0.3s ease; }
@@ -174,7 +195,7 @@ const PRACTICE_STYLES = `
   .sd-jp-stem { font-size: 1.2rem; line-height: 1.65; font-weight: 700; color: #123227; margin: 0 0 20px 0; white-space: pre-wrap; overflow-wrap: break-word; }
   .sd-jp-options { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .sd-jp-option { display: flex; align-items: flex-start; gap: 12px; text-align: left; min-height: 56px; padding: 16px; border-radius: 16px; border: 2px solid #dce6df; background: #ffffff; color: #123227; font-size: 1rem; line-height: 1.55; cursor: pointer; font-family: inherit; transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease; }
-  .sd-jp-option:hover:not(:disabled) { border-color: #9dc3b1; box-shadow: 0 4px 14px rgba(18, 50, 39, 0.08); transform: translateY(-1px); }
+  .sd-jp-option:hover:not(:disabled) { border-color: #007a4d; box-shadow: 0 4px 14px rgba(18, 50, 39, 0.08); transform: translateY(-1px); }
   .sd-jp-option:disabled { cursor: default; }
   .sd-jp-option-letter { flex: none; width: 30px; height: 30px; border-radius: 10px; background: #eef6f1; color: #004d34; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
   .sd-jp-option-picked { border-color: #007a4d; background: #e6f5ec; box-shadow: 0 4px 14px rgba(0, 122, 77, 0.14); }
@@ -191,11 +212,17 @@ const PRACTICE_STYLES = `
   .sd-jp-expl { color: #3c4a44; }
   .sd-jp-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 26px; }
   .sd-jp-answered { font-weight: 800; color: #123227; font-size: 0.95rem; font-variant-numeric: tabular-nums; text-align: center; }
-  .sd-jp-grid { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 18px; }
-  .sd-jp-grid-btn { width: 40px; height: 40px; border-radius: 12px; border: 1px solid #dce6df; background: #ffffff; color: #123227; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease; }
+  /* Next drives forward momentum: solid SpringDrill Green, sized to
+     match the Previous outline button beside it. */
+  .sd-jp-btn-nav { min-height: 48px; padding: 12px 24px; font-size: 0.95rem; }
+  .sd-jp-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 18px; }
+  /* Circular question indicators, exactly three states: unanswered
+     light gray, answered solid green, current white with a thick green
+     ring. border-box keeps every state the same 40px size. */
+  .sd-jp-grid-btn { box-sizing: border-box; width: 40px; height: 40px; border-radius: 50%; border: 2px solid #dce6df; background: #f2f4f3; color: #5a6b63; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease; }
   .sd-jp-grid-btn:hover { border-color: #007a4d; }
-  .sd-jp-grid-current { background: #007a4d !important; border-color: #007a4d !important; color: #ffffff !important; }
-  .sd-jp-grid-answered { background: #e6f5ec; border-color: #007a4d; color: #004d34; }
+  .sd-jp-grid-current { background: #ffffff !important; border: 3px solid #007a4d !important; color: #004d34 !important; box-shadow: 0 0 0 2px rgba(0, 122, 77, 0.25); }
+  .sd-jp-grid-answered { background: #007a4d !important; border-color: #007a4d !important; color: #ffffff !important; }
   .sd-jp-kbd-hint { font-size: 0.85rem; color: #5a6b63; text-align: center; margin: 14px 0 0 0; }
   .sd-jp-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
 
@@ -223,11 +250,6 @@ const PRACTICE_STYLES = `
   .sd-jp-section-tab-active { background: #007a4d !important; border-color: #007a4d !important; color: #ffffff !important; }
   .sd-jp-grid-label { font-size: 0.9rem; font-weight: 700; color: #004d34; margin: 18px 0 10px 0; }
 
-  /* The locked English card in sitting setup: a fixed selection, kept
-     fully readable — never greyed out like a dead control. */
-  .sd-jp-subject-card:disabled { opacity: 1; cursor: default; color: #123227; }
-  .sd-jp-subject-card:disabled:hover { transform: none; box-shadow: none; border-color: #007a4d; }
-
   /* Sitting score breakdown: one cell per subject inside the hero. */
   .sd-jp-score-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 20px; text-align: left; }
   .sd-jp-score-cell { background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 14px; padding: 14px; }
@@ -249,10 +271,41 @@ const PRACTICE_STYLES = `
   .sd-jp-empty p { margin: 0 0 12px 0; font-size: 0.98rem; line-height: 1.65; color: #123227; }
   .sd-jp-empty p:last-of-type { margin-bottom: 16px; }
 
-  /* Disabled primary buttons (sitting start before 3 picks): visibly
-     inactive, never a dead-looking control. */
+  /* Disabled primary buttons: visibly inactive, never a dead-looking
+     control. The subject modal's Continue button overrides this with
+     its own light-gray disabled style (see .sd-jp-pick-continue). */
   .sd-jp-btn:disabled { opacity: 0.5; cursor: default; }
   .sd-jp-btn:disabled:hover { background: #007a4d; box-shadow: none; }
+
+  /* Subject Selection modal: the same overlay pattern as the
+     instruction modal, with a slightly wider card for the subject grid
+     and an X close button in the corner. */
+  .sd-jp-modal-card-wide { max-width: 640px; }
+  .sd-jp-modal-close { position: absolute; top: 14px; right: 14px; width: 38px; height: 38px; border-radius: 50%; border: none; background: transparent; color: #5a6b63; font-size: 1.5rem; line-height: 1; cursor: pointer; font-family: inherit; }
+  .sd-jp-modal-close:hover { background: #eef6f1; color: #123227; }
+  /* Live counter: gray while picking, Deep SpringDrill Green at 4/4. */
+  .sd-jp-pick-counter { font-weight: 800; font-size: 1.05rem; color: #5a6b63; margin: 0 0 16px 0; font-variant-numeric: tabular-nums; }
+  .sd-jp-pick-counter-complete { color: #007a4d; }
+  /* Subject grid: 3 columns on desktop, 2 on phones (media query). */
+  .sd-jp-pick-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0 0 16px 0; }
+  .sd-jp-pick-card { position: relative; text-align: left; background: #ffffff; border: 2px solid #dce6df; border-radius: 16px; padding: 16px 14px; cursor: pointer; color: #3c4a44; font-family: inherit; transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease; }
+  .sd-jp-pick-card:hover:not(:disabled) { border-color: #9dc3b1; box-shadow: 0 6px 16px rgba(18, 50, 39, 0.08); transform: translateY(-1px); }
+  .sd-jp-pick-card-selected { border-color: #007a4d; background: #f2faf5; color: #007a4d; }
+  .sd-jp-pick-card-selected .sd-jp-pick-meta { color: #004d34; }
+  .sd-jp-pick-card:disabled { cursor: not-allowed; }
+  /* At 4/4 the unpicked cards gray out. The locked English card is
+     disabled too but stays fully readable in its selected green. */
+  .sd-jp-pick-card:disabled:not(.sd-jp-pick-card-selected) { opacity: 0.45; background: #f2f4f3; color: #8a9690; }
+  .sd-jp-pick-card-selected:disabled { cursor: default; opacity: 1; }
+  .sd-jp-pick-check { position: absolute; top: 10px; right: 10px; width: 24px; height: 24px; border-radius: 50%; background: #007a4d; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 800; }
+  .sd-jp-pick-name { display: block; font-weight: 800; font-size: 1rem; padding-right: 28px; }
+  .sd-jp-pick-meta { display: block; font-size: 0.82rem; color: #5a6b63; margin-top: 4px; line-height: 1.4; }
+  /* Continue: light gray and unclickable until exactly 4 are picked,
+     then solid green with a soft hover glow. */
+  .sd-jp-pick-continue { width: 100%; font-size: 1.1rem; min-height: 54px; margin-top: 8px; }
+  .sd-jp-pick-continue:hover:not(:disabled) { background: #00603d; box-shadow: 0 0 0 4px rgba(0, 122, 77, 0.18), 0 10px 24px rgba(0, 122, 77, 0.30); transform: scale(1.01); }
+  .sd-jp-btn.sd-jp-pick-continue:disabled { opacity: 1; background: #dfe5e1; color: #8a9690; box-shadow: none; cursor: not-allowed; }
+  .sd-jp-btn.sd-jp-pick-continue:disabled:hover { background: #dfe5e1; box-shadow: none; }
 
   @media (max-width: 700px) {
     .sd-jp-card { padding: 20px 16px; }
@@ -260,6 +313,7 @@ const PRACTICE_STYLES = `
     .sd-jp-prep-grid { grid-template-columns: 1fr; }
     .sd-jp-score-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .sd-jp-subjects { grid-template-columns: 1fr; }
+    .sd-jp-pick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .sd-jp-options { grid-template-columns: 1fr; }
     .sd-jp-review-options { grid-template-columns: 1fr; }
     .sd-jp-dash-grid { gap: 8px; }
@@ -271,6 +325,10 @@ const PRACTICE_STYLES = `
     .sd-jp-question { scroll-margin-top: 208px; }
     .sd-jp-stem { font-size: 1.1rem; }
     .sd-jp-nav .sd-jp-btn-secondary { width: auto; flex: 1; }
+    .sd-jp-nav .sd-jp-btn-nav { width: auto; flex: 1; }
+    .sd-jp-modal-overlay { padding: 12px; }
+    .sd-jp-modal-card { padding: 26px 20px 22px; border-radius: 20px; }
+    .sd-jp-modal-title { font-size: 1.4rem; }
     .sd-jp-kbd-hint { display: none; }
   }
 `;
