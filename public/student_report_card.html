@@ -171,7 +171,7 @@
                         <th class="text-center" width="10%">CAT 1 (20)</th>
                         <th class="text-center" width="10%">CAT 2 (20)</th>
                         <th class="text-center" width="10%">EXAM (60)</th>
-                        <th class="text-center" width="10%">TOTAL (100)</th>
+                        <th class="text-center" width="10%" id="rcTotalTh">TOTAL (100)</th>
                         <th class="text-center" width="10%">GRADE</th>
                         <th class="text-center" width="20%">REMARK</th>
                     </tr>
@@ -187,6 +187,8 @@
                     </tr>
                 </tfoot>
             </table>
+
+            <p class="text-muted small mb-4" id="rcHalfTermNote" style="display: none;">Grades are awarded at Full Term, when the exam is complete. Half Term totals are out of 40.</p>
 
             <p class="text-muted small mb-4" id="rcCumulative" style="display: none;"></p>
 
@@ -317,6 +319,8 @@
                 const subTermId = document.getElementById('subTermSelect').value;
 
                 document.getElementById('rcDocumentTitle').innerText = termId.toUpperCase() + ' — ' + subTermId.toUpperCase() + ' REPORT';
+                document.getElementById('rcTotalTh').textContent = R.isHalfTerm(subTermId) ? 'TOTAL (40)' : 'TOTAL (100)';
+                document.getElementById('rcHalfTermNote').style.display = R.isHalfTerm(subTermId) ? 'block' : 'none';
 
                 const { data: results, error } = await supabase
                     .from('term_results')
@@ -341,7 +345,7 @@
 
                 if (!results || results.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger fw-bold py-5"><i class="fas fa-lock fs-2 mb-2 d-block"></i>No published report card found for this term.<br><small class="fw-normal">It may not be released yet by the Admin.</small></td></tr>`;
-                    document.getElementById('rcTotalAvg').innerText = '--%';
+                    document.getElementById('rcTotalAvg').innerText = R.formatAverage(null, subTermId);
                     document.getElementById('rcPosition').innerText = '--';
                     document.getElementById('rcCumulative').style.display = 'none';
                     document.getElementById('rcSupervisorRemark').innerText = 'No remark recorded yet.';
@@ -358,13 +362,14 @@
                         const exam = R.num(r.exam);
                         const total = R.subjectTotal(r);
                         const scored = R.hasAnyScore(r);
-                        const band = R.ssceGrade(total);
+                        const band = R.displayGrade(total, subTermId);
                         const grade = scored ? band.letter : '--';
                         const remark = scored ? band.remark : '--';
-                        let color = 'text-danger';
+                        let color = 'text-muted';
                         if (grade === 'A1' || grade === 'B2') color = 'text-success';
                         else if (['B3', 'C4', 'C5', 'C6'].includes(grade)) color = 'text-primary';
                         else if (grade === 'D7' || grade === 'E8') color = 'text-dark';
+                        else if (grade === 'F9' || grade === 'F') color = 'text-danger';
 
                         rowsHtml += `
                             <tr>
@@ -381,7 +386,7 @@
 
                     tbody.innerHTML = rowsHtml;
                     const avg = R.averageOf(results);
-                    document.getElementById('rcTotalAvg').innerText = (avg == null ? '--' : avg.toFixed(1)) + '%';
+                    document.getElementById('rcTotalAvg').innerText = R.formatAverage(avg, subTermId);
 
                     // Position in class: computed from every published row
                     // for the whole class, same session/term/sub-term.
@@ -422,10 +427,10 @@
                         });
                         const parts = [];
                         if (termAvgs['First Term'] != null && termAvgs['Second Term'] != null) {
-                            parts.push('2-Term Average: ' + R.cumulativeAverage([termAvgs['First Term'], termAvgs['Second Term']]).toFixed(1) + '%');
+                            parts.push('2-Term Average: ' + R.formatAverage(R.cumulativeAverage([termAvgs['First Term'], termAvgs['Second Term']]), subTermId));
                         }
                         if (termAvgs['First Term'] != null && termAvgs['Second Term'] != null && termAvgs['Third Term'] != null) {
-                            parts.push('3-Term Average: ' + R.cumulativeAverage([termAvgs['First Term'], termAvgs['Second Term'], termAvgs['Third Term']]).toFixed(1) + '%');
+                            parts.push('3-Term Average: ' + R.formatAverage(R.cumulativeAverage([termAvgs['First Term'], termAvgs['Second Term'], termAvgs['Third Term']]), subTermId));
                         }
                         const cumEl = document.getElementById('rcCumulative');
                         if (parts.length) {

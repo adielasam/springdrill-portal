@@ -29,7 +29,7 @@
                         <th class="text-center">1st CAT (20)</th>
                         <th class="text-center">2nd CAT (20)</th>
                         <th class="text-center">Exam (60)</th>
-                        <th class="text-center fw-bold">Total (100)</th>
+                        <th class="text-center fw-bold" id="vrTotalTh">Total (100)</th>
                         <th class="text-center">Grade</th>
                     </tr>
                 </thead>
@@ -52,6 +52,7 @@
             const subjectId = params.get('subject');
             const termId = params.get('term');
             const subTermId = params.get('subterm');
+            document.getElementById('vrTotalTh').textContent = R.isHalfTerm(subTermId) ? 'Total (40)' : 'Total (100)';
             
             if(!classId || !subjectId) return document.getElementById('resultsBody').innerHTML = '<tr><td colspan="6" class="text-center">Missing parameters</td></tr>';
 
@@ -93,7 +94,7 @@
                 const exam = r.exam || 0;
                 const total = r.total || (cat1 + cat2 + exam);
                 const hasScore = R.hasAnyScore(r);
-                const grade = hasScore ? R.ssceGrade(total).letter : '--';
+                const grade = hasScore ? R.displayGrade(total, subTermId).letter : '--';
 
                 html += `
                 <tr>

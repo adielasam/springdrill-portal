@@ -155,7 +155,7 @@
                         </div>
                     </div>
                     <div class="p-3 d-flex justify-content-between align-items-center flex-wrap gap-2" style="background: white;">
-                        <span class="text-muted small">Grade = SSCE grade of the average. Position uses competition ranking: tied averages share a position and the next position is skipped.</span>
+                        <span class="text-muted small">Grade = SSCE grade of the average at Full Term; Half Term results carry no grade until the exam is complete. Position uses competition ranking: tied averages share a position and the next position is skipped.</span>
                         <button id="exportBtn" class="btn btn-outline-dark fw-bold" disabled><i class="fas fa-file-csv me-2"></i>Export Broadsheet (CSV)</button>
                     </div>
                 </div>
@@ -173,7 +173,8 @@
                     <div class="col-md-6">
                         <div class="premium-card p-4" style="background: white;">
                             <h6 class="fw-bold mb-3">Grade Distribution (SSCE bands, subject totals)</h6>
-                            <div style="position: relative; height: 300px;"><canvas id="gradeChart"></canvas></div>
+                            <p class="text-muted small" id="gradeChartNote" style="display: none;">Grades are awarded at Full Term, when the exam is complete — no grade distribution for Half Term results.</p>
+                            <div id="gradeChartWrap" style="position: relative; height: 300px;"><canvas id="gradeChart"></canvas></div>
                         </div>
                     </div>
                 </div>
@@ -388,8 +389,8 @@
                         cells += `<td class="fw-bold">${R.subjectTotal(row)}</td>`;
                     }
                 });
-                const avg = s.average == null ? '--' : s.average.toFixed(1);
-                const grade = s.average == null ? '--' : R.ssceGrade(s.average).letter;
+                const avg = R.formatAverage(s.average, sel.subTerm);
+                const grade = s.average == null ? '--' : R.displayGrade(s.average, sel.subTerm).letter;
                 const pos = s.position == null ? '--' : R.ordinal(s.position);
                 cells += `<td class="fw-bold">${avg}</td><td class="fw-bold" style="color:#007a4d;">${grade}</td><td class="fw-bold">${pos}</td>`;
                 return `<tr>${cells}</tr>`;
@@ -414,30 +415,36 @@
                     labels: subjectAvgs.map(s => s.name),
                     datasets: [{ label: 'Class average', data: subjectAvgs.map(s => s.avg), backgroundColor: '#007a4d' }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } }, plugins: { legend: { display: false } } }
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: R.isHalfTerm(selection().subTerm) ? R.HALF_TERM_MAX : 100 } }, plugins: { legend: { display: false } } }
             });
 
-            // Grade distribution across subject totals
-            const counts = {};
-            R.SSCE_BANDS.forEach(b => { counts[b.letter] = 0; });
-            currentRows.forEach(r => {
-                if (R.hasAnyScore(r)) counts[R.ssceGrade(R.subjectTotal(r)).letter]++;
-            });
-            const gCtx = $('gradeChart').getContext('2d');
-            if (gradeChart) gradeChart.destroy();
-            gradeChart = new Chart(gCtx, {
-                type: 'bar',
-                data: {
-                    labels: R.SSCE_BANDS.map(b => b.letter),
-                    datasets: [{ label: 'Subject totals', data: R.SSCE_BANDS.map(b => counts[b.letter]), backgroundColor: '#059669' }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false } } }
-            });
+            // Grade distribution across subject totals (Full Term only:
+            // Half Term totals carry no grade until the exam is complete).
+            const halfTermView = R.isHalfTerm(selection().subTerm);
+            $('gradeChartWrap').style.display = halfTermView ? 'none' : 'block';
+            $('gradeChartNote').style.display = halfTermView ? 'block' : 'none';
+            if (gradeChart) { gradeChart.destroy(); gradeChart = null; }
+            if (!halfTermView) {
+                const counts = {};
+                R.SSCE_BANDS.forEach(b => { counts[b.letter] = 0; });
+                currentRows.forEach(r => {
+                    if (R.hasAnyScore(r)) counts[R.ssceGrade(R.subjectTotal(r)).letter]++;
+                });
+                const gCtx = $('gradeChart').getContext('2d');
+                gradeChart = new Chart(gCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: R.SSCE_BANDS.map(b => b.letter),
+                        datasets: [{ label: 'Subject totals', data: R.SSCE_BANDS.map(b => counts[b.letter]), backgroundColor: '#059669' }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false } } }
+                });
+            }
 
             // Top / bottom 5
             const ranked = currentSummary.filter(s => s.average != null).slice().sort((a, b) => b.average - a.average);
             const nameOf = (s) => R.escapeHtml(`${s.student.first_name || ''} ${s.student.surname || ''}`.trim());
-            const row = (s) => `<tr><td class="fw-bold">${nameOf(s)}</td><td class="text-center">${s.average.toFixed(1)}</td><td class="text-center fw-bold">${R.ordinal(s.position)}</td></tr>`;
+            const row = (s) => `<tr><td class="fw-bold">${nameOf(s)}</td><td class="text-center">${R.formatAverage(s.average, selection().subTerm)}</td><td class="text-center fw-bold">${R.ordinal(s.position)}</td></tr>`;
             const top = ranked.slice(0, 5).map(row).join('') || '<tr><td colspan="3" class="text-center text-muted">No averages yet.</td></tr>';
             const bottom = ranked.slice(-5).reverse().map(row).join('') || '<tr><td colspan="3" class="text-center text-muted">No averages yet.</td></tr>';
             $('topBottomBox').innerHTML = `
@@ -466,7 +473,7 @@
                     const avgs = termNames.map(t => R.averageOf(filtered.filter(r => String(r.student_id) === String(s.id) && r.term === t)));
                     const two = R.cumulativeAverage([avgs[0], avgs[1]]);
                     const three = R.cumulativeAverage(avgs);
-                    const fmt = (a) => a == null ? '--' : a.toFixed(1);
+                    const fmt = (a) => R.formatAverage(a, sel.subTerm);
                     const name = `${s.first_name || ''} ${s.surname || ''}`.trim() || 'Unnamed Student';
                     return `<tr><td>${i + 1}</td><td class="student-cell">${R.escapeHtml(name)}</td><td>${fmt(avgs[0])}</td><td>${fmt(avgs[1])}</td><td>${fmt(avgs[2])}</td><td class="fw-bold">${fmt(two)}</td><td class="fw-bold" style="color:#007a4d;">${fmt(three)}</td></tr>`;
                 }).join('') || '<tr><td colspan="7" class="text-center py-4 text-muted">No students in this class.</td></tr>';
@@ -487,7 +494,7 @@
                     cells.push(row && R.hasAnyScore(row) ? R.subjectTotal(row) : '');
                 });
                 cells.push(s.average == null ? '' : s.average.toFixed(1));
-                cells.push(s.average == null ? '' : R.ssceGrade(s.average).letter);
+                cells.push(s.average == null ? '' : R.displayGrade(s.average, sel.subTerm).letter);
                 cells.push(s.position == null ? '' : s.position);
                 return cells;
             });
