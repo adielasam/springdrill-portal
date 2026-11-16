@@ -84,6 +84,59 @@ html, body {
 }
 
 /* --------------------------------------------------------
+   SIDEBAR SCROLLBAR (all roles, all widths)
+   --------------------------------------------------------
+   Root cause of the unreachable menu items: the student
+   pages define .sidebar as position:fixed + height:100vh
+   with NO overflow rule, so menu items taller than the
+   viewport spill past the bottom edge of the fixed box —
+   invisible and unreachable, because page scroll cannot
+   move a fixed element's content. Admin/teacher pages
+   already scroll, but with a faint 6px thumb (or the
+   browser default on light sidebars) that is easy to miss.
+
+   This shared block — mobile_responsive.css is loaded by
+   every sidebar page — makes the sidebar scroll on its own
+   (wheel, touch-drag, keyboard) with a slim, VISIBLE,
+   brand-green scrollbar that reads on both the dark-green
+   (student/teacher) and light (admin) sidebar themes.
+   The main content area is untouched and keeps scrolling
+   normally; overscroll-behavior: contain stops sidebar
+   scrolling from chaining into the page behind it.
+   -------------------------------------------------------- */
+.sidebar,
+div.sidebar,
+#sidebar {
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #007a4d transparent;
+    -webkit-overflow-scrolling: touch;
+}
+.sidebar::-webkit-scrollbar,
+div.sidebar::-webkit-scrollbar,
+#sidebar::-webkit-scrollbar {
+    width: 8px;
+}
+.sidebar::-webkit-scrollbar-track,
+div.sidebar::-webkit-scrollbar-track,
+#sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb,
+div.sidebar::-webkit-scrollbar-thumb,
+#sidebar::-webkit-scrollbar-thumb {
+    background: #007a4d;
+    border-radius: 4px;
+}
+.sidebar::-webkit-scrollbar-thumb:hover,
+div.sidebar::-webkit-scrollbar-thumb:hover,
+#sidebar::-webkit-scrollbar-thumb:hover {
+    background: #149a63;
+}
+
+/* --------------------------------------------------------
    MEDIA QUERY: Screens 991.98px and below (Mobile / Tablet)
    -------------------------------------------------------- */
 @media (max-width: 991.98px) {
