@@ -198,7 +198,8 @@ html, body {
     }
     table.table,
     table.table-premium,
-    table.custom-table {
+    table.custom-table,
+    table.sv-table {
         min-width: 600px !important;
     }
 
