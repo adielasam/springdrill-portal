@@ -75,7 +75,7 @@ export async function POST(req: Request) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "model": "google/gemini-2.5-flash",
+        "model": "openrouter/free",
         "max_tokens": 4000,
         "messages": [
           {"role": "user", "content": promptText}
@@ -86,7 +86,7 @@ export async function POST(req: Request) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("OpenRouter API Error:", errorText);
-      return NextResponse.json({ error: `OpenRouter Error: ${response.status} ${errorText}` }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to generate lesson' }, { status: 500 });
     }
 
     const data = await response.json();
