@@ -126,7 +126,7 @@
     "61"
    ],
    "answer": 0,
-   "explanation": "2F₁₆ = 2 × 16 + 15 = 32 + 15 = 47. F in hexadecimal equals 15 in decimal."
+   "explanation": "Imagine you are counting, but instead of stopping at 9, you need more single-digit symbols. Since we run out of numbers, we start using the alphabet! A = 10, B = 11, C = 12, D = 13, E = 14, F = 15. So the letter F is just a secret code for the number 15! In Hexadecimal (which means base-16), the first number is multiplied by 16, and the second number is added to it. For 2F: take the 2 and multiply it by 16 (2 × 16 = 32), take the F (which is 15), and add them together: 32 + 15 = 47."
   },
   {
    "id": "digital-technology-010",

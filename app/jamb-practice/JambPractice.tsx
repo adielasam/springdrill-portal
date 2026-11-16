@@ -16,12 +16,14 @@ const OPTION_LETTERS = ['A', 'B', 'C', 'D'];
 // the student asks to reset scores.
 const HISTORY_STORAGE_KEY = 'sd-jamb-history-v1';
 
-type Phase = 'setup' | 'running' | 'review';
+type Phase = 'setup' | 'instructions' | 'running' | 'review';
 type Mode = 'practice' | 'study';
 // Preparation mode: the first step of setup. 'single' is the existing
-// one-subject flow; 'sitting' is the full UTME sitting; 'weak' builds a
-// set from the student's own weakest topics. Null shows the chooser.
-type PrepMode = 'single' | 'sitting' | 'weak';
+// one-subject flow; 'weak' builds a set from the student's own weakest
+// topics. The JAMB standard sitting has no setup screen of its own: the
+// chooser opens the Subject Selection modal directly, and confirming
+// there moves straight to the instruction modal. Null shows the chooser.
+type PrepMode = 'single' | 'weak';
 // What kind of run is in progress: drives the timer, section tabs,
 // scoring and review. Stored in runMeta at start time.
 type RunKind = 'single' | 'sitting' | 'weak';
@@ -31,6 +33,17 @@ interface SectionScore {
   correct: number;
   total: number;
   score100: number;
+}
+
+// A run that has been built but not yet started: the instruction modal
+// shows first, and the countdown only begins when the student taps
+// "Start Quiz" in the modal. The pending run is discarded if the
+// student goes back to setup.
+interface PendingRun {
+  questions: RunQuestion[];
+  sections: SittingSection[];
+  meta: { subjectLabel: string; subjectSlug?: PackSubject; year: string; mode: Mode; kind: RunKind };
+  totalSeconds: number;
 }
 
 function formatTime(totalSeconds: number): string {
@@ -135,7 +148,12 @@ export default function JambPractice({ initialSubject }: { initialSubject?: Pack
   // never assumes a fixed number of subjects or questions per pack.
   const [packCounts, setPackCounts] = useState<Partial<Record<PackSubject, number>>>({});
   // Sitting setup: the 3 non-English subjects picked, in pick order.
+  // Picked in the Subject Selection modal; English is always locked in.
   const [sittingPicks, setSittingPicks] = useState<PackSubject[]>([]);
+  // Subject Selection modal: open when the student taps "JAMB standard"
+  // on the chooser. Confirming builds the run and moves to the
+  // instruction modal; dismissing returns to the chooser untouched.
+  const [subjectModalOpen, setSubjectModalOpen] = useState(false);
   // Per-topic accuracy from this device only (see topicStats.ts). Loaded
   // on mount and refreshed after every finished run.
   const [topicStats, setTopicStats] = useState<TopicStat[]>([]);
@@ -157,6 +175,9 @@ export default function JambPractice({ initialSubject }: { initialSubject?: Pack
   const [sections, setSections] = useState<SittingSection[]>([]);
   const [sectionScores, setSectionScores] = useState<SectionScore[] | null>(null);
   const [runMeta, setRunMeta] = useState<{ subjectLabel: string; subjectSlug?: PackSubject; year: string; mode: Mode; kind: RunKind }>({ subjectLabel: '', year: '', mode: 'practice', kind: 'single' });
+  // Pending run awaiting the instruction modal's "Start Quiz". Null
+  // outside the instructions phase.
+  const [pendingRun, setPendingRun] = useState<PendingRun | null>(null);
   const finishedRef = useRef(false);
   // Scroll anchors: the question block and the review score hero. Their
   // scroll-margin-top (PRACTICE_STYLES) holds them clear of the sticky
@@ -291,6 +312,9 @@ export default function JambPractice({ initialSubject }: { initialSubject?: Pack
     setConfirmReset(false);
   };
 
+  // Start functions build the run and show the instruction modal. The
+  // run itself — and its countdown — only begins when the student taps
+  // "Start Quiz" in the modal (see confirmStart below).
   const startRun = useCallback(async () => {
     setPackError('');
     let activePack: Pack;
@@ -307,26 +331,19 @@ export default function JambPractice({ initialSubject }: { initialSubject?: Pack
       setPackError('No questions found for that subject and year.');
       return;
     }
-    finishedRef.current = false;
-    setQuestions(runQuestions);
-    setAnswers(new Array(runQuestions.length).fill(null));
-    setLocked(new Array(runQuestions.length).fill(false));
-    setIndex(0);
-    setConfirmSubmit(false);
-    setResult(null);
-    setSectionScores(null);
-    setSections([]);
-    setSyncNote('');
-    setSecondsLeft(runQuestions.length * SECONDS_PER_QUESTION);
-    setRunMeta({
-      subjectLabel: PACK_SUBJECTS.find((s) => s.slug === subject)?.label ?? subject,
-      subjectSlug: subject,
-      year,
-      mode,
-      kind: 'single',
+    setPendingRun({
+      questions: runQuestions,
+      sections: [],
+      meta: {
+        subjectLabel: PACK_SUBJECTS.find((s) => s.slug === subject)?.label ?? subject,
+        subjectSlug: subject,
+        year,
+        mode,
+        kind: 'single',
+      },
+      totalSeconds: runQuestions.length * SECONDS_PER_QUESTION,
     });
-    setPhase('running');
-    setOfflineReady(await packsSavedForOffline());
+    setPhase('instructions');
   }, [subject, year, size, mode]);
 
   // Shared run reset: every start function funnels through the same
@@ -352,6 +369,15 @@ export default function JambPractice({ initialSubject }: { initialSubject?: Pack
     setPhase('running');
     setOfflineReady(await packsSavedForOffline());
   }, []);
+
+  // The instruction modal's "Start Quiz": the countdown starts here and
+  // nowhere earlier — the timer effect only runs in the running phase.
+  const confirmStart = useCallback(() => {
+    if (!pendingRun) return;
+    const run = pendingRun;
+    setPendingRun(null);
+    void beginRun(run.questions, run.sections, run.meta, run.totalSeconds);
+  }, [pendingRun, beginRun]);
 
   const startSitting = useCallback(async () => {
     setPackError('');
@@ -380,13 +406,18 @@ export default function JambPractice({ initialSubject }: { initialSubject?: Pack
       setPackError('No questions found for that sitting.');
       return;
     }
-    await beginRun(
-      runQuestions,
-      runSections,
-      { subjectLabel: 'JAMB standard', year: 'RANDOM', mode: 'practice', kind: 'sitting' },
-      SITTING_SECONDS,
-    );
-  }, [sittingPicks, beginRun]);
+    setPendingRun({
+      questions: runQuestions,
+      sections: runSections,
+      meta: { subjectLabel: 'JAMB standard', year: 'RANDOM', mode: 'practice', kind: 'sitting' },
+      totalSeconds: SITTING_SECONDS,
+    });
+    // Success only: the subject modal closes as the instruction modal
+    // opens. On a load failure above, the modal stays open and the
+    // error shows inside it.
+    setSubjectModalOpen(false);
+    setPhase('instructions');
+  }, [sittingPicks]);
 
   const startWeak = useCallback(async () => {
     setPackError('');
@@ -413,13 +444,14 @@ export default function JambPractice({ initialSubject }: { initialSubject?: Pack
       setPackError('No questions found for those topics.');
       return;
     }
-    await beginRun(
-      runQuestions,
-      [],
-      { subjectLabel: 'Weak topics', year: 'RANDOM', mode, kind: 'weak' },
-      runQuestions.length * SECONDS_PER_QUESTION,
-    );
-  }, [weakSetTopics, size, mode, beginRun]);
+    setPendingRun({
+      questions: runQuestions,
+      sections: [],
+      meta: { subjectLabel: 'Weak topics', year: 'RANDOM', mode, kind: 'weak' },
+      totalSeconds: runQuestions.length * SECONDS_PER_QUESTION,
+    });
+    setPhase('instructions');
+  }, [weakSetTopics, size, mode]);
 
   const finishRun = useCallback(async () => {
     if (finishedRef.current) return;
@@ -588,6 +620,9 @@ export default function JambPractice({ initialSubject }: { initialSubject?: Pack
   const answeredCount = questions.length - unanswered;
   const progressPct = questions.length > 0 ? Math.round(((index + 1) / questions.length) * 100) : 0;
 
+  // Subject Selection modal counter: English locked in (1) + picks.
+  const selectedCount = 1 + sittingPicks.length;
+
   const onSubmitClick = () => {
     if (unanswered > 0 && !confirmSubmit) {
       setConfirmSubmit(true);
@@ -598,13 +633,96 @@ export default function JambPractice({ initialSubject }: { initialSubject?: Pack
 
   const backToSetup = () => {
     setPhase('setup');
+    setPendingRun(null);
     setConfirmSubmit(false);
     setConfirmReset(false);
     setHistory(loadHistory());
     setTopicStats(loadTopicStats());
   };
 
+  // The instruction modal never traps the student: Escape returns to
+  // setup, and so does clicking the dimmed overlay (see the modal JSX).
+  useEffect(() => {
+    if (phase !== 'instructions') return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') backToSetup();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [phase]);
+
+  // Same for the Subject Selection modal: Escape closes it back to the
+  // mode chooser, with nothing started.
+  useEffect(() => {
+    if (!subjectModalOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSubjectModalOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [subjectModalOpen]);
+
   const current = questions[index];
+
+  // Instruction-modal copy: title, intro and rules adapt to the pending
+  // run. Every rule states true behaviour only — shuffling, answer
+  // changes, timer and review are exactly what the run screen does.
+  const modalCopy = useMemo(() => {
+    if (!pendingRun) return null;
+    const n = pendingRun.questions.length;
+    const { meta, sections: pendingSections } = pendingRun;
+    const timed = meta.mode === 'practice';
+    if (meta.kind === 'sitting') {
+      const pickedLabels = pendingSections.slice(1).map((s) => s.label);
+      return {
+        title: 'JAMB Standard Sitting',
+        intro: 'The full UTME sitting: 180 questions across 4 subjects in 2 hours, scored out of 400 — just like the real exam.',
+        rules: [
+          `180 questions: 60 English and 40 each in ${pickedLabels.join(', ')}.`,
+          '120 minutes for the whole sitting. The timer starts when you tap Start Quiz.',
+          'English is compulsory. Use the subject tabs to switch between sections.',
+          'Questions are shuffled within each subject.',
+          'Each subject is scored /100, and your total is out of 400.',
+          'You can change an answer any time before you submit. Unanswered questions count as wrong.',
+          'Your score, the correct answers and full explanations show at the end.',
+        ],
+      };
+    }
+    if (meta.kind === 'weak') {
+      return {
+        title: 'Weak Topics Quiz',
+        intro: timed
+          ? `A timed ${n}-question set drawn from your weakest topics, built from your own past sets on this device.`
+          : `An untimed ${n}-question study set drawn from your weakest topics, built from your own past sets on this device.`,
+        rules: [
+          `${n} questions from your ${weakSetTopics.length} weakest topic${weakSetTopics.length === 1 ? '' : 's'}.`,
+          ...(timed
+            ? [`${n} minutes — 1 minute per question. The timer starts when you tap Start Quiz.`]
+            : ['No timer. Your answer locks when you pick it, and the explanation shows straight away.']),
+          'Questions are shuffled, so every set is different.',
+          ...(timed ? ['You can change an answer any time before you submit.'] : []),
+          'Unanswered questions count as wrong.',
+          'Your score, the correct answers and full explanations show at the end.',
+        ],
+      };
+    }
+    const yearPart = meta.year === 'RANDOM' ? ', drawn from all years' : ` from ${meta.year}`;
+    return {
+      title: `${meta.subjectLabel} Quiz`,
+      intro: timed
+        ? `A timed ${n}-question ${meta.subjectLabel} set${yearPart}. Read each question carefully — you can change your answers before you submit.`
+        : `An untimed ${n}-question ${meta.subjectLabel} study set${yearPart}. Take your time — the explanation shows as soon as you answer.`,
+      rules: [
+        ...(timed
+          ? [`${n} questions, ${n} minutes — 1 minute per question. The timer starts when you tap Start Quiz.`]
+          : [`${n} questions, no timer.`, 'Your answer locks when you pick it — the correct answer and explanation show straight away.']),
+        'Questions are shuffled, so every set is different.',
+        ...(timed ? ['You can change an answer any time before you submit.'] : []),
+        'Unanswered questions count as wrong.',
+        'Your score, the correct answers and full explanations show at the end.',
+      ],
+    };
+  }, [pendingRun, weakSetTopics.length]);
 
   // Sitting section helpers: which section the current question sits in,
   // and jumping to a section's first unanswered question (else its start).
@@ -633,8 +751,10 @@ export default function JambPractice({ initialSubject }: { initialSubject?: Pack
   const sectionAnswered = (sec: SittingSection) =>
     answers.slice(sec.start, sec.start + sec.count).filter((a) => a !== null).length;
 
-  // Sitting subject picking: toggle, capped at exactly 3. Tapping a
-  // fourth subject does nothing — the counter says to remove one first.
+  // Sitting subject picking in the Subject Selection modal: toggle,
+  // capped at exactly 3 non-English subjects (English is locked in).
+  // Tapping a fourth subject does nothing — at 4/4 the unpicked cards
+  // are disabled, and the counter says to remove one first.
   const toggleSittingPick = (slug: PackSubject) => {
     setPackError('');
     setSittingPicks((prev) => {
@@ -698,7 +818,10 @@ export default function JambPractice({ initialSubject }: { initialSubject?: Pack
         <p className="sd-jp-note">Practising as a guest — scores stay on this device only. Sign in to the portal to sync them to My Results.</p>
       )}
 
-      {phase === 'setup' && (
+      {/* The setup screen stays mounted while the instruction modal is
+          open, dimmed behind the overlay — the modal is a step over the
+          dashboard, not a separate page. */}
+      {(phase === 'setup' || phase === 'instructions') && (
         <>
           {/* Progress dashboard: Readiness + XP from local history only. */}
           <section className="sd-jp-dash" aria-label="Your progress on this device">
@@ -771,7 +894,7 @@ export default function JambPractice({ initialSubject }: { initialSubject?: Pack
                 <button
                   type="button"
                   className="sd-jp-mode-card"
-                  onClick={() => setPrepMode('sitting')}
+                  onClick={() => { setSittingPicks([]); setPackError(''); setSubjectModalOpen(true); }}
                 >
                   <span className="sd-jp-mode-icon"><CapIcon /></span>
                   <span className="sd-jp-mode-name">JAMB standard</span>
@@ -880,63 +1003,6 @@ export default function JambPractice({ initialSubject }: { initialSubject?: Pack
             </>
           )}
 
-          {prepMode === 'sitting' && (
-            <>
-              <p className="sd-jp-note">The real UTME sitting: English is compulsory, plus any 3 subjects you pick. 180 questions in 2 hours — 60 English and 40 per other subject — drawn from all years 2020–2025, each subject scored /100, total /400.</p>
-
-              <fieldset className="sd-jp-field">
-                <legend className="sd-jp-field-label">Your 4 subjects</legend>
-                <div className="sd-jp-subjects" role="group" aria-label="Sitting subjects">
-                  <button
-                    type="button"
-                    className="sd-jp-subject-card sd-jp-subject-card-active"
-                    disabled
-                    aria-disabled="true"
-                  >
-                    <span className="sd-jp-subject-mono">E</span>
-                    <span className="sd-jp-subject-text">
-                      <span className="sd-jp-subject-name">English</span>
-                      <span className="sd-jp-subject-meta">60 questions · Compulsory — always included</span>
-                    </span>
-                    <span className="sd-jp-subject-check" aria-hidden="true">✓</span>
-                  </button>
-                  {PACK_SUBJECTS.filter((s) => s.slug !== 'english').map((s) => {
-                    const picked = sittingPicks.includes(s.slug);
-                    return (
-                      <button
-                        key={s.slug}
-                        type="button"
-                        className={picked ? 'sd-jp-subject-card sd-jp-subject-card-active' : 'sd-jp-subject-card'}
-                        aria-pressed={picked}
-                        onClick={() => toggleSittingPick(s.slug)}
-                      >
-                        <span className="sd-jp-subject-mono">{s.label.charAt(0)}</span>
-                        <span className="sd-jp-subject-text">
-                          <span className="sd-jp-subject-name">{s.label}</span>
-                          <span className="sd-jp-subject-meta">{packCounts[s.slug] ? `40 sampled from ${packCounts[s.slug]} questions · ` : ''}{PACK_YEARS[0]}–{PACK_YEARS[PACK_YEARS.length - 1]}</span>
-                        </span>
-                        <span className="sd-jp-subject-check" aria-hidden="true">✓</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </fieldset>
-
-              <p className="sd-jp-note" role="status">
-                {sittingPicks.length < SITTING_PICK_COUNT
-                  ? `${sittingPicks.length} of ${SITTING_PICK_COUNT} picked — pick ${SITTING_PICK_COUNT - sittingPicks.length} more to start.`
-                  : `${SITTING_PICK_COUNT} of ${SITTING_PICK_COUNT} picked. Tap a picked subject to remove it.`}
-              </p>
-              <p className="sd-jp-note">Timed only — 120 minutes for the whole sitting, like the real exam. Unanswered questions count as wrong when the timer ends.</p>
-
-              {packError && <p className="sd-jp-error" role="alert">{packError}</p>}
-
-              <button type="button" className="sd-jp-btn sd-jp-btn-start" disabled={sittingPicks.length !== SITTING_PICK_COUNT} onClick={() => { void startSitting(); }}>
-                Start JAMB standard sitting
-              </button>
-            </>
-          )}
-
           {prepMode === 'weak' && (
             <>
               <p className="sd-jp-note">Built only from your own past sets on this device: your lowest-accuracy topics, with at least {MIN_ANSWERS_PER_TOPIC} questions answered each. Nothing is predicted or guessed.</p>
@@ -1028,18 +1094,109 @@ export default function JambPractice({ initialSubject }: { initialSubject?: Pack
         </>
       )}
 
+      {/* Pre-quiz instruction modal: the dashboard dims behind a dark
+          overlay; the card states the quiz rules before the timer starts.
+          Clicking the overlay (not the card) returns to setup. */}
+      {phase === 'instructions' && pendingRun && modalCopy && (
+        <div
+          className="sd-jp-modal-overlay"
+          onClick={(e) => { if (e.target === e.currentTarget) backToSetup(); }}
+        >
+          <div className="sd-jp-modal-card" role="dialog" aria-modal="true" aria-labelledby="sd-jp-modal-title">
+            <h2 id="sd-jp-modal-title" className="sd-jp-modal-title">{modalCopy.title}</h2>
+            <p className="sd-jp-modal-intro">{modalCopy.intro}</p>
+            <ul className="sd-jp-modal-rules">
+              {modalCopy.rules.map((rule) => (
+                <li key={rule}>{rule}</li>
+              ))}
+            </ul>
+            <button type="button" className="sd-jp-btn sd-jp-modal-start" onClick={confirmStart} autoFocus>
+              Start Quiz
+            </button>
+            <button type="button" className="sd-jp-modal-back" onClick={backToSetup}>
+              ← Back to setup
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Subject Selection modal: opens the moment "JAMB standard" is
+          tapped on the chooser. English is locked in as compulsory —
+          the real UTME format — and the student picks 3 more. At 4/4
+          the unpicked cards disable and Continue activates; confirming
+          builds the sitting and opens the instruction modal. */}
+      {subjectModalOpen && (
+        <div
+          className="sd-jp-modal-overlay"
+          onClick={(e) => { if (e.target === e.currentTarget) setSubjectModalOpen(false); }}
+        >
+          <div className="sd-jp-modal-card sd-jp-modal-card-wide" role="dialog" aria-modal="true" aria-labelledby="sd-jp-subject-modal-title">
+            <button type="button" className="sd-jp-modal-close" aria-label="Close subject selection" onClick={() => setSubjectModalOpen(false)} autoFocus>
+              ×
+            </button>
+            <h2 id="sd-jp-subject-modal-title" className="sd-jp-modal-title">Select Your Subjects</h2>
+            <p className="sd-jp-modal-intro">English is compulsory in the real UTME, so it is already locked in. Pick 3 more subjects for your sitting.</p>
+            <p className={selectedCount === 4 ? 'sd-jp-pick-counter sd-jp-pick-counter-complete' : 'sd-jp-pick-counter'} role="status">
+              Selected: {selectedCount}/4
+            </p>
+            <div className="sd-jp-pick-grid" role="group" aria-label="Sitting subjects">
+              {PACK_SUBJECTS.map((s) => {
+                const isEnglish = s.slug === 'english';
+                const picked = isEnglish || sittingPicks.includes(s.slug);
+                const maxed = selectedCount >= 4 && !picked;
+                return (
+                  <button
+                    key={s.slug}
+                    type="button"
+                    className={picked ? 'sd-jp-pick-card sd-jp-pick-card-selected' : 'sd-jp-pick-card'}
+                    aria-pressed={picked}
+                    disabled={isEnglish || maxed}
+                    onClick={() => toggleSittingPick(s.slug)}
+                  >
+                    {picked && <span className="sd-jp-pick-check" aria-hidden="true">✓</span>}
+                    <span className="sd-jp-pick-name">{s.label}</span>
+                    <span className="sd-jp-pick-meta">
+                      {isEnglish
+                        ? '60 questions · Compulsory'
+                        : packCounts[s.slug]
+                          ? `40 sampled from ${packCounts[s.slug]} questions`
+                          : '40 sampled questions'}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            {selectedCount < 4 && (
+              <p className="sd-jp-note">Pick {4 - selectedCount} more subject{4 - selectedCount === 1 ? '' : 's'} to continue.</p>
+            )}
+            {packError && <p className="sd-jp-error" role="alert">{packError}</p>}
+            <button
+              type="button"
+              className="sd-jp-btn sd-jp-pick-continue"
+              disabled={selectedCount !== 4}
+              onClick={() => { void startSitting(); }}
+            >
+              Continue to Quiz
+            </button>
+            <button type="button" className="sd-jp-modal-back" onClick={() => setSubjectModalOpen(false)}>
+              ← Back to preparation modes
+            </button>
+          </div>
+        </div>
+      )}
+
       {phase === 'running' && current && (
         <>
           <div className="sd-jp-run-head">
             <span className="sd-jp-run-title">Question {index + 1} of {questions.length} · {runMeta.kind === 'sitting' && currentSection ? currentSection.label : runMeta.subjectLabel}</span>
             <span className="sd-jp-run-tools">
               {runMeta.mode === 'practice' ? (
-                <span className={secondsLeft <= (runMeta.kind === 'sitting' ? 300 : 60) ? 'sd-jp-timer sd-jp-timer-low' : 'sd-jp-timer'} aria-label="Time remaining">{formatTime(secondsLeft)}</span>
+                <span className={secondsLeft <= (runMeta.kind === 'sitting' ? 300 : 60) ? 'sd-jp-timer sd-jp-timer-low' : 'sd-jp-timer'} aria-label="Time remaining">Time left: {formatTime(secondsLeft)}</span>
               ) : (
                 <span className="sd-jp-timer">Study mode</span>
               )}
               <button type="button" className="sd-jp-btn sd-jp-btn-submit" onClick={onSubmitClick}>
-                {confirmSubmit ? `Submit anyway (${unanswered} unanswered)?` : 'Submit set'}
+                {confirmSubmit ? `Submit anyway (${unanswered} unanswered)?` : 'Submit Quiz'}
               </button>
             </span>
           </div>
@@ -1110,7 +1267,7 @@ export default function JambPractice({ initialSubject }: { initialSubject?: Pack
               Previous
             </button>
             <span className="sd-jp-answered">Answered: {answeredCount} / {questions.length}</span>
-            <button type="button" className="sd-jp-btn-secondary" disabled={index === questions.length - 1} onClick={() => { setIndex(index + 1); setConfirmSubmit(false); }}>
+            <button type="button" className="sd-jp-btn sd-jp-btn-nav" disabled={index === questions.length - 1} onClick={() => { setIndex(index + 1); setConfirmSubmit(false); }}>
               Next
             </button>
           </div>
