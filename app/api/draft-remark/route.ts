@@ -128,7 +128,12 @@ Write a warm, professional Supervisor's remark of 2-3 sentences that reflects ON
 
     // The free router sometimes returns an HTTP 200 with EMPTY content
     // (proven 16 Nov via Vercel logs) and then succeeds on a later call,
-    // so try up to three times before giving up.
+    // so try up to three times before giving up. The token budget must
+    // stay generous: at max_tokens 500 the production route failed all
+    // 3 attempts with finish_reason "length" and zero content — a
+    // reasoning model spent the whole budget thinking and had nothing
+    // left to answer with. 2000 matches the working suggest-affective
+    // route and leaves room to think AND answer.
     let remark: string | null = null;
     let upstreamFailures = 0;
     for (let attempt = 1; attempt <= 3 && !remark; attempt++) {
@@ -140,7 +145,7 @@ Write a warm, professional Supervisor's remark of 2-3 sentences that reflects ON
         },
         body: JSON.stringify({
           model: 'openrouter/free',
-          max_tokens: 500,
+          max_tokens: 2000,
           temperature: 0.3,
           messages: [{ role: 'user', content: promptText }],
         }),
