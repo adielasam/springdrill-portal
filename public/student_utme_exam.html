@@ -98,6 +98,7 @@
         </div>
     </div>
 
+    <script src="sd-confirm.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
@@ -272,14 +273,29 @@
             }, 1000);
         }
 
-        window.closeExam = () => {
-            if(confirm("Are you sure you want to close this exam? Your progress will NOT be saved.")) {
+        window.closeExam = async () => {
+            const ok = await sdConfirm({
+                title: 'Close exam?',
+                message: "Are you sure you want to close this exam? Your progress will NOT be saved.",
+                confirmLabel: 'Close exam',
+                cancelLabel: 'Keep working',
+                danger: true
+            });
+            if (ok) {
                 clearInterval(timerInterval);
                 window.location.href = 'student_utme'; 
             }
         };
 
-        window.submitExam = () => { if(confirm("Are you sure you want to submit your exam?")) autoSubmitExam(); };
+        window.submitExam = async () => {
+            const ok = await sdConfirm({
+                title: 'Submit exam?',
+                message: "Are you sure you want to submit your exam?",
+                confirmLabel: 'Submit',
+                cancelLabel: 'Cancel'
+            });
+            if (ok) autoSubmitExam();
+        };
 
         async function autoSubmitExam() {
             clearInterval(timerInterval);
