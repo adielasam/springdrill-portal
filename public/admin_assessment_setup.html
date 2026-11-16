@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPRINGDRILL - Report Setup</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --brand-600: #059669; --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-500: #6b7280; --gray-900: #111827;
+            --bg-color: var(--gray-50); --card-bg: #ffffff; --text-main: var(--gray-900); --text-muted: var(--gray-500);
+            --border-color: var(--gray-200); --input-bg: var(--gray-100);
+            --radius: 12px; --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; }
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); padding: 32px 16px; z-index: 1050; transition: transform 0.3s ease; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+        .sidebar-brand h4 { font-weight: 800; margin: 0; font-size: 20px; letter-spacing: -0.5px; }
+        .sidebar-heading { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 16px 12px 8px; margin-top: 8px; }
+        .nav-link { color: var(--text-muted); padding: 10px 12px; margin: 2px 0; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; }
+        .nav-link:hover { background: var(--input-bg); color: var(--text-main); }
+        .nav-link.active { background: var(--brand-600); color: white; font-weight: 600; box-shadow: var(--shadow-sm); }
+        .main-content { margin-left: 280px; padding: 32px 48px; min-height: 100vh; }
+        .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .breadcrumb { margin: 0; font-size: 14px; font-weight: 500; color: var(--text-muted); }
+        .breadcrumb span { color: var(--text-main); font-weight: 600; }
+        .page-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.5px; }
+        .page-header p { font-size: 14px; color: var(--text-muted); margin: 0; }
+        .premium-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
+        .card-header-green { background: #007a4d; color: white; padding: 12px 20px; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+        .setup-table th { font-size: 11px; text-transform: uppercase; color: var(--gray-500); letter-spacing: 0.5px; background: var(--gray-50); }
+        .setup-table td { font-size: 13px; padding: 10px 16px; }
+        .flow-step { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
+        .flow-arrow { color: var(--gray-500); }
+        #loadingOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: 0.3s; }
+    </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
+</head>
+<body>
+    <div id="loadingOverlay">
+        <i data-lucide="loader-2" class="lucide-spin" style="width: 48px; height: 48px; color: var(--brand-600); margin-bottom: 16px;"></i>
+        <h5 style="font-weight: 600; color: var(--text-muted); font-size: 16px;">Loading Report Setup...</h5>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar" data-role="admin">
+        <!-- Shared sidebar: rendered by sidebar.js (one menu for all admin/teacher pages). -->
+    </div>
+    <script src="sidebar.js"></script>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle me-2" onclick="toggleSidebar()" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
+                <div class="breadcrumb">SpringDrill / Reports / <span>Report Setup</span></div>
+            </div>
+            <div class="dropdown">
+                <div class="topbar-profile" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 4px 8px; border-radius: 8px;">
+                    <div class="info" style="text-align: right;">
+                        <div class="name" id="navAdminName" style="font-weight: 600; font-size: 14px;">Admin</div>
+                        <div class="role" style="font-size: 12px; color: var(--text-muted);">Workspace Owner</div>
+                    </div>
+                    <div class="avatar" id="navAvatar" style="overflow: hidden; width: 40px; height: 40px; border-radius: 50%; background: #d1fae5; color: #059669; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">AD</div>
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border: 1px solid var(--border-color); border-radius: 8px;">
+                    <li><a class="dropdown-item" href="admin_settings.html" style="font-size: 13px; font-weight: 500;">My Profile</a></li>
+                    <li><a class="dropdown-item" href="admin_settings.html" style="font-size: 13px; font-weight: 500;">Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#" id="logoutBtn" style="font-size: 13px; font-weight: 500;">Log Out</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="page-header">
+            <h1>Report Setup</h1>
+            <p>The assessment rules every results page follows. These values are fixed in the shared results engine (<code>public/resultsEngine.js</code>) so scores, grades and positions can never disagree between pages.</p>
+        </div>
+
+        <div id="setupStatus" class="alert shadow-sm mb-4" role="alert" style="font-size: 13px;">
+            <i class="fas fa-spinner fa-spin me-2"></i>Checking database setup...
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="premium-card">
+                    <div class="card-header-green"><i data-lucide="sliders-horizontal" style="width:16px; height:16px;"></i> Assessment Setup — all terms, all levels</div>
+                    <div class="p-0">
+                        <table class="table m-0 setup-table">
+                            <thead><tr><th>Component</th><th>Max Score</th><th>Sub-Term</th></tr></thead>
+                            <tbody id="assessmentBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="p-3" style="background: white;">
+                        <p class="small text-muted mb-0">Subject total = 1st CAT + 2nd CAT + Exam, out of 100. Identical for Ember, Lent and Trinity terms and for every year group (verified on Educare). Half Term reports use the two CATs only; the Exam column appears at Full Term.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="premium-card">
+                    <div class="card-header-green"><i data-lucide="git-branch" style="width:16px; height:16px;"></i> Result Workflow</div>
+                    <div class="p-4" style="background: white;">
+                        <div class="flow-step">Draft <span class="flow-arrow">→</span> Submitted <span class="flow-arrow">→</span> Approved <span class="flow-arrow">→</span> Published</div>
+                        <p class="small text-muted mt-3 mb-2">Teachers save drafts, then Submit Final (irreversible — the batch locks). Admin approves or rejects on Approve Reports. Admin publishes per class/term on Publish Report — only then do students see their cards. Rejected batches return to the teacher for correction.</p>
+                        <p class="small text-muted mb-0">Averages and positions are computed live from stored scores whenever a view loads, so there is no separate Process run that can go stale.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mt-1">
+            <div class="col-md-6">
+                <div class="premium-card">
+                    <div class="card-header-green"><i data-lucide="award" style="width:16px; height:16px;"></i> SSCE Grading (9 bands) — used on report cards &amp; broadsheet</div>
+                    <div class="p-0">
+                        <table class="table m-0 setup-table">
+                            <thead><tr><th>Score Range</th><th>Grade</th><th>Point</th><th>Remark</th></tr></thead>
+                            <tbody id="ssceBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="premium-card">
+                    <div class="card-header-green"><i data-lucide="award" style="width:16px; height:16px;"></i> JSCE Grading (6 bands) — configured</div>
+                    <div class="p-0">
+                        <table class="table m-0 setup-table">
+                            <thead><tr><th>Score Range</th><th>Grade</th><th>Point</th><th>Remark</th></tr></thead>
+                            <tbody id="jsceBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="p-3" style="background: white;">
+                        <p class="small text-muted mb-0">Note: the letter B is used twice (60–69 and 70–79), exactly as configured on Educare.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="premium-card mt-4">
+            <div class="card-header-green"><i data-lucide="heart" style="width:16px; height:16px;"></i> Affective Keys (7 traits, scored 1–5)</div>
+            <div class="p-4" style="background: white;">
+                <p class="small text-muted">Traits: <span id="traitList"></span></p>
+                <p class="small text-muted mb-0">Keys: 5 = Excellent, 4 = Good, 3 = Satisfactory, 2 = Fair, 1 = Poor. Scored on the Term Comments page; shown on the report card.</p>
+            </div>
+        </div>
+
+        <div class="premium-card mt-4">
+            <div class="card-header-green"><i data-lucide="calculator" style="width:16px; height:16px;"></i> Collation Rules</div>
+            <div class="p-4" style="background: white;">
+                <ul class="small text-muted mb-0" style="line-height: 1.9;">
+                    <li><strong>Average</strong> = sum of subject totals ÷ number of subjects taken. Subjects with no entered score are excluded.</li>
+                    <li><strong>Position</strong> = rank by average, descending. Tied averages share the same position and the next position is skipped (12th, 12th, 14th).</li>
+                    <li><strong>2-Term Average</strong> = mean of the First and Second Term averages. <strong>3-Term Average</strong> = mean of all three term averages. Terms with no scores are left out.</li>
+                    <li><strong>Cumulative names are plain words</strong> — Educare's P A / C P / P B F codes carry no meaning on screen and are not used here.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="resultsEngine.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        const R = window.ResultsEngine;
+        const $ = (id) => document.getElementById(id);
+
+        function bandRange(bands, band) {
+            const i = bands.indexOf(band);
+            if (i === 0) return band.min + '–100';
+            return band.min + '–' + (bands[i - 1].min - 1);
+        }
+
+        function renderTables() {
+            $('assessmentBody').innerHTML = [
+                ['1st CAT', R.CAT1_MAX, 'Half Term'],
+                ['2nd CAT', R.CAT2_MAX, 'Half Term'],
+                ['Exam', R.EXAM_MAX, 'Full Term'],
+                ['Subject Total', R.TOTAL_MAX, '—']
+            ].map(r => `<tr><td class="fw-bold">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('');
+            $('ssceBody').innerHTML = R.SSCE_BANDS.map(b => `<tr><td>${bandRange(R.SSCE_BANDS, b)}</td><td class="fw-bold">${b.letter}</td><td>${b.point}</td><td>${b.remark}</td></tr>`).join('');
+            $('jsceBody').innerHTML = R.JSCE_BANDS.map(b => `<tr><td>${bandRange(R.JSCE_BANDS, b)}</td><td class="fw-bold">${b.letter}</td><td>${b.point}</td><td>${b.remark}</td></tr>`).join('');
+            $('traitList').textContent = R.AFFECTIVE_TRAITS.join(', ');
+        }
+
+        async function init() {
+            renderTables();
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = '/';
+                const { data: profile } = await supabase.from('users').select('name, avatar_url, role').eq('id', session.user.id).single();
+                if (profile && profile.role !== 'admin') return window.location.href = '/';
+                if (profile) {
+                    $('navAdminName').innerText = profile.name || 'Admin';
+                    const av = $('navAvatar');
+                    if (profile.avatar_url) { av.style.background = `url('${profile.avatar_url}') center/cover`; av.innerText = ''; }
+                    else av.innerText = (profile.name || 'AD').substring(0, 2).toUpperCase();
+                }
+                // Probe: does the report_remarks table exist (i.e. has the
+                // Phase 1 migration been run)?
+                const { error } = await supabase.from('report_remarks').select('id').limit(1);
+                const box = $('setupStatus');
+                if (error) {
+                    box.className = 'alert alert-warning shadow-sm mb-4';
+                    box.innerHTML = '<strong><i class="fas fa-exclamation-triangle me-2"></i>Database setup not detected.</strong> The remarks table is missing, so the Phase 1 SQL migration has probably not been run yet. Run <code>supabase/migrations/phase1-results-engine.sql</code> once in the Supabase SQL editor. Score entry and approval may also be affected (status constraint + session column).';
+                } else {
+                    box.className = 'alert alert-success shadow-sm mb-4';
+                    box.innerHTML = '<strong><i class="fas fa-check-circle me-2"></i>Database setup detected.</strong> The remarks table exists. If Approve/Publish ever report a status-constraint error, re-run the migration — it is safe to run more than once.';
+                }
+                lucide.createIcons();
+                $('loadingOverlay').style.opacity = '0';
+                setTimeout(() => $('loadingOverlay').style.display = 'none', 300);
+            } catch (err) {
+                console.error(err);
+                $('loadingOverlay').style.display = 'none';
+            }
+        }
+
+        $('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = '/';
+        });
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+    <script src="mobile_nav.js"></script>
+</body>
+</html>

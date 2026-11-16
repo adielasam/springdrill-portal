@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRINGDRILL - Make Report (Score Entry)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7fa; overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: linear-gradient(180deg, #1a3c34 0%, #122b25 100%); color: white; padding-top: 30px; z-index: 1000; box-shadow: 4px 0 15px rgba(0,0,0,0.1); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+        .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 15px 25px; margin: 4px 15px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; text-decoration: none; }
+        .nav-link i { width: 25px; font-size: 1.1rem; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; transform: translateX(5px); }
+        .nav-link.text-danger:hover { background: rgba(220, 53, 69, 0.2); color: #ff6b6b !important; }
+        .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
+        .top-header { background: white; padding: 20px 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; border-left: 5px solid #007a4d; }
+        .content-card { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: none; margin-bottom: 30px; }
+        .form-label { font-size: 12px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .sv-table th { background: #1a3c34; color: #fff; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; vertical-align: middle; white-space: nowrap; }
+        .sv-table td { vertical-align: middle; font-size: 14px; }
+        .sv-table input[type="number"] { width: 90px; text-align: center; font-weight: 600; }
+        .sv-table input[type="number"]:disabled { background: #f1f3f5; color: #9ca3af; }
+        .sv-table input.imported { border: 2px solid #007a4d; background: #ecfdf5; }
+        .student-photo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #e5e7eb; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+        .status-draft { background: #f3f4f6; color: #4b5563; }
+        .status-final { background: #fef08a; color: #854d0e; }
+        .status-approved { background: #d1fae5; color: #065f46; }
+        .status-rejected { background: #fee2e2; color: #991b1b; }
+        .status-published { background: #dbeafe; color: #1e40af; }
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+    </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
+</head>
+<body>
+
+    <div id="loadingOverlay">
+        <i class="fas fa-spinner fa-spin fa-3x text-success mb-3"></i>
+        <h4 id="loadingText">Authenticating Staff Credentials...</h4>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar" data-role="teacher">
+        <!-- Shared sidebar: rendered by sidebar.js (one menu for all admin/teacher pages). -->
+    </div>
+    <script src="sidebar.js"></script>
+
+    <div class="main-content">
+        <div class="d-flex align-items-center mb-3 d-lg-none">
+            <button class="mobile-menu-toggle me-2" onclick="toggleSidebar()" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
+        </div>
+
+        <div class="top-header">
+            <div>
+                <h3 class="fw-bold mb-0 text-dark"><i class="fas fa-edit text-success me-2"></i> Make Report — Score Entry</h3>
+                <p class="text-muted mb-0 mt-1">Enter 1st CAT (20), 2nd CAT (20) and Exam (60) scores. Subject total is out of 100. Collation, averages, grades and positions are computed automatically — never by hand.</p>
+            </div>
+        </div>
+
+        <div id="alertBox" class="alert d-none shadow-sm mb-4" role="alert" style="font-size: 13px; font-weight: 500;"></div>
+
+        <div id="setupBanner" class="alert alert-warning d-none shadow-sm mb-4" role="alert" style="font-size: 13px;">
+            <strong><i class="fas fa-database me-2"></i>Database setup required.</strong>
+            The results tables need the Phase 1 setup before scores can be saved. Ask the administrator to run
+            <code>supabase/migrations/phase1-results-engine.sql</code> once in the Supabase SQL editor, then reload this page.
+            <span id="setupDetail" class="d-block mt-1 text-muted"></span>
+        </div>
+
+        <!-- SELECTORS -->
+        <div class="content-card">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-2">
+                    <label class="form-label" for="sessionSelect">Session</label>
+                    <select id="sessionSelect" class="form-select fw-bold"></select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="termSelect">Term</label>
+                    <select id="termSelect" class="form-select fw-bold"></select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="subTermSelect">Sub-Term</label>
+                    <select id="subTermSelect" class="form-select fw-bold"></select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="classSelect">Class</label>
+                    <select id="classSelect" class="form-select fw-bold"><option value="">Select class...</option></select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="subjectSelect">Subject</label>
+                    <select id="subjectSelect" class="form-select fw-bold"><option value="">Select subject...</option></select>
+                </div>
+            </div>
+            <div class="mt-3 d-flex flex-wrap gap-2 align-items-center">
+                <button id="loadGridBtn" class="btn btn-success fw-bold"><i class="fas fa-search me-2"></i>Load Score Grid</button>
+                <button id="importBtn" class="btn btn-outline-success fw-bold" disabled><i class="fas fa-file-import me-2"></i>Import From CBT</button>
+                <span id="batchStatus" class="ms-auto"></span>
+            </div>
+            <p class="text-muted small mb-0 mt-3" id="lockingNote"></p>
+        </div>
+
+        <!-- IMPORT FROM CBT PANEL -->
+        <div id="importPanel" class="content-card d-none" style="border: 2px solid #007a4d;">
+            <h5 class="fw-bold mb-1"><i class="fas fa-file-import text-success me-2"></i>Import From CBT</h5>
+            <p class="text-muted small">Scores from a CBT test are scaled to the component maximum (test fraction &times; max). Imported values only fill the grid — nothing is saved until you click Save Result or Submit Final.</p>
+            <div class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label" for="cbtTestSelect">CBT Test (this class &amp; subject)</label>
+                    <select id="cbtTestSelect" class="form-select fw-bold"><option value="">Loading tests...</option></select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="cbtTargetSelect">Fill Into</label>
+                    <select id="cbtTargetSelect" class="form-select fw-bold"></select>
+                </div>
+                <div class="col-md-4 d-flex gap-2">
+                    <button id="cbtApplyBtn" class="btn btn-success fw-bold"><i class="fas fa-check me-2"></i>Preview &amp; Fill Grid</button>
+                    <button id="cbtCancelBtn" class="btn btn-outline-secondary fw-bold">Cancel</button>
+                </div>
+            </div>
+            <div id="importSummary" class="small text-muted mt-3"></div>
+        </div>
+
+        <!-- SCORE GRID -->
+        <div id="gridCard" class="content-card d-none">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <h5 class="fw-bold m-0" id="gridTitle">Score Grid</h5>
+                <span class="text-muted small" id="gridCount"></span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle sv-table" id="scoreTable">
+                    <thead id="scoreThead"></thead>
+                    <tbody id="scoreTbody"></tbody>
+                </table>
+            </div>
+            <div class="alert alert-danger mt-4 mb-3" role="alert" style="font-size: 13px;">
+                <i class="fas fa-exclamation-triangle me-2"></i><strong>Please verify results before clicking "Submit Final Result".</strong> Results cannot be modified afterwards.
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <button id="saveBtn" class="btn btn-outline-success fw-bold px-4"><i class="fas fa-save me-2"></i>Save Result</button>
+                <button id="submitFinalBtn" class="btn btn-success fw-bold px-4"><i class="fas fa-paper-plane me-2"></i>Submit Final</button>
+            </div>
+        </div>
+
+        <div id="emptyState" class="text-center py-5 mt-3">
+            <i class="fas fa-clipboard-list fa-4x text-muted opacity-25 mb-3"></i>
+            <h4 class="text-muted fw-bold">Select Session, Term, Class &amp; Subject</h4>
+            <p class="text-muted">Choose the filters above, then load the score grid. Teachers only see the classes and subjects assigned to them.</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="resultsEngine.js"></script>
+    <script src="sd-confirm.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        const R = window.ResultsEngine;
+        let currentUser = null;
+        let currentRole = null;
+        let sessions = [];            // academic_sessions rows {id, name}
+        let assignments = [];         // teacher_class_subjects rows for this teacher+session
+        let allClasses = [];
+        let classSubjects = {};       // class_id -> [subject rows] (admin path)
+        let students = [];            // students rows for the loaded class
+        let existingRows = {};        // students.id -> term_results row
+        let batchLocked = false;
+        let batchStatus = null;
+
+        const $ = (id) => document.getElementById(id);
+
+        function showAlert(type, msg, sticky) {
+            const box = $('alertBox');
+            box.className = `alert alert-${type} shadow-sm mb-4`;
+            box.innerHTML = msg;
+            box.classList.remove('d-none');
+            if (!sticky) setTimeout(() => box.classList.add('d-none'), 6000);
+        }
+
+        function showSetupBanner(detail) {
+            $('setupDetail').textContent = detail || '';
+            $('setupBanner').classList.remove('d-none');
+        }
+
+        // PostgREST / Postgres errors that mean the Phase 1 migration has
+        // not been run yet (missing session column, narrow status check).
+        function isSetupError(err) {
+            const m = (err && err.message ? err.message : '') + ' ' + (err && err.code ? err.code : '');
+            return /session|term_results_status_check|does not exist|42703|PGRST204/i.test(m);
+        }
+
+        async function init() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = '/';
+                currentUser = session.user;
+
+                const { data: profile } = await supabase.from('users').select('role').eq('id', session.user.id).single();
+                currentRole = profile ? profile.role : null;
+                if (currentRole !== 'teacher' && currentRole !== 'admin') return window.location.href = '/';
+
+                // Terms / sub-terms use the exact strings stored in term_results.
+                R.TERMS.forEach(t => $('termSelect').add(new Option(t, t)));
+                R.SUB_TERMS.forEach(t => $('subTermSelect').add(new Option(t, t)));
+
+                const { data: sessData } = await supabase.from('academic_sessions').select('id, name').order('name', { ascending: false });
+                sessions = sessData || [];
+                if (sessions.length === 0) {
+                    $('sessionSelect').add(new Option('2026/2027', '2026/2027'));
+                    sessions = [{ id: null, name: '2026/2027' }];
+                } else {
+                    sessions.forEach(s => $('sessionSelect').add(new Option(s.name, s.id)));
+                }
+
+                const { data: clsData } = await supabase.from('classes').select('id, name').order('name');
+                allClasses = clsData || [];
+
+                await loadAssignments();
+                $('loadingOverlay').style.display = 'none';
+            } catch (err) {
+                console.error(err);
+                $('loadingText').textContent = 'Failed to load. Please reload the page.';
+            }
+        }
+
+        async function loadAssignments() {
+            const sessionId = $('sessionSelect').value;
+            $('classSelect').innerHTML = '<option value="">Select class...</option>';
+            $('subjectSelect').innerHTML = '<option value="">Select subject...</option>';
+            if (currentRole === 'admin') {
+                allClasses.forEach(c => $('classSelect').add(new Option(c.name, c.id)));
+                return;
+            }
+            let query = supabase.from('teacher_class_subjects')
+                .select('subject_id, class_id')
+                .eq('teacher_id', currentUser.id);
+            if (sessionId) query = query.eq('session_id', sessionId);
+            const { data, error } = await query;
+            if (error) { console.error(error); showAlert('danger', 'Could not load your assigned classes: ' + R.escapeHtml(error.message)); return; }
+            assignments = data || [];
+            // Join subject/class names with plain queries instead of relation
+            // embeds (plain queries work with or without a foreign key).
+            const [subjRes, classRes] = await Promise.all([
+                supabase.from('subjects').select('id, name'),
+                supabase.from('classes').select('id, name')
+            ]);
+            const subjById = {};
+            (subjRes.data || []).forEach(s => { subjById[String(s.id)] = s; });
+            const classById = {};
+            (classRes.data || []).forEach(c => { classById[String(c.id)] = c; });
+            assignments.forEach(a => {
+                a.subjects = subjById[String(a.subject_id)] || null;
+                a.classes = classById[String(a.class_id)] || null;
+            });
+            const seen = {};
+            assignments.forEach(a => {
+                if (a.classes && !seen[a.classes.id]) { seen[a.classes.id] = true; $('classSelect').add(new Option(a.classes.name, a.classes.id)); }
+            });
+            if (assignments.length === 0) {
+                showAlert('warning', 'No classes/subjects are assigned to you for this session. Ask the admin to assign them under Subjects &rarr; Assign to Teachers.', true);
+            }
+        }
+
+        async function loadSubjectsForClass(classId) {
+            $('subjectSelect').innerHTML = '<option value="">Select subject...</option>';
+            if (currentRole === 'admin') {
+                if (!classSubjects[classId]) {
+                    const { data } = await supabase.from('class_subjects').select('subject_id').eq('class_id', classId);
+                    const { data: subjData } = await supabase.from('subjects').select('id, name');
+                    const subjById = {};
+                    (subjData || []).forEach(s => { subjById[String(s.id)] = s; });
+                    classSubjects[classId] = (data || []).map(d => subjById[String(d.subject_id)]).filter(Boolean);
+                }
+                let list = classSubjects[classId];
+                if (list.length === 0) {
+                    const { data } = await supabase.from('subjects').select('id, name').order('name');
+                    list = data || [];
+                }
+                list.forEach(s => $('subjectSelect').add(new Option(s.name, s.id)));
+                return;
+            }
+            const seen = {};
+            assignments.filter(a => String(a.class_id) === String(classId)).forEach(a => {
+                if (a.subjects && !seen[a.subjects.id]) { seen[a.subjects.id] = true; $('subjectSelect').add(new Option(a.subjects.name, a.subjects.id)); }
+            });
+        }
+
+        function selection() {
+            const sessionId = $('sessionSelect').value;
+            const sessionRow = sessions.find(s => String(s.id) === String(sessionId)) || sessions[0];
+            return {
+                sessionId: sessionId || null,
+                sessionName: sessionRow ? sessionRow.name : '',
+                term: $('termSelect').value,
+                subTerm: $('subTermSelect').value,
+                classId: $('classSelect').value,
+                subjectId: $('subjectSelect').value
+            };
+        }
+
+        function editableColumns(subTerm) {
+            // Educare rule: Half Term shows CATs only; Full Term shows all
+            // three columns but the CATs are locked (entered at Half Term)
+            // and only the Exam is editable.
+            return subTerm === 'Half Term' ? ['first_cat', 'second_cat'] : ['first_cat', 'second_cat', 'exam'];
+        }
+
+        function columnEditable(col, subTerm) {
+            if (subTerm === 'Half Term') return col !== 'exam';
+            return col === 'exam';
+        }
+
+        async function loadGrid() {
+            const sel = selection();
+            if (!sel.term || !sel.subTerm || !sel.classId || !sel.subjectId) {
+                showAlert('warning', 'Please select Term, Sub-Term, Class and Subject first.');
+                return;
+            }
+            $('loadGridBtn').disabled = true;
+            $('loadGridBtn').innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Loading...';
+            try {
+                const { data: studData, error: studErr } = await supabase
+                    .from('students')
+                    .select('id, user_id, first_name, surname, reg_number, passport_url')
+                    .eq('class_id', sel.classId)
+                    .eq('approved', true)
+                    .order('surname', { ascending: true })
+                    .order('first_name', { ascending: true });
+                if (studErr) throw studErr;
+                students = studData || [];
+
+                const { data: rows, error: rowsErr } = await supabase
+                    .from('term_results')
+                    .select('*')
+                    .eq('class_id', sel.classId)
+                    .eq('subject_id', sel.subjectId)
+                    .eq('term', sel.term)
+                    .eq('sub_term', sel.subTerm)
+                    // Legacy rows predate the session column (session IS NULL): include them, or the page reports "New" and a save hits the unique_term_result constraint.
+                    .or('session.eq."' + sel.sessionName + '",session.is.null');
+                if (rowsErr) throw rowsErr;
+
+                existingRows = {};
+                (rows || []).forEach(r => { existingRows[String(r.student_id)] = r; });
+
+                // Batch status: the most advanced status present wins.
+                const rank = { draft: 0, rejected: 1, submitted: 2, final: 2, approved: 3, published: 4 };
+                batchStatus = null;
+                let best = -1;
+                Object.values(existingRows).forEach(r => {
+                    const v = rank[r.status] == null ? 0 : rank[r.status];
+                    if (v > best) { best = v; batchStatus = r.status; }
+                });
+                batchLocked = batchStatus === 'submitted' || batchStatus === 'final' || batchStatus === 'approved' || batchStatus === 'published';
+
+                renderGrid(sel);
+                $('emptyState').style.display = 'none';
+                $('gridCard').classList.remove('d-none');
+                $('importBtn').disabled = batchLocked || students.length === 0;
+            } catch (err) {
+                console.error(err);
+                if (isSetupError(err)) {
+                    showSetupBanner('Technical detail: ' + err.message);
+                    showAlert('warning', 'The score grid cannot load until the Phase 1 database setup has been run (see the banner above).', true);
+                } else {
+                    showAlert('danger', 'Failed to load the score grid: ' + R.escapeHtml(err.message));
+                }
+            } finally {
+                $('loadGridBtn').disabled = false;
+                $('loadGridBtn').innerHTML = '<i class="fas fa-search me-2"></i>Load Score Grid';
+            }
+        }
+
+        function renderGrid(sel) {
+            const cols = editableColumns(sel.subTerm);
+            const className = $('classSelect').options[$('classSelect').selectedIndex].text;
+            const subjectName = $('subjectSelect').options[$('subjectSelect').selectedIndex].text;
+            $('gridTitle').textContent = `${subjectName} — ${className} (${sel.term}, ${sel.subTerm})`;
+            $('gridCount').textContent = students.length + ' student(s)';
+
+            const badgeClass = { draft: 'status-draft', rejected: 'status-rejected', submitted: 'status-final', final: 'status-final', approved: 'status-approved', published: 'status-published' };
+            $('batchStatus').innerHTML = batchStatus
+                ? `<span class="status-badge ${badgeClass[batchStatus] || 'status-draft'}">Batch: ${R.statusLabel(batchStatus)}</span>`
+                : '<span class="status-badge status-draft">Batch: New (no saved rows)</span>';
+
+            if (batchLocked) {
+                $('lockingNote').innerHTML = `<i class="fas fa-lock me-1"></i> This batch is <strong>${R.statusLabel(batchStatus)}</strong> and locked for editing. A rejected batch returns here for correction and resubmission.`;
+            } else if (batchStatus === 'rejected') {
+                $('lockingNote').innerHTML = '<i class="fas fa-undo me-1"></i> This batch was <strong>rejected</strong> by the admin. Correct the scores below and submit again.';
+            } else if (sel.subTerm === 'Full Term') {
+                $('lockingNote').textContent = 'Full Term: 1st CAT and 2nd CAT are locked (they were entered at Half Term). Only the Exam column is editable here.';
+            } else {
+                $('lockingNote').textContent = 'Half Term: enter the two CAT scores. The Exam column appears at Full Term.';
+            }
+
+            let head = '<tr><th style="width:5%">S/N</th><th style="width:6%">Photo</th><th style="width:10%">Admission No</th><th>Student Name</th>';
+            if (cols.includes('first_cat')) head += '<th class="text-center">1st CAT (20)</th>';
+            if (cols.includes('second_cat')) head += '<th class="text-center">2nd CAT (20)</th>';
+            if (cols.includes('exam')) head += '<th class="text-center">Exam (60)</th>';
+            head += '<th class="text-center">Total (100)</th></tr>';
+            $('scoreThead').innerHTML = head;
+
+            if (students.length === 0) {
+                $('scoreTbody').innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">No approved students in this class.</td></tr>';
+                $('saveBtn').disabled = true;
+                $('submitFinalBtn').disabled = true;
+                return;
+            }
+            $('saveBtn').disabled = batchLocked;
+            $('submitFinalBtn').disabled = batchLocked;
+
+            $('scoreTbody').innerHTML = students.map((s, i) => {
+                const row = existingRows[String(s.id)] || {};
+                const name = `${s.first_name || ''} ${s.surname || ''}`.trim() || 'Unnamed Student';
+                const photo = s.passport_url || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&size=80&background=1a3c34&color=fff');
+                const regNo = s.reg_number || ('SD-' + String(s.id));
+                const input = (col, max) => {
+                    const val = row[col] == null ? '' : row[col];
+                    const disabled = batchLocked || !columnEditable(col, sel.subTerm) ? 'disabled' : '';
+                    return `<input type="number" class="form-control d-inline-block score-input" data-student="${s.id}" data-col="${col}" min="0" max="${max}" step="0.1" value="${val}" ${disabled} aria-label="${col} for ${R.escapeHtml(name)}">`;
+                };
+                let cells = `<td>${i + 1}</td><td><img src="${R.escapeHtml(photo)}" class="student-photo" alt=""></td><td class="fw-bold small">${R.escapeHtml(regNo)}</td><td class="fw-bold">${R.escapeHtml(name)}</td>`;
+                if (cols.includes('first_cat')) cells += `<td class="text-center">${input('first_cat', R.CAT1_MAX)}</td>`;
+                if (cols.includes('second_cat')) cells += `<td class="text-center">${input('second_cat', R.CAT2_MAX)}</td>`;
+                if (cols.includes('exam')) cells += `<td class="text-center">${input('exam', R.EXAM_MAX)}</td>`;
+                cells += `<td class="text-center fw-bold text-success" data-total-for="${s.id}">—</td>`;
+                return `<tr>${cells}</tr>`;
+            }).join('');
+
+            document.querySelectorAll('.score-input').forEach(inp => {
+                inp.addEventListener('input', () => updateRowTotal(inp.dataset.student));
+            });
+            students.forEach(s => updateRowTotal(String(s.id)));
+        }
+
+        function readRowInputs(studentId) {
+            const vals = {};
+            document.querySelectorAll(`.score-input[data-student="${studentId}"]`).forEach(inp => {
+                const raw = inp.value === '' ? null : R.num(inp.value);
+                const max = inp.dataset.col === 'exam' ? R.EXAM_MAX : R.CAT1_MAX;
+                vals[inp.dataset.col] = raw == null ? null : Math.min(Math.max(raw, 0), max);
+            });
+            return vals;
+        }
+
+        function updateRowTotal(studentId) {
+            const row = existingRows[studentId] || {};
+            const vals = readRowInputs(studentId);
+            const merged = {
+                first_cat: vals.first_cat !== undefined ? vals.first_cat : row.first_cat,
+                second_cat: vals.second_cat !== undefined ? vals.second_cat : row.second_cat,
+                exam: vals.exam !== undefined ? vals.exam : row.exam
+            };
+            const cell = document.querySelector(`[data-total-for="${studentId}"]`);
+            if (!cell) return;
+            if (!R.hasAnyScore(merged)) { cell.textContent = '—'; return; }
+            cell.textContent = R.subjectTotal(merged);
+        }
+
+        async function saveBatch(finalSubmit) {
+            const sel = selection();
+            // A locked batch (submitted/approved/published) must never be overwritten from here; the buttons are disabled when locked, and this guard covers any other path to this function.
+            if (batchLocked) { showAlert('warning', 'This batch is locked for editing. A rejected batch returns here for correction.'); return; }
+            const action = finalSubmit ? 'Submit Final' : 'Save Result';
+            const btn = finalSubmit ? $('submitFinalBtn') : $('saveBtn');
+            btn.disabled = true;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+            try {
+                let saved = 0, skipped = 0;
+                for (const s of students) {
+                    const row = existingRows[String(s.id)] || {};
+                    const vals = readRowInputs(String(s.id));
+                    const merged = {
+                        first_cat: vals.first_cat !== undefined ? vals.first_cat : (row.first_cat != null ? row.first_cat : null),
+                        second_cat: vals.second_cat !== undefined ? vals.second_cat : (row.second_cat != null ? row.second_cat : null),
+                        exam: vals.exam !== undefined ? vals.exam : (row.exam != null ? row.exam : null)
+                    };
+                    if (!R.hasAnyScore(merged) && !row.id) { skipped++; continue; }
+                    const payload = {
+                        student_id: s.id,
+                        class_id: parseInt(sel.classId, 10),
+                        subject_id: parseInt(sel.subjectId, 10),
+                        term: sel.term,
+                        sub_term: sel.subTerm,
+                        session: sel.sessionName,
+                        first_cat: merged.first_cat,
+                        second_cat: merged.second_cat,
+                        exam: merged.exam,
+                        // NOTE: no `total` here — term_results.total is a
+                        // GENERATED column in the live DB; writing it fails
+                        // with 428C9. The database computes it from the
+                        // three components. Display totals come from
+                        // R.subjectTotal() on read.
+                        status: finalSubmit ? 'submitted' : 'draft'
+                    };
+                    if (finalSubmit) {
+                        payload.submitted_by = currentUser.id;
+                        payload.submitted_at = new Date().toISOString();
+                    }
+                    let error;
+                    if (row.id) {
+                        ({ error } = await supabase.from('term_results').update(payload).eq('id', row.id));
+                    } else {
+                        ({ error } = await supabase.from('term_results').insert([payload]));
+                    }
+                    if (error) throw error;
+                    saved++;
+                }
+                showAlert('success', finalSubmit
+                    ? `<i class="fas fa-check-circle me-2"></i>${saved} result(s) submitted as Final. The batch is now locked and waiting for admin approval.`
+                    : `<i class="fas fa-check-circle me-2"></i>Draft saved (${saved} result(s)). You can keep editing until you Submit Final.`);
+                await loadGrid();
+            } catch (err) {
+                console.error(err);
+                if (isSetupError(err)) {
+                    showSetupBanner('Technical detail: ' + err.message);
+                    showAlert('danger', 'Could not ' + action.toLowerCase() + ': the Phase 1 database setup has not been run yet (see the banner above).', true);
+                } else {
+                    showAlert('danger', 'Could not ' + action.toLowerCase() + ': ' + R.escapeHtml(err.message));
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        // ---- Import From CBT ----
+        async function openImportPanel() {
+            const sel = selection();
+            $('importPanel').classList.remove('d-none');
+            $('importSummary').textContent = '';
+            const target = $('cbtTargetSelect');
+            target.innerHTML = '';
+            const editable = editableColumns(sel.subTerm).filter(c => columnEditable(c, sel.subTerm));
+            editable.forEach(c => {
+                const label = c === 'first_cat' ? '1st CAT (max 20)' : c === 'second_cat' ? '2nd CAT (max 20)' : 'Exam (max 60)';
+                target.add(new Option(label, c));
+            });
+            const testSelect = $('cbtTestSelect');
+            testSelect.innerHTML = '<option value="">Loading tests...</option>';
+            let query = supabase.from('tests').select('id, title, code').eq('class_id', sel.classId).eq('subject_id', sel.subjectId).order('created_at', { ascending: false });
+            if (currentRole === 'teacher') query = query.eq('teacher_id', currentUser.id);
+            const { data, error } = await query;
+            if (error) { testSelect.innerHTML = '<option value="">Could not load tests</option>'; return; }
+            if (!data || data.length === 0) {
+                testSelect.innerHTML = '<option value="">No CBT tests for this class &amp; subject</option>';
+                return;
+            }
+            testSelect.innerHTML = '<option value="">Select a test...</option>';
+            data.forEach(t => testSelect.add(new Option(`${t.title} (${t.code || 'no code'})`, t.id)));
+        }
+
+        async function applyImport() {
+            const testId = $('cbtTestSelect').value;
+            const targetCol = $('cbtTargetSelect').value;
+            if (!testId || !targetCol) { showAlert('warning', 'Select a CBT test and a target column first.'); return; }
+            const max = targetCol === 'exam' ? R.EXAM_MAX : R.CAT1_MAX;
+            $('cbtApplyBtn').disabled = true;
+            try {
+                const { data: attempts, error } = await supabase.from('test_results').select('student_id, score, total_questions').eq('test_id', testId);
+                if (error) throw error;
+                if (!attempts || attempts.length === 0) {
+                    $('importSummary').textContent = 'That test has no student attempts yet — nothing to import.';
+                    return;
+                }
+                // test_results.student_id is the auth UUID; map via students.user_id.
+                const byUserId = {};
+                students.forEach(s => { byUserId[String(s.user_id)] = s; });
+                let filled = 0, skipped = 0;
+                attempts.forEach(a => {
+                    const student = byUserId[String(a.student_id)];
+                    const totalQ = R.num(a.total_questions);
+                    if (!student || totalQ <= 0) { skipped++; return; }
+                    const scaled = R.round2((R.num(a.score) / totalQ) * max);
+                    const input = document.querySelector(`.score-input[data-student="${student.id}"][data-col="${targetCol}"]`);
+                    if (!input || input.disabled) { skipped++; return; }
+                    input.value = scaled;
+                    input.classList.add('imported');
+                    updateRowTotal(String(student.id));
+                    filled++;
+                });
+                $('importSummary').textContent = `Filled ${filled} student(s) from the CBT test (${skipped} attempt(s) skipped: no matching student in this class, no questions, or a locked column). Review the highlighted values, then Save or Submit Final.`;
+            } catch (err) {
+                console.error(err);
+                showAlert('danger', 'Import failed: ' + R.escapeHtml(err.message));
+            } finally {
+                $('cbtApplyBtn').disabled = false;
+            }
+        }
+
+        $('sessionSelect').addEventListener('change', loadAssignments);
+        $('classSelect').addEventListener('change', (e) => loadSubjectsForClass(e.target.value));
+        $('loadGridBtn').addEventListener('click', loadGrid);
+        $('saveBtn').addEventListener('click', () => saveBatch(false));
+        $('submitFinalBtn').addEventListener('click', async () => {
+            const ok = await window.sdConfirm({
+                title: 'Submit Final results?',
+                message: 'Please verify the scores. Results cannot be modified afterwards. The batch will be locked and sent to the admin for approval.',
+                confirmLabel: 'Submit Final',
+                cancelLabel: 'Keep Editing',
+                danger: true
+            });
+            if (ok) saveBatch(true);
+        });
+        $('importBtn').addEventListener('click', openImportPanel);
+        $('cbtCancelBtn').addEventListener('click', () => $('importPanel').classList.add('d-none'));
+        $('cbtApplyBtn').addEventListener('click', applyImport);
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+    <script src="mobile_nav.js"></script>
+</body>
+</html>

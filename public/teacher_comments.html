@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPRINGDRILL - Term Comments &amp; Affective Keys</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --brand-600: #059669; --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-500: #6b7280; --gray-900: #111827;
+            --bg-color: var(--gray-50); --card-bg: #ffffff; --text-main: var(--gray-900); --text-muted: var(--gray-500);
+            --border-color: var(--gray-200); --input-bg: var(--gray-100);
+            --radius: 12px; --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; }
+        .sidebar { width: 280px; position: fixed; top: 0; left: 0; height: 100vh; background: var(--card-bg); border-right: 1px solid var(--border-color); padding: 32px 16px; z-index: 1050; transition: transform 0.3s ease; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+        .sidebar-brand h4 { font-weight: 800; margin: 0; font-size: 20px; letter-spacing: -0.5px; }
+        .sidebar-heading { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 16px 12px 8px; margin-top: 8px; }
+        .nav-link { color: var(--text-muted); padding: 10px 12px; margin: 2px 0; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; }
+        .nav-link:hover { background: var(--input-bg); color: var(--text-main); }
+        .nav-link.active { background: var(--brand-600); color: white; font-weight: 600; box-shadow: var(--shadow-sm); }
+        .main-content { margin-left: 280px; padding: 32px 48px; min-height: 100vh; }
+        .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .breadcrumb { margin: 0; font-size: 14px; font-weight: 500; color: var(--text-muted); }
+        .breadcrumb span { color: var(--text-main); font-weight: 600; }
+        .page-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.5px; }
+        .page-header p { font-size: 14px; color: var(--text-muted); margin: 0; }
+        .premium-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
+        .card-header-green { background: #007a4d; color: white; padding: 12px 20px; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+        .form-label { font-size: 12px; font-weight: 600; color: var(--gray-500); margin-bottom: 4px; }
+        .form-select, .form-control { font-size: 13px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg); }
+        .sv-table th { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--gray-500); letter-spacing: 0.5px; padding: 12px 10px; border-bottom: 1px solid var(--border-color); background: var(--gray-50); white-space: nowrap; }
+        .sv-table td { font-size: 13px; padding: 10px; border-bottom: 1px solid var(--border-color); vertical-align: top; }
+        .student-photo { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #e5e7eb; }
+        .affective-grid { display: grid; grid-template-columns: repeat(2, minmax(150px, 1fr)); gap: 4px 12px; min-width: 330px; }
+        .affective-grid label { font-size: 11px; color: var(--gray-500); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .affective-grid select { width: 84px; padding: 3px 6px; font-size: 12px; }
+        textarea.remark-input { min-height: 56px; font-size: 13px; resize: vertical; }
+        #loadingOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: 0.3s; }
+    </style>
+    <link rel="stylesheet" href="mobile_responsive.css">
+</head>
+<body>
+    <div id="loadingOverlay">
+        <i data-lucide="loader-2" class="lucide-spin" style="width: 48px; height: 48px; color: var(--brand-600); margin-bottom: 16px;"></i>
+        <h5 style="font-weight: 600; color: var(--text-muted); font-size: 16px;">Loading Term Comments...</h5>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar" data-role="teacher">
+        <!-- Shared sidebar: rendered by sidebar.js (one menu for all admin/teacher pages). The data-role is switched to admin at runtime for admins. -->
+    </div>
+    <script src="sidebar.js"></script>
+
+    <div class="main-content">
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="mobile-menu-toggle me-2" onclick="toggleSidebar()" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
+                <div class="breadcrumb">SpringDrill / Reports / <span>Term Comments</span></div>
+            </div>
+            <div class="dropdown">
+                <div class="topbar-profile" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 4px 8px; border-radius: 8px;">
+                    <div class="info" style="text-align: right;">
+                        <div class="name" id="navUserName" style="font-weight: 600; font-size: 14px;">User</div>
+                        <div class="role" id="navUserRole" style="font-size: 12px; color: var(--text-muted);">Teacher</div>
+                    </div>
+                    <div class="avatar" id="navAvatar" style="overflow: hidden; width: 40px; height: 40px; border-radius: 50%; background: #d1fae5; color: #059669; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">U</div>
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border: 1px solid var(--border-color); border-radius: 8px;">
+                    <li><a class="dropdown-item" href="teacher_settings.html" style="font-size: 13px; font-weight: 500;">My Profile</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#" id="logoutBtn" style="font-size: 13px; font-weight: 500;">Log Out</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="page-header">
+            <h1>Term Comments &amp; Affective Keys</h1>
+            <p id="roleHint">Write the Supervisor's remark and score the 7 affective traits for each student. These appear on the printed report card.</p>
+        </div>
+
+        <div id="alertBox" class="alert d-none shadow-sm mb-4" role="alert" style="font-size: 13px; font-weight: 500;"></div>
+
+        <div id="setupBanner" class="alert alert-warning d-none shadow-sm mb-4" role="alert" style="font-size: 13px;">
+            <strong><i class="fas fa-database me-2"></i>Database setup required.</strong>
+            The remarks table does not exist yet. Ask the administrator to run
+            <code>supabase/migrations/phase1-results-engine.sql</code> once in the Supabase SQL editor, then reload this page.
+            <span id="setupDetail" class="d-block mt-1 text-muted"></span>
+        </div>
+
+        <div class="premium-card mb-4">
+            <div class="card-header-green"><i data-lucide="filter" style="width:16px; height:16px;"></i> Select Session, Term &amp; Class</div>
+            <div class="p-4" style="background: white;">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Session</label>
+                        <select id="filterSession" class="form-select"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Term</label>
+                        <select id="filterTerm" class="form-select"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Sub-Term</label>
+                        <select id="filterSubTerm" class="form-select"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Class</label>
+                        <select id="filterClass" class="form-select"><option value="">Select Class</option></select>
+                    </div>
+                    <div class="col-md-2">
+                        <button id="loadBtn" class="btn w-100" style="background: #007a4d; color: white; font-weight: 600; font-size: 13px; padding: 10px; border-radius: 6px;"><i data-lucide="search" style="width:16px; height:16px; margin-right:4px;"></i> Load Students</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="premium-card">
+            <div class="card-header-green" id="tableTitle"><i data-lucide="message-square-text" style="width:16px; height:16px;"></i> Students</div>
+            <div class="p-0">
+                <div class="table-responsive m-0" style="min-height: 200px;">
+                    <table class="table table-hover align-middle m-0 sv-table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Supervisor's Remark</th>
+                                <th>Principal's Remark</th>
+                                <th>Affective Keys (1–5)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTbody">
+                            <tr><td colspan="4" class="text-center py-5 text-muted" style="font-size:13px;">Select filters and click Load Students.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="p-3 d-flex justify-content-between align-items-center" style="background: white; border-top: 1px solid var(--border-color);">
+                <span class="text-muted small">Keys: 5 Excellent · 4 Good · 3 Satisfactory · 2 Fair · 1 Poor. Leave a trait blank to skip it.</span>
+                <button id="saveBtn" class="btn" style="background: #007a4d; color: white; font-weight: 600; font-size: 13px; padding: 10px 24px; border-radius: 6px;" disabled><i class="fas fa-save me-2"></i>Save Comments</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="resultsEngine.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        const R = window.ResultsEngine;
+        let currentUserId = null;
+        let currentRole = null;
+        let isAdmin = false;
+        let sessions = [];
+        let students = [];
+        let existing = {}; // student_id -> report_remarks row
+        let tableReady = true;
+        const $ = (id) => document.getElementById(id);
+
+        function showAlert(type, msg) {
+            const box = $('alertBox');
+            box.className = `alert alert-${type} shadow-sm mb-4`;
+            box.innerHTML = msg;
+            box.classList.remove('d-none');
+            setTimeout(() => box.classList.add('d-none'), 6000);
+        }
+
+        function isSetupError(err) {
+            const m = (err && err.message ? err.message : '') + ' ' + (err && err.code ? err.code : '');
+            return /does not exist|PGRST204|PGRST205|42P01/i.test(m);
+        }
+
+        async function init() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return window.location.href = '/';
+                currentUserId = session.user.id;
+                const { data: profile } = await supabase.from('users').select('name, avatar_url, role').eq('id', currentUserId).single();
+                currentRole = profile ? profile.role : null;
+                if (currentRole !== 'teacher' && currentRole !== 'admin') return window.location.href = '/';
+                isAdmin = currentRole === 'admin';
+                if (profile) {
+                    $('navUserName').innerText = profile.name || 'User';
+                    $('navUserRole').innerText = isAdmin ? 'Workspace Owner' : 'Teacher';
+                    const av = $('navAvatar');
+                    if (profile.avatar_url) { av.style.background = `url('${profile.avatar_url}') center/cover`; av.innerText = ''; }
+                    else av.innerText = (profile.name || 'U').substring(0, 2).toUpperCase();
+                }
+                if (isAdmin) {
+                    // Re-render the shared sidebar with the admin menu.
+                    const sb = $('sidebar');
+                    sb.setAttribute('data-role', 'admin');
+                    if (typeof window.renderSidebar === 'function') window.renderSidebar();
+                    $('roleHint').textContent = 'As admin you can write both the Supervisor\'s and the Principal\'s remarks, and score the 7 affective traits. These appear on the printed report card.';
+                }
+                R.TERMS.forEach(t => $('filterTerm').add(new Option(t, t)));
+                R.SUB_TERMS.forEach(t => $('filterSubTerm').add(new Option(t, t)));
+                const { data: sessData } = await supabase.from('academic_sessions').select('id, name').order('name', { ascending: false });
+                sessions = sessData || [];
+                if (sessions.length === 0) {
+                    $('filterSession').add(new Option('2026/2027', '2026/2027'));
+                    sessions = [{ id: null, name: '2026/2027' }];
+                } else {
+                    sessions.forEach(s => $('filterSession').add(new Option(s.name, s.id)));
+                }
+                await loadClasses();
+                // Probe the remarks table once so a missing migration is
+                // surfaced honestly instead of failing on first save.
+                const { error: probeErr } = await supabase.from('report_remarks').select('id').limit(1);
+                if (probeErr && isSetupError(probeErr)) {
+                    tableReady = false;
+                    $('setupDetail').textContent = 'Technical detail: ' + probeErr.message;
+                    $('setupBanner').classList.remove('d-none');
+                }
+                lucide.createIcons();
+                $('loadingOverlay').style.opacity = '0';
+                setTimeout(() => $('loadingOverlay').style.display = 'none', 300);
+            } catch (err) {
+                console.error(err);
+                $('loadingOverlay').style.display = 'none';
+            }
+        }
+
+        async function loadClasses() {
+            const sel = $('filterClass');
+            sel.innerHTML = '<option value="">Select Class</option>';
+            if (isAdmin) {
+                const { data } = await supabase.from('classes').select('id, name').order('name');
+                (data || []).forEach(c => sel.add(new Option(c.name, c.id)));
+                return;
+            }
+            // Teacher: only classes assigned to them for the selected session.
+            const sessionId = $('filterSession').value;
+            const { data: assigns } = await supabase.from('teacher_class_subjects').select('class_id').eq('teacher_id', currentUserId).eq('session_id', sessionId);
+            const { data: classData } = await supabase.from('classes').select('id, name');
+            const classById = {};
+            (classData || []).forEach(c => { classById[String(c.id)] = c; });
+            // Join class names with a plain query (no relation embed).
+            (assigns || []).forEach(a => { a.classes = classById[String(a.class_id)] || null; });
+            const seen = new Map();
+            (assigns || []).forEach(a => { if (a.classes) seen.set(a.classes.id, a.classes); });
+            [...seen.values()].sort((a, b) => a.name.localeCompare(b.name)).forEach(c => sel.add(new Option(c.name, c.id)));
+            if (seen.size === 0) {
+                const opt = new Option('No classes assigned to you this session', '');
+                sel.add(opt);
+            }
+        }
+
+        function selection() {
+            const sessionId = $('filterSession').value;
+            const sessionRow = sessions.find(s => String(s.id) === String(sessionId)) || sessions[0];
+            return {
+                sessionName: sessionRow ? sessionRow.name : '',
+                term: $('filterTerm').value,
+                subTerm: $('filterSubTerm').value,
+                classId: $('filterClass').value
+            };
+        }
+
+        async function loadStudents() {
+            const sel = selection();
+            if (!sel.term || !sel.subTerm || !sel.classId) {
+                showAlert('warning', 'Please select Term, Sub-Term and Class first.');
+                return;
+            }
+            const tbody = $('studentsTbody');
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>Loading students...</td></tr>';
+            try {
+                const { data: studData, error: studErr } = await supabase
+                    .from('students').select('id, user_id, first_name, surname, reg_number, passport_url')
+                    .eq('class_id', sel.classId).eq('approved', true).order('surname').order('first_name');
+                if (studErr) throw studErr;
+                students = studData || [];
+                // Join user names with a plain query (no relation embed).
+                const userIds = [...new Set(students.map(s => s.user_id).filter(Boolean))];
+                if (userIds.length) {
+                    const { data: userData } = await supabase.from('users').select('id, name').in('id', userIds);
+                    const userById = {};
+                    (userData || []).forEach(u => { userById[String(u.id)] = u; });
+                    students.forEach(s => { s.users = userById[String(s.user_id)] || null; });
+                }
+                existing = {};
+                if (tableReady) {
+                    const { data: remarks, error: remErr } = await supabase
+                        .from('report_remarks').select('*')
+                        .eq('class_id', sel.classId).eq('term', sel.term).eq('sub_term', sel.subTerm).eq('session', sel.sessionName);
+                    if (remErr) throw remErr;
+                    (remarks || []).forEach(r => { existing[String(r.student_id)] = r; });
+                }
+                renderGrid();
+                $('saveBtn').disabled = !tableReady || students.length === 0;
+            } catch (err) {
+                console.error(err);
+                if (isSetupError(err)) {
+                    tableReady = false;
+                    $('setupDetail').textContent = 'Technical detail: ' + err.message;
+                    $('setupBanner').classList.remove('d-none');
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted" style="font-size:13px;">Comments cannot load until the Phase 1 database setup has been run (see the banner above).</td></tr>';
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-danger">Failed to load students: ' + R.escapeHtml(err.message) + '</td></tr>';
+                }
+            }
+        }
+
+        function renderGrid() {
+            const tbody = $('studentsTbody');
+            const className = $('filterClass').options[$('filterClass').selectedIndex].text;
+            $('tableTitle').innerHTML = `<i data-lucide="message-square-text" style="width:16px; height:16px;"></i> ${R.escapeHtml(className)} — ${students.length} student(s)`;
+            lucide.createIcons();
+            if (students.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted" style="font-size:13px;">No approved students in this class.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = students.map(s => {
+                const name = `${s.first_name || ''} ${s.surname || ''}`.trim() || (s.users && s.users.name) || 'Unnamed Student';
+                const photo = s.passport_url || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&size=80&background=1a3c34&color=fff');
+                const row = existing[String(s.id)] || {};
+                const aff = (row.affective && typeof row.affective === 'object') ? row.affective : {};
+                const traitHtml = R.AFFECTIVE_TRAITS.map(t => {
+                    const v = aff[t];
+                    const opts = '<option value="">—</option>' + [1, 2, 3, 4, 5].map(n => `<option value="${n}" ${v === n ? 'selected' : ''}>${n} — ${R.AFFECTIVE_KEYS[n]}</option>`).join('');
+                    return `<label>${t}<select class="form-select affective-select" data-student="${s.id}" data-trait="${R.escapeHtml(t)}">${opts}</select></label>`;
+                }).join('');
+                return `<tr>
+                    <td style="min-width:170px;">
+                        <div class="d-flex align-items-center gap-2">
+                            <img src="${R.escapeHtml(photo)}" class="student-photo" alt="">
+                            <div><div class="fw-bold">${R.escapeHtml(name)}</div><div class="text-muted small">${R.escapeHtml(s.reg_number || ('SD-' + String(s.id)))}</div></div>
+                        </div>
+                    </td>
+                    <td style="min-width:220px;"><textarea class="form-control remark-input supervisor-remark" data-student="${s.id}" placeholder="Supervisor's remark...">${R.escapeHtml(row.supervisor_remark || '')}</textarea></td>
+                    <td style="min-width:220px;">
+                        <textarea class="form-control remark-input principal-remark" data-student="${s.id}" placeholder="${isAdmin ? "Principal's remark..." : 'Principal\'s remark — admin only'}" ${isAdmin ? '' : 'disabled'}>${R.escapeHtml(row.principal_remark || '')}</textarea>
+                        ${isAdmin ? '' : '<div class="text-muted small mt-1">Only the admin/principal can write this remark.</div>'}
+                    </td>
+                    <td><div class="affective-grid">${traitHtml}</div></td>
+                </tr>`;
+            }).join('');
+        }
+
+        async function saveComments() {
+            const sel = selection();
+            if (!tableReady) { showAlert('warning', 'The remarks table is missing — run the Phase 1 SQL migration first.'); return; }
+            const btn = $('saveBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+            try {
+                const supervisorEls = document.querySelectorAll('.supervisor-remark');
+                for (const el of supervisorEls) {
+                    const studentId = el.dataset.student;
+                    const principalEl = document.querySelector(`.principal-remark[data-student="${studentId}"]`);
+                    const affective = {};
+                    document.querySelectorAll(`.affective-select[data-student="${studentId}"]`).forEach(a => {
+                        if (a.value !== '') affective[a.dataset.trait] = parseInt(a.value, 10);
+                    });
+                    const payload = {
+                        student_id: parseInt(studentId, 10),
+                        class_id: parseInt(sel.classId, 10),
+                        session: sel.sessionName,
+                        term: sel.term,
+                        sub_term: sel.subTerm,
+                        supervisor_remark: el.value.trim() || null,
+                        affective,
+                        updated_by: currentUserId,
+                        updated_at: new Date().toISOString()
+                    };
+                    // Teachers must not overwrite the Principal's remark.
+                    if (isAdmin) payload.principal_remark = principalEl.value.trim() || null;
+                    const row = existing[String(studentId)];
+                    if (row) {
+                        const { error } = await supabase.from('report_remarks').update(payload).eq('id', row.id);
+                        if (error) throw error;
+                    } else {
+                        const { error } = await supabase.from('report_remarks').insert([payload]);
+                        if (error) throw error;
+                    }
+                }
+                showAlert('success', 'Comments saved. They will appear on the printed report cards for this term.');
+            } catch (err) {
+                console.error(err);
+                if (isSetupError(err)) {
+                    tableReady = false;
+                    $('setupDetail').textContent = 'Technical detail: ' + err.message;
+                    $('setupBanner').classList.remove('d-none');
+                    showAlert('warning', 'Save failed: the remarks table is missing — run the Phase 1 SQL migration first.');
+                } else {
+                    showAlert('danger', 'Save failed: ' + R.escapeHtml(err.message));
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save me-2"></i>Save Comments';
+            }
+        }
+
+        $('filterSession').addEventListener('change', loadClasses);
+        $('loadBtn').addEventListener('click', loadStudents);
+        $('saveBtn').addEventListener('click', saveComments);
+        $('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = '/';
+        });
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+    <script src="mobile_nav.js"></script>
+</body>
+</html>

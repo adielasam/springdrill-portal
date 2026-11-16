@@ -40,8 +40,10 @@
         </div>
     </div>
 
+    <script src="resultsEngine.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
+        const R = window.ResultsEngine;
         
         async function load() {
             lucide.createIcons();
@@ -90,20 +92,16 @@
                 const cat2 = r.second_cat || 0;
                 const exam = r.exam || 0;
                 const total = r.total || (cat1 + cat2 + exam);
-                
-                let grade = 'F';
-                if(total >= 70) grade = 'A';
-                else if(total >= 60) grade = 'B';
-                else if(total >= 50) grade = 'C';
-                else if(total >= 40) grade = 'D';
-                
+                const hasScore = R.hasAnyScore(r);
+                const grade = hasScore ? R.ssceGrade(total).letter : '--';
+
                 html += `
                 <tr>
                     <td class="fw-bold">${name}</td>
-                    <td class="text-center">${cat1}</td>
-                    <td class="text-center">${cat2}</td>
-                    <td class="text-center">${exam}</td>
-                    <td class="text-center fw-bold" style="color:#059669;">${total}</td>
+                    <td class="text-center">${r.first_cat == null ? '--' : cat1}</td>
+                    <td class="text-center">${r.second_cat == null ? '--' : cat2}</td>
+                    <td class="text-center">${r.exam == null ? '--' : exam}</td>
+                    <td class="text-center fw-bold" style="color:#059669;">${hasScore ? total : '--'}</td>
                     <td class="text-center fw-bold">${grade}</td>
                 </tr>
                 `;

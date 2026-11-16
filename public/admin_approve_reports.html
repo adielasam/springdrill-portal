@@ -60,6 +60,7 @@
         .status-draft { background: var(--gray-100); color: var(--gray-600); }
         .status-final { background: #fef08a; color: #854d0e; } /* Pending Approval */
         .status-approved { background: #d1fae5; color: #065f46; }
+        .status-published { background: #dbeafe; color: #1e40af; }
         .status-rejected { background: #fee2e2; color: #991b1b; }
 
         .action-btn { padding: 6px 12px; font-size: 11px; font-weight: 600; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: none; transition: 0.2s; text-decoration: none; }
@@ -217,6 +218,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="sd-confirm.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
@@ -375,6 +377,9 @@
                         } else if (rawStatus === 'approved') {
                             statusBadge = `<span class="status-badge status-approved">Approved</span>`;
                             actionButtons = `<button class="action-btn btn-reject" onclick="window.promptReject(${classId}, ${g.subject_id}, '${termId}', '${subTermId}')"><i data-lucide="corner-up-left"></i> Revoke & Reject</button>`;
+                        } else if (rawStatus === 'published') {
+                            statusBadge = `<span class="status-badge status-published">Published</span>`;
+                            actionButtons = `<span class="text-muted" style="font-size:11px;">Managed on Publish Report</span>`;
                         } else if (rawStatus === 'rejected') {
                             statusBadge = `<span class="status-badge status-rejected">Rejected</span>`;
                             actionButtons = `<span class="text-muted" style="font-size:11px;">Awaiting Teacher Fix</span>`;
@@ -419,7 +424,13 @@
 
         // Action Handlers
         window.approveResult = async (classId, subjectId, termId, subTermId) => {
-            if(!confirm('Are you sure you want to approve this result for the final report card?')) return;
+            const ok = await window.sdConfirm({
+                title: 'Approve this result?',
+                message: 'Approve this subject result for the final report card? It can still be published or revoked afterwards.',
+                confirmLabel: 'Approve',
+                cancelLabel: 'Cancel'
+            });
+            if (!ok) return;
             
             try {
                 // If DB constraint still enforces IN ('draft','final'), we might hit an error if we set 'approved'.
@@ -433,7 +444,7 @@
                 
                 if (error) {
                     if (error.message.includes('term_results_status_check')) {
-                        showAlert('danger', 'Database constraint prevents "approved" status. Please run the provided SQL setup script first.');
+                        showAlert('danger', 'Database constraint prevents "approved" status. Run supabase/migrations/phase1-results-engine.sql once in the Supabase SQL editor, then try again.');
                     } else {
                         throw error;
                     }
