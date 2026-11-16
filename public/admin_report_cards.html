@@ -326,7 +326,7 @@
 
                 const subjectRows = s.rows.slice().sort((a, b) => (a.subjects?.name || '').localeCompare(b.subjects?.name || '')).map(r => {
                     const total = R.subjectTotal(r);
-                    const band = R.ssceGrade(total);
+                    const band = R.displayGrade(total, sel.subTerm);
                     const cell = (v) => v == null ? '--' : R.num(v);
                     return `<tr>
                         <td>${R.escapeHtml(r.subjects?.name || 'Unknown Subject')}</td>
@@ -339,7 +339,7 @@
                     </tr>`;
                 }).join('') || '<tr><td colspan="7" class="text-center text-muted py-3">No results recorded for this term.</td></tr>';
 
-                const avg = s.average == null ? '--' : s.average.toFixed(1);
+                const avg = R.formatAverage(s.average, sel.subTerm);
                 const pos = s.position == null ? '--' : R.ordinal(s.position) + ' in Class';
                 const supervisorRemark = remark && remark.supervisor_remark ? R.escapeHtml(remark.supervisor_remark) : 'No remark recorded yet.';
                 const principalRemark = remark && remark.principal_remark ? R.escapeHtml(remark.principal_remark) : 'No remark recorded yet.';
@@ -350,6 +350,9 @@
                     return `<tr><td>${t}</td><td class="text-center fw-bold">${label}</td></tr>`;
                 }).join('');
                 const gradeKey = R.SSCE_BANDS.map(b => `${b.min}–${b.letter === 'A1' ? 100 : R.SSCE_BANDS[R.SSCE_BANDS.indexOf(b) - 1].min - 1} ${b.letter}`).join(' &nbsp;|&nbsp; ');
+                const gradeKeyLine = R.isHalfTerm(sel.subTerm)
+                    ? '<strong>Half Term:</strong> Grades are awarded at Full Term, when the exam is complete. Half Term totals are out of 40.'
+                    : '<strong>SSCE Grading:</strong> ' + gradeKey;
 
                 return `<div class="report-card">
                     <div class="rc-header">
@@ -368,12 +371,12 @@
                     </div>
                     <table class="table table-bordered rc-table mb-3">
                         <thead><tr>
-                            <th width="28%">SUBJECT</th><th class="text-center">1ST CAT (20)</th><th class="text-center">2ND CAT (20)</th><th class="text-center">EXAM (60)</th><th class="text-center">TOTAL (100)</th><th class="text-center">GRADE</th><th class="text-center">REMARK</th>
+                            <th width="28%">SUBJECT</th><th class="text-center">1ST CAT (20)</th><th class="text-center">2ND CAT (20)</th><th class="text-center">EXAM (60)</th><th class="text-center">TOTAL (${R.isHalfTerm(sel.subTerm) ? 40 : 100})</th><th class="text-center">GRADE</th><th class="text-center">REMARK</th>
                         </tr></thead>
                         <tbody>${subjectRows}</tbody>
                         <tfoot><tr class="table-light border-top border-dark border-2">
                             <td class="fw-bold text-end" colspan="4">OVERALL AVERAGE:</td>
-                            <td class="text-center fw-bold fs-5" colspan="3">${avg}% &nbsp;·&nbsp; Position: ${pos}</td>
+                            <td class="text-center fw-bold fs-5" colspan="3">${avg} &nbsp;·&nbsp; Position: ${pos}</td>
                         </tr></tfoot>
                     </table>
                     <div class="rc-remark-box"><h6>Supervisor's Remark:</h6><p>${supervisorRemark}</p></div>
@@ -381,7 +384,7 @@
                     <h6 class="fw-bold mt-4 mb-2" style="font-size:13px;">AFFECTIVE KEYS (5 = Excellent, 4 = Good, 3 = Satisfactory, 2 = Fair, 1 = Poor)</h6>
                     <table class="table table-bordered rc-affective mb-2"><tbody>${affectiveRows}</tbody></table>
                     ${remarksAvailable ? '' : '<p class="text-muted small">Remarks and affective scores are unavailable — the Phase 1 database setup has not been run yet.</p>'}
-                    <p class="rc-grade-key"><strong>SSCE Grading:</strong> ${gradeKey}</p>
+                    <p class="rc-grade-key">${gradeKeyLine}</p>
                     <div class="rc-footer">
                         <div class="rc-signature">Class Teacher's Signature</div>
                         <div class="rc-signature">Principal's Signature &amp; Stamp</div>

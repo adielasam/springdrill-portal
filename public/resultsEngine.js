@@ -9,6 +9,17 @@
 //
 // No dependencies, no network calls, no AI. Loaded as a classic script
 // before the page's <script type="module"> block, like sd-confirm.js.
+//
+// HALF TERM GRADING (provisional rule, adopted 16 Nov 2026): a Half Term
+// total covers only the two CATs (40 of the 100 marks), so no SSCE/JSCE
+// grade or remark is awarded until Full Term, when the exam completes
+// the assessment — grading a 40-point total on the 100-point bands
+// would label strong mid-term work F9/FAIL. Positions still rank by
+// average (scale-invariant, so ranking is unaffected). This rule was
+// NOT observed on Educare: no Half Term report card existed to study
+// in either study pass. It is to be verified against Educare's
+// complete records when the current exams finish (~7 Dec 2026) and
+// corrected if Educare grades Half Term results differently.
 (function () {
     'use strict';
 
@@ -19,6 +30,8 @@
     var CAT2_MAX = 20;
     var EXAM_MAX = 60;
     var TOTAL_MAX = 100;
+    // Half Term maximum: the two CATs only (no exam yet).
+    var HALF_TERM_MAX = 40;
 
     // Term / sub-term value conventions. These exact strings are what the
     // existing approve/publish pages already store in term_results.term and
@@ -94,6 +107,26 @@
             if (t >= bands[i].min) return bands[i];
         }
         return bands[bands.length - 1];
+    }
+
+    function isHalfTerm(subTerm) { return subTerm === 'Half Term'; }
+
+    // The grade/remark shown for a total under a given sub-term. Half
+    // Term totals carry no grade (see the header note); Full Term uses
+    // the SSCE bands. Every page must grade through this function, never
+    // through ssceGrade directly, or Half Term cards show F9 again.
+    var HALF_TERM_GRADE = { letter: '--', point: null, remark: '--' };
+    function displayGrade(total, subTerm) {
+        if (isHalfTerm(subTerm)) return HALF_TERM_GRADE;
+        return ssceGrade(total);
+    }
+
+    // Average as displayed: Half Term averages are out of 40, Full Term
+    // averages are percentages out of 100. Null stays '--'.
+    function formatAverage(avg, subTerm) {
+        if (avg == null) return '--';
+        if (isHalfTerm(subTerm)) return avg.toFixed(1) + ' / 40';
+        return avg.toFixed(1) + '%';
     }
 
     function ssceGrade(total) { return gradeFor(total, SSCE_BANDS); }
@@ -197,6 +230,7 @@
         CAT2_MAX: CAT2_MAX,
         EXAM_MAX: EXAM_MAX,
         TOTAL_MAX: TOTAL_MAX,
+        HALF_TERM_MAX: HALF_TERM_MAX,
         TERMS: TERMS,
         SUB_TERMS: SUB_TERMS,
         SSCE_BANDS: SSCE_BANDS,
@@ -211,6 +245,9 @@
         gradeFor: gradeFor,
         ssceGrade: ssceGrade,
         jsceGrade: jsceGrade,
+        isHalfTerm: isHalfTerm,
+        displayGrade: displayGrade,
+        formatAverage: formatAverage,
         ordinal: ordinal,
         averageOf: averageOf,
         assignPositions: assignPositions,

@@ -343,6 +343,37 @@
                 existingRows = {};
                 (rows || []).forEach(r => { existingRows[String(r.student_id)] = r; });
 
+                // Full Term carry-forward: the CATs were entered at Half Term
+                // (same class/subject/term/session) and the Full Term grid
+                // shows them locked, exactly as on Educare. A Full Term row
+                // that lacks them inherits them from its Half Term row, so
+                // the grid shows the locked CATs and a save writes a
+                // complete row. Without this, a new Full Term row would
+                // hold the exam score only, and every Full Term total and
+                // grade would be wrong. Half Term rows are only read here,
+                // never written, so their locked status is untouched.
+                if (sel.subTerm === 'Full Term') {
+                    const { data: htRows, error: htErr } = await supabase
+                        .from('term_results')
+                        .select('*')
+                        .eq('class_id', sel.classId)
+                        .eq('subject_id', sel.subjectId)
+                        .eq('term', sel.term)
+                        .eq('sub_term', 'Half Term')
+                        .or('session.eq."' + sel.sessionName + '",session.is.null');
+                    if (htErr) throw htErr;
+                    (htRows || []).forEach(ht => {
+                        const key = String(ht.student_id);
+                        const full = existingRows[key];
+                        if (full) {
+                            if (full.first_cat == null) full.first_cat = ht.first_cat;
+                            if (full.second_cat == null) full.second_cat = ht.second_cat;
+                        } else if (ht.first_cat != null || ht.second_cat != null) {
+                            existingRows[key] = { first_cat: ht.first_cat, second_cat: ht.second_cat, exam: null };
+                        }
+                    });
+                }
+
                 // Batch status: the most advanced status present wins.
                 const rank = { draft: 0, rejected: 1, submitted: 2, final: 2, approved: 3, published: 4 };
                 batchStatus = null;
