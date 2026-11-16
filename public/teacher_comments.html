@@ -464,6 +464,11 @@
             } catch (err) {
                 console.error(err);
                 showAlert('danger', 'AI suggestions are unavailable right now (' + R.escapeHtml(err.message) + '). You can still score the traits by hand.');
+                // Keep the failure visible in the row: the top banner
+                // disappears after a few seconds, and a teacher who
+                // looks away would otherwise see nothing at all.
+                reasonsEl.innerHTML = '<div class="text-danger fw-bold">AI suggestions are unavailable right now — please score the traits by hand, or try again.</div>';
+                reasonsEl.style.display = 'block';
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;
@@ -510,6 +515,11 @@
             } catch (err) {
                 console.error(err);
                 showAlert('danger', 'AI drafting is unavailable right now (' + R.escapeHtml(err.message) + '). You can still write the remark by hand.');
+                // Keep the failure visible in the row: the top banner
+                // disappears after a few seconds, and a teacher who
+                // looks away would otherwise see nothing at all.
+                noteEl.innerHTML = '<div class="text-danger fw-bold">AI drafting is unavailable right now — please write the remark by hand, or try again.</div>';
+                noteEl.style.display = 'block';
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;
