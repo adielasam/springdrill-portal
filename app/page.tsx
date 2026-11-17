@@ -469,19 +469,19 @@ function LoginForm() {
            wordmark images are preloaded in the document head so they
            render in the very first frame. Reduced motion: static logo,
            full bar, no spin or pulse. */
-        .sd-preloader { position: fixed; inset: 0; background: #ffffff; z-index: 99999; display: flex; flex-direction: column; gap: 30px; align-items: center; justify-content: center; }
-        .sd-preloader-galaxy { position: relative; width: min(430px, 88vw); display: flex; align-items: center; justify-content: center; }
-        .sd-preloader-lockup { position: relative; z-index: 2; display: flex; align-items: center; gap: 14px; }
-        .sd-preloader-emblem { display: block; width: 118px; height: 118px; animation: sd-emblem-spin 1.5s linear infinite; }
+        .sd-preloader { position: fixed; inset: 0; background: #ffffff; z-index: 99999; display: flex; flex-direction: column; gap: 22px; align-items: center; justify-content: center; }
+        .sd-preloader-galaxy { position: relative; width: min(260px, 78vw); display: flex; align-items: center; justify-content: center; }
+        .sd-preloader-lockup { position: relative; z-index: 2; display: flex; align-items: center; gap: 10px; }
+        .sd-preloader-emblem { display: block; width: 72px; height: 72px; animation: sd-emblem-spin 1.5s linear infinite; }
         @keyframes sd-emblem-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .sd-preloader-wordmark { display: block; height: 62px; width: auto; }
+        .sd-preloader-wordmark { display: block; height: 38px; width: auto; }
         .sd-preloader-orbit { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1; width: 118%; height: auto; overflow: visible; pointer-events: none; }
         .sd-galaxy-spin { transform-box: fill-box; transform-origin: center; animation: sd-galaxy-spin 9s linear infinite; }
         @keyframes sd-galaxy-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .sd-preloader-pulse { position: absolute; inset: -32px -8px; border: 2px solid rgba(0, 122, 77, 0.35); border-radius: 50%; animation: sd-preloader-pulse 2.2s ease-out infinite; pointer-events: none; }
+        .sd-preloader-pulse { position: absolute; inset: -20px -6px; border: 2px solid rgba(0, 122, 77, 0.35); border-radius: 50%; animation: sd-preloader-pulse 2.2s ease-out infinite; pointer-events: none; }
         .sd-preloader-pulse-2 { animation-delay: 1.1s; }
         @keyframes sd-preloader-pulse { 0% { transform: scale(0.72); opacity: 0.7; } 100% { transform: scale(1.14); opacity: 0; } }
-        .sd-preloader-bar { width: min(240px, 60vw); height: 6px; border-radius: 999px; background: #e6efe9; overflow: hidden; }
+        .sd-preloader-bar { width: min(180px, 50vw); height: 6px; border-radius: 999px; background: #e6efe9; overflow: hidden; }
         .sd-preloader-bar-fill { height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #007a4d, #4D9F5F); animation: sd-preloader-fill 3s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
         @keyframes sd-preloader-fill { from { width: 0; } to { width: 100%; } }
 
