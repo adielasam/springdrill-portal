@@ -431,8 +431,10 @@
     
     <!-- IMPERSONATE OVERLAY -->
     <div id="impersonateOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; flex-direction:column; align-items:center; justify-content:center;">
-        <i data-lucide="loader-2" class="spin mb-3" style="animation: spin 1s linear infinite; width:48px; height:48px; color: #059669;"></i>
-        <h4 style="color: #059669; font-weight:700;">Logging in as student...</h4>
+        <span id="impersonateSpinnerWrap"><i data-lucide="loader-2" class="spin mb-3" style="animation: spin 1s linear infinite; width:48px; height:48px; color: #059669;"></i></span>
+        <h4 id="impersonateHeading" style="color: #059669; font-weight:700;">Logging in as student...</h4>
+        <p id="impersonateError" style="display:none; color:#b91c1c; max-width:440px; text-align:center; padding:0 20px;"></p>
+        <button id="impersonateCloseBtn" type="button" class="btn btn-outline-secondary" style="display:none; margin-top:16px;" onclick="document.getElementById('impersonateOverlay').style.display='none'">Go back</button>
     </div>
     
     <style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
@@ -660,30 +662,52 @@
 
         window.loginAsStudent = async function() {
             if(!currentStudentData) return;
-            const email = currentStudentData.student_email;
-            if(!email) {
-                alert('This student does not have an email address set. Please Edit Info and set an Email first to impersonate.');
-                return;
-            }
-            
-            document.getElementById('impersonateOverlay').style.display = 'flex';
-            
+            const overlay = document.getElementById('impersonateOverlay');
+            const spinnerWrap = document.getElementById('impersonateSpinnerWrap');
+            const heading = document.getElementById('impersonateHeading');
+            const errEl = document.getElementById('impersonateError');
+            const closeBtn = document.getElementById('impersonateCloseBtn');
+            // Reset the overlay in case a previous attempt failed.
+            spinnerWrap.style.display = '';
+            heading.textContent = 'Logging in as student...';
+            errEl.style.display = 'none';
+            errEl.textContent = '';
+            closeBtn.style.display = 'none';
+            overlay.style.display = 'flex';
+
             try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) throw new Error('Your admin session has ended. Please sign in again.');
+                // The server resolves the sign-in email from the users table
+                // by user id: the students-table email is often empty.
                 const response = await fetch('/api/admin/impersonate', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: email, redirectTo: window.location.origin + '/student_dashboard.html' })
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+                    body: JSON.stringify({ userId: currentStudentData.user_id, email: currentStudentData.student_email || null, redirectTo: window.location.origin + '/student_dashboard.html' })
                 });
-                
+
                 const data = await response.json();
                 if (data.success && data.action_link) {
+                    // Save the admin session so the student dashboard can
+                    // offer a one-click return (see return_to_admin.js).
+                    try {
+                        sessionStorage.setItem('SD_IMPERSONATE_RETURN', JSON.stringify({
+                            access_token: session.access_token,
+                            refresh_token: session.refresh_token,
+                            asName: ((currentStudentData.surname || '') + ' ' + (currentStudentData.first_name || '')).trim(),
+                            asRole: 'student'
+                        }));
+                    } catch (e) { /* the return pill simply won't appear */ }
                     window.location.href = data.action_link;
                 } else {
                     throw new Error(data.error || 'Failed to generate link');
                 }
             } catch (error) {
-                document.getElementById('impersonateOverlay').style.display = 'none';
-                alert('Error impersonating student: ' + error.message);
+                spinnerWrap.style.display = 'none';
+                heading.textContent = 'Could not switch to this student.';
+                errEl.textContent = error.message;
+                errEl.style.display = 'block';
+                closeBtn.style.display = 'inline-block';
             }
         };
 
