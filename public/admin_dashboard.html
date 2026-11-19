@@ -295,10 +295,10 @@
                     </div>
                     <div class="avatar" id="navAvatar" style="overflow: hidden; width: 40px; height: 40px; border-radius: 50%; background: var(--brand-100); color: var(--brand-600); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">AD</div>
                 </div>
-                <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border: 1px solid var(--border-color); border-radius: 8px;">
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm" id="adminProfileMenu" style="border: 1px solid var(--border-color); border-radius: 8px;">
                     <li><a class="dropdown-item" href="admin_settings.html" style="font-size: 13px; font-weight: 500;"><i data-lucide="user" class="me-2" style="width:16px; height:16px;"></i> My Profile</a></li>
                     <li><a class="dropdown-item" href="admin_settings.html" style="font-size: 13px; font-weight: 500;"><i data-lucide="settings" class="me-2" style="width:16px; height:16px;"></i> Settings</a></li>
-                    <li><hr class="dropdown-divider"></li>
+                    <li id="adminRolesDivider"><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item text-danger" href="#" id="logoutBtn" style="font-size: 13px; font-weight: 500;"><i data-lucide="log-out" class="me-2" style="width:16px; height:16px;"></i> Log Out</a></li>
                 </ul>
             </div>
@@ -455,11 +455,18 @@
     
     <script type="module">
         import { supabase } from './supabaseClient.js';
+        import { getMyRoles, buildMyRolesMenu, guardRole } from './roleSwitcher.js';
 
         async function initializeDashboard() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = '/';
+
+                // Role switcher (PR #41): only accounts holding the admin role
+                // stay here; anyone else is sent to a dashboard they do hold.
+                await guardRole('admin');
+                const myRoles = await getMyRoles();
+                if (myRoles) buildMyRolesMenu(document.getElementById('adminProfileMenu'), 'adminRolesDivider', myRoles, 'admin');
 
                 const { data: profile } = await supabase.from('users').select('name, avatar_url').eq('id', session.user.id).single();
                 if(profile) {
