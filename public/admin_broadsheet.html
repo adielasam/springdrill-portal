@@ -29,9 +29,6 @@
         .top-navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
         .breadcrumb { margin: 0; font-size: 14px; font-weight: 500; color: var(--text-muted); }
         .breadcrumb span { color: var(--text-main); font-weight: 600; }
-        .page-header { margin-bottom: 32px; }
-        .page-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.5px; }
-        .page-header p { font-size: 14px; color: var(--text-muted); margin: 0; }
         .premium-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
         .card-header-green { background: #007a4d; color: white; padding: 12px 20px; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
         .form-label { font-size: 12px; font-weight: 600; color: var(--gray-500); margin-bottom: 4px; }
@@ -43,6 +40,20 @@
         .sv-table td.empty-cell { color: #cbd5e1; }
         .nav-tabs .nav-link { color: var(--text-muted); font-weight: 600; font-size: 13px; border: none; }
         .nav-tabs .nav-link.active { color: #007a4d; background: none; border-bottom: 3px solid #007a4d; }
+        /* Educare-style section banner: dark green bar, title left, count right (same as Question Bank / CBT Test Manager / Make Report) */
+        .sd-banner { background: #004d34; color: #fff; border-radius: 4px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+        .sd-banner-title { font-weight: 800; font-size: 1.15rem; display: flex; align-items: center; gap: 10px; }
+        .sd-banner-count { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.35); font-weight: 600; }
+        /* Table footer (DataTables-style count line) */
+        .table-footer { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; color: var(--text-muted); font-size: 0.9rem; border-top: 1px solid var(--border-color); background: var(--card-bg); }
+        /* Empty states */
+        .empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); }
+        .empty-state i { font-size: 2.2rem; margin-bottom: 12px; display: block; }
+        /* Results tab strip: links to the other results pages; Broadsheet / Result Insight switch the in-page tabs */
+        .sd-tab-strip { display: flex; flex-wrap: wrap; gap: 4px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 6px; box-shadow: var(--shadow-sm); }
+        .sd-tab-strip-item { border: none; background: none; color: var(--text-muted); font-weight: 600; font-size: 13px; padding: 8px 14px; border-radius: 8px; text-decoration: none; cursor: pointer; }
+        .sd-tab-strip-item:hover { color: var(--text-main); background: var(--input-bg); text-decoration: none; }
+        .sd-tab-strip-item.active { color: #007a4d; background: var(--brand-50); box-shadow: inset 0 -3px 0 #007a4d; }
         #loadingOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: 0.3s; }
     </style>
     <link rel="stylesheet" href="mobile_responsive.css">
@@ -82,10 +93,11 @@
             </div>
         </div>
 
-        <div class="page-header">
-            <h1>Reports View</h1>
-            <p>Broadsheet, Result Insight and cumulative averages. Averages and positions are computed live from stored scores — no separate Process run.</p>
+        <div class="sd-banner">
+            <span class="sd-banner-title"><i data-lucide="table"></i> Reports View</span>
+            <span class="badge sd-banner-count" id="bannerCount">&hellip;</span>
         </div>
+        <p class="text-muted small mb-4">Broadsheet, Result Insight and cumulative averages. Averages and positions are computed live from stored scores — no separate Process run.</p>
 
         <div id="alertBox" class="alert d-none shadow-sm mb-4" role="alert" style="font-size: 13px; font-weight: 500;"></div>
 
@@ -98,7 +110,7 @@
 
         <!-- FILTER CARD -->
         <div class="premium-card mb-4">
-            <div class="card-header-green"><i data-lucide="filter" style="width:16px; height:16px;"></i> Select Result to View</div>
+            <div class="card-header-green"><i data-lucide="filter" style="width:16px; height:16px;"></i> Filter Results</div>
             <div class="p-4" style="background: white;">
                 <div class="row g-3 align-items-end">
                     <div class="col-md-2">
@@ -128,8 +140,20 @@
                     <div class="col-md-2">
                         <button id="loadBtn" class="btn w-100" style="background: #007a4d; color: white; font-weight: 600; font-size: 13px; padding: 10px; border-radius: 6px;"><i data-lucide="search" style="width:16px; height:16px; margin-right:4px;"></i> Load View</button>
                     </div>
+                    <div class="col-md-2">
+                        <button id="clearBtn" class="btn btn-outline-secondary w-100" style="font-weight: 600; font-size: 13px; padding: 10px; border-radius: 6px;">Clear</button>
+                    </div>
                 </div>
             </div>
+        </div>
+
+        <!-- RESULTS TAB STRIP: links to the other results pages; Broadsheet / Result Insight switch the in-page tabs below -->
+        <div class="sd-tab-strip mb-3" role="navigation" aria-label="Results pages">
+            <a href="teacher_make_report.html" class="sd-tab-strip-item"><i class="fas fa-edit me-1"></i> Make Report</a>
+            <button type="button" class="sd-tab-strip-item active" data-bs-toggle="tab" data-bs-target="#pane-broadsheet"><i class="fas fa-table me-1"></i> Broadsheet</button>
+            <a href="admin_report_cards.html" class="sd-tab-strip-item"><i class="fas fa-print me-1"></i> Bulk Print</a>
+            <a href="teacher_comments.html" class="sd-tab-strip-item"><i class="fas fa-comment me-1"></i> Term Comments</a>
+            <button type="button" class="sd-tab-strip-item" data-bs-toggle="tab" data-bs-target="#pane-insight"><i class="fas fa-chart-bar me-1"></i> Result Insight</button>
         </div>
 
         <!-- TABS -->
@@ -149,9 +173,12 @@
                             <table class="table table-hover align-middle m-0 sv-table" id="broadsheetTable">
                                 <thead id="broadsheetThead"></thead>
                                 <tbody id="broadsheetTbody">
-                                    <tr><td class="text-center py-5 text-muted" style="font-size:13px;">Select filters and click Load View.</td></tr>
+                                    <tr><td colspan="20"><div class="empty-state"><i class="fas fa-table"></i><strong>No results loaded yet.</strong><br>Select Session, Term, Sub-Term and Class above, then click Load View.</div></td></tr>
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="table-footer">
+                            <span id="broadsheetFooterInfo">Showing 0 of 0 students</span>
                         </div>
                     </div>
                     <div class="p-3 d-flex justify-content-between align-items-center flex-wrap gap-2" style="background: white;">
@@ -205,7 +232,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="cumulativeTbody">
-                                    <tr><td colspan="7" class="text-center py-5 text-muted" style="font-size:13px;">Select filters and click Load View.</td></tr>
+                                    <tr><td colspan="7"><div class="empty-state"><i class="fas fa-layer-group"></i><strong>No cumulative averages loaded yet.</strong><br>Select Session, Term, Sub-Term and Class above, then click Load View.</div></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -365,6 +392,8 @@
             const className = $('filterClass').options[$('filterClass').selectedIndex].text;
             $('broadsheetTitle').innerHTML = `<i data-lucide="table" style="width:16px; height:16px;"></i> Broadsheet — ${R.escapeHtml(className)} (${R.escapeHtml(sel.term)}, ${R.escapeHtml(sel.subTerm)})`;
             lucide.createIcons();
+            $('bannerCount').textContent = currentStudents.length + (currentStudents.length === 1 ? ' student' : ' students');
+            $('broadsheetFooterInfo').textContent = `Showing ${currentStudents.length} of ${currentStudents.length} students`;
 
             const positions = R.assignPositions(currentSummary.map(s => ({ key: String(s.student.id), average: s.average })));
             currentSummary.forEach(s => { s.position = positions[String(s.student.id)]; });
@@ -375,7 +404,7 @@
             $('broadsheetThead').innerHTML = head;
 
             if (currentStudents.length === 0) {
-                $('broadsheetTbody').innerHTML = '<tr><td colspan="20" class="text-center py-5 text-muted" style="font-size:13px;">No approved students in this class.</td></tr>';
+                $('broadsheetTbody').innerHTML = '<tr><td colspan="20"><div class="empty-state"><i class="fas fa-users"></i><strong>No approved students in this class.</strong><br>Enrol and approve students for this class first, then load the view again.</div></td></tr>';
                 return;
             }
             $('broadsheetTbody').innerHTML = currentSummary.map((s, i) => {
@@ -476,7 +505,7 @@
                     const fmt = (a) => R.formatAverage(a, sel.subTerm);
                     const name = `${s.first_name || ''} ${s.surname || ''}`.trim() || 'Unnamed Student';
                     return `<tr><td>${i + 1}</td><td class="student-cell">${R.escapeHtml(name)}</td><td>${fmt(avgs[0])}</td><td>${fmt(avgs[1])}</td><td>${fmt(avgs[2])}</td><td class="fw-bold">${fmt(two)}</td><td class="fw-bold" style="color:#007a4d;">${fmt(three)}</td></tr>`;
-                }).join('') || '<tr><td colspan="7" class="text-center py-4 text-muted">No students in this class.</td></tr>';
+                }).join('') || '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-users"></i><strong>No students in this class.</strong><br>Enrol and approve students for this class first, then load the view again.</div></td></tr>';
             } catch (err) {
                 console.error(err);
                 tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-danger">Failed to load cumulative averages: ' + R.escapeHtml(err.message) + '</td></tr>';
@@ -502,7 +531,54 @@
             R.downloadCsv(`broadsheet-${className}-${sel.term}-${sel.subTerm}.csv`, R.toCsv(headers, rows));
         }
 
+        // Clear resets the filters and returns every tab to its unloaded empty state (no data is changed).
+        function clearFilters() {
+            $('filterSession').selectedIndex = 0;
+            $('filterTerm').selectedIndex = 0;
+            $('filterSubTerm').selectedIndex = 0;
+            $('filterClass').selectedIndex = 0;
+            $('filterStatus').value = 'all';
+            currentRows = [];
+            currentStudents = [];
+            currentSubjects = [];
+            currentSummary = [];
+            $('broadsheetThead').innerHTML = '';
+            $('broadsheetTbody').innerHTML = '<tr><td colspan="20"><div class="empty-state"><i class="fas fa-table"></i><strong>No results loaded yet.</strong><br>Select Session, Term, Sub-Term and Class above, then click Load View.</div></td></tr>';
+            $('broadsheetTitle').innerHTML = '<i data-lucide="table" style="width:16px; height:16px;"></i> Broadsheet';
+            $('cumulativeTbody').innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-layer-group"></i><strong>No cumulative averages loaded yet.</strong><br>Select Session, Term, Sub-Term and Class above, then click Load View.</div></td></tr>';
+            $('topBottomBox').innerHTML = '<span class="text-muted" style="font-size:13px;">Load a view to see rankings.</span>';
+            if (subjectChart) { subjectChart.destroy(); subjectChart = null; }
+            if (gradeChart) { gradeChart.destroy(); gradeChart = null; }
+            $('bannerCount').textContent = '…';
+            $('broadsheetFooterInfo').textContent = 'Showing 0 of 0 students';
+            $('exportBtn').disabled = true;
+            document.getElementById('tab-broadsheet').click();
+            lucide.createIcons();
+        }
+
+        // The strip's tab buttons switch the in-page tabs by clicking the matching
+        // inner tab button (the proven path — Bootstrap's data-API does not fire
+        // reliably for these buttons outside the tab list; verified on preview).
+        document.querySelectorAll('.sd-tab-strip [data-bs-target]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const inner = document.querySelector(`#viewTabs [data-bs-target="${btn.getAttribute('data-bs-target')}"]`);
+                if (inner) inner.click();
+            });
+        });
+
+        // Keep the tab strip and the in-page tabs in sync: both lists show the same active tab.
+        document.addEventListener('shown.bs.tab', (e) => {
+            const target = e.target.getAttribute('data-bs-target');
+            document.querySelectorAll('.sd-tab-strip [data-bs-target]').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-bs-target') === target);
+            });
+            document.querySelectorAll('#viewTabs .nav-link').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-bs-target') === target);
+            });
+        });
+
         $('loadBtn').addEventListener('click', loadView);
+        $('clearBtn').addEventListener('click', clearFilters);
         $('exportBtn').addEventListener('click', exportCsv);
         $('logoutBtn').addEventListener('click', async (e) => {
             e.preventDefault();
