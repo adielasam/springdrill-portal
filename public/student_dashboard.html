@@ -10,7 +10,7 @@
         :root { --bg-color: #f4f7fa; --card-bg: #ffffff; --text-color: #333333; --text-muted: #6c757d; --border-color: #e9ecef; --input-bg: #f8f9fa; --utme-green: #007a4d;}
         body.dark-mode { --bg-color: #121212; --card-bg: #1e1e1e; --text-color: #e0e0e0; --text-muted: #a0a0a0; --border-color: #333333; --input-bg: #2c2c2c; }
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
-        
+
         .sidebar { width: 260px; position: fixed; top: 0; left: 0; height: 100vh; background: #004d34; color: white; padding-top: 30px; z-index: 1050; transition: transform 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.1);}
         .sidebar-brand { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
         .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; margin: 2px 10px; border-radius: 5px; transition: all 0.3s; display: flex; align-items: center; font-size: 0.95rem; text-decoration: none;}
@@ -18,38 +18,56 @@
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.15); color: white; font-weight: bold; border-left: 4px solid #f1c40f;}
 
         .main-content { margin-left: 260px; padding: 20px 40px; min-height: 100vh; transition: margin-left 0.3s ease; }
-        
+
         .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; }
         .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
 
-        .welcome-banner { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; border-radius: 10px; padding: 30px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);}
-        .welcome-banner h2 { font-weight: 800; margin-bottom: 5px;}
-        .welcome-banner p { margin: 0; opacity: 0.9; font-size: 1.1rem;}
-        .welcome-icon { font-size: 5rem; opacity: 0.3; }
+        /* Educare-style profile header: passport photo, name, class */
+        .profile-header { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 30px 20px 24px; margin-bottom: 24px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .profile-photo { width: 110px; height: 110px; border-radius: 50%; overflow: hidden; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; background: #e9ecef; border: 4px solid #004d34; box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+        .profile-photo img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-header h2 { font-weight: 800; margin-bottom: 4px; font-size: 1.5rem; text-transform: uppercase; }
+        .profile-header .profile-class { font-weight: 700; color: var(--text-muted); font-size: 1rem; margin-bottom: 6px; }
+        .profile-header .profile-welcome { margin: 0; opacity: 0.85; font-size: 0.95rem; color: var(--text-muted); }
+
+        /* Tab strip: Overview / Results / Reports / Messages (real pages) */
+        .sd-tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--border-color); margin-bottom: 24px; overflow-x: auto; }
+        .sd-tabs a { padding: 10px 18px; font-weight: 700; font-size: 0.95rem; color: var(--text-muted); text-decoration: none; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; }
+        .sd-tabs a:hover { color: var(--text-color); }
+        .sd-tabs a.active { color: #007a4d; border-bottom-color: #007a4d; }
 
         .section-title { font-weight: 800; font-size: 1.2rem; margin-bottom: 20px; color: var(--text-color); }
 
-        .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 40px; }
-        
-        .action-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 30px 20px; text-align: center; text-decoration: none; color: var(--text-color); transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 180px; position: relative;}
-        .action-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); color: inherit; }
-        
-        .action-card i { font-size: 2.5rem; margin-bottom: 15px; }
-        .action-card h5 { font-weight: 700; margin-bottom: 10px; color: var(--text-color);}
-        .action-card p { font-size: 0.9rem; color: var(--text-muted); margin: 0;}
+        /* Educare-style icon row: large solid circles with labels beneath */
+        .icon-row { display: flex; flex-wrap: wrap; gap: 28px 24px; margin-bottom: 40px; }
+        .sd-icon-item { display: flex; flex-direction: column; align-items: center; width: 128px; text-decoration: none; color: var(--text-color); position: relative; }
+        .sd-icon-item:hover { color: var(--text-color); }
+        .sd-icon-circle { width: 104px; height: 104px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 2.4rem; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.3s, box-shadow 0.3s; }
+        .sd-icon-item:hover .sd-icon-circle { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .sd-icon-label { font-weight: 700; font-size: 0.92rem; text-align: center; line-height: 1.3; }
+        .sd-icon-sub { font-size: 0.78rem; color: var(--text-muted); text-align: center; line-height: 1.3; }
+        .icon-sim { background: #27ae60; }
+        .icon-cbt { background: #3498db; }
+        .icon-notes { background: #2980b9; }
+        .icon-class { background: #e74c3c; }
+        .icon-results { background: #f39c12; }
+        .icon-reports { background: #c0392b; }
+        .icon-msg { background: #7f8c8d; }
+        .icon-hub { background: #9b59b6; }
+        .sd-new-badge { position: absolute; top: -2px; right: 6px; z-index: 2; }
 
-        /* The original Green Border for Simulator */
-        .card-ai-sim { border: 2px solid #2ecc71; background: rgba(46, 204, 113, 0.02); }
-        .card-ai-sim i { color: #2ecc71; }
-        .card-ai-sim h5 { color: #27ae60; }
+        /* Upcoming exams (right column) */
+        .schedules-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .schedules-card .card-header { background: transparent; border-bottom: 1px solid var(--border-color); font-weight: 800; font-size: 1.05rem; padding: 16px 20px; color: var(--text-color); }
+        .schedule-item { padding: 14px 20px; border-bottom: 1px solid var(--border-color); }
+        .schedule-item:last-child { border-bottom: none; }
+        .schedule-item .sched-title { font-weight: 700; font-size: 0.92rem; color: var(--text-color); }
+        .schedule-item .sched-meta { font-size: 0.82rem; color: var(--text-muted); }
 
-        /* Icon Colors */
-        .card-cbt i { color: #3498db; }
-        .card-notes i { color: #2980b9; }
-        .card-class i { color: #e74c3c; }
-        .card-results i { color: #f1c40f; }
-        .card-msg i { color: #95a5a6; }
-        .card-real-hub i { color: #9b59b6; }
+        /* Profile dropdown (top-right): My Profile + Log Out. No My Roles on student. */
+        .profile-menu-btn { display: flex; align-items: center; gap: 8px; background: none; border: none; padding: 4px 6px; border-radius: 8px; cursor: pointer; color: var(--text-color); }
+        .profile-menu-btn:hover { background: var(--input-bg); }
+        .profile-menu-btn .menu-avatar { width: 35px; height: 35px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #e9ecef; }
 
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.3s; }
 
@@ -58,7 +76,9 @@
             .sidebar.mobile-open { transform: translateX(0); }
             .main-content { margin-left: 0; padding: 15px; }
             .mobile-menu-toggle { display: inline-block !important; }
-            .welcome-icon { display: none; }
+            .icon-row { gap: 20px 16px; }
+            .sd-icon-item { width: 104px; }
+            .sd-icon-circle { width: 88px; height: 88px; font-size: 2rem; }
         }
         .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
         .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
@@ -129,24 +149,21 @@
             <h5 class="text-white fw-bold m-0"><img src="dorvas-logo.png" alt="Dorvas" style="max-height: 40px; margin-right: 10px;" /></h5>
             <button class="btn btn-sm btn-link text-white d-lg-none" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
         </div>
-        
+
         <nav class="nav flex-column mt-3">
             <a href="student_dashboard.html" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
             <a href="student_subjects.html" class="nav-link"><i class="fas fa-book"></i> My Subjects & Notes</a>
             <a href="student_eclassroom.html" class="nav-link"><i class="fas fa-video text-danger"></i> Live eClassroom</a>
             <a href="student_cbt.html" class="nav-link"><i class="fas fa-laptop-code text-info"></i> Take CBT Exam</a>
-            
+
             <a href="student_utme.html" class="nav-link"><i class="fas fa-university text-success"></i> UTME Simulator</a>
-            
+
             <a href="student_results.html" class="nav-link"><i class="fas fa-chart-line text-warning"></i> My Results</a>
             <a href="student_report_card.html" class="nav-link"><i class="fas fa-file-pdf text-danger"></i> Term Reports</a>
             <a href="student_messages.html" class="nav-link"><i class="fas fa-envelope"></i> Messages</a>
 
             <hr class="mx-3 my-2 border-secondary">
             <a href="student_utme_hub.html" class="nav-link fw-bold text-warning"><i class="fas fa-rocket"></i> Real UTME Hub (New)</a>
-
-            <hr class="mx-3 my-4 border-secondary">
-            <a href="#" id="logoutBtn" class="nav-link text-danger mt-auto"><i class="fas fa-power-off"></i> Secure Logout</a>
         </nav>
     </div>
 
@@ -159,82 +176,139 @@
                 <button class="dark-toggle-btn me-3" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark Mode">
                     <i class="fas fa-moon" id="themeIcon"></i>
                 </button>
-                <div class="fw-bold d-flex align-items-center" style="color: var(--text-color);">
-                    <div id="navAvatar" class="me-2" style="width: 35px; height: 35px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #e9ecef;">
-                        <i class="fas fa-user-circle fs-4 text-primary"></i>
-                    </div>
-                    <span id="navTopName">Loading...</span>
+                <div class="dropdown">
+                    <button class="profile-menu-btn fw-bold" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span id="navAvatar" class="menu-avatar">
+                            <i class="fas fa-user-circle fs-4 text-primary"></i>
+                        </span>
+                        <span id="navTopName">Loading...</span>
+                        <i class="fas fa-chevron-down ms-1" style="font-size: 0.7rem; color: var(--text-muted);"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#profileModal"><i class="fas fa-user me-2"></i> My Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="fas fa-power-off me-2"></i> Log Out</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
 
-        <div class="welcome-banner">
-            <div>
-                <h2>Welcome back, <span id="navStudentName">Student</span>!</h2>
-                <p>Keep up the great work and prepare for your upcoming exams.</p>
+        <div class="profile-header">
+            <div class="profile-photo" id="profilePhoto">
+                <i class="fas fa-user-circle fs-1 text-primary"></i>
             </div>
-            <i class="fas fa-book-reader welcome-icon"></i>
+            <h2 id="profileName">Student</h2>
+            <div class="profile-class" id="profileClass">Loading...</div>
+            <p class="profile-welcome">Keep up the great work and prepare for your upcoming exams.</p>
         </div>
 
-        <h4 class="section-title">Learning Actions</h4>
-        
-        <div class="action-grid">
-            
-            <a href="student_utme" class="action-card card-ai-sim">
-                <i class="fas fa-university"></i>
-                <h5>JAMB / UTME Simulator</h5>
-                <p>Practice past questions under real exam conditions.</p>
-            </a>
-
-            <a href="student_cbt" class="action-card card-cbt">
-                <i class="fas fa-laptop-code"></i>
-                <h5>School CBT Exams</h5>
-                <p>Take your termly or continuous assessments.</p>
-            </a>
-
-            <a href="student_subjects" class="action-card card-notes">
-                <i class="fas fa-book"></i>
-                <h5>Subject Notes</h5>
-                <p>Download schemes of work and lesson materials.</p>
-            </a>
-
-            <a href="student_eclassroom" class="action-card card-class">
-                <i class="fas fa-video"></i>
-                <h5>Live eClassroom</h5>
-                <p>Join virtual video classes with your teachers.</p>
-            </a>
-
-            <a href="student_results" class="action-card card-results">
-                <i class="fas fa-chart-line"></i>
-                <h5>Performance Results</h5>
-                <p>Check your grades and track your academic growth.</p>
-            </a>
-            
-            <a href="student_report_card" class="action-card" style="border: 2px solid #e74c3c;">
-                <i class="fas fa-file-pdf" style="color: #e74c3c;"></i>
-                <h5 style="color: #c0392b;">Term Reports</h5>
-                <p>View approved end-of-term report cards and Principal remarks.</p>
-            </a>
-
-            <a href="student_messages" class="action-card card-msg">
-                <i class="fas fa-envelope"></i>
-                <h5>Messages</h5>
-                <p>Communicate securely with school administration.</p>
-            </a>
-            
-            <a href="student_utme_hub" class="action-card card-real-hub border-warning">
-                <span class="badge bg-danger position-absolute top-0 end-0 m-3 shadow">NEW APP</span>
-                <i class="fas fa-rocket text-warning"></i>
-                <h5 class="text-warning">Real UTME Hub</h5>
-                <p>Take exams using authentic questions uploaded by teachers.</p>
-            </a>
-
+        <div class="sd-tabs">
+            <a href="student_dashboard.html" class="active">Overview</a>
+            <a href="student_results.html">Results</a>
+            <a href="student_report_card.html">Reports</a>
+            <a href="student_messages.html">Messages</a>
         </div>
 
-        <h4 class="section-title mt-5">Teacher Announcements</h4>
-        <div id="postsFeed" class="row">
-            <div class="col-12">
-                <div class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Loading announcements...</div>
+        <div class="row">
+            <div class="col-lg-8">
+                <h4 class="section-title">Learning Actions</h4>
+
+                <div class="icon-row">
+                    <a href="student_utme" class="sd-icon-item">
+                        <span class="sd-icon-circle icon-sim"><i class="fas fa-university"></i></span>
+                        <span class="sd-icon-label">JAMB / UTME Simulator</span>
+                        <span class="sd-icon-sub">Practice past questions under real exam conditions.</span>
+                    </a>
+
+                    <a href="student_cbt" class="sd-icon-item">
+                        <span class="sd-icon-circle icon-cbt"><i class="fas fa-laptop-code"></i></span>
+                        <span class="sd-icon-label">School CBT Exams</span>
+                        <span class="sd-icon-sub">Take your termly or continuous assessments.</span>
+                    </a>
+
+                    <a href="student_subjects" class="sd-icon-item">
+                        <span class="sd-icon-circle icon-notes"><i class="fas fa-book"></i></span>
+                        <span class="sd-icon-label">Subject Notes</span>
+                        <span class="sd-icon-sub">Download schemes of work and lesson materials.</span>
+                    </a>
+
+                    <a href="student_eclassroom" class="sd-icon-item">
+                        <span class="sd-icon-circle icon-class"><i class="fas fa-video"></i></span>
+                        <span class="sd-icon-label">Live eClassroom</span>
+                        <span class="sd-icon-sub">Join virtual video classes with your teachers.</span>
+                    </a>
+
+                    <a href="student_results" class="sd-icon-item">
+                        <span class="sd-icon-circle icon-results"><i class="fas fa-chart-line"></i></span>
+                        <span class="sd-icon-label">Performance Results</span>
+                        <span class="sd-icon-sub">Check your grades and track your academic growth.</span>
+                    </a>
+
+                    <a href="student_report_card" class="sd-icon-item">
+                        <span class="sd-icon-circle icon-reports"><i class="fas fa-file-pdf"></i></span>
+                        <span class="sd-icon-label">Term Reports</span>
+                        <span class="sd-icon-sub">View approved end-of-term report cards and Principal remarks.</span>
+                    </a>
+
+                    <a href="student_messages" class="sd-icon-item">
+                        <span class="sd-icon-circle icon-msg"><i class="fas fa-envelope"></i></span>
+                        <span class="sd-icon-label">Messages</span>
+                        <span class="sd-icon-sub">Communicate securely with school administration.</span>
+                    </a>
+
+                    <a href="student_utme_hub" class="sd-icon-item">
+                        <span class="badge bg-danger sd-new-badge">NEW APP</span>
+                        <span class="sd-icon-circle icon-hub"><i class="fas fa-rocket"></i></span>
+                        <span class="sd-icon-label text-warning">Real UTME Hub</span>
+                        <span class="sd-icon-sub">Take exams using authentic questions uploaded by teachers.</span>
+                    </a>
+                </div>
+
+                <h4 class="section-title mt-5">Teacher Announcements</h4>
+                <div id="postsFeed" class="row">
+                    <div class="col-12">
+                        <div class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Loading announcements...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="schedules-card">
+                    <div class="card-header"><i class="far fa-calendar-alt me-2"></i>Upcoming Exams</div>
+                    <div id="schedulesList">
+                        <div class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Loading exams...</div>
+                    </div>
+                    <div class="p-3 border-top text-center">
+                        <a href="student_cbt.html" class="btn btn-sm btn-success">Open Take CBT Exam</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Profile modal: real record only, no invented fields -->
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background: var(--card-bg); color: var(--text-color);">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">My Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="profile-photo" id="modalPhoto" style="width: 90px; height: 90px;">
+                        <i class="fas fa-user-circle fs-1 text-primary"></i>
+                    </div>
+                    <h5 class="fw-bold" id="modalName">Student</h5>
+                    <div class="text-muted mb-3" id="modalClass">Loading...</div>
+                    <table class="table table-sm text-start" style="color: var(--text-color);">
+                        <tbody>
+                            <tr><th style="width: 40%;">Full name</th><td id="modalFullName">—</td></tr>
+                            <tr><th>Class</th><td id="modalClassRow">—</td></tr>
+                            <tr><th>Reg. number</th><td id="modalRegNo">—</td></tr>
+                            <tr><th>Email</th><td id="modalEmail">—</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -244,7 +318,7 @@
         import { supabase } from './supabaseClient.js';
 
         window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('mobile-open'); document.getElementById('sidebarOverlay').style.display = document.getElementById('sidebarOverlay').style.display === 'block' ? 'none' : 'block'; };
-        
+
         window.toggleTheme = () => {
             const body = document.body; body.classList.toggle('dark-mode');
             const isDark = body.classList.contains('dark-mode');
@@ -253,55 +327,146 @@
         };
         if (localStorage.getItem('SPRINGDRILL_THEME') === 'dark') window.toggleTheme();
 
+        function avatarHtml(name, avatarUrl, size) {
+            if (avatarUrl) return `<img src="${avatarUrl}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            const initials = (name || 'SD').substring(0, 2).toUpperCase();
+            return `<div style="width:100%; height:100%; background: #004d34; color: white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:${size || 14}px;">${initials}</div>`;
+        }
+
         async function initializeDashboard() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = '/';
 
                 const { data: profile } = await supabase.from('users').select('name, avatar_url').eq('id', session.user.id).single();
-                
-                if (profile) {
-                    const firstName = profile.name.split(' ')[0];
-                    document.getElementById('navStudentName').innerText = firstName;
-                    document.getElementById('navTopName').innerText = firstName;
-                    
-                    const avatarContainer = document.getElementById('navAvatar');
-                    if(avatarContainer) {
-                        const avatarHtml = profile.avatar_url 
-                            ? `<img src="${profile.avatar_url}" style="width: 100%; height: 100%; object-fit: cover;">` 
-                            : `<div style="width:100%; height:100%; background: #004d34; color: white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:14px;">${profile.name.substring(0,2).toUpperCase()}</div>`;
-                        avatarContainer.innerHTML = avatarHtml;
+
+                let className = null;
+                let regNo = null;
+                let studentRow = null;
+                const { data: student } = await supabase.from('students').select('class_id, reg_number, first_name, surname').eq('user_id', session.user.id).single();
+                if (student) {
+                    studentRow = student;
+                    regNo = student.reg_number || null;
+                    if (student.class_id) {
+                        // Separate plain query + JS join: no FK assumption (see AGENTS.md lessons).
+                        const { data: classes } = await supabase.from('classes').select('id, name');
+                        const cls = (classes || []).find(c => c.id === student.class_id);
+                        if (cls) className = cls.name;
                     }
                 }
 
+                if (profile) {
+                    const firstName = (profile.name || 'Student').split(' ')[0];
+                    document.getElementById('navTopName').innerText = firstName;
+                    document.getElementById('profileName').innerText = profile.name || 'Student';
+                    const classLine = className ? className.toUpperCase() + (regNo ? '  •  ' + regNo : '') : (regNo || 'Not assigned to a class yet');
+                    document.getElementById('profileClass').innerText = classLine;
+
+                    const navAvatar = document.getElementById('navAvatar');
+                    if (navAvatar) navAvatar.innerHTML = avatarHtml(profile.name, profile.avatar_url, 14);
+                    const photo = document.getElementById('profilePhoto');
+                    if (photo) photo.innerHTML = avatarHtml(profile.name, profile.avatar_url, 34);
+                    const modalPhoto = document.getElementById('modalPhoto');
+                    if (modalPhoto) modalPhoto.innerHTML = avatarHtml(profile.name, profile.avatar_url, 28);
+
+                    document.getElementById('modalName').innerText = profile.name || 'Student';
+                    document.getElementById('modalClass').innerText = classLine;
+                    document.getElementById('modalFullName').innerText = profile.name || '—';
+                    document.getElementById('modalClassRow').innerText = className || 'Not assigned';
+                    document.getElementById('modalRegNo').innerText = regNo || '—';
+                    document.getElementById('modalEmail').innerText = session.user.email || '—';
+                }
+
                 document.getElementById('loadingOverlay').style.display = 'none';
-                loadPosts(session.user.id);
-                
+                loadPosts(session.user.id, studentRow);
+                loadUpcomingExams(session.user.id, studentRow);
+
             } catch (err) {
                 console.error(err);
                 document.getElementById('loadingOverlay').style.display = 'none';
             }
         }
-        
-        async function loadPosts(userId) {
+
+        async function loadUpcomingExams(userId, studentRow) {
+            const list = document.getElementById('schedulesList');
+            try {
+                if (!studentRow || !studentRow.class_id) {
+                    list.innerHTML = '<div class="text-center py-4 text-muted">You are not assigned to a class yet.</div>';
+                    return;
+                }
+                // Same published + assignment rules as student_cbt.html.
+                const { data: rawTests } = await supabase
+                    .from('tests')
+                    .select('*, subjects(name)')
+                    .eq('is_published', true)
+                    .eq('class_id', studentRow.class_id)
+                    .order('created_at', { ascending: false });
+                let allowed = rawTests || [];
+                if (rawTests && rawTests.length > 0) {
+                    const rawTestIds = rawTests.map(t => t.id);
+                    const { data: allAssignments, error: assignErr } = await supabase
+                        .from('test_students')
+                        .select('test_id, student_id')
+                        .in('test_id', rawTestIds);
+                    if (!assignErr && allAssignments) {
+                        allowed = rawTests.filter(t => {
+                            const testAssignments = allAssignments.filter(a => a.test_id === t.id);
+                            if (testAssignments.length === 0) return true;
+                            return testAssignments.some(a => a.student_id === userId);
+                        });
+                    }
+                }
+                // Only exams with questions mapped, like student_cbt.html.
+                const stats = {};
+                if (allowed.length > 0) {
+                    const testIds = allowed.map(t => t.id);
+                    const { data: testQs } = await supabase.from('test_questions').select('test_id, questions(marks)').in('test_id', testIds);
+                    if (testQs) {
+                        testQs.forEach(tq => {
+                            if (!stats[tq.test_id]) stats[tq.test_id] = { count: 0, marks: 0 };
+                            stats[tq.test_id].count += 1;
+                            stats[tq.test_id].marks += (tq.questions?.marks || 1);
+                        });
+                    }
+                }
+                const valid = allowed.filter(t => stats[t.id] && stats[t.id].count > 0).slice(0, 5);
+                if (valid.length === 0) {
+                    list.innerHTML = '<div class="text-center py-4 text-muted">No exams scheduled for your class at this time.</div>';
+                    return;
+                }
+                list.innerHTML = valid.map(t => {
+                    const s = stats[t.id] || { count: 0, marks: 0 };
+                    const dur = t.duration_minutes || t.duration || 30;
+                    return `<div class="schedule-item">
+                        <div class="sched-title">${t.title}</div>
+                        <div class="sched-meta">${t.subjects?.name || 'General'} &nbsp;•&nbsp; ${dur} min &nbsp;•&nbsp; ${s.count} question${s.count === 1 ? '' : 's'} &nbsp;•&nbsp; ${s.marks} marks</div>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                console.error('Error loading upcoming exams:', e);
+                list.innerHTML = '<div class="text-center py-4 text-danger">Could not load exams.</div>';
+            }
+        }
+
+        async function loadPosts(userId, studentRow) {
             const feed = document.getElementById('postsFeed');
             try {
                 // 1. Get student's class
-                const { data: student } = await supabase.from('students').select('class_id').eq('user_id', userId).single();
+                const student = studentRow || (await supabase.from('students').select('class_id').eq('user_id', userId).single()).data;
                 if (!student || !student.class_id) {
                     feed.innerHTML = '<div class="col-12 text-center text-muted py-4">You are not assigned to a class yet.</div>';
                     return;
                 }
-                
+
                 // 2. Get teachers for this class
                 const { data: assignments } = await supabase.from('teacher_class_subjects').select('teacher_id').eq('class_id', student.class_id);
                 if (!assignments || assignments.length === 0) {
                     feed.innerHTML = '<div class="col-12 text-center text-muted py-4">No teachers assigned to your class yet.</div>';
                     return;
                 }
-                
+
                 const teacherIds = [...new Set(assignments.map(a => a.teacher_id))];
-                
+
                 // 3. Get posts
                 const { data: posts, error } = await supabase
                     .from('teacher_posts')
@@ -309,30 +474,30 @@
                     .in('teacher_id', teacherIds)
                     .order('created_at', { ascending: false })
                     .limit(20);
-                    
+
                 if (error) throw error;
-                
+
                 if (!posts || posts.length === 0) {
                     feed.innerHTML = '<div class="col-12 text-center text-muted py-4">No announcements from your teachers yet.</div>';
                     return;
                 }
-                
+
                 let html = '';
                 posts.forEach(post => {
                     const date = new Date(post.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
                     const teacherName = post.teacher?.name || 'Unknown Teacher';
                     const avatarUrl = post.teacher?.avatar_url;
-                    
-                    const avatarHtml = avatarUrl 
-                        ? `<img src="${avatarUrl}" style="width: 100%; height: 100%; object-fit: cover;">` 
+
+                    const avatarHtml = avatarUrl
+                        ? `<img src="${avatarUrl}" style="width: 100%; height: 100%; object-fit: cover;">`
                         : `<div style="width:100%; height:100%; background: #004d34; color: white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:14px;">${teacherName.substring(0,2).toUpperCase()}</div>`;
-                    
+
                     const formattedContent = post.content.replace(/\n/g, '<br>');
-                    
-                    const imageHtml = post.image_url 
-                        ? `<div class="mt-3"><img src="${post.image_url}" class="img-fluid rounded border" style="max-height: 400px; width: auto;"></div>` 
+
+                    const imageHtml = post.image_url
+                        ? `<div class="mt-3"><img src="${post.image_url}" class="img-fluid rounded border" style="max-height: 400px; width: auto;"></div>`
                         : '';
-                        
+
                     html += `
                         <div class="col-md-6 col-lg-4 mb-4">
                             <div class="card h-100 border-0 shadow-sm" style="background: var(--card-bg);">
@@ -355,7 +520,7 @@
                         </div>
                     `;
                 });
-                
+
                 feed.innerHTML = html;
             } catch(e) {
                 console.error('Error loading posts:', e);
@@ -363,7 +528,7 @@
             }
         }
 
-        
+
         const logoutBtn = document.getElementById('logoutBtn');
         if(logoutBtn) {
             logoutBtn.addEventListener('click', async (e) => {
@@ -374,7 +539,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', initializeDashboard);
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/'; });
     </script>
     <script src="mobile_nav.js"></script>
     <script type="module" src="return_to_admin.js"></script>
