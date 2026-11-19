@@ -244,6 +244,7 @@
                     </div>
                     <ul class="profile-menu">
                         <li><a onclick="impersonateTeacher()"><i data-lucide="log-in"></i> Login As Teacher</a></li>
+                        <li><a onclick="toggleAdminRole()"><i data-lucide="shield"></i> <span id="adminRoleMenuLabel">Make Admin</span></a></li>
                         <li><a onclick="alert('Access Pin: 2308')"><i data-lucide="key"></i> Access Pin</a></li>
                         <li><a onclick="openEditModal()"><i data-lucide="edit-3"></i> Edit Info</a></li>
                         <li><a onclick="alert('Messaging system coming soon.')"><i data-lucide="message-square"></i> Message</a></li>
@@ -546,10 +547,12 @@
             document.getElementById('viewClasses').innerHTML = classHtml;
             
             const isActive = currentTeacher.is_active !== false;
-            document.getElementById('deactivateBtnText').innerHTML = isActive 
+            document.getElementById('deactivateBtnText').innerHTML = isActive
                 ? '<i data-lucide="power"></i> Deactivate Account?'
                 : '<i data-lucide="power"></i> Activate Account?';
-            
+
+            refreshAdminRoleLabel();
+
             document.getElementById('viewModalOverlay').classList.add('active');
             lucide.createIcons();
         }
@@ -689,6 +692,69 @@
 
         window.closeViewModal = function() {
             document.getElementById('viewModalOverlay').classList.remove('active');
+        }
+
+        // Grant / remove the extra Admin role for this teacher (PR #41).
+        // The role lives in user_roles; users.role stays 'teacher', so the
+        // teacher keeps every teacher feature and gains the switcher.
+        window.toggleAdminRole = async function() {
+            const errEl = document.getElementById('impersonateErrorMsg');
+            const showNote = (msg, ok) => {
+                if (errEl) { errEl.textContent = msg; errEl.style.display = 'block'; errEl.style.color = ok ? '#059669' : '#b91c1c'; }
+            };
+            if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+            if (!currentTeacher || !currentTeacher.id) {
+                showNote('Could not identify this teacher account.');
+                return;
+            }
+            const teacherName = currentTeacher.name || currentTeacher.email || 'this teacher';
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    showNote('Your admin session has ended. Please sign in again.');
+                    return;
+                }
+                const { data: rows, error: readErr } = await supabase
+                    .from('user_roles').select('id, role')
+                    .eq('user_id', currentTeacher.id).eq('role', 'admin');
+                if (readErr) {
+                    showNote('Could not read roles — run the user_roles migration first (see PR #41), then try again.');
+                    return;
+                }
+                const hasAdmin = rows && rows.length > 0;
+                const ok = await window.sdConfirm({
+                    title: hasAdmin ? 'Remove Admin role?' : 'Make Admin?',
+                    message: hasAdmin
+                        ? teacherName + ' will lose the Admin role and will only be able to use the Teacher dashboard.'
+                        : teacherName + ' will be able to switch between the Teacher and Admin dashboards from the profile menu.',
+                    confirmLabel: hasAdmin ? 'Remove' : 'Make Admin',
+                    cancelLabel: 'Cancel'
+                });
+                if (!ok) return;
+                if (hasAdmin) {
+                    const { error } = await supabase.from('user_roles').delete().eq('user_id', currentTeacher.id).eq('role', 'admin');
+                    if (error) { showNote('Could not remove the Admin role: ' + (error.message || 'Unknown error')); return; }
+                    showNote('Admin role removed from ' + teacherName + '.', true);
+                } else {
+                    const { error } = await supabase.from('user_roles').insert([{ user_id: currentTeacher.id, role: 'admin' }]);
+                    if (error) { showNote('Could not grant the Admin role: ' + (error.message || 'Unknown error')); return; }
+                    showNote(teacherName + ' can now switch between Teacher and Admin.', true);
+                }
+                refreshAdminRoleLabel();
+            } catch (e) {
+                showNote('Error reaching the server. Please try again.');
+                console.error(e);
+            }
+        };
+
+        async function refreshAdminRoleLabel() {
+            const label = document.getElementById('adminRoleMenuLabel');
+            if (!label || !currentTeacher || !currentTeacher.id) return;
+            label.textContent = 'Make Admin';
+            try {
+                const { data, error } = await supabase.from('user_roles').select('id').eq('user_id', currentTeacher.id).eq('role', 'admin');
+                if (!error && data && data.length > 0) label.textContent = 'Remove Admin role';
+            } catch (e) { /* user_roles missing: leave the default label */ }
         }
 
         window.closeEditModal = function() {
