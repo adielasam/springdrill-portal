@@ -38,14 +38,15 @@
 
         .section-title { font-weight: 800; font-size: 1.2rem; margin-bottom: 20px; color: var(--text-color); }
 
-        /* Educare-style icon row: large solid circles with labels beneath */
-        .icon-row { display: flex; flex-wrap: wrap; gap: 28px 24px; margin-bottom: 40px; }
-        .sd-icon-item { display: flex; flex-direction: column; align-items: center; width: 128px; text-decoration: none; color: var(--text-color); position: relative; }
+        /* Educare-style icon row: large solid circles with labels beneath.
+           No sub-text under the labels (Educare shows icon + label only).
+           Even 4-column grid so the 8 icons sit 4 + 4, aligned. */
+        .icon-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px 24px; margin-bottom: 40px; }
+        .sd-icon-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: var(--text-color); position: relative; }
         .sd-icon-item:hover { color: var(--text-color); }
         .sd-icon-circle { width: 104px; height: 104px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 2.4rem; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.3s, box-shadow 0.3s; }
         .sd-icon-item:hover .sd-icon-circle { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
         .sd-icon-label { font-weight: 700; font-size: 0.92rem; text-align: center; line-height: 1.3; }
-        .sd-icon-sub { font-size: 0.78rem; color: var(--text-muted); text-align: center; line-height: 1.3; }
         .icon-sim { background: #27ae60; }
         .icon-cbt { background: #3498db; }
         .icon-notes { background: #2980b9; }
@@ -76,8 +77,7 @@
             .sidebar.mobile-open { transform: translateX(0); }
             .main-content { margin-left: 0; padding: 15px; }
             .mobile-menu-toggle { display: inline-block !important; }
-            .icon-row { gap: 20px 16px; }
-            .sd-icon-item { width: 104px; }
+            .icon-row { grid-template-columns: repeat(2, 1fr); gap: 20px 16px; }
             .sd-icon-circle { width: 88px; height: 88px; font-size: 2rem; }
         }
         .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
@@ -217,50 +217,42 @@
                     <a href="student_utme" class="sd-icon-item">
                         <span class="sd-icon-circle icon-sim"><i class="fas fa-university"></i></span>
                         <span class="sd-icon-label">JAMB / UTME Simulator</span>
-                        <span class="sd-icon-sub">Practice past questions under real exam conditions.</span>
                     </a>
 
                     <a href="student_cbt" class="sd-icon-item">
                         <span class="sd-icon-circle icon-cbt"><i class="fas fa-laptop-code"></i></span>
                         <span class="sd-icon-label">School CBT Exams</span>
-                        <span class="sd-icon-sub">Take your termly or continuous assessments.</span>
                     </a>
 
                     <a href="student_subjects" class="sd-icon-item">
                         <span class="sd-icon-circle icon-notes"><i class="fas fa-book"></i></span>
                         <span class="sd-icon-label">Subject Notes</span>
-                        <span class="sd-icon-sub">Download schemes of work and lesson materials.</span>
                     </a>
 
                     <a href="student_eclassroom" class="sd-icon-item">
                         <span class="sd-icon-circle icon-class"><i class="fas fa-video"></i></span>
                         <span class="sd-icon-label">Live eClassroom</span>
-                        <span class="sd-icon-sub">Join virtual video classes with your teachers.</span>
                     </a>
 
                     <a href="student_results" class="sd-icon-item">
                         <span class="sd-icon-circle icon-results"><i class="fas fa-chart-line"></i></span>
                         <span class="sd-icon-label">Performance Results</span>
-                        <span class="sd-icon-sub">Check your grades and track your academic growth.</span>
                     </a>
 
                     <a href="student_report_card" class="sd-icon-item">
                         <span class="sd-icon-circle icon-reports"><i class="fas fa-file-pdf"></i></span>
                         <span class="sd-icon-label">Term Reports</span>
-                        <span class="sd-icon-sub">View approved end-of-term report cards and Principal remarks.</span>
                     </a>
 
                     <a href="student_messages" class="sd-icon-item">
                         <span class="sd-icon-circle icon-msg"><i class="fas fa-envelope"></i></span>
                         <span class="sd-icon-label">Messages</span>
-                        <span class="sd-icon-sub">Communicate securely with school administration.</span>
                     </a>
 
                     <a href="student_utme_hub" class="sd-icon-item">
                         <span class="badge bg-danger sd-new-badge">NEW APP</span>
                         <span class="sd-icon-circle icon-hub"><i class="fas fa-rocket"></i></span>
                         <span class="sd-icon-label text-warning">Real UTME Hub</span>
-                        <span class="sd-icon-sub">Take exams using authentic questions uploaded by teachers.</span>
                     </a>
                 </div>
 
@@ -343,7 +335,7 @@
                 let className = null;
                 let regNo = null;
                 let studentRow = null;
-                const { data: student } = await supabase.from('students').select('class_id, reg_number, first_name, surname').eq('user_id', session.user.id).single();
+                const { data: student } = await supabase.from('students').select('class_id, reg_number, first_name, surname, passport_url').eq('user_id', session.user.id).single();
                 if (student) {
                     studentRow = student;
                     regNo = student.reg_number || null;
@@ -362,12 +354,18 @@
                     const classLine = className ? className.toUpperCase() + (regNo ? '  •  ' + regNo : '') : (regNo || 'Not assigned to a class yet');
                     document.getElementById('profileClass').innerText = classLine;
 
+                    // Profile photo: the uploaded passport photo first
+                    // (students.passport_url — where every upload saves it),
+                    // then users.avatar_url, then initials. The dashboard used
+                    // to read avatar_url only, so an uploaded passport photo
+                    // never appeared here (PR #42).
+                    const photoUrl = (studentRow && studentRow.passport_url) || profile.avatar_url || null;
                     const navAvatar = document.getElementById('navAvatar');
-                    if (navAvatar) navAvatar.innerHTML = avatarHtml(profile.name, profile.avatar_url, 14);
+                    if (navAvatar) navAvatar.innerHTML = avatarHtml(profile.name, photoUrl, 14);
                     const photo = document.getElementById('profilePhoto');
-                    if (photo) photo.innerHTML = avatarHtml(profile.name, profile.avatar_url, 34);
+                    if (photo) photo.innerHTML = avatarHtml(profile.name, photoUrl, 34);
                     const modalPhoto = document.getElementById('modalPhoto');
-                    if (modalPhoto) modalPhoto.innerHTML = avatarHtml(profile.name, profile.avatar_url, 28);
+                    if (modalPhoto) modalPhoto.innerHTML = avatarHtml(profile.name, photoUrl, 28);
 
                     document.getElementById('modalName').innerText = profile.name || 'Student';
                     document.getElementById('modalClass').innerText = classLine;
