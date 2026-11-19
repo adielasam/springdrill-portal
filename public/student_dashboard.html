@@ -22,13 +22,16 @@
         .top-navbar { background: var(--card-bg); padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; }
         .dark-toggle-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
 
-        /* Educare-style profile header: passport photo, name, class */
-        .profile-header { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 30px 20px 24px; margin-bottom: 24px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-        .profile-photo { width: 110px; height: 110px; border-radius: 50%; overflow: hidden; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; background: #e9ecef; border: 4px solid #004d34; box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+        /* Educare-style hero: passport photo + name on the LEFT, icons in a
+           card on the RIGHT, one section — as on the Educare dashboard. */
+        .sd-hero { display: flex; gap: 24px; align-items: stretch; margin-bottom: 24px; }
+        .sd-hero-profile { flex: 0 0 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 16px 8px; }
+        .profile-photo { width: 180px; height: 180px; border-radius: 50%; overflow: hidden; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; background: #e9ecef; border: 4px solid #004d34; box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
         .profile-photo img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-header h2 { font-weight: 800; margin-bottom: 4px; font-size: 1.5rem; text-transform: uppercase; }
-        .profile-header .profile-class { font-weight: 700; color: var(--text-muted); font-size: 1rem; margin-bottom: 6px; }
-        .profile-header .profile-welcome { margin: 0; opacity: 0.85; font-size: 0.95rem; color: var(--text-muted); }
+        .sd-hero-profile h2 { font-weight: 800; margin-bottom: 4px; font-size: 1.5rem; text-transform: uppercase; }
+        .sd-hero-profile .profile-class { font-weight: 700; color: var(--text-muted); font-size: 1rem; margin-bottom: 6px; }
+        .sd-hero-profile .profile-welcome { margin: 0; opacity: 0.85; font-size: 0.95rem; color: var(--text-muted); }
+        .sd-hero-icons { flex: 1; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; align-items: center; padding: 24px 16px; }
 
         /* Tab strip: Overview / Results / Reports / Messages (real pages) */
         .sd-tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--border-color); margin-bottom: 24px; overflow-x: auto; }
@@ -40,8 +43,8 @@
 
         /* Educare-style icon row: large solid circles with labels beneath.
            No sub-text under the labels (Educare shows icon + label only).
-           Even 4-column grid so the 8 icons sit 4 + 4, aligned. */
-        .icon-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px 24px; margin-bottom: 40px; }
+           All 8 in one row inside the hero card on desktop. */
+        .icon-row { display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; width: 100%; margin-bottom: 0; }
         .sd-icon-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: var(--text-color); position: relative; }
         .sd-icon-item:hover { color: var(--text-color); }
         .sd-icon-circle { width: 104px; height: 104px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 2.4rem; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.3s, box-shadow 0.3s; }
@@ -77,8 +80,14 @@
             .sidebar.mobile-open { transform: translateX(0); }
             .main-content { margin-left: 0; padding: 15px; }
             .mobile-menu-toggle { display: inline-block !important; }
-            .icon-row { grid-template-columns: repeat(2, 1fr); gap: 20px 16px; }
+            .sd-hero { flex-direction: column; gap: 16px; }
+            .sd-hero-profile { flex: none; width: 100%; }
+            .icon-row { grid-template-columns: repeat(4, 1fr); gap: 20px 16px; }
             .sd-icon-circle { width: 88px; height: 88px; font-size: 2rem; }
+        }
+        @media (max-width: 576px) {
+            .profile-photo { width: 150px; height: 150px; }
+            .icon-row { grid-template-columns: repeat(2, 1fr); }
         }
         .mobile-menu-toggle { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
         .sidebar-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
@@ -193,26 +202,16 @@
             </div>
         </div>
 
-        <div class="profile-header">
-            <div class="profile-photo" id="profilePhoto">
-                <i class="fas fa-user-circle fs-1 text-primary"></i>
+        <div class="sd-hero">
+            <div class="sd-hero-profile">
+                <div class="profile-photo" id="profilePhoto">
+                    <i class="fas fa-user-circle fs-1 text-primary"></i>
+                </div>
+                <h2 id="profileName">Student</h2>
+                <div class="profile-class" id="profileClass">Loading...</div>
+                <p class="profile-welcome">Keep up the great work and prepare for your upcoming exams.</p>
             </div>
-            <h2 id="profileName">Student</h2>
-            <div class="profile-class" id="profileClass">Loading...</div>
-            <p class="profile-welcome">Keep up the great work and prepare for your upcoming exams.</p>
-        </div>
-
-        <div class="sd-tabs">
-            <a href="student_dashboard.html" class="active">Overview</a>
-            <a href="student_results.html">Results</a>
-            <a href="student_report_card.html">Reports</a>
-            <a href="student_messages.html">Messages</a>
-        </div>
-
-        <div class="row">
-            <div class="col-lg-8">
-                <h4 class="section-title">Learning Actions</h4>
-
+            <div class="sd-hero-icons">
                 <div class="icon-row">
                     <a href="student_utme" class="sd-icon-item">
                         <span class="sd-icon-circle icon-sim"><i class="fas fa-university"></i></span>
@@ -255,7 +254,18 @@
                         <span class="sd-icon-label text-warning">Real UTME Hub</span>
                     </a>
                 </div>
+            </div>
+        </div>
 
+        <div class="sd-tabs">
+            <a href="student_dashboard.html" class="active">Overview</a>
+            <a href="student_results.html">Results</a>
+            <a href="student_report_card.html">Reports</a>
+            <a href="student_messages.html">Messages</a>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
                 <h4 class="section-title mt-5">Teacher Announcements</h4>
                 <div id="postsFeed" class="row">
                     <div class="col-12">
@@ -363,7 +373,7 @@
                     const navAvatar = document.getElementById('navAvatar');
                     if (navAvatar) navAvatar.innerHTML = avatarHtml(profile.name, photoUrl, 14);
                     const photo = document.getElementById('profilePhoto');
-                    if (photo) photo.innerHTML = avatarHtml(profile.name, photoUrl, 34);
+                    if (photo) photo.innerHTML = avatarHtml(profile.name, photoUrl, 56);
                     const modalPhoto = document.getElementById('modalPhoto');
                     if (modalPhoto) modalPhoto.innerHTML = avatarHtml(profile.name, photoUrl, 28);
 
