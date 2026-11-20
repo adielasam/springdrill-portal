@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vendor dashboard — SpringDrill</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --brand-600: #059669; --brand-dark: #004d34; --brand-100: #d1fae5; }
+        body { background: #f9fafb; font-family: 'Inter', sans-serif; color: #111827; }
+        .sd-topbar { background: #fff; border-bottom: 1px solid #e5e7eb; }
+        .sd-brand { font-weight: 800; font-size: 20px; letter-spacing: -.5px; color: var(--brand-600); margin: 0; }
+        .sd-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; }
+        .btn-brand { background: var(--brand-600); border-color: var(--brand-600); color: #fff; font-weight: 600; }
+        .btn-brand:hover { background: #047857; border-color: #047857; color: #fff; }
+        .badge-status { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-active { background: var(--brand-100); color: var(--brand-dark); }
+        .badge-paused { background: #fee2e2; color: #991b1b; }
+        .badge-expired { background: #e0e7ff; color: #3730a3; }
+        .badge-declined { background: #f3f4f6; color: #4b5563; }
+        .school-row { cursor: pointer; }
+        .school-row:hover { background: #f9fafb; }
+        .school-row.selected { background: #ecfdf5; }
+        .form-label { font-weight: 600; font-size: 13px; }
+        .form-control, .form-select { font-size: 14px; }
+        .code-big { font-size: 28px; font-weight: 800; letter-spacing: 2px; color: var(--brand-dark); }
+    </style>
+</head>
+<body>
+    <header class="sd-topbar">
+        <div class="container-fluid d-flex align-items-center justify-content-between py-3 px-4">
+            <div class="d-flex align-items-center gap-3">
+                <p class="sd-brand">SpringDrill</p>
+                <span class="badge bg-dark" style="font-size: 12px;">VENDOR</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <a href="/admin_dashboard.html" class="text-muted text-decoration-none" style="font-size: 13px;">Spring Valley admin</a>
+                <a href="/" class="text-muted text-decoration-none" style="font-size: 13px;">Portal home</a>
+                <span id="vendorName" class="fw-semibold" style="font-size: 14px;"></span>
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="logoutBtn">Log out</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container-fluid px-4 py-4" style="max-width: 1100px;">
+        <h1 class="h4 fw-bold mb-1">Schools</h1>
+        <p class="text-muted" style="font-size: 14px;">Approve new schools, send their setup codes, and pause or resume them. Only partner schools are listed here — SpringDrill's own Nursery, Primary and High sections are managed under Subjects, as before.</p>
+
+        <div id="pageError" class="alert alert-danger" style="display:none; font-size: 14px;"></div>
+        <div id="pageOk" class="alert alert-success" style="display:none; font-size: 14px;"></div>
+
+        <div class="row g-3 mb-4" id="statsRow">
+            <div class="col-6 col-md-3"><div class="sd-card text-center"><div class="h4 fw-bold mb-0" id="statPending">0</div><div class="text-muted" style="font-size: 13px;">Waiting approval</div></div></div>
+            <div class="col-6 col-md-3"><div class="sd-card text-center"><div class="h4 fw-bold mb-0" id="statActive">0</div><div class="text-muted" style="font-size: 13px;">Active</div></div></div>
+            <div class="col-6 col-md-3"><div class="sd-card text-center"><div class="h4 fw-bold mb-0" id="statPaused">0</div><div class="text-muted" style="font-size: 13px;">Paused</div></div></div>
+            <div class="col-6 col-md-3"><div class="sd-card text-center"><div class="h4 fw-bold mb-0" id="statTotal">0</div><div class="text-muted" style="font-size: 13px;">Partner schools</div></div></div>
+        </div>
+
+        <div id="approveResult" class="sd-card mb-4" style="display:none; border-color: var(--brand-600);">
+            <h2 class="h6 fw-bold">School approved — send these details to the school</h2>
+            <p class="text-muted mb-2" style="font-size: 14px;">Send this by email or WhatsApp to the school's contact person. The temporary password is shown once — it cannot be recovered from here.</p>
+            <div class="mb-1"><span class="text-muted" style="font-size: 13px;">School address</span><br><strong id="approveUrl"></strong></div>
+            <div class="mb-1"><span class="text-muted" style="font-size: 13px;">Setup code</span><br><span class="code-big" id="approveCode"></span></div>
+            <div class="mb-1"><span class="text-muted" style="font-size: 13px;">Admin login</span><br><strong id="approveEmail"></strong></div>
+            <div class="mb-3"><span class="text-muted" style="font-size: 13px;">Temporary password</span><br><strong id="approvePassword" class="code-big" style="font-size: 20px;"></strong></div>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-brand btn-sm" id="copyApproveBtn">Copy details to send</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="dismissApproveBtn">Done</button>
+            </div>
+            <p id="copyNote" class="text-success mt-2 mb-0" style="display:none; font-size: 13px;">Copied.</p>
+        </div>
+
+        <div class="sd-card mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h6 fw-bold mb-0">Waiting for approval</h2>
+                <input class="form-control form-control-sm" id="searchBox" type="search" placeholder="Search schools..." style="max-width: 220px;">
+            </div>
+            <div id="approvalsList"></div>
+        </div>
+
+        <div class="sd-card mb-4">
+            <h2 class="h6 fw-bold mb-3">All partner schools</h2>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" style="font-size: 14px;">
+                    <thead><tr><th>School</th><th>Status</th><th>Contact</th><th>Students</th><th>Expires</th><th></th></tr></thead>
+                    <tbody id="schoolsTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="detailPanel" class="sd-card mb-4" style="display:none;">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h2 class="h6 fw-bold mb-0" id="detailName"></h2>
+                    <p class="text-muted mb-0" style="font-size: 13px;" id="detailSlug"></p>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="closeDetailBtn">Close</button>
+            </div>
+            <hr>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <h3 class="h6 fw-bold">Setup code</h3>
+                    <p class="text-muted" style="font-size: 13px;">The school's first admin enters this once to unlock setup. The code stops working after it is used, and it expires 14 days after approval.</p>
+                    <p class="mb-2"><span class="code-big" id="detailCode" style="font-size: 22px;">—</span></p>
+                    <div class="d-flex gap-2 mb-4">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="copyCodeBtn">Copy code</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="regenCodeBtn">Generate a fresh code</button>
+                    </div>
+                    <h3 class="h6 fw-bold">Plan &amp; expiry</h3>
+                    <div class="mb-2">
+                        <label class="form-label" for="planInput">Plan</label>
+                        <input class="form-control" id="planInput" type="text" placeholder="e.g. yearly">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label" for="expiryInput">Membership expires</label>
+                        <input class="form-control" id="expiryInput" type="date">
+                        <div class="form-text">Leave empty for no expiry date (set once pricing is decided).</div>
+                    </div>
+                    <button type="button" class="btn btn-brand btn-sm" id="savePlanBtn">Save plan &amp; expiry</button>
+                    <div class="mt-4">
+                        <h3 class="h6 fw-bold">Membership</h3>
+                        <button type="button" class="btn btn-danger btn-sm" id="pauseBtn">Pause school</button>
+                        <button type="button" class="btn btn-brand btn-sm" id="resumeBtn" style="display:none;">Resume school</button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h3 class="h6 fw-bold">School admins</h3>
+                    <div id="adminsList" class="mb-3" style="font-size: 14px;"></div>
+                    <h3 class="h6 fw-bold">Create an admin login</h3>
+                    <p class="text-muted" style="font-size: 13px;">Use this to create Spring Valley's own school-admin login, or an extra admin for any school. The login belongs to this school only.</p>
+                    <div class="mb-2"><label class="form-label" for="newAdminName">Full name</label><input class="form-control" id="newAdminName" type="text"></div>
+                    <div class="mb-2"><label class="form-label" for="newAdminEmail">Email</label><input class="form-control" id="newAdminEmail" type="email"></div>
+                    <div class="mb-2"><label class="form-label" for="newAdminPassword">Temporary password (min 8 characters)</label><input class="form-control" id="newAdminPassword" type="text" autocomplete="off"></div>
+                    <button type="button" class="btn btn-brand btn-sm" id="createAdminBtn">Create admin login</button>
+                    <p id="createAdminNote" class="text-success mt-2 mb-0" style="display:none; font-size: 13px;"></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="sd-confirm.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        const errEl = document.getElementById('pageError');
+        const okEl = document.getElementById('pageOk');
+        let session = null;
+        let schools = [];
+        let selectedId = null;
+
+        function showError(msg) {
+            errEl.textContent = msg;
+            errEl.style.display = 'block';
+            errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        function showOk(msg) {
+            okEl.textContent = msg;
+            okEl.style.display = 'block';
+            setTimeout(() => { okEl.style.display = 'none'; }, 6000);
+        }
+        function hideAlerts() { errEl.style.display = 'none'; okEl.style.display = 'none'; }
+
+        function isVendor(profile) {
+            if (!profile) return false;
+            if (profile.role === 'vendor') return true;
+            // Pre-migration owner: admin with no school yet.
+            if (profile.role === 'admin' && (profile.school_id === null || profile.school_id === undefined)) return true;
+            return false;
+        }
+        function roleDashboard(role) {
+            if (role === 'admin') return '/admin_dashboard.html';
+            if (role === 'teacher') return '/teacher_dashboard.html';
+            if (role === 'student') return '/student_dashboard.html';
+            return '/';
+        }
+        function statusBadge(status) {
+            const map = { pending: 'badge-pending', active: 'badge-active', paused: 'badge-paused', expired: 'badge-expired', declined: 'badge-declined' };
+            const cls = map[status] || 'badge-declined';
+            return '<span class="badge-status ' + cls + '">' + (status || 'section') + '</span>';
+        }
+        function esc(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+        function fmtDate(iso) {
+            if (!iso) return '—';
+            const d = new Date(iso);
+            return isNaN(d.getTime()) ? '—' : d.toLocaleDateString();
+        }
+
+        async function api(path, body) {
+            const res = await fetch(path, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+                body: JSON.stringify(body),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.error || 'Request failed.');
+            return data;
+        }
+
+        async function loadSchools() {
+            const { data, error } = await supabase.from('schools').select('*').order('created_at', { ascending: false });
+            if (error) throw new Error('Could not load schools: ' + error.message);
+            // Partner schools only: the 3 legacy sections have no status.
+            schools = (data || []).filter((s) => s.status !== null && s.status !== undefined);
+            document.getElementById('statPending').textContent = schools.filter((s) => s.status === 'pending').length;
+            document.getElementById('statActive').textContent = schools.filter((s) => s.status === 'active').length;
+            document.getElementById('statPaused').textContent = schools.filter((s) => s.status === 'paused').length;
+            document.getElementById('statTotal').textContent = schools.length;
+            renderApprovals();
+            await renderTable();
+        }
+
+        function renderApprovals() {
+            const box = document.getElementById('approvalsList');
+            const pending = schools.filter((s) => s.status === 'pending');
+            if (!pending.length) {
+                box.innerHTML = '<p class="text-muted mb-0" style="font-size: 14px;">No schools waiting for approval.</p>';
+                return;
+            }
+            box.innerHTML = pending.map((s) => `
+                <div class="border rounded p-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                        <div>
+                            <strong>${esc(s.name)}</strong> <span class="text-muted" style="font-size: 13px;">(${esc(s.slug || 'no address yet')})</span><br>
+                            <span style="font-size: 13px;">${esc(s.contact_name || '')} — ${esc(s.contact_email || '')} — ${esc(s.contact_phone || '')}</span><br>
+                            <span class="text-muted" style="font-size: 13px;">${esc(s.town || s.address || '')}${s.students_count ? ' · about ' + s.students_count + ' students' : ''}${s.wants ? ' · wants: ' + esc(s.wants) : ''}</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-brand btn-sm" data-approve="${s.id}">Approve</button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" data-decline="${s.id}">Decline</button>
+                        </div>
+                    </div>
+                </div>`).join('');
+            box.querySelectorAll('[data-approve]').forEach((btn) => {
+                btn.addEventListener('click', () => approveSchool(Number(btn.getAttribute('data-approve')), btn));
+            });
+            box.querySelectorAll('[data-decline]').forEach((btn) => {
+                btn.addEventListener('click', () => declineSchool(Number(btn.getAttribute('data-decline')), btn));
+            });
+        }
+
+        async function renderTable() {
+            const q = (document.getElementById('searchBox').value || '').trim().toLowerCase();
+            const tbody = document.getElementById('schoolsTable');
+            const rows = schools.filter((s) => {
+                if (!q) return true;
+                return [s.name, s.slug, s.contact_name, s.contact_email].some((v) => String(v || '').toLowerCase().includes(q));
+            });
+            if (!rows.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-muted">No partner schools yet.</td></tr>';
+                return;
+            }
+            const counts = {};
+            for (const s of rows) {
+                try {
+                    const { count } = await supabase.from('students').select('id', { count: 'exact', head: true }).eq('school_id', s.id);
+                    counts[s.id] = count == null ? 0 : count;
+                } catch (e) { counts[s.id] = '—'; }
+            }
+            tbody.innerHTML = rows.map((s) => `
+                <tr class="school-row ${selectedId === s.id ? 'selected' : ''}" data-school="${s.id}">
+                    <td><strong>${esc(s.name)}</strong><br><span class="text-muted" style="font-size: 12px;">/${esc(s.slug || '')}</span></td>
+                    <td>${statusBadge(s.status)}</td>
+                    <td style="font-size: 13px;">${esc(s.contact_name || '')}<br><span class="text-muted">${esc(s.contact_email || '')}</span></td>
+                    <td>${counts[s.id]}</td>
+                    <td>${fmtDate(s.expires_at)}</td>
+                    <td><button type="button" class="btn btn-outline-secondary btn-sm" data-view="${s.id}">View</button></td>
+                </tr>`).join('');
+            tbody.querySelectorAll('[data-view]').forEach((btn) => {
+                btn.addEventListener('click', (e) => { e.stopPropagation(); selectSchool(Number(btn.getAttribute('data-view'))); });
+            });
+            tbody.querySelectorAll('tr.school-row').forEach((tr) => {
+                tr.addEventListener('click', () => selectSchool(Number(tr.getAttribute('data-school'))));
+            });
+        }
+
+        function selectedSchool() { return schools.find((s) => s.id === selectedId) || null; }
+
+        async function selectSchool(id) {
+            selectedId = id;
+            const s = selectedSchool();
+            if (!s) return;
+            document.getElementById('detailPanel').style.display = 'block';
+            document.getElementById('detailName').textContent = s.name;
+            document.getElementById('detailSlug').textContent = '/' + (s.slug || '') + ' · ' + (s.status || '');
+            document.getElementById('detailCode').textContent = s.setup_code || '—';
+            document.getElementById('planInput').value = s.plan || '';
+            document.getElementById('expiryInput').value = s.expires_at ? new Date(s.expires_at).toISOString().slice(0, 10) : '';
+            document.getElementById('regenCodeBtn').style.display = (!s.setup_completed && s.status === 'active') ? '' : 'none';
+            document.getElementById('pauseBtn').style.display = s.status === 'paused' ? 'none' : '';
+            document.getElementById('resumeBtn').style.display = s.status === 'paused' ? '' : 'none';
+            document.getElementById('createAdminNote').style.display = 'none';
+            const { data: admins } = await supabase.from('users').select('name, email').eq('school_id', s.id).eq('role', 'admin').order('name');
+            const list = document.getElementById('adminsList');
+            if (!admins || !admins.length) {
+                list.innerHTML = '<p class="text-muted mb-0">No admin logins yet for this school.</p>';
+            } else {
+                list.innerHTML = '<ul class="mb-0 ps-3">' + admins.map((a) => '<li>' + esc(a.name || '') + ' — ' + esc(a.email || '') + '</li>').join('') + '</ul>';
+            }
+            await renderTable();
+            document.getElementById('detailPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        async function approveSchool(id, btn) {
+            const s = schools.find((x) => x.id === id);
+            if (!s) return;
+            const ok = await window.sdConfirm({
+                title: 'Approve this school?',
+                message: 'This creates the school\u2019s workspace, a one-time setup code, and a first admin login for ' + (s.contact_email || 'the contact person') + '. Send the code and the temporary password to the school afterwards.',
+                confirmLabel: 'Approve school',
+            });
+            if (!ok) return;
+            hideAlerts();
+            btn.disabled = true;
+            btn.textContent = 'Approving...';
+            try {
+                const data = await api('/api/vendor/approve-school', { school_id: id });
+                document.getElementById('approveUrl').textContent = data.url;
+                document.getElementById('approveCode').textContent = data.setup_code;
+                document.getElementById('approveEmail').textContent = data.admin_email;
+                document.getElementById('approvePassword').textContent = data.temp_password;
+                document.getElementById('copyNote').style.display = 'none';
+                document.getElementById('approveResult').style.display = 'block';
+                document.getElementById('approveResult').dataset.message =
+                    'SpringDrill — your school is approved!\nSchool address: ' + data.url +
+                    '\nSetup code: ' + data.setup_code +
+                    '\nAdmin login: ' + data.admin_email +
+                    '\nTemporary password: ' + data.temp_password +
+                    '\nLog in and enter the setup code once to complete your setup.';
+                showOk(s.name + ' approved.');
+                await loadSchools();
+            } catch (err) {
+                showError(err.message || 'Approval failed.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Approve';
+            }
+        }
+
+        async function declineSchool(id, btn) {
+            const s = schools.find((x) => x.id === id);
+            if (!s) return;
+            const ok = await window.sdConfirm({
+                title: 'Decline this school?',
+                message: 'This marks ' + s.name + ' as declined. Nothing else happens.',
+                confirmLabel: 'Decline',
+                danger: true,
+            });
+            if (!ok) return;
+            hideAlerts();
+            const { error } = await supabase.from('schools').update({ status: 'declined' }).eq('id', id);
+            if (error) { showError('Could not decline: ' + error.message); return; }
+            showOk(s.name + ' declined.');
+            await loadSchools();
+        }
+
+        function setupCodeFor(slug) {
+            const letters = (slug || '').replace(/[^a-z]/gi, '').slice(0, 3).toUpperCase() || 'SCH';
+            return letters + '-' + (1000 + Math.floor(Math.random() * 9000));
+        }
+
+        document.getElementById('copyApproveBtn').addEventListener('click', async () => {
+            const text = document.getElementById('approveResult').dataset.message || '';
+            try { await navigator.clipboard.writeText(text); } catch (e) {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                try { document.execCommand('copy'); } catch (e2) { /* user copies by hand */ }
+                ta.remove();
+            }
+            document.getElementById('copyNote').style.display = 'block';
+        });
+        document.getElementById('dismissApproveBtn').addEventListener('click', () => {
+            document.getElementById('approveResult').style.display = 'none';
+        });
+        document.getElementById('searchBox').addEventListener('input', () => renderTable());
+        document.getElementById('closeDetailBtn').addEventListener('click', () => {
+            selectedId = null;
+            document.getElementById('detailPanel').style.display = 'none';
+            renderTable();
+        });
+        document.getElementById('copyCodeBtn').addEventListener('click', async () => {
+            const code = document.getElementById('detailCode').textContent;
+            if (!code || code === '—') return;
+            try { await navigator.clipboard.writeText(code); showOk('Setup code copied.'); } catch (e) { showError('Copy failed — select the code and copy it by hand.'); }
+        });
+        document.getElementById('regenCodeBtn').addEventListener('click', async () => {
+            const s = selectedSchool();
+            if (!s) return;
+            const ok = await window.sdConfirm({
+                title: 'Generate a fresh setup code?',
+                message: 'The old code stops working. Only do this if the school lost its code or the code expired (codes last 14 days).',
+                confirmLabel: 'Generate fresh code',
+            });
+            if (!ok) return;
+            hideAlerts();
+            let code = setupCodeFor(s.slug);
+            for (let attempt = 0; attempt < 5; attempt++) {
+                const { data } = await supabase.from('schools').select('id').eq('setup_code', code).limit(1);
+                if (!data || !data.length) break;
+                code = setupCodeFor(s.slug);
+            }
+            const { error } = await supabase.from('schools').update({ setup_code: code }).eq('id', s.id);
+            if (error) { showError('Could not generate a code: ' + error.message); return; }
+            showOk('Fresh setup code: ' + code);
+            await loadSchools();
+            selectSchool(s.id);
+        });
+        document.getElementById('savePlanBtn').addEventListener('click', async () => {
+            const s = selectedSchool();
+            if (!s) return;
+            hideAlerts();
+            const plan = document.getElementById('planInput').value.trim() || null;
+            const expiryRaw = document.getElementById('expiryInput').value;
+            const expiresAt = expiryRaw ? new Date(expiryRaw + 'T00:00:00').toISOString() : null;
+            const { error } = await supabase.from('schools').update({ plan, expires_at: expiresAt }).eq('id', s.id);
+            if (error) { showError('Could not save: ' + error.message); return; }
+            showOk('Plan and expiry saved for ' + s.name + '.');
+            await loadSchools();
+            selectSchool(s.id);
+        });
+        document.getElementById('pauseBtn').addEventListener('click', async () => {
+            const s = selectedSchool();
+            if (!s) return;
+            const extra = s.slug === 'spring-valley'
+                ? ' This is Spring Valley School — pausing it locks out its admins, teachers and students too.'
+                : '';
+            const ok = await window.sdConfirm({
+                title: 'Pause this school?',
+                message: 'Nobody from ' + s.name + ' will be able to sign in until you resume it. Nothing is deleted.' + extra,
+                confirmLabel: 'Pause school',
+                danger: true,
+            });
+            if (!ok) return;
+            hideAlerts();
+            const { error } = await supabase.from('schools').update({ status: 'paused' }).eq('id', s.id);
+            if (error) { showError('Could not pause: ' + error.message); return; }
+            showOk(s.name + ' paused.');
+            await loadSchools();
+            selectSchool(s.id);
+        });
+        document.getElementById('resumeBtn').addEventListener('click', async () => {
+            const s = selectedSchool();
+            if (!s) return;
+            const ok = await window.sdConfirm({
+                title: 'Resume this school?',
+                message: s.name + ' will be able to sign in again straight away.',
+                confirmLabel: 'Resume school',
+            });
+            if (!ok) return;
+            hideAlerts();
+            const { error } = await supabase.from('schools').update({ status: 'active' }).eq('id', s.id);
+            if (error) { showError('Could not resume: ' + error.message); return; }
+            showOk(s.name + ' resumed.');
+            await loadSchools();
+            selectSchool(s.id);
+        });
+        document.getElementById('createAdminBtn').addEventListener('click', async () => {
+            const s = selectedSchool();
+            if (!s) return;
+            hideAlerts();
+            const name = document.getElementById('newAdminName').value.trim();
+            const email = document.getElementById('newAdminEmail').value.trim();
+            const password = document.getElementById('newAdminPassword').value;
+            if (!name || !email || password.length < 8) {
+                showError('Fill in the name, a valid email, and a password of at least 8 characters.');
+                return;
+            }
+            const btn = document.getElementById('createAdminBtn');
+            btn.disabled = true;
+            btn.textContent = 'Creating...';
+            try {
+                const data = await api('/api/school/create-user', { school_id: s.id, name, email, password, role: 'admin' });
+                document.getElementById('createAdminNote').textContent = 'Admin login created for ' + data.email + '. Share the password with them.';
+                document.getElementById('createAdminNote').style.display = 'block';
+                document.getElementById('newAdminName').value = '';
+                document.getElementById('newAdminEmail').value = '';
+                document.getElementById('newAdminPassword').value = '';
+                await selectSchool(s.id);
+            } catch (err) {
+                showError(err.message || 'Could not create the admin login.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Create admin login';
+            }
+        });
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = '/';
+        });
+
+        // Gate: vendor only (role 'vendor', or the pre-migration owner:
+        // admin with no school yet). Anyone else goes to their own page.
+        try {
+            const { data: { session: sess } } = await supabase.auth.getSession();
+            if (!sess) { window.location.href = '/'; }
+            else {
+                session = sess;
+                const { data: profile } = await supabase.from('users').select('*').eq('id', sess.user.id).single();
+                if (!profile || !isVendor(profile)) {
+                    window.location.href = profile ? roleDashboard(profile.role) : '/';
+                } else {
+                    document.getElementById('vendorName').textContent = profile.name || '';
+                    await loadSchools();
+                }
+            }
+        } catch (err) {
+            showError('Could not load the vendor dashboard: ' + (err.message || err));
+        }
+    </script>
+</body>
+</html>

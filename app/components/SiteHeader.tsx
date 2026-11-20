@@ -49,6 +49,7 @@ export function SiteHeader({ variant, onNavClick }: { variant: 'home' | 'contact
               <a key={link.label} href={link.href} onClick={link.anchor ? anchorClick(link.anchor) : undefined}>{link.label}</a>
             ))}
             <a href="/contact" className={isContact ? 'sd-active' : undefined} aria-current={isContact ? 'page' : undefined}>Contact</a>
+            <a href="/school_signup.html">Register your school</a>
             <a href={isHome ? '#signin' : '/#signin'} className="sd-btn" onClick={isHome ? anchorClick('#signin') : undefined}>Portal sign-in</a>
           </nav>
           <button type="button" className="sd-menu-btn" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} aria-controls="sd-mobile-menu" onClick={() => setMenuOpen(!menuOpen)}>
@@ -67,6 +68,7 @@ export function SiteHeader({ variant, onNavClick }: { variant: 'home' | 'contact
             <a key={link.label} href={link.href} onClick={anchorClick(link.anchor)}>{link.label}</a>
           ))}
           <a href="/contact" className={isContact ? 'sd-active' : undefined} aria-current={isContact ? 'page' : undefined} onClick={() => setMenuOpen(false)}>Contact</a>
+          <a href="/school_signup.html" onClick={() => setMenuOpen(false)}>Register your school</a>
           <a href={isHome ? '#signin' : '/#signin'} className="sd-btn" onClick={anchorClick(isHome ? '#signin' : null)}>Portal sign-in</a>
         </div>
       )}

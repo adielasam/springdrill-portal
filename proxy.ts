@@ -60,6 +60,34 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  // School path addresses (Phase 1, LIVE): each partner school gets a path
+  // address on the current domain, e.g. /giftedhands — no custom domain,
+  // no wildcard subdomains, no extra cost. The request is REWRITTEN (not
+  // redirected) to /school.html?slug=<slug>, so the school keeps its clean
+  // address in the browser bar. Only a single path segment with no dot is
+  // treated as a slug, and reserved words (real routes and files) are never
+  // rewritten. The subdomain block above is the Phase 3 switch and is
+  // untouched.
+  const RESERVED_SLUGS = new Set([
+    'admin_dashboard.html', 'teacher_dashboard.html', 'student_dashboard.html',
+    'admin_create_user.html', 'vendor_dashboard.html', 'school_setup.html',
+    'school_signup.html', 'school.html', 'school_paused.html',
+    'contact', 'jamb-practice', 'tools', 'high', 'api', 'sitemap.xml', 'robots.txt',
+  ]);
+  const pathParts = request.nextUrl.pathname.split('/').filter(Boolean);
+  if (pathParts.length === 1) {
+    const seg = pathParts[0].toLowerCase();
+    const isSlug = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(seg)
+      && !seg.includes('.')
+      && !RESERVED_SLUGS.has(seg);
+    if (isSlug) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/school.html';
+      url.searchParams.set('slug', seg);
+      return NextResponse.rewrite(url);
+    }
+  }
+
   return supabaseResponse
 }
 
