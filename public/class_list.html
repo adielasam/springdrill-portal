@@ -121,7 +121,7 @@
                 <div class="filter-row">
                     <div class="filter-label">Select School</div>
                     <select class="filter-input" disabled>
-                        <option>SpringDrill School</option>
+                        <option id="filterSchoolOption">SpringDrill School</option>
                     </select>
                 </div>
                 <div class="filter-row">
@@ -166,11 +166,12 @@
             <div class="section-header">
                 <div id="tableHeaderTitle">Student Information Section For SpringDrill School</div>
                 <div>
-                    <button class="btn btn-sm btn-light" style="font-weight: 600; font-size: 12px;" onclick="alert('Add student modal coming soon')">
+                    <button class="btn btn-sm btn-light" style="font-weight: 600; font-size: 12px;" onclick="openAddStudentModal()">
                         <i data-lucide="plus" style="width: 14px; height: 14px;"></i> Add a Student
                     </button>
                 </div>
             </div>
+            <div id="addStudentSuccess" class="alert alert-success m-3 mb-0" style="display:none;"></div>
             <div class="table-responsive">
                 <table class="table">
                     <thead>
@@ -219,6 +220,14 @@
             pageScope = await getSchoolScope(session);
             renderViewPill(pageScope);
 
+            // The table header and the school filter show the effective
+            // school (the partner school in view), not the hardcoded
+            // "SpringDrill School" label.
+            const schoolName = pageScope.effectiveSchool?.name || 'SpringDrill School';
+            document.getElementById('tableHeaderTitle').textContent = 'Student Information Section For ' + schoolName;
+            const schoolOption = document.getElementById('filterSchoolOption');
+            if (schoolOption) schoolOption.textContent = schoolName;
+
             // Fetch classes
             const { data: classes } = await scopeEq(supabase.from('classes').select('id, name').order('name'), pageScope.effectiveSchoolId);
             if (classes) {
@@ -231,11 +240,17 @@
             }
 
             // Fetch students
-            const { data: students, error } = await scopeEq(supabase.from('students')
+            await refreshStudentList();
+        }
+
+        // Scoped student list, shared by init() and the Add Student
+        // success path: approved students of the effective school only.
+        async function refreshStudentList() {
+            const { data: students } = await scopeEq(supabase.from('students')
                 .select('*'), pageScope.effectiveSchoolId)
                 .eq('approved', true)
                 .order('surname');
-                
+
             if (students) {
                 allStudents = students;
                 renderStudents(allStudents);
@@ -408,6 +423,148 @@
             }
         };
 
+        // ADD STUDENT MODAL — fills the gap the "coming soon" stub left.
+        // Same creation flow as admin_create_user.html (Accounts), only
+        // scoped to this page's effective school: auth sign-up, users
+        // upsert, optional passport upload, students insert. Feedback is
+        // in-page only — no alert()/confirm() (cloud browsers silently
+        // dismiss native dialogs, so the action would never run there).
+        function generateRegNum() {
+            const year = new Date().getFullYear().toString().slice(-2);
+            const rand = Math.floor(1000 + Math.random() * 9000);
+            return `SD/${year}/${rand}`;
+        }
+
+        function autoGenerateAddEmail() {
+            const first = document.getElementById('addFirstName').value.trim();
+            const last = document.getElementById('addSurname').value.trim();
+            if (!first || !last) return;
+            const clean = (s) => s.toLowerCase().replace(/[^a-z]/g, '');
+            const rand = Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('addEmail').value = `${clean(first)}.${clean(last)}${rand}@springdrill.edu`;
+        }
+
+        window.openAddStudentModal = function() {
+            const form = document.getElementById('addStudentForm');
+            form.reset();
+            document.getElementById('addStudentError').style.display = 'none';
+            document.getElementById('addRegNumber').value = generateRegNum();
+            const classSelect = document.getElementById('addClassId');
+            if (allClasses.length) {
+                classSelect.innerHTML = '<option value="" disabled selected>Select Class...</option>' + allClasses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            } else {
+                classSelect.innerHTML = '<option value="" disabled selected>No classes found — create classes first</option>';
+            }
+            const btn = document.getElementById('addStudentBtn');
+            btn.disabled = false;
+            btn.textContent = 'Add Student';
+            new bootstrap.Modal(document.getElementById('addStudentModal')).show();
+        };
+
+        document.getElementById('addFirstName').addEventListener('blur', autoGenerateAddEmail);
+        document.getElementById('addSurname').addEventListener('blur', autoGenerateAddEmail);
+
+        document.getElementById('addStudentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('addStudentBtn');
+            const errEl = document.getElementById('addStudentError');
+            btn.disabled = true;
+            btn.textContent = 'Adding…';
+            errEl.style.display = 'none';
+            try {
+                const firstName = document.getElementById('addFirstName').value.trim();
+                const surname = document.getElementById('addSurname').value.trim();
+                const otherName = document.getElementById('addOtherName').value.trim();
+                const gender = document.getElementById('addGender').value;
+                const classId = document.getElementById('addClassId').value;
+                const dobValue = document.getElementById('addDob').value;
+                const parentName = document.getElementById('addParentName').value.trim();
+                const phone = document.getElementById('addPhone').value.trim();
+                const address = document.getElementById('addAddress').value.trim();
+                const email = document.getElementById('addEmail').value.trim();
+                const password = document.getElementById('addPassword').value;
+                const regNum = document.getElementById('addRegNumber').value;
+                const passportFile = document.getElementById('addPassport').files[0];
+                const fullName = [firstName, otherName, surname].filter(Boolean).join(' ');
+                if (!email) throw new Error('Enter the first name and surname so a login email can be generated.');
+                if (!classId) throw new Error('Select a class for this student.');
+
+                // 1. Create User in Auth (same as admin_create_user).
+                const { data: authData, error: authErr } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: { data: { name: fullName, role: 'student', gender: gender } }
+                });
+                if (authErr) throw authErr;
+                if (!authData || !authData.user) throw new Error('Failed to generate authentication data.');
+                const newUserId = authData.user.id;
+                const generatedUsername = email.split('@')[0];
+
+                // 2. Brief 1.5-second delay to allow database triggers to settle (same as admin_create_user).
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // 3. Create the user in public.users, tagged to the effective
+                // school (the partner school in view); when there is no
+                // effective school, fall back to the creator's own school,
+                // the same inheritance as admin_create_user.
+                const schoolId = pageScope.effectiveSchoolId ?? pageScope.viewerRow?.school_id ?? null;
+                const userPayload = {
+                    id: newUserId,
+                    name: fullName,
+                    email: email,
+                    username: generatedUsername,
+                    role: 'student',
+                    gender: gender
+                };
+                if (schoolId !== null && schoolId !== undefined) userPayload.school_id = schoolId;
+                const { error: syncErr } = await supabase.from('users').upsert(userPayload, { onConflict: 'id' });
+                if (syncErr) throw new Error('Database blocked user sync. ' + syncErr.message);
+
+                // 4. Optional passport upload (same as admin_create_user).
+                let passportUrl = null;
+                if (passportFile) {
+                    const fileExt = passportFile.name.split('.').pop();
+                    const fileName = `passport_${Date.now()}.${fileExt}`;
+                    const { error: uploadError } = await supabase.storage.from('passports').upload(fileName, passportFile);
+                    if (!uploadError) {
+                        const { data: pubData } = supabase.storage.from('passports').getPublicUrl(fileName);
+                        passportUrl = pubData.publicUrl;
+                    }
+                }
+
+                // 5. Write the student record, approved so they show in this list.
+                const studentPayload = {
+                    user_id: newUserId,
+                    first_name: firstName,
+                    surname: surname,
+                    other_name: otherName || null,
+                    gender: gender,
+                    reg_number: regNum,
+                    class_id: classId,
+                    dob: dobValue || null,
+                    parent_name: parentName,
+                    address: address,
+                    phone_number: phone || null,
+                    passport_url: passportUrl,
+                    approved: true
+                };
+                if (schoolId !== null && schoolId !== undefined) studentPayload.school_id = schoolId;
+                const { error: stuErr } = await supabase.from('students').insert([studentPayload]);
+                if (stuErr) throw stuErr;
+
+                bootstrap.Modal.getInstance(document.getElementById('addStudentModal')).hide();
+                await refreshStudentList();
+                const okEl = document.getElementById('addStudentSuccess');
+                okEl.innerHTML = 'Student added: <strong>' + fullName + '</strong> — login email <strong>' + email + '</strong>, reg no. <strong>' + regNum + '</strong>. Share the email and the password you entered with the student.';
+                okEl.style.display = 'block';
+            } catch (err) {
+                errEl.textContent = 'Could not add this student: ' + err.message;
+                errEl.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'Add Student';
+            }
+        });
+
         document.getElementById('editStudentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('saveStudentBtn');
@@ -519,6 +676,91 @@
                         <div class="d-flex justify-content-end gap-2 mt-4">
                             <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="font-size: 13px; font-weight: 600; border-radius: 6px; border: 1px solid #cbd5e1;">Cancel</button>
                             <button type="submit" class="btn btn-success" id="saveStudentBtn" style="font-size: 13px; font-weight: 600; border-radius: 6px; background: #007a4d; border: none;">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD STUDENT MODAL -->
+    <!-- The Add a Student button was an alert('Add student modal coming soon')
+         stub since 17 Sept 2026 (commit 8b08028); this modal replaces it with
+         the same creation flow as admin_create_user.html (Accounts). -->
+    <div class="modal fade" id="addStudentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 12px; border: none; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                <div class="modal-header" style="background: #007a4d; color: white; border-bottom: none; padding: 15px 20px;">
+                    <h5 class="modal-title" style="font-weight: 700; font-size: 16px;"><i data-lucide="user-plus" style="width: 18px; height: 18px; margin-right: 6px;"></i> Add a Student</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding: 20px; background: #f8fafc;">
+                    <form id="addStudentForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size: 12px; font-weight: 600; color: #64748b;">First Name</label>
+                                <input type="text" class="form-control" id="addFirstName" required style="font-size: 13px; border-radius: 6px;">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size: 12px; font-weight: 600; color: #64748b;">Surname</label>
+                                <input type="text" class="form-control" id="addSurname" required style="font-size: 13px; border-radius: 6px;">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size: 12px; font-weight: 600; color: #64748b;">Other Name(s)</label>
+                                <input type="text" class="form-control" id="addOtherName" style="font-size: 13px; border-radius: 6px;">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size: 12px; font-weight: 600; color: #64748b;">Gender</label>
+                                <select class="form-select" id="addGender" required style="font-size: 13px; border-radius: 6px;">
+                                    <option value="" disabled selected>Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size: 12px; font-weight: 600; color: #64748b;">Class</label>
+                                <select class="form-select" id="addClassId" required style="font-size: 13px; border-radius: 6px;"></select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size: 12px; font-weight: 600; color: #64748b;">Date of Birth</label>
+                                <input type="date" class="form-control" id="addDob" style="font-size: 13px; border-radius: 6px;">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size: 12px; font-weight: 600; color: #64748b;">Parent/Guardian Name</label>
+                                <input type="text" class="form-control" id="addParentName" style="font-size: 13px; border-radius: 6px;">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size: 12px; font-weight: 600; color: #64748b;">Phone</label>
+                                <input type="tel" class="form-control" id="addPhone" style="font-size: 13px; border-radius: 6px;">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label" style="font-size: 12px; font-weight: 600; color: #64748b;">Home Address</label>
+                                <input type="text" class="form-control" id="addAddress" style="font-size: 13px; border-radius: 6px;">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size: 12px; font-weight: 600; color: #64748b;">Passport Photo (Optional)</label>
+                                <input type="file" class="form-control" id="addPassport" accept="image/*" style="font-size: 13px; border-radius: 6px;">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size: 12px; font-weight: 600; color: #64748b;">Registration No.</label>
+                                <input type="text" class="form-control fw-bold text-primary" id="addRegNumber" readonly style="font-size: 13px; border-radius: 6px;">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label" style="font-size: 12px; font-weight: 600; color: #64748b;">Login Email</label>
+                                <input type="email" class="form-control text-primary fw-bold" id="addEmail" readonly required style="font-size: 13px; border-radius: 6px;">
+                                <small class="text-success fw-bold mt-1 d-block"><i class="fas fa-magic"></i> Auto-generated from the name.</small>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label" style="font-size: 12px; font-weight: 600; color: #64748b;">Password</label>
+                                <input type="password" class="form-control fw-bold" id="addPassword" placeholder="Enter secure password" required minlength="6" style="font-size: 13px; border-radius: 6px;">
+                            </div>
+                        </div>
+
+                        <div id="addStudentError" class="alert alert-danger mt-3 mb-0" style="display:none;"></div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="font-size: 13px; font-weight: 600; border-radius: 6px; border: 1px solid #cbd5e1;">Cancel</button>
+                            <button type="submit" class="btn btn-success" id="addStudentBtn" style="font-size: 13px; font-weight: 600; border-radius: 6px; background: #007a4d; border: none;">Add Student</button>
                         </div>
                     </form>
                 </div>
