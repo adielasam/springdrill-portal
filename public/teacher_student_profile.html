@@ -442,7 +442,7 @@
                 </div>
                 <div class="modal-body p-4">
                     <p id="deleteStudentText">Permanently delete this student?</p>
-                    <p class="text-muted small mb-0">Their student record and login are removed. Their test scores and results stay in the system with no owner. This cannot be undone.</p>
+                    <p class="text-muted small mb-0">Their student record and login are removed, along with their test scores and results. This cannot be undone.</p>
                     <div id="deleteStudentError" class="alert alert-danger mt-3 mb-0" style="display:none;"></div>
                 </div>
                 <div class="modal-footer d-flex justify-content-end bg-light">
@@ -673,6 +673,19 @@
             new bootstrap.Modal(document.getElementById('deleteStudentModal')).show();
         };
 
+        // Hard delete for leavers (owner's decision, 20 Nov 2026): deleting
+        // a student also deletes everything linked to them — CBT scores,
+        // term results, remarks, test assignments and CBT results — so
+        // nothing is left ownerless. Scores and results key off the
+        // integer students-row id, so it is captured before the row is
+        // deleted; assignments and CBT results key off the login UUID.
+        // Steps stop at the first failure; only a missing table
+        // (PGRST205) is treated as "nothing to clean".
+        async function deleteLinked(table, column, value) {
+            const { error } = await supabase.from(table).delete().eq(column, value);
+            if (error && error.code !== 'PGRST205') throw new Error('Could not delete linked ' + table + ' rows: ' + error.message);
+        }
+
         window.confirmDeleteStudent = async function() {
             if(!currentStudentData) return;
             const btn = document.getElementById('confirmDeleteStudentBtn');
@@ -681,6 +694,12 @@
             btn.textContent = 'Deleting…';
             errEl.style.display = 'none';
             try {
+                const studentRowId = currentStudentData.id;
+                await deleteLinked('cbt_scores', 'student_id', studentRowId);
+                await deleteLinked('term_results', 'student_id', studentRowId);
+                await deleteLinked('report_remarks', 'student_id', studentRowId);
+                await deleteLinked('test_students', 'student_id', currentStudentData.user_id);
+                await deleteLinked('test_results', 'student_id', currentStudentData.user_id);
                 const { error } = await supabase.from('students').delete().eq('user_id', currentStudentData.user_id);
                 if(error) throw error;
                 // Also remove the login row, so a leaver leaves nothing behind.

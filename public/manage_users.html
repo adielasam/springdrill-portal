@@ -465,7 +465,7 @@
 
         window.confirmDeleteUser = async function() {
             if (!pendingDelete) return;
-            const { userId } = pendingDelete;
+            const { userId, targetRole } = pendingDelete;
             const btn = document.getElementById('deleteConfirmBtn');
             const errEl = document.getElementById('deleteConfirmError');
             errEl.style.display = 'none';
@@ -474,12 +474,19 @@
             btn.innerText = 'Deleting...';
             document.getElementById('loadingOverlay').style.display = 'flex';
             try {
-                // Best-effort: the students/teachers rows may not exist, and the
-                // teachers table may not exist at all — only the users row is required.
-                const { error: sErr } = await supabase.from('students').delete().eq('user_id', userId);
-                if (sErr) console.warn('Delete cleanup skipped for students:', sErr.message);
-                const { error: tErr } = await supabase.from('teachers').delete().eq('user_id', userId);
-                if (tErr) console.warn('Delete cleanup skipped for teachers:', tErr.message);
+                // Hard delete for leavers (owner's decision, 20 Nov 2026):
+                // deleting a user also deletes everything linked to them,
+                // so nothing is left ownerless. Steps run in dependency
+                // order (children first) and stop at the first failure.
+                // Only a missing table (PGRST205) is "nothing to clean".
+                if (targetRole === 'teacher') await deleteTeacherLinkedRows(userId);
+                else if (targetRole === 'student') await deleteStudentLinkedRows(userId);
+                else {
+                    // Admins and other roles have no linked tests/scores;
+                    // only the students/teachers rows may exist.
+                    await deleteLinked('students', 'user_id', userId);
+                    await deleteLinked('teachers', 'user_id', userId);
+                }
                 const { error } = await supabase.from('users').delete().eq('id', userId);
                 if (error) throw error;
                 pendingDelete = null;
@@ -496,6 +503,57 @@
             }
         };
 
+        // Shared hard-delete helpers (same chain as teacher_list.html and
+        // the student pages). deleteLinked throws on any error except a
+        // missing table (PGRST205).
+        async function deleteLinked(table, column, value) {
+            let req = supabase.from(table).delete();
+            req = Array.isArray(value) ? req.in(column, value) : req.eq(column, value);
+            const { error } = await req;
+            if (error && error.code !== 'PGRST205') throw new Error('Could not delete linked ' + table + ' rows: ' + error.message);
+        }
+
+        async function deleteTeacherLinkedRows(teacherId) {
+            // The teacher's tests, children first: scores, question links
+            // and student assignments, then the tests themselves.
+            const { data: teacherTests, error: testsErr } = await supabase.from('tests').select('id').eq('teacher_id', teacherId);
+            if (testsErr) throw testsErr;
+            const testIds = (teacherTests || []).map(t => t.id);
+            if (testIds.length) {
+                await deleteLinked('test_results', 'test_id', testIds);
+                await deleteLinked('test_questions', 'test_id', testIds);
+                await deleteLinked('test_students', 'test_id', testIds);
+            }
+            await deleteLinked('tests', 'teacher_id', teacherId);
+            // The teacher's questions, with their links into any test,
+            // then the questions themselves.
+            const { data: teacherQuestions, error: qsErr } = await supabase.from('questions').select('id').eq('teacher_id', teacherId);
+            if (qsErr) throw qsErr;
+            const questionIds = (teacherQuestions || []).map(q => q.id);
+            if (questionIds.length) await deleteLinked('test_questions', 'question_id', questionIds);
+            await deleteLinked('questions', 'teacher_id', teacherId);
+            await deleteLinked('teacher_class_subjects', 'teacher_id', teacherId);
+            await deleteLinked('user_roles', 'user_id', teacherId);
+            await deleteLinked('teachers', 'user_id', teacherId);
+        }
+
+        async function deleteStudentLinkedRows(userId) {
+            // Scores and results key off the integer students-row id, so
+            // capture it before the row is deleted; test assignments and
+            // CBT results key off the login UUID instead.
+            const { data: studentRow, error: rowErr } = await supabase.from('students').select('id').eq('user_id', userId).single();
+            if (rowErr && rowErr.code !== 'PGRST116') throw rowErr;
+            const studentRowId = studentRow ? studentRow.id : null;
+            if (studentRowId !== null) {
+                await deleteLinked('cbt_scores', 'student_id', studentRowId);
+                await deleteLinked('term_results', 'student_id', studentRowId);
+                await deleteLinked('report_remarks', 'student_id', studentRowId);
+            }
+            await deleteLinked('test_students', 'student_id', userId);
+            await deleteLinked('test_results', 'student_id', userId);
+            await deleteLinked('students', 'user_id', userId);
+        }
+
 
         document.addEventListener('DOMContentLoaded', loadUsers);
         const logoutBtn = document.getElementById('logoutBtn');
@@ -509,7 +567,7 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <p class="mb-1">Permanently delete <strong id="deleteConfirmName">this user</strong> (<span id="deleteConfirmEmail"></span>, <span id="deleteConfirmRole"></span>)? Their student/teacher record and login row are removed. This cannot be undone.</p>
+                    <p class="mb-1">Permanently delete <strong id="deleteConfirmName">this user</strong> (<span id="deleteConfirmEmail"></span>, <span id="deleteConfirmRole"></span>)? Their student/teacher record and login row are removed, along with everything linked to them — their tests, questions, scores and results. This cannot be undone.</p>
                     <p id="deleteConfirmError" class="text-danger small mt-3 mb-0" style="display:none;"></p>
                 </div>
                 <div class="modal-footer">
