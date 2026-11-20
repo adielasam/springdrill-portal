@@ -43,15 +43,11 @@
         /* Top Navbar */
         .top-navbar { background: var(--card-bg); padding: 10px 30px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
         
-        /* Educare-style hero: teacher photo + name on the LEFT, quick links
-           in a card on the RIGHT, one section — same as the student dashboard. */
-        .sd-hero { display: flex; gap: 24px; align-items: stretch; padding: 30px 30px 24px; }
-        .sd-hero-profile { flex: 0 0 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 16px 8px; }
-        .sd-hero-photo { width: 180px; height: 180px; border-radius: 50%; overflow: hidden; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; background: #e9ecef; border: 4px solid #004d34; box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
-        .sd-hero-photo img { width: 100%; height: 100%; object-fit: cover; }
-        .sd-hero-profile h2 { font-weight: 800; margin-bottom: 4px; font-size: 1.3rem; line-height: 1.25; text-transform: uppercase; }
-        .sd-hero-profile .teacher-role { font-weight: 700; color: var(--text-muted); font-size: 1rem; margin-bottom: 0; }
-        .sd-hero-icons { flex: 1; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; align-items: center; padding: 24px 16px; }
+        /* Educare-style hero (teacher): quick links in a full-width card, NO
+           photo — matches Educare's teacher dashboard. The photo-left layout
+           is student-only (see student_dashboard.html). */
+        .sd-hero { padding: 30px 30px 24px; }
+        .sd-hero-icons { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; align-items: center; padding: 24px 16px; }
         .quick-links-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 100%; padding: 0; background: transparent; border: none; }
         .quick-link-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: var(--text-color); cursor: pointer; transition: transform 0.2s; }
         .quick-link-item:hover { transform: scale(1.05); }
@@ -68,12 +64,8 @@
         .sd-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         @media (max-width: 991.98px) {
-            .sd-hero { flex-direction: column; gap: 16px; padding: 0 0 16px; }
-            .sd-hero-profile { flex: none; width: 100%; }
+            .sd-hero { padding: 0 0 16px; }
             .quick-links-container { grid-template-columns: repeat(2, 1fr); gap: 20px 16px; }
-        }
-        @media (max-width: 480px) {
-            .sd-hero-photo { width: 150px; height: 150px; }
         }
 
         /* Tabs */
@@ -206,13 +198,6 @@
         </div>
 
         <div class="sd-hero">
-            <div class="sd-hero-profile">
-                <div class="sd-hero-photo" id="heroPhoto">
-                    <i class="fas fa-user-circle fa-3x text-muted"></i>
-                </div>
-                <h2 id="heroTeacherName">Teacher</h2>
-                <div class="teacher-role">Teacher</div>
-            </div>
             <div class="sd-hero-icons">
                 <div class="quick-links-container">
                     <a href="teacher_eclassroom.html" class="quick-link-item">
@@ -337,16 +322,6 @@
                     
                     const navAvatar = document.getElementById('navAvatar');
                     if (navAvatar) navAvatar.innerHTML = avatarHtml;
-
-                    const heroName = document.getElementById('heroTeacherName');
-                    if (heroName) heroName.innerText = profile.name;
-
-                    const heroAvatarHtml = profile.avatar_url
-                        ? `<img src="${profile.avatar_url}" style="width: 100%; height: 100%; object-fit: cover;">`
-                        : `<div style="width:100%; height:100%; background: #059669; color: white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:56px;">${profile.name.substring(0,2).toUpperCase()}</div>`;
-
-                    const heroPhoto = document.getElementById('heroPhoto');
-                    if (heroPhoto) heroPhoto.innerHTML = heroAvatarHtml;
                 }
             } catch(e) { console.error(e); }
         }
