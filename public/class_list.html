@@ -216,7 +216,7 @@
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) return window.location.href = '/';
 
-            pageScope = await getSchoolScope();
+            pageScope = await getSchoolScope(session);
             renderViewPill(pageScope);
 
             // Fetch classes

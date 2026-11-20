@@ -513,50 +513,77 @@
                 // own school, or the partner school the vendor is
                 // viewing. NULL means no filter — the vendor's global
                 // view, and Spring Valley behaviour is unchanged.
-                dashboardScope = await getSchoolScope();
+                dashboardScope = await getSchoolScope(session);
                 renderViewPill(dashboardScope);
 
                 // Role switcher (PR #41): only accounts holding the admin role
                 // stay here; anyone else is sent to a dashboard they do hold.
-                await guardRole('admin');
-                const myRoles = await getMyRoles();
+                // getMyRoles is memoized per page load (PR #61), so this
+                // guard and the menu below share the one users-row fetch
+                // instead of querying users twice more.
+                await guardRole('admin', session);
+                const myRoles = await getMyRoles(session);
                 if (myRoles) buildMyRolesMenu(document.getElementById('adminProfileMenu'), 'adminRolesDivider', myRoles, 'admin');
 
-                const { data: profile } = await supabase.from('users').select('name, avatar_url').eq('id', session.user.id).single();
+                // Profile name/avatar come from the users row getSchoolScope
+                // / getMyRoles already fetched (PR #61) — no separate
+                // profile query.
+                const profile = dashboardScope.viewerRow;
                 if(profile) {
                     document.getElementById('navAdminName').innerText = profile.name;
-                    
+
                     const avatarContainer = document.getElementById('navAvatar');
                     if(avatarContainer) {
-                        const avatarHtml = profile.avatar_url 
-                            ? `<img src="${profile.avatar_url}" style="width: 100%; height: 100%; object-fit: cover;">` 
+                        const avatarHtml = profile.avatar_url
+                            ? `<img src="${profile.avatar_url}" style="width: 100%; height: 100%; object-fit: cover;">`
                             : `<div style="width:100%; height:100%; background: #059669; color: white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:14px;">${profile.name.substring(0,2).toUpperCase()}</div>`;
                         avatarContainer.innerHTML = avatarHtml;
                     }
                 }
 
+                // Shell first (PR #61): the overlay used to wait for the
+                // counts below — every database round trip costs ~1s
+                // against the live database, and the old chain ran them
+                // one after another, so the page sat on "Syncing
+                // Workspace..." for a long time. Hide the overlay now
+                // that the session, scope and role are settled; the
+                // numbers fill in below as they arrive.
+                document.getElementById('statActiveStudents').innerText = '…';
+                document.getElementById('statMale').innerText = '…';
+                document.getElementById('statFemale').innerText = '…';
+                document.getElementById('statTeachers').innerText = '…';
+                document.getElementById('loadingOverlay').style.opacity = '0';
+                setTimeout(() => document.getElementById('loadingOverlay').style.display = 'none', 300);
+
+                // Counts (PR #61): one scoped students query, counted in
+                // JS, plus the classes and teachers counts in parallel —
+                // 3 round trips instead of 6. The numbers are identical
+                // to the old exact counts: active = approved true,
+                // pending = approved false, male/female = approved true
+                // with that gender (a NULL approved counts in neither,
+                // exactly as the old .eq() filters did).
+                // Limit note: PostgREST caps a row fetch at 1000 rows by
+                // default, so these counts are exact up to 1000 students
+                // per school — far above any school on the portal today.
                 const [
-                    { count: activeStudents }, { count: pendingCount },
-                    { count: maleCount }, { count: femaleCount },
-                    { count: classCount }, { count: teacherCount }
+                    { data: studentRows }, { count: classCount }, { count: teacherCount }
                 ] = await Promise.all([
-                    scopeEq(supabase.from('students').select('*', { count: 'exact', head: true })).eq('approved', true),
-                    scopeEq(supabase.from('students').select('*', { count: 'exact', head: true })).eq('approved', false),
-                    scopeEq(supabase.from('students').select('*', { count: 'exact', head: true })).eq('gender', 'Male').eq('approved', true),
-                    scopeEq(supabase.from('students').select('*', { count: 'exact', head: true })).eq('gender', 'Female').eq('approved', true),
+                    scopeEq(supabase.from('students').select('id, gender, approved').limit(5000)),
                     scopeEq(supabase.from('classes').select('*', { count: 'exact', head: true })),
                     scopeEq(supabase.from('users').select('*', { count: 'exact', head: true })).eq('role', 'teacher')
                 ]);
+                const rows = studentRows || [];
+                const activeStudents = rows.filter(s => s.approved === true).length;
+                const pendingCount = rows.filter(s => s.approved === false).length; // fetched before, never shown — kept for parity
+                const maleCount = rows.filter(s => s.approved === true && s.gender === 'Male').length;
+                const femaleCount = rows.filter(s => s.approved === true && s.gender === 'Female').length;
 
                 document.getElementById('statActiveStudents').innerText = activeStudents || 0;
-                
+
                 document.getElementById('statMale').innerText = maleCount || 0;
                 document.getElementById('statFemale').innerText = femaleCount || 0;
                 // statClasses is now set by renderClassChart()
                 document.getElementById('statTeachers').innerText = teacherCount || 0;
-
-                document.getElementById('loadingOverlay').style.opacity = '0';
-                setTimeout(() => document.getElementById('loadingOverlay').style.display = 'none', 300);
 
                 Promise.all([
                     renderClassChart(),

@@ -437,15 +437,20 @@
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = '/';
 
-                pageScope = await getSchoolScope();
+                // Shell first (PR #61): hide the overlay now, before the
+                // data queries run — the table keeps its own loading state
+                // until the teachers arrive. The overlay used to wait for
+                // every query, so the page sat blank for a long time.
+                document.getElementById('loadingOverlay').style.opacity = '0';
+                setTimeout(() => document.getElementById('loadingOverlay').style.display = 'none', 300);
+
+                pageScope = await getSchoolScope(session);
                 renderViewPill(pageScope);
 
                 const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
                 if(profile) document.getElementById('navAdminName').innerText = profile.name;
 
                 await loadData();
-                document.getElementById('loadingOverlay').style.opacity = '0';
-                setTimeout(() => document.getElementById('loadingOverlay').style.display = 'none', 300);
 
             } catch (err) {
                 console.error(err);
