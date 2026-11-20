@@ -173,7 +173,10 @@
                     <h2 class="h6 fw-bold mb-0" id="detailName"></h2>
                     <p class="text-muted mb-0" style="font-size: 13px;" id="detailSlug"></p>
                 </div>
-                <button type="button" class="btn btn-sm btn-outline-secondary" id="closeDetailBtn">Close</button>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-brand" id="openWorkspaceBtn">Open workspace</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="closeDetailBtn">Close</button>
+                </div>
             </div>
             <hr>
             <div class="row g-4">
@@ -241,6 +244,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
+        import { setViewSchool } from './schoolScope.js';
 
         const errEl = document.getElementById('pageError');
         const okEl = document.getElementById('pageOk');
@@ -598,6 +602,15 @@
             document.getElementById('detailPanel').style.display = 'block';
             document.getElementById('detailName').textContent = s.name;
             document.getElementById('detailSlug').textContent = '/' + (s.slug || '') + ' · ' + (effStatus(s) || '');
+            // Open workspace (PR #60): enter this school's admin area
+            // scoped to it — the pages show the school's own data, with
+            // a "Viewing ... as vendor" pill and an Exit back here.
+            const openBtn = document.getElementById('openWorkspaceBtn');
+            openBtn.style.display = s.slug ? '' : 'none';
+            openBtn.onclick = () => {
+                setViewSchool({ id: s.id, name: s.name, slug: s.slug });
+                window.location.href = '/' + s.slug + '/admin_dashboard.html';
+            };
             document.getElementById('detailCode').textContent = s.setup_code || '—';
             fillPlanSelect(s.plan || null);
             document.getElementById('expiryInput').value = s.expires_at ? new Date(s.expires_at).toISOString().slice(0, 10) : '';

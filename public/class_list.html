@@ -201,18 +201,26 @@
 
     <script type="module">
         import { supabase } from './supabaseClient.js';
+        import { getSchoolScope, scopeEq, renderViewPill } from './schoolScope.js';
         lucide.createIcons();
 
         let allStudents = [];
         let classesMap = {};
         let allClasses = [];
+        // Multi-school scoping (PR #60): the effective school — the
+        // signed-in admin's own school, or the partner school the
+        // vendor is viewing. NULL means the vendor's global view.
+        let pageScope = null;
 
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) return window.location.href = '/';
 
+            pageScope = await getSchoolScope();
+            renderViewPill(pageScope);
+
             // Fetch classes
-            const { data: classes } = await supabase.from('classes').select('id, name').order('name');
+            const { data: classes } = await scopeEq(supabase.from('classes').select('id, name').order('name'), pageScope.effectiveSchoolId);
             if (classes) {
                 allClasses = classes;
                 const classSelect = document.getElementById('filterClass');
@@ -223,8 +231,8 @@
             }
 
             // Fetch students
-            const { data: students, error } = await supabase.from('students')
-                .select('*')
+            const { data: students, error } = await scopeEq(supabase.from('students')
+                .select('*'), pageScope.effectiveSchoolId)
                 .eq('approved', true)
                 .order('surname');
                 
@@ -448,7 +456,8 @@
         
         async function fetchClassesForEdit() {
             try {
-                const { data } = await supabase.from('classes').select('id, name').order('name');
+                if (!pageScope) pageScope = await getSchoolScope();
+                const { data } = await scopeEq(supabase.from('classes').select('id, name').order('name'), pageScope.effectiveSchoolId);
                 if (data) {
                     const select = document.getElementById('editClassId');
                     select.innerHTML = '<option value="">Select Class</option>' + data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
