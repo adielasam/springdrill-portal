@@ -94,6 +94,31 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  const pathParts = request.nextUrl.pathname.split('/').filter(Boolean);
+
+  // Two-segment school URLs (PR #59): once a school admin signs in
+  // from the school front door, the login redirect sends them to
+  // /<slug>/admin_dashboard.html, and the sidebar links are relative —
+  // so the slug must survive navigation. A path with exactly two
+  // segments, where the first is a valid school slug and the second is
+  // a page file, is rewritten to that page, keeping the slug in the
+  // browser bar. The query string is preserved. Placed here, after the
+  // apex redirect and before the single-segment rewrite below; the
+  // subdomain block, the apex redirect and the single-segment rewrite
+  // are untouched.
+  if (pathParts.length === 2) {
+    const [seg, page] = pathParts;
+    const slug = seg.toLowerCase();
+    const isSlug = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(slug)
+      && !slug.includes('.')
+      && !RESERVED_SLUGS.has(slug);
+    if (isSlug && /^[a-z0-9_-]+\.html$/.test(page)) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/' + page;
+      return NextResponse.rewrite(url);
+    }
+  }
+
   // School path addresses (Phase 1, LIVE): each partner school gets a path
   // address on the current domain, e.g. /giftedhands — no custom domain,
   // no wildcard subdomains, no extra cost. The request is REWRITTEN (not
@@ -102,7 +127,6 @@ export async function proxy(request: NextRequest) {
   // treated as a slug, and reserved words (real routes and files) are never
   // rewritten. The subdomain block above is the Phase 3 switch and is
   // untouched.
-  const pathParts = request.nextUrl.pathname.split('/').filter(Boolean);
   if (pathParts.length === 1) {
     const seg = pathParts[0].toLowerCase();
     const isSlug = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(seg)
