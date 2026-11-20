@@ -414,10 +414,25 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
-        
+        import { getSchoolScope, scopeEq, renderViewPill } from './schoolScope.js';
+
         let schools = [], groups = [], departments = [], categories = [], sessions = [];
         let subjects = [], classes = [], teachers = [], students = [];
         let matrixAssignments = []; // to store initial state
+        // Multi-school scoping (PR #60): the effective school — the
+        // signed-in admin's own school, or the partner school the
+        // vendor is viewing. NULL means the vendor's global view.
+        // Section mode = no effective school, or the effective school
+        // is Spring Valley (slug 'spring-valley'): its subjects are the
+        // school's internal sections, so everything behaves exactly as
+        // today. Tenant mode = any other effective school: the lists
+        // below are restricted to that school only.
+        let pageScope = null;
+        function isTenantMode() {
+            if (!pageScope || !pageScope.effectiveSchoolId) return false;
+            if (!pageScope.effectiveSchool) return true; // school row unreadable: restrict, fail closed
+            return pageScope.effectiveSchool.slug !== 'spring-valley';
+        }
 
         document.addEventListener('DOMContentLoaded', async () => {
             const hash = window.location.hash;
@@ -444,17 +459,20 @@
 
         async function loadBaseData() {
             try {
+                if (!pageScope) { pageScope = await getSchoolScope(); renderViewPill(pageScope); }
+                const tenant = isTenantMode();
+                const effId = pageScope.effectiveSchoolId;
                 const [sch, grp, dep, cat, sub, cls, tch, sess] = await Promise.all([
                     supabase.from('schools').select('*').order('name'),
                     supabase.from('subject_groups').select('*').order('name'),
                     supabase.from('subject_departments').select('*').order('name'),
                     supabase.from('subject_categories').select('*').order('name'),
-                    supabase.from('subjects').select(`*, subject_groups(name), subject_departments(name), subject_categories(name), schools(name)`).order('name'),
-                    supabase.from('classes').select('*').order('name'),
-                    supabase.from('users').select('*').eq('role', 'teacher'),
+                    scopeEq(supabase.from('subjects').select(`*, subject_groups(name), subject_departments(name), subject_categories(name), schools(name)`).order('name'), tenant ? effId : null),
+                    scopeEq(supabase.from('classes').select('*').order('name'), tenant ? effId : null),
+                    scopeEq(supabase.from('users').select('*').eq('role', 'teacher'), tenant ? effId : null),
                     supabase.from('academic_sessions').select('*').order('name', {ascending: false})
                 ]);
-                
+
                 schools = sch.data || [];
                 groups = grp.data || [];
                 departments = dep.data || [];
@@ -464,7 +482,28 @@
                 teachers = tch.data || [];
                 sessions = sess.data || [];
 
+                if (tenant) {
+                    // Tenant mode: this page sees one school only. The
+                    // subjects/classes/teachers lists are restricted
+                    // STRICTLY to the effective school — NULL-school rows
+                    // are not included (in section mode they are Spring
+                    // Valley's, and the per-tab filters keep them).
+                    schools = pageScope.effectiveSchool ? [pageScope.effectiveSchool] : [];
+                    subjects = subjects.filter(s => s.school_id === effId);
+                    classes = classes.filter(c => c.school_id === effId);
+                    teachers = teachers.filter(t => t.school_id === effId);
+                }
+
                 populateDropdowns();
+
+                if (tenant) {
+                    // Auto-select the only school in every school picker
+                    // and refresh the subjects list for it — the list
+                    // renders from the dropdown value, which starts
+                    // empty, so without this it would stay blank.
+                    document.querySelectorAll('.school-dropdown').forEach(el => { el.value = String(effId); });
+                    renderSubjects();
+                }
             } catch(e) { console.error('Error loading data', e); }
         }
 

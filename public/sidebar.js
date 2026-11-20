@@ -146,9 +146,13 @@
         // Multi-school (Phase 1): show the signed-in school's name under the
         // brand. The name was stored in session storage at login; nothing is
         // shown before the Phase 1 migration, exactly as today.
+        // PR #60: when the vendor is viewing a partner's workspace there
+        // is no sd_school (the vendor has none), so fall back to the
+        // viewed school (sd_view_school) for the name.
         var schoolName = '';
         try {
             var storedSchool = window.sessionStorage && sessionStorage.getItem('sd_school');
+            if (!storedSchool) storedSchool = sessionStorage.getItem('sd_view_school');
             if (storedSchool) schoolName = (JSON.parse(storedSchool).name || '');
         } catch (e) { /* no school stored */ }
         if (schoolName) {

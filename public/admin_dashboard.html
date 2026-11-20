@@ -501,19 +501,20 @@
     <script type="module">
         import { supabase } from './supabaseClient.js';
         import { getMyRoles, buildMyRolesMenu, guardRole } from './roleSwitcher.js';
+        import { getSchoolScope, scopeEq as scopeEqById, renderViewPill } from './schoolScope.js';
 
         async function initializeDashboard() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = '/';
 
-                // Multi-school scoping (PR #59): the signed-in admin's
-                // school, fetched first so every count below can be
-                // scoped to it. NULL (the vendor/owner) means no filter
-                // — the global view, and Spring Valley behaviour is
-                // unchanged.
-                const { data: viewer } = await supabase.from('users').select('school_id').eq('id', session.user.id).single();
-                viewerSchoolId = viewer ? viewer.school_id : null;
+                // Multi-school scoping (PR #59, shared helper since
+                // PR #60): the effective school — the signed-in admin's
+                // own school, or the partner school the vendor is
+                // viewing. NULL means no filter — the vendor's global
+                // view, and Spring Valley behaviour is unchanged.
+                dashboardScope = await getSchoolScope();
+                renderViewPill(dashboardScope);
 
                 // Role switcher (PR #41): only accounts holding the admin role
                 // stay here; anyone else is sent to a dashboard they do hold.
@@ -582,11 +583,12 @@
         ];
         let schoolNoticesState = { session: null, schoolId: null, school: null, plans: DEFAULT_PLANS, announcements: [], pendingRequests: [] };
 
-        // Multi-school scoping (PR #59): the signed-in admin's school,
-        // set in initializeDashboard before any count runs. NULL means
-        // the vendor/owner, who sees everything (no filter).
-        let viewerSchoolId = null;
-        function scopeEq(q) { return viewerSchoolId ? q.eq('school_id', viewerSchoolId) : q; }
+        // Multi-school scoping (PR #59, shared helper since PR #60):
+        // the effective school, set in initializeDashboard before any
+        // count runs. NULL means the vendor/owner, who sees everything
+        // (no filter).
+        let dashboardScope = null;
+        function scopeEq(q) { return scopeEqById(q, dashboardScope ? dashboardScope.effectiveSchoolId : null); }
 
         // Notices + Subscription panels start collapsed so the stat cards
         // sit at the top; the header (with its badge) stays visible.
@@ -624,13 +626,15 @@
             const wrap = document.getElementById('schoolNoticesWrap');
             try {
                 schoolNoticesState.session = session;
-                // The admin's school. A separate guarded query so the
-                // dashboard keeps working if school_id does not exist yet.
-                const { data: me, error: meErr } = await supabase.from('users').select('school_id').eq('id', session.user.id).single();
-                if (meErr || !me || !me.school_id) return; // Not linked to a school: nothing to show.
-                const schoolId = me.school_id;
-                const { data: school, error: schoolErr } = await supabase.from('schools').select('*').eq('id', schoolId).single();
-                if (schoolErr || !school) return;
+                // The effective school (PR #60): the admin's own school,
+                // or the partner school the vendor is viewing. No
+                // effective school (the vendor's global view) means
+                // nothing to show here — the vendor dashboard has its
+                // own announcements, plans and requests.
+                if (!dashboardScope) dashboardScope = await getSchoolScope();
+                const schoolId = dashboardScope.effectiveSchoolId;
+                const school = dashboardScope.effectiveSchool;
+                if (!schoolId || !school) return; // Not linked to a school: nothing to show.
                 schoolNoticesState.schoolId = schoolId;
                 schoolNoticesState.school = school;
 
@@ -927,8 +931,8 @@
                         // (Unscoped — the vendor/owner — keeps the old
                         // behaviour: everything counts, unknown classes
                         // show as 'Unknown'.)
-                        if (viewerSchoolId && rawId && !stu) return;
-                        if (viewerSchoolId && record.class_id && !classMap[record.class_id]) return;
+                        if (dashboardScope && dashboardScope.effectiveSchoolId && rawId && !stu) return;
+                        if (dashboardScope && dashboardScope.effectiveSchoolId && record.class_id && !classMap[record.class_id]) return;
 
                         let cName = 'Unknown';
                         if (stu && classMap[stu.class_id]) cName = classMap[stu.class_id];
@@ -939,7 +943,7 @@
                         // Scoped view: a record with no class of this
                         // school is not ours — skip it instead of
                         // counting it as 'Unknown'.
-                        if (viewerSchoolId && cName === 'Unknown') return;
+                        if (dashboardScope && dashboardScope.effectiveSchoolId && cName === 'Unknown') return;
 
                         if (!classCounts[cName]) classCounts[cName] = { present: 0, absent: 0 };
                         const stat = String(record.status).toLowerCase();

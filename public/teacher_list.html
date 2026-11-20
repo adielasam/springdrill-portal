@@ -424,13 +424,21 @@
     <script src="sd-confirm.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
+        import { getSchoolScope, scopeEq, renderViewPill } from './schoolScope.js';
         let allTeachers = [];
         let currentTeacher = null;
+        // Multi-school scoping (PR #60): the effective school — the
+        // signed-in admin's own school, or the partner school the
+        // vendor is viewing. NULL means the vendor's global view.
+        let pageScope = null;
 
         async function init() {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = '/';
+
+                pageScope = await getSchoolScope();
+                renderViewPill(pageScope);
 
                 const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
                 if(profile) document.getElementById('navAdminName').innerText = profile.name;
@@ -446,8 +454,9 @@
         }
         
         async function loadData() {
-            const { data: teachers, error } = await supabase.from('users')
-                .select('*')
+            if (!pageScope) pageScope = await getSchoolScope();
+            const { data: teachers, error } = await scopeEq(supabase.from('users')
+                .select('*'), pageScope.effectiveSchoolId)
                 .eq('role', 'teacher')
                 .order('created_at', { ascending: false });
 
