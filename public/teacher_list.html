@@ -133,6 +133,7 @@
         
         /* EDIT MODAL */
         .edit-modal { background: var(--card-bg); width: 100%; max-width: 800px; border-radius: var(--radius); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; max-height: 90vh; }
+        .delete-confirm-modal { max-width: 460px; }
         .edit-body { padding: 24px; overflow-y: auto; }
         .form-section-title { font-size: 14px; font-weight: 700; color: var(--text-main); margin-top: 24px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
         .form-section-title i { color: var(--brand-500); width: 16px; height: 16px; }
@@ -304,7 +305,25 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- DELETE TEACHER CONFIRM -->
+    <div class="modal-overlay" id="deleteConfirmOverlay">
+        <div class="edit-modal delete-confirm-modal">
+            <div class="modal-header" style="padding: 16px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <h5 style="margin: 0; font-weight: 800;">Delete teacher?</h5>
+                <button class="close-btn" onclick="closeDeleteConfirm()"><i data-lucide="x"></i></button>
+            </div>
+            <div style="padding: 20px 24px;">
+                <p style="margin: 0;">Permanently delete <strong id="deleteConfirmName">this teacher</strong>? Their login row and class/subject links are removed too. This cannot be undone.</p>
+                <p id="deleteConfirmError" style="display: none; color: #b91c1c; font-size: 13px; line-height: 1.4; margin: 12px 0 0;"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light border fw-bold" onclick="closeDeleteConfirm()">Cancel</button>
+                <button type="button" class="btn btn-danger fw-bold" id="deleteConfirmBtn" onclick="confirmDeleteTeacher()">Delete teacher</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 2. EDIT TEACHER MODAL -->
     <div class="modal-overlay" id="editModalOverlay">
         <div class="edit-modal">
@@ -581,15 +600,59 @@
             } catch(e) { console.error(e); }
         }
 
-        window.deleteCurrentTeacher = async function() {
+        // In-page delete confirm (no native confirm()): the row is only
+        // removed from the list when the server confirms the delete, and a
+        // refused delete shows the real server error instead of pretending
+        // it worked and letting the teacher come back on refresh.
+        window.deleteCurrentTeacher = function() {
             if(!currentTeacher) return;
-            if(!confirm(`Are you sure you want to delete teacher ${currentTeacher.name}?`)) return;
+            document.getElementById('deleteConfirmName').innerText = currentTeacher.name || 'this teacher';
+            const errEl = document.getElementById('deleteConfirmError');
+            errEl.style.display = 'none';
+            errEl.textContent = '';
+            document.getElementById('deleteConfirmOverlay').classList.add('active');
+            lucide.createIcons();
+        }
+
+        window.closeDeleteConfirm = function() {
+            document.getElementById('deleteConfirmOverlay').classList.remove('active');
+        }
+
+        // Best-effort cleanup of a leaver's linked rows. These tables may not
+        // exist (user_roles needs the Phase 2 migration) or the row may
+        // already be gone, so failures here are logged, never fatal.
+        async function cleanupLinkedRows(table, column, value) {
             try {
-                await supabase.from('users').delete().eq('id', currentTeacher.id);
+                const { error } = await supabase.from(table).delete().eq(column, value);
+                if (error) console.warn('Delete cleanup skipped for ' + table + ':', error.message);
+            } catch(e) { console.warn('Delete cleanup skipped for ' + table + ':', e); }
+        }
+
+        window.confirmDeleteTeacher = async function() {
+            if(!currentTeacher) return;
+            const errEl = document.getElementById('deleteConfirmError');
+            const btn = document.getElementById('deleteConfirmBtn');
+            errEl.style.display = 'none';
+            errEl.textContent = '';
+            btn.disabled = true;
+            btn.innerText = 'Deleting...';
+            try {
+                await cleanupLinkedRows('teacher_class_subjects', 'teacher_id', currentTeacher.id);
+                await cleanupLinkedRows('user_roles', 'user_id', currentTeacher.id);
+                const { error } = await supabase.from('users').delete().eq('id', currentTeacher.id);
+                if (error) throw error;
                 allTeachers = allTeachers.filter(t => t.id !== currentTeacher.id);
+                closeDeleteConfirm();
                 closeModals();
                 renderTable(allTeachers);
-            } catch(e) { console.error(e); alert("Failed to delete"); }
+            } catch(e) {
+                console.error(e);
+                errEl.textContent = 'Could not delete this teacher: ' + (e.message || e) + ' If this is a permissions error, run supabase/migrations/phase3-admin-delete-users.sql in the Supabase SQL editor and try again.';
+                errEl.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Delete teacher';
+            }
         }
 
         // --- EDIT MODAL LOGIC ---

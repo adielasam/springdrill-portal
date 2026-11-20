@@ -227,6 +227,7 @@
         let currentAdminId = null;
         let profileModal = null;
         let currentUserEmail = null;
+        let pendingDelete = null;
         // Admin-only page: the Delete button is shown to admins.
         // deleteUser() itself still refuses to delete a super-admin account.
         const canDelete = true;
@@ -440,7 +441,10 @@
         };
 
         
-        window.deleteUser = async function(userId, targetEmail, targetRole) {
+        // In-page delete confirm (no native confirm()): the row is only
+        // removed when the server confirms the delete, and a refused delete
+        // shows the real server error instead of pretending it worked.
+        window.deleteUser = function(userId, targetEmail, targetRole) {
             if (SUPER_ADMIN_EMAILS.includes(targetEmail)) {
                 alert("Action Denied: Super Admin accounts cannot be deleted.");
                 return;
@@ -449,12 +453,47 @@
                 alert("Action Denied: Only Super Admins can delete Administrator accounts.");
                 return;
             }
-            if (!confirm("Are you sure you want to permanently delete this user's data from the directory?")) return;
+            pendingDelete = { userId, targetEmail, targetRole };
+            document.getElementById('deleteConfirmName').innerText = targetEmail;
+            document.getElementById('deleteConfirmEmail').innerText = targetEmail;
+            document.getElementById('deleteConfirmRole').innerText = targetRole;
+            const errEl = document.getElementById('deleteConfirmError');
+            errEl.style.display = 'none';
+            errEl.textContent = '';
+            new bootstrap.Modal(document.getElementById('deleteConfirmModal')).show();
+        };
+
+        window.confirmDeleteUser = async function() {
+            if (!pendingDelete) return;
+            const { userId } = pendingDelete;
+            const btn = document.getElementById('deleteConfirmBtn');
+            const errEl = document.getElementById('deleteConfirmError');
+            errEl.style.display = 'none';
+            errEl.textContent = '';
+            btn.disabled = true;
+            btn.innerText = 'Deleting...';
             document.getElementById('loadingOverlay').style.display = 'flex';
-            await supabase.from('students').delete().eq('user_id', userId);
-            await supabase.from('teachers').delete().eq('user_id', userId);
-            await supabase.from('users').delete().eq('id', userId);
-            await loadUsers();
+            try {
+                // Best-effort: the students/teachers rows may not exist, and the
+                // teachers table may not exist at all — only the users row is required.
+                const { error: sErr } = await supabase.from('students').delete().eq('user_id', userId);
+                if (sErr) console.warn('Delete cleanup skipped for students:', sErr.message);
+                const { error: tErr } = await supabase.from('teachers').delete().eq('user_id', userId);
+                if (tErr) console.warn('Delete cleanup skipped for teachers:', tErr.message);
+                const { error } = await supabase.from('users').delete().eq('id', userId);
+                if (error) throw error;
+                pendingDelete = null;
+                bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal')).hide();
+                await loadUsers();
+            } catch (e) {
+                console.error(e);
+                errEl.textContent = 'Could not delete this user: ' + (e.message || e) + ' If this is a permissions error, run supabase/migrations/phase3-admin-delete-users.sql in the Supabase SQL editor and try again.';
+                errEl.style.display = 'block';
+                document.getElementById('loadingOverlay').style.display = 'none';
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Delete user';
+            }
         };
 
 
@@ -462,6 +501,25 @@
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) logoutBtn.addEventListener('click', async (e) => { e.preventDefault(); await supabase.auth.signOut(); window.location.href = '/'; });
     </script>
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-trash me-2"></i> Delete user?</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="mb-1">Permanently delete <strong id="deleteConfirmName">this user</strong> (<span id="deleteConfirmEmail"></span>, <span id="deleteConfirmRole"></span>)? Their student/teacher record and login row are removed. This cannot be undone.</p>
+                    <p id="deleteConfirmError" class="text-danger small mt-3 mb-0" style="display:none;"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light border fw-bold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger fw-bold" id="deleteConfirmBtn" onclick="window.confirmDeleteUser()">Delete user</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="mobile_nav.js"></script>
 </body>
 </html>
