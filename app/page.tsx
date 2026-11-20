@@ -387,9 +387,11 @@ function LoginForm() {
 
       // Multi-school (Phase 1): a member of a paused school is locked out,
       // the vendor goes to the vendor dashboard, and a school admin whose
-      // setup is not finished goes to the setup wizard. The school is kept
-      // in session storage so pages can show its name; before the Phase 1
-      // migration runs, school_id is undefined and this block is a no-op.
+      // setup is not finished goes to the setup wizard. Monthly expiry:
+      // a school whose membership has run out is locked out exactly like
+      // a paused school. The school is kept in session storage so pages
+      // can show its name; before the Phase 1 migration runs, school_id
+      // is undefined and this block is a no-op.
       if (profile.school_id !== null && profile.school_id !== undefined) {
         const { data: school, error: schoolErr } = await supabase
           .from('schools')
@@ -400,7 +402,8 @@ function LoginForm() {
           await supabase.auth.signOut();
           throw new Error('Your school could not be found. Contact the school administrator.');
         }
-        if (school.status === 'paused') {
+        const membershipExpired = school.expires_at && new Date(school.expires_at) < new Date();
+        if (school.status === 'paused' || membershipExpired) {
           await supabase.auth.signOut();
           window.location.href = '/school_paused.html';
           return;

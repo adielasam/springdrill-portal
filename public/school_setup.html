@@ -184,7 +184,10 @@
             const { data, error } = await supabase.from('schools').select('*').eq('id', school.id).single();
             if (error || !data) throw new Error('Could not load your school.');
             school = data;
-            if (school.status === 'paused') { window.location.href = '/school_paused.html'; return false; }
+            // Monthly expiry: an expired school is treated exactly like
+            // a paused school, even mid-setup.
+            const membershipExpired = school.expires_at && new Date(school.expires_at) < new Date();
+            if (school.status === 'paused' || membershipExpired) { window.location.href = '/school_paused.html'; return false; }
             if (school.setup_completed) { window.location.href = '/admin_dashboard.html'; return false; }
             document.getElementById('pageTitle').textContent = 'Set up ' + school.name;
             document.getElementById('fName').value = school.name || '';
@@ -200,6 +203,30 @@
             document.getElementById('wizard').style.display = 'block';
             renderPills();
             showStep(1);
+        }
+
+        // Setup-code expiry: a code is valid for 14 days from approval
+        // (approved_at, set by the approve route and reset whenever the
+        // vendor generates a fresh code). A school whose approval date is
+        // missing (pre-migration rows) cannot be dated, so its code is
+        // accepted — the vendor can always regenerate a code.
+        const SETUP_CODE_VALID_DAYS = 14;
+        function setupCodeExpiryDate() {
+            if (!school || !school.approved_at) return null;
+            const d = new Date(school.approved_at);
+            if (isNaN(d.getTime())) return null;
+            d.setDate(d.getDate() + SETUP_CODE_VALID_DAYS);
+            return d;
+        }
+        function setupCodeExpired() {
+            if (!school || !school.setup_code) return false;
+            const until = setupCodeExpiryDate();
+            if (!until) return false;
+            return Date.now() > until.getTime();
+        }
+        function setupCodeExpiredMessage() {
+            const until = setupCodeExpiryDate();
+            return 'This setup code expired' + (until ? ' on ' + until.toLocaleDateString() : '') + '. Ask the SpringDrill team for a fresh code — the old one cannot be used.';
         }
 
         async function loadClasses() {
@@ -260,6 +287,10 @@
             const entered = document.getElementById('setupCodeInput').value.trim().toUpperCase();
             if (!entered) { showError('Type the setup code first.'); return; }
             if (!school.setup_code) { openWizard(); return; }
+            if (setupCodeExpired()) {
+                showError(setupCodeExpiredMessage());
+                return;
+            }
             if (entered !== String(school.setup_code).trim().toUpperCase()) {
                 showError('That code does not match. Check it and try again, or ask the SpringDrill team for a fresh code.');
                 return;
@@ -405,6 +436,7 @@
                     if (await loadSchool()) {
                         if (school.setup_code) {
                             document.getElementById('codeGate').style.display = 'block';
+                            if (setupCodeExpired()) showError(setupCodeExpiredMessage());
                         } else {
                             openWizard();
                         }
