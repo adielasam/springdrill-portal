@@ -9,47 +9,145 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --brand-600: #059669; --brand-dark: #004d34; }
-        body { background: #f9fafb; font-family: 'Inter', sans-serif; color: #111827; }
-        .sd-card { max-width: 560px; margin: 48px auto; background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,.05); }
-        .sd-brand { font-weight: 800; font-size: 22px; letter-spacing: -.5px; color: var(--brand-600); margin: 0; }
-        .btn-brand { background: var(--brand-600); border-color: var(--brand-600); color: #fff; font-weight: 600; }
-        .btn-brand:hover { background: #047857; border-color: #047857; color: #fff; }
+        :root { --brand-600: #059669; --brand-700: #047857; --brand-dark: #004d34; --ink: #111827; --muted: #6b7280; --line: #e5e7eb; --soft: #f4f7f5; }
+        body { background: #fff; font-family: 'Inter', sans-serif; color: var(--ink); }
+        a { text-decoration: none; }
+
+        /* Shared top bar + footer (same on all school pages) */
+        .sd-topbar { background: #fff; border-bottom: 1px solid var(--line); }
+        .sd-topbar-inner { max-width: 1120px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+        .sd-topbar-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; color: var(--brand-600); letter-spacing: -.5px; }
+        .sd-topbar-brand img { display: block; }
+        .sd-topbar-nav { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .sd-topbar-nav a { color: #374151; font-size: 14px; font-weight: 600; }
+        .sd-topbar-nav a:hover { color: var(--brand-600); }
+        .sd-topbar-signin { background: var(--brand-600); color: #fff !important; padding: 8px 16px; border-radius: 999px; }
+        .sd-topbar-signin:hover { background: var(--brand-700); color: #fff !important; }
+        .sd-footer { background: var(--brand-dark); color: #d1fae5; margin-top: 72px; }
+        .sd-footer-inner { max-width: 1120px; margin: 0 auto; padding: 44px 20px 36px; text-align: center; }
+        .sd-footer-brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; color: #fff; letter-spacing: -.5px; }
+        .sd-footer-tag { font-size: 14px; margin: 12px 0 4px; }
+        .sd-footer-contact { font-size: 14px; margin: 0 0 18px; }
+        .sd-footer-contact strong { color: #fff; }
+        .sd-footer-nav { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }
+        .sd-footer-nav a { color: #d1fae5; font-size: 14px; font-weight: 600; }
+        .sd-footer-nav a:hover { color: #fff; }
+        .sd-footer-copy { font-size: 12px; color: #a7f3d0; margin: 22px 0 0; }
+
+        /* Hero */
+        .sd-hero { background: linear-gradient(135deg, var(--brand-dark) 0%, #036b4a 55%, var(--brand-600) 100%); color: #fff; }
+        .sd-hero-inner { max-width: 1120px; margin: 0 auto; padding: 60px 20px 52px; text-align: center; }
+        .sd-hero h1 { font-weight: 800; font-size: clamp(30px, 5vw, 46px); letter-spacing: -1px; line-height: 1.1; margin: 0 0 14px; }
+        .sd-hero p { font-size: clamp(15px, 2vw, 18px); color: #d1fae5; max-width: 640px; margin: 0 auto 22px; line-height: 1.6; }
+        .sd-trust { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .sd-trust span { border: 1px solid rgba(255,255,255,.45); border-radius: 999px; padding: 7px 14px; font-size: 13px; font-weight: 600; color: #fff; }
+        .sd-trust span b { color: #a7f3d0; }
+
+        /* Sections */
+        .sd-section { max-width: 1120px; margin: 0 auto; padding: 52px 20px 0; }
+        .sd-section h2 { font-weight: 800; font-size: clamp(22px, 3vw, 28px); letter-spacing: -.5px; text-align: center; margin: 0 0 8px; }
+        .sd-section-sub { text-align: center; color: var(--muted); font-size: 15px; max-width: 620px; margin: 0 auto 28px; line-height: 1.6; }
+
+        /* Plan cards */
+        .sd-plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: stretch; }
+        @media (max-width: 767px) { .sd-plans { grid-template-columns: 1fr; } }
+        .sd-plan { position: relative; background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 26px 24px 24px; display: flex; flex-direction: column; cursor: pointer; transition: box-shadow .15s ease, border-color .15s ease, transform .15s ease; }
+        .sd-plan:hover { box-shadow: 0 10px 28px rgba(0,0,0,.10); transform: translateY(-2px); }
+        .sd-plan.popular { border: 2px solid var(--brand-600); box-shadow: 0 8px 24px rgba(5,150,105,.14); }
+        .sd-plan.selected { border-color: var(--brand-600); box-shadow: 0 0 0 3px rgba(5,150,105,.25); }
+        .sd-plan-badge { position: absolute; top: -13px; left: 50%; transform: translateX(-50%); background: var(--brand-600); color: #fff; font-size: 12px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; padding: 5px 12px; border-radius: 999px; white-space: nowrap; }
+        .sd-plan-name { font-weight: 800; font-size: 18px; margin: 0 0 2px; }
+        .sd-plan-limit { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+        .sd-plan-price { font-weight: 800; font-size: 34px; letter-spacing: -1px; line-height: 1; }
+        .sd-plan-price small { font-size: 15px; font-weight: 600; color: var(--muted); letter-spacing: 0; }
+        .sd-plan-yearly { color: var(--muted); font-size: 13px; margin: 6px 0 16px; }
+        .sd-plan-features { list-style: none; padding: 0; margin: 0 0 20px; flex: 1; }
+        .sd-plan-features li { font-size: 14px; padding: 5px 0 5px 26px; position: relative; line-height: 1.45; }
+        .sd-plan-features li::before { content: "✓"; position: absolute; left: 2px; top: 5px; color: var(--brand-600); font-weight: 800; }
+        .sd-plan-choose { width: 100%; border-radius: 10px; font-weight: 700; padding: 10px 12px; }
+        .sd-plan-choose.btn-outline-success { border-color: var(--brand-600); color: var(--brand-600); }
+        .sd-plan-choose.btn-outline-success:hover { background: var(--brand-600); color: #fff; }
+        .sd-plan-choose.btn-success { background: var(--brand-600); border-color: var(--brand-600); }
+        .sd-plan-choose.btn-success:hover { background: var(--brand-700); border-color: var(--brand-700); }
+        .sd-plans-note { text-align: center; color: var(--muted); font-size: 13px; margin: 22px 0 0; }
+
+        /* How it works */
+        .sd-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        @media (max-width: 767px) { .sd-steps { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 480px) { .sd-steps { grid-template-columns: 1fr; } }
+        .sd-step { background: var(--soft); border: 1px solid #e7efeb; border-radius: 16px; padding: 22px 18px; text-align: center; }
+        .sd-step-num { width: 44px; height: 44px; margin: 0 auto 12px; border-radius: 50%; background: var(--brand-600); color: #fff; font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .sd-step h3 { font-weight: 700; font-size: 16px; margin: 0 0 6px; }
+        .sd-step p { color: var(--muted); font-size: 13px; margin: 0; line-height: 1.55; }
+
+        /* Form */
+        .sd-form-card { max-width: 660px; margin: 0 auto; background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 32px; box-shadow: 0 8px 28px rgba(0,0,0,.07); }
+        @media (max-width: 575px) { .sd-form-card { padding: 24px 18px; } }
+        .sd-form-card h2 { font-weight: 800; font-size: 24px; letter-spacing: -.5px; margin: 0 0 6px; }
+        .sd-form-card .sd-form-sub { color: var(--muted); font-size: 14px; margin: 0 0 22px; line-height: 1.6; }
+        .btn-brand { background: var(--brand-600); border-color: var(--brand-600); color: #fff; font-weight: 700; }
+        .btn-brand:hover { background: var(--brand-700); border-color: var(--brand-700); color: #fff; }
         .btn-brand:disabled { background: #6b7280; border-color: #6b7280; }
         .form-label { font-weight: 600; font-size: 13px; }
-        .form-control, .form-select { font-size: 14px; padding: 10px 12px; border-radius: 8px; }
+        .form-control, .form-select { font-size: 14px; padding: 11px 12px; border-radius: 9px; }
+        .form-control:focus, .form-select:focus { border-color: var(--brand-600); box-shadow: 0 0 0 3px rgba(5,150,105,.18); }
+        .sd-chosen-plan { background: var(--soft); border: 1px solid #d9eadf; border-radius: 10px; padding: 12px 14px; font-size: 14px; margin-bottom: 20px; }
+        .sd-chosen-plan a { color: var(--brand-600); font-weight: 600; }
     </style>
 </head>
 <body>
-    <div class="container px-3">
-        <div class="sd-card">
-            <p class="sd-brand">SpringDrill</p>
-            <h1 class="h4 fw-bold mt-2 mb-1">Register your school</h1>
-            <p class="text-muted" style="font-size: 14px;">Tell us about your school. We review every application — if approved, we send you a setup code to create your school's own portal.</p>
+    <header class="sd-topbar">
+        <div class="sd-topbar-inner">
+            <a href="/" class="sd-topbar-brand"><img src="/springdrill-emblem.png" alt="" width="30" height="30"><span>SpringDrill</span></a>
+            <nav class="sd-topbar-nav">
+                <a href="/">Home</a>
+                <a href="/contact">Contact</a>
+                <a href="/#signin" class="sd-topbar-signin">Portal sign-in</a>
+            </nav>
+        </div>
+    </header>
 
-            <div class="mb-4">
-                <h2 class="h6 fw-bold mb-2">Plans — flat monthly, not per student</h2>
-                <div class="border rounded p-3 mb-2" style="font-size: 14px;">
-                    <div class="d-flex justify-content-between"><strong>Starter</strong><strong>₦5,000 / month</strong></div>
-                    <div class="text-muted">₦50,000 / year · Up to 100 students</div>
-                    <div class="text-muted">Results &amp; report cards · CBT tests · JAMB practice · Question bank</div>
-                </div>
-                <div class="border rounded p-3 mb-2" style="font-size: 14px;">
-                    <div class="d-flex justify-content-between"><strong>Growth</strong><strong>₦10,000 / month</strong></div>
-                    <div class="text-muted">₦100,000 / year · Up to 300 students</div>
-                    <div class="text-muted">Everything in Starter, plus finance &amp; fees tracking, attendance, AI lesson planner</div>
-                </div>
-                <div class="border rounded p-3 mb-2" style="font-size: 14px;">
-                    <div class="d-flex justify-content-between"><strong>Premium</strong><strong>₦20,000 / month</strong></div>
-                    <div class="text-muted">₦200,000 / year · Unlimited students</div>
-                    <div class="text-muted">Everything in Growth, plus priority support, custom subdomain, data migration help</div>
-                </div>
-                <p class="text-muted mb-0" style="font-size: 12px;">Every plan starts with a 14-day free trial. You pick your plan after approval — no payment is taken here.</p>
+    <section class="sd-hero">
+        <div class="sd-hero-inner">
+            <h1>Bring your school onto SpringDrill</h1>
+            <p>Results, report cards, CBT tests and JAMB practice — one portal for your whole school. We review every application; approved schools get a setup code and their own portal.</p>
+            <div class="sd-trust">
+                <span><b>✓</b> 14-day free trial</span>
+                <span><b>✓</b> No payment taken here</span>
+                <span><b>✓</b> Set up in minutes</span>
             </div>
+        </div>
+    </section>
+
+    <section class="sd-section" id="plans">
+        <h2>Plans — flat monthly, not per student</h2>
+        <p class="sd-section-sub">One flat price per school. No per-student billing, no hidden fees. Pick a plan now — you can change it later, and every plan starts with a 14-day free trial.</p>
+        <div class="sd-plans" id="plansGrid">
+            <p class="text-muted text-center w-100" style="font-size: 14px;" id="plansLoading">Loading plans…</p>
+        </div>
+        <p class="sd-plans-note">Prices are per school per month. Yearly is 10× monthly — two months free.</p>
+    </section>
+
+    <section class="sd-section">
+        <h2>How it works</h2>
+        <p class="sd-section-sub">From application to your own school portal in four steps.</p>
+        <div class="sd-steps">
+            <div class="sd-step"><div class="sd-step-num">1</div><h3>Apply</h3><p>Tell us about your school in the form below. It takes two minutes.</p></div>
+            <div class="sd-step"><div class="sd-step-num">2</div><h3>We review</h3><p>Every application is checked by the SpringDrill team.</p></div>
+            <div class="sd-step"><div class="sd-step-num">3</div><h3>Setup code</h3><p>Approved schools get a one-time setup code and a first admin login by email.</p></div>
+            <div class="sd-step"><div class="sd-step-num">4</div><h3>Your portal</h3><p>Finish five quick setup steps and open your school's own dashboard.</p></div>
+        </div>
+    </section>
+
+    <section class="sd-section" id="apply">
+        <div class="sd-form-card">
+            <h2>Register your school</h2>
+            <p class="sd-form-sub">Tell us about your school. We review every application — if approved, we send you a setup code to create your school's own portal.</p>
 
             <div id="signupError" class="alert alert-danger" style="display:none; font-size: 14px;"></div>
 
             <form id="signupForm">
+                <div class="sd-chosen-plan">Chosen plan: <strong id="chosenPlanLabel">Growth</strong> &nbsp;·&nbsp; <a href="#plans">Change plan</a></div>
                 <div class="mb-3">
                     <label class="form-label" for="schoolName">School name *</label>
                     <input class="form-control" id="schoolName" type="text" placeholder="e.g. Gifted Hands Academy" required maxlength="120">
@@ -93,22 +191,111 @@
             <div id="signupSuccess" style="display:none;">
                 <div class="alert alert-success" style="font-size: 14px;">
                     <strong>Application received.</strong><br>
-                    The SpringDrill team will review it and send your setup code to <strong id="successEmail"></strong>.
+                    The SpringDrill team will review it and send your setup code to <strong id="successEmail"></strong>.<br>
+                    Plan chosen: <strong id="successPlan"></strong>
                 </div>
                 <p class="text-muted" style="font-size: 14px;">Your school's address, once approved, will be:<br>
                     <strong id="successUrl"></strong>
                 </p>
                 <a href="/" class="btn btn-outline-secondary w-100">Back to SpringDrill home</a>
             </div>
-
-            <p class="text-center mt-4 mb-0" style="font-size: 13px;"><a href="/" class="text-muted">Back to SpringDrill home</a></p>
         </div>
-    </div>
+    </section>
+
+    <footer class="sd-footer">
+        <div class="sd-footer-inner">
+            <div class="sd-footer-brand"><img src="/springdrill-emblem.png" alt="" width="30" height="30"><span>SpringDrill</span></div>
+            <p class="sd-footer-tag">CBT tests, results and report cards for Nigerian schools.</p>
+            <p class="sd-footer-contact">For partnerships and purchases, call <strong>08162337303</strong></p>
+            <nav class="sd-footer-nav">
+                <a href="/">Home</a>
+                <a href="/school_signup.html">Register your school</a>
+                <a href="/contact">Contact</a>
+                <a href="/#signin">Portal sign-in</a>
+            </nav>
+            <p class="sd-footer-copy">© 2026 SpringDrill</p>
+        </div>
+    </footer>
 
     <script type="module">
+        import { supabase } from './supabaseClient.js';
+
         const form = document.getElementById('signupForm');
         const errEl = document.getElementById('signupError');
         const btn = document.getElementById('submitBtn');
+        const plansGrid = document.getElementById('plansGrid');
+        const chosenPlanLabel = document.getElementById('chosenPlanLabel');
+
+        // Fallback prices — the exact prices the page showed before this
+        // rebuild. Used only if the plans table cannot be read, so the
+        // page never shows a wrong price.
+        const DEFAULT_PLANS = [
+            { name: 'Starter', monthly_price: 5000, yearly_price: 50000, student_limit: 100, features: 'Results & report cards\nCBT tests\nJAMB practice\nQuestion bank' },
+            { name: 'Growth', monthly_price: 10000, yearly_price: 100000, student_limit: 300, features: 'Everything in Starter\nFinance & fees tracking\nAttendance\nAI lesson planner' },
+            { name: 'Premium', monthly_price: 20000, yearly_price: 200000, student_limit: null, features: 'Everything in Growth\nPriority support\nCustom subdomain\nData migration help' },
+        ];
+
+        let selectedPlan = 'Growth';
+
+        function esc(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+        function naira(n) {
+            return '₦' + Number(n || 0).toLocaleString('en-NG');
+        }
+
+        function renderPlans(plans) {
+            const popularIdx = Math.max(0, plans.findIndex((p) => p.name === 'Growth'));
+            plansGrid.innerHTML = plans.map((p, i) => {
+                const features = String(p.features || '').split('\n').map((f) => f.trim()).filter(Boolean);
+                const limit = p.student_limit === null || p.student_limit === undefined ? 'Unlimited students' : 'Up to ' + Number(p.student_limit).toLocaleString('en-NG') + ' students';
+                const isPopular = i === popularIdx;
+                const isSelected = p.name === selectedPlan;
+                return '<article class="sd-plan' + (isPopular ? ' popular' : '') + (isSelected ? ' selected' : '') + '" data-plan="' + esc(p.name) + '" tabindex="0" role="button" aria-pressed="' + isSelected + '">' +
+                    (isPopular ? '<span class="sd-plan-badge">Most popular</span>' : '') +
+                    '<p class="sd-plan-name">' + esc(p.name) + '</p>' +
+                    '<p class="sd-plan-limit">' + esc(limit) + '</p>' +
+                    '<p class="sd-plan-price">' + esc(naira(p.monthly_price)) + ' <small>/ month</small></p>' +
+                    '<p class="sd-plan-yearly">' + esc(naira(p.yearly_price)) + ' / year · 2 months free</p>' +
+                    '<ul class="sd-plan-features">' + features.map((f) => '<li>' + esc(f) + '</li>').join('') + '</ul>' +
+                    '<button type="button" class="btn ' + (isSelected ? 'btn-success' : 'btn-outline-success') + ' sd-plan-choose">' + (isSelected ? '✓ Selected' : 'Choose ' + esc(p.name)) + '</button>' +
+                    '</article>';
+            }).join('');
+            plansGrid.querySelectorAll('.sd-plan').forEach((card) => {
+                const pick = () => selectPlan(card.getAttribute('data-plan'));
+                card.addEventListener('click', pick);
+                card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+            });
+        }
+
+        function selectPlan(name) {
+            if (!name) return;
+            selectedPlan = name;
+            chosenPlanLabel.textContent = name;
+            plansGrid.querySelectorAll('.sd-plan').forEach((card) => {
+                const on = card.getAttribute('data-plan') === name;
+                card.classList.toggle('selected', on);
+                card.setAttribute('aria-pressed', String(on));
+                const b = card.querySelector('.sd-plan-choose');
+                if (b) {
+                    b.textContent = on ? '✓ Selected' : 'Choose ' + card.getAttribute('data-plan');
+                    b.className = 'btn sd-plan-choose ' + (on ? 'btn-success' : 'btn-outline-success');
+                }
+            });
+        }
+
+        async function loadPlans() {
+            try {
+                const { data, error } = await supabase.from('plans').select('name, monthly_price, yearly_price, student_limit, features').eq('is_active', true).order('monthly_price', { ascending: true });
+                if (!error && data && data.length) {
+                    if (!data.some((p) => p.name === selectedPlan)) selectedPlan = data[0].name;
+                    chosenPlanLabel.textContent = selectedPlan;
+                    renderPlans(data);
+                    return;
+                }
+            } catch (e) { /* fall back to the hardcoded defaults below */ }
+            renderPlans(DEFAULT_PLANS);
+        }
 
         function showError(msg) {
             errEl.textContent = msg;
@@ -130,6 +317,7 @@
                     contact_phone: document.getElementById('contactPhone').value.trim(),
                     students_count: document.getElementById('studentsCount').value.trim(),
                     wants: document.getElementById('wants').value,
+                    plan: selectedPlan,
                 };
                 const res = await fetch('/api/school-signup', {
                     method: 'POST',
@@ -140,6 +328,7 @@
                 if (!res.ok) throw new Error(data.error || 'Could not save the application. Please try again.');
                 document.getElementById('successEmail').textContent = payload.contact_email;
                 document.getElementById('successUrl').textContent = window.location.origin + '/' + data.slug;
+                document.getElementById('successPlan').textContent = selectedPlan;
                 form.style.display = 'none';
                 document.getElementById('signupSuccess').style.display = 'block';
             } catch (err) {
@@ -149,6 +338,8 @@
                 btn.textContent = 'Submit application';
             }
         });
+
+        loadPlans();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -9,25 +9,84 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --brand-600: #059669; }
-        body { background: #f9fafb; font-family: 'Inter', sans-serif; color: #111827; }
-        .sd-card { max-width: 560px; margin: 48px auto; background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,.05); text-align: center; }
-        .sd-brand { font-weight: 800; font-size: 20px; letter-spacing: -.5px; color: var(--brand-600); margin: 0; }
-        .btn-brand { background: var(--brand-600); border-color: var(--brand-600); color: #fff; font-weight: 600; }
-        .btn-brand:hover { background: #047857; border-color: #047857; color: #fff; }
+        :root { --brand-600: #059669; --brand-700: #047857; --brand-dark: #004d34; --ink: #111827; --muted: #6b7280; --line: #e5e7eb; --soft: #f4f7f5; }
+        body { background: var(--soft); font-family: 'Inter', sans-serif; color: var(--ink); }
+        a { text-decoration: none; }
+
+        /* Shared top bar + footer (same on all school pages) */
+        .sd-topbar { background: #fff; border-bottom: 1px solid var(--line); }
+        .sd-topbar-inner { max-width: 1120px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+        .sd-topbar-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; color: var(--brand-600); letter-spacing: -.5px; }
+        .sd-topbar-brand img { display: block; }
+        .sd-topbar-nav { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .sd-topbar-nav a { color: #374151; font-size: 14px; font-weight: 600; }
+        .sd-topbar-nav a:hover { color: var(--brand-600); }
+        .sd-topbar-signin { background: var(--brand-600); color: #fff !important; padding: 8px 16px; border-radius: 999px; }
+        .sd-topbar-signin:hover { background: var(--brand-700); color: #fff !important; }
+        .sd-footer { background: var(--brand-dark); color: #d1fae5; margin-top: 72px; }
+        .sd-footer-inner { max-width: 1120px; margin: 0 auto; padding: 44px 20px 36px; text-align: center; }
+        .sd-footer-brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; color: #fff; letter-spacing: -.5px; }
+        .sd-footer-tag { font-size: 14px; margin: 12px 0 4px; }
+        .sd-footer-contact { font-size: 14px; margin: 0 0 18px; }
+        .sd-footer-contact strong { color: #fff; }
+        .sd-footer-nav { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }
+        .sd-footer-nav a { color: #d1fae5; font-size: 14px; font-weight: 600; }
+        .sd-footer-nav a:hover { color: #fff; }
+        .sd-footer-copy { font-size: 12px; color: #a7f3d0; margin: 22px 0 0; }
+
+        /* Paused card */
+        .sd-paused-card { max-width: 600px; margin: 56px auto; background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 40px 32px; box-shadow: 0 8px 28px rgba(0,0,0,.07); text-align: center; }
+        @media (max-width: 575px) { .sd-paused-card { padding: 32px 20px; margin: 32px auto; } }
+        .sd-paused-icon { width: 72px; height: 72px; margin: 0 auto 20px; border-radius: 50%; background: #fef3c7; display: flex; align-items: center; justify-content: center; }
+        .sd-paused-card h1 { font-weight: 800; font-size: clamp(22px, 3.5vw, 28px); letter-spacing: -.5px; margin: 0 0 12px; }
+        .sd-paused-card p { color: var(--muted); font-size: 15px; line-height: 1.65; }
+        .sd-safe-strip { background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; padding: 12px 16px; font-size: 14px; color: var(--brand-dark); margin: 20px 0; }
+        .btn-brand { background: var(--brand-600); border-color: var(--brand-600); color: #fff; font-weight: 700; }
+        .btn-brand:hover { background: var(--brand-700); border-color: var(--brand-700); color: #fff; }
     </style>
 </head>
 <body>
-    <div class="container px-3">
-        <div class="sd-card">
-            <p class="sd-brand">SpringDrill</p>
-            <h1 class="h4 fw-bold mt-3 mb-2">Your school's membership is paused</h1>
-            <p class="text-muted" style="font-size: 14px;">Your school's Spring Drill membership has run out, so nobody from the school can sign in right now. Nothing has been deleted — all students, scores, results and report cards are exactly as they were.</p>
-            <p class="text-muted" style="font-size: 14px;">To continue, the school needs to renew its membership. Please contact the Spring Drill team.</p>
+    <header class="sd-topbar">
+        <div class="sd-topbar-inner">
+            <a href="/" class="sd-topbar-brand"><img src="/springdrill-emblem.png" alt="" width="30" height="30"><span>SpringDrill</span></a>
+            <nav class="sd-topbar-nav">
+                <a href="/">Home</a>
+                <a href="/school_signup.html">Register your school</a>
+                <a href="/contact">Contact</a>
+                <a href="/#signin" class="sd-topbar-signin">Portal sign-in</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container px-3">
+        <div class="sd-paused-card">
+            <div class="sd-paused-icon" aria-hidden="true">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><rect x="6" y="5" width="4" height="14" rx="1.5" fill="#92400e"/><rect x="14" y="5" width="4" height="14" rx="1.5" fill="#92400e"/></svg>
+            </div>
+            <h1>Your school's membership is paused</h1>
+            <p>Your school's Spring Drill membership has run out, so nobody from the school can sign in right now. Nothing has been deleted — all students, scores, results and report cards are exactly as they were.</p>
+            <div class="sd-safe-strip"><strong>Nothing has been deleted.</strong> Everything will be exactly as you left it when the membership is renewed.</div>
+            <p>To continue, the school needs to renew its membership. Please contact the Spring Drill team.</p>
             <a href="/contact" class="btn btn-brand w-100 py-2">Contact the Spring Drill team</a>
             <p class="text-center mt-4 mb-0" style="font-size: 13px;"><a href="/" class="text-muted">Back to SpringDrill home</a></p>
         </div>
-    </div>
+    </main>
+
+    <footer class="sd-footer">
+        <div class="sd-footer-inner">
+            <div class="sd-footer-brand"><img src="/springdrill-emblem.png" alt="" width="30" height="30"><span>SpringDrill</span></div>
+            <p class="sd-footer-tag">CBT tests, results and report cards for Nigerian schools.</p>
+            <p class="sd-footer-contact">For partnerships and purchases, call <strong>08162337303</strong></p>
+            <nav class="sd-footer-nav">
+                <a href="/">Home</a>
+                <a href="/school_signup.html">Register your school</a>
+                <a href="/contact">Contact</a>
+                <a href="/#signin">Portal sign-in</a>
+            </nav>
+            <p class="sd-footer-copy">© 2026 SpringDrill</p>
+        </div>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
