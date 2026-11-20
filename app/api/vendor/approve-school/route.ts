@@ -194,15 +194,19 @@ export async function POST(request: Request) {
         }
 
         // (a) + (b) Activate the workspace and store the setup code.
-        // expires_at stays empty until pricing is decided (plan §5.2):
-        // the vendor sets it from the dashboard.
+        // Monthly membership (multi-school monthly expiry): the
+        // membership runs for one month from approval. The vendor
+        // extends it from the dashboard when the school renews.
+        const approvedAt = new Date();
+        const expiresAt = new Date(approvedAt);
+        expiresAt.setMonth(expiresAt.getMonth() + 1);
         const { error: schoolUpdateErr } = await supabaseAdmin
             .from('schools')
             .update({
                 status: 'active',
                 setup_code: setupCode,
-                approved_at: new Date().toISOString(),
-                expires_at: null,
+                approved_at: approvedAt.toISOString(),
+                expires_at: expiresAt.toISOString(),
                 setup_completed: false,
             })
             .eq('id', school.id);
@@ -220,6 +224,7 @@ export async function POST(request: Request) {
             temp_password: password,
             admin_email: school.contact_email,
             slug: school.slug,
+            expires_at: expiresAt.toISOString(),
             url: `${siteBase(request)}/${school.slug}`,
         });
     } catch (error: any) {

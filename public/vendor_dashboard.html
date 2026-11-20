@@ -54,10 +54,11 @@
         <div id="pageOk" class="alert alert-success" style="display:none; font-size: 14px;"></div>
 
         <div class="row g-3 mb-4" id="statsRow">
-            <div class="col-6 col-md-3"><div class="sd-card text-center"><div class="h4 fw-bold mb-0" id="statPending">0</div><div class="text-muted" style="font-size: 13px;">Waiting approval</div></div></div>
-            <div class="col-6 col-md-3"><div class="sd-card text-center"><div class="h4 fw-bold mb-0" id="statActive">0</div><div class="text-muted" style="font-size: 13px;">Active</div></div></div>
-            <div class="col-6 col-md-3"><div class="sd-card text-center"><div class="h4 fw-bold mb-0" id="statPaused">0</div><div class="text-muted" style="font-size: 13px;">Paused</div></div></div>
-            <div class="col-6 col-md-3"><div class="sd-card text-center"><div class="h4 fw-bold mb-0" id="statTotal">0</div><div class="text-muted" style="font-size: 13px;">Partner schools</div></div></div>
+            <div class="col-6 col-md"><div class="sd-card text-center"><div class="h4 fw-bold mb-0" id="statPending">0</div><div class="text-muted" style="font-size: 13px;">Waiting approval</div></div></div>
+            <div class="col-6 col-md"><div class="sd-card text-center"><div class="h4 fw-bold mb-0" id="statActive">0</div><div class="text-muted" style="font-size: 13px;">Active</div></div></div>
+            <div class="col-6 col-md"><div class="sd-card text-center"><div class="h4 fw-bold mb-0" id="statPaused">0</div><div class="text-muted" style="font-size: 13px;">Paused</div></div></div>
+            <div class="col-6 col-md"><div class="sd-card text-center"><div class="h4 fw-bold mb-0" id="statExpired">0</div><div class="text-muted" style="font-size: 13px;">Expired</div></div></div>
+            <div class="col-6 col-md"><div class="sd-card text-center"><div class="h4 fw-bold mb-0" id="statTotal">0</div><div class="text-muted" style="font-size: 13px;">Partner schools</div></div></div>
         </div>
 
         <div id="approveResult" class="sd-card mb-4" style="display:none; border-color: var(--brand-600);">
@@ -65,6 +66,7 @@
             <p class="text-muted mb-2" style="font-size: 14px;">Send this by email or WhatsApp to the school's contact person. The temporary password is shown once — it cannot be recovered from here.</p>
             <div class="mb-1"><span class="text-muted" style="font-size: 13px;">School address</span><br><strong id="approveUrl"></strong></div>
             <div class="mb-1"><span class="text-muted" style="font-size: 13px;">Setup code</span><br><span class="code-big" id="approveCode"></span></div>
+            <div class="mb-1"><span class="text-muted" style="font-size: 13px;">Membership runs to</span><br><strong id="approveExpiry"></strong></div>
             <div class="mb-1"><span class="text-muted" style="font-size: 13px;">Admin login</span><br><strong id="approveEmail"></strong></div>
             <div class="mb-3"><span class="text-muted" style="font-size: 13px;">Temporary password</span><br><strong id="approvePassword" class="code-big" style="font-size: 20px;"></strong></div>
             <div class="d-flex gap-2">
@@ -118,9 +120,13 @@
                     <div class="mb-2">
                         <label class="form-label" for="expiryInput">Membership expires</label>
                         <input class="form-control" id="expiryInput" type="date">
-                        <div class="form-text">Leave empty for no expiry date (set once pricing is decided).</div>
+                        <div class="form-text">Approval sets the expiry one month ahead. Extend it when the school renews; leave empty for no expiry date.</div>
                     </div>
-                    <button type="button" class="btn btn-brand btn-sm" id="savePlanBtn">Save plan &amp; expiry</button>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="button" class="btn btn-brand btn-sm" id="savePlanBtn">Save plan &amp; expiry</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="extendBtn">Extend by 1 month</button>
+                    </div>
+                    <p id="expiryNote" class="text-muted mt-2 mb-0" style="display:none; font-size: 13px;"></p>
                     <div class="mt-4">
                         <h3 class="h6 fw-bold">Membership</h3>
                         <button type="button" class="btn btn-danger btn-sm" id="pauseBtn">Pause school</button>
@@ -183,6 +189,15 @@
             const cls = map[status] || 'badge-declined';
             return '<span class="badge-status ' + cls + '">' + (status || 'section') + '</span>';
         }
+        // Monthly expiry: an 'active' school whose membership has run
+        // out is shown as expired everywhere in this dashboard, even
+        // though its stored status stays 'active' until the vendor
+        // extends it or pauses it. A paused school stays paused.
+        function effStatus(s) {
+            if (!s) return '';
+            if (s.status === 'active' && s.expires_at && new Date(s.expires_at) < new Date()) return 'expired';
+            return s.status || '';
+        }
         function esc(s) {
             return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         }
@@ -209,8 +224,9 @@
             // Partner schools only: the 3 legacy sections have no status.
             schools = (data || []).filter((s) => s.status !== null && s.status !== undefined);
             document.getElementById('statPending').textContent = schools.filter((s) => s.status === 'pending').length;
-            document.getElementById('statActive').textContent = schools.filter((s) => s.status === 'active').length;
+            document.getElementById('statActive').textContent = schools.filter((s) => effStatus(s) === 'active').length;
             document.getElementById('statPaused').textContent = schools.filter((s) => s.status === 'paused').length;
+            document.getElementById('statExpired').textContent = schools.filter((s) => effStatus(s) === 'expired').length;
             document.getElementById('statTotal').textContent = schools.length;
             renderApprovals();
             await renderTable();
@@ -266,7 +282,7 @@
             tbody.innerHTML = rows.map((s) => `
                 <tr class="school-row ${selectedId === s.id ? 'selected' : ''}" data-school="${s.id}">
                     <td><strong>${esc(s.name)}</strong><br><span class="text-muted" style="font-size: 12px;">/${esc(s.slug || '')}</span></td>
-                    <td>${statusBadge(s.status)}</td>
+                    <td>${statusBadge(effStatus(s))}</td>
                     <td style="font-size: 13px;">${esc(s.contact_name || '')}<br><span class="text-muted">${esc(s.contact_email || '')}</span></td>
                     <td>${counts[s.id]}</td>
                     <td>${fmtDate(s.expires_at)}</td>
@@ -288,11 +304,19 @@
             if (!s) return;
             document.getElementById('detailPanel').style.display = 'block';
             document.getElementById('detailName').textContent = s.name;
-            document.getElementById('detailSlug').textContent = '/' + (s.slug || '') + ' · ' + (s.status || '');
+            document.getElementById('detailSlug').textContent = '/' + (s.slug || '') + ' · ' + (effStatus(s) || '');
             document.getElementById('detailCode').textContent = s.setup_code || '—';
             document.getElementById('planInput').value = s.plan || '';
             document.getElementById('expiryInput').value = s.expires_at ? new Date(s.expires_at).toISOString().slice(0, 10) : '';
             document.getElementById('regenCodeBtn').style.display = (!s.setup_completed && s.status === 'active') ? '' : 'none';
+            document.getElementById('extendBtn').style.display = (s.status === 'pending' || s.status === 'declined') ? 'none' : '';
+            const expiryNote = document.getElementById('expiryNote');
+            if (effStatus(s) === 'expired') {
+                expiryNote.textContent = 'Membership expired on ' + fmtDate(s.expires_at) + '. Extend it below to switch the school back on.';
+                expiryNote.style.display = 'block';
+            } else {
+                expiryNote.style.display = 'none';
+            }
             document.getElementById('pauseBtn').style.display = s.status === 'paused' ? 'none' : '';
             document.getElementById('resumeBtn').style.display = s.status === 'paused' ? '' : 'none';
             document.getElementById('createAdminNote').style.display = 'none';
@@ -323,6 +347,7 @@
                 const data = await api('/api/vendor/approve-school', { school_id: id });
                 document.getElementById('approveUrl').textContent = data.url;
                 document.getElementById('approveCode').textContent = data.setup_code;
+                document.getElementById('approveExpiry').textContent = data.expires_at ? new Date(data.expires_at).toLocaleDateString() : 'No expiry set';
                 document.getElementById('approveEmail').textContent = data.admin_email;
                 document.getElementById('approvePassword').textContent = data.temp_password;
                 document.getElementById('copyNote').style.display = 'none';
@@ -330,6 +355,7 @@
                 document.getElementById('approveResult').dataset.message =
                     'SpringDrill — your school is approved!\nSchool address: ' + data.url +
                     '\nSetup code: ' + data.setup_code +
+                    '\nMembership runs to: ' + (data.expires_at ? new Date(data.expires_at).toLocaleDateString() : 'no expiry set') +
                     '\nAdmin login: ' + data.admin_email +
                     '\nTemporary password: ' + data.temp_password +
                     '\nLog in and enter the setup code once to complete your setup.';
@@ -396,7 +422,7 @@
             if (!s) return;
             const ok = await window.sdConfirm({
                 title: 'Generate a fresh setup code?',
-                message: 'The old code stops working. Only do this if the school lost its code or the code expired (codes last 14 days).',
+                message: 'The old code stops working. The fresh code is valid for 14 days from now. Only do this if the school lost its code or the code expired.',
                 confirmLabel: 'Generate fresh code',
             });
             if (!ok) return;
@@ -407,7 +433,8 @@
                 if (!data || !data.length) break;
                 code = setupCodeFor(s.slug);
             }
-            const { error } = await supabase.from('schools').update({ setup_code: code }).eq('id', s.id);
+            // Resetting approved_at restarts the 14-day setup-code clock.
+            const { error } = await supabase.from('schools').update({ setup_code: code, approved_at: new Date().toISOString() }).eq('id', s.id);
             if (error) { showError('Could not generate a code: ' + error.message); return; }
             showOk('Fresh setup code: ' + code);
             await loadSchools();
@@ -423,6 +450,30 @@
             const { error } = await supabase.from('schools').update({ plan, expires_at: expiresAt }).eq('id', s.id);
             if (error) { showError('Could not save: ' + error.message); return; }
             showOk('Plan and expiry saved for ' + s.name + '.');
+            await loadSchools();
+            selectSchool(s.id);
+        });
+        document.getElementById('extendBtn').addEventListener('click', async () => {
+            const s = selectedSchool();
+            if (!s) return;
+            // Extend from the current expiry when it is still ahead,
+            // otherwise from today — an expired school gets a full month.
+            const current = s.expires_at ? new Date(s.expires_at) : null;
+            const base = (current && !isNaN(current.getTime()) && current > new Date()) ? current : new Date();
+            const next = new Date(base);
+            next.setMonth(next.getMonth() + 1);
+            const ok = await window.sdConfirm({
+                title: 'Extend membership by 1 month?',
+                message: s.name + ' will run to ' + next.toLocaleDateString() + '.' +
+                    (effStatus(s) === 'expired' ? ' The school is expired now, so extending switches it back on.' : '') +
+                    (s.status === 'paused' ? ' The school is paused as well, so tap Resume too before its members can sign in.' : ''),
+                confirmLabel: 'Extend by 1 month',
+            });
+            if (!ok) return;
+            hideAlerts();
+            const { error } = await supabase.from('schools').update({ expires_at: next.toISOString() }).eq('id', s.id);
+            if (error) { showError('Could not extend: ' + error.message); return; }
+            showOk(s.name + ' extended to ' + next.toLocaleDateString() + '.');
             await loadSchools();
             selectSchool(s.id);
         });

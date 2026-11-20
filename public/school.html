@@ -84,7 +84,10 @@
                     }
                     const notice = document.getElementById('schoolNotice');
                     const loginBlock = document.getElementById('loginBlock');
-                    if (s.status === 'paused') {
+                    // Monthly expiry: a school whose membership has run
+                    // out is shown exactly like a paused school.
+                    const membershipExpired = s.expires_at && new Date(s.expires_at) < new Date();
+                    if (s.status === 'paused' || membershipExpired) {
                         notice.className = 'alert alert-warning';
                         notice.textContent = 'This school\u2019s SpringDrill membership is paused. Please renew to continue.';
                         notice.style.display = 'block';
