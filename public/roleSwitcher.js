@@ -19,16 +19,32 @@ export function roleDashboard(role) {
     return ROLE_DASHBOARD[role] || '/';
 }
 
-// Returns { primary, roles } or null when there is no session.
+// Memoized per page load (PR #61): getMyRoles used to hit the database
+// on every call — guardRole calls it, then the page called it again, and
+// getSchoolScope fetched the same users row a third time, each round trip
+// costing ~1s against the live database. Roles cannot change mid-page-load,
+// so one fetch serves every caller on the page. Never persisted across
+// logins: the module is reloaded with every page load, and a fresh page
+// starts with an empty cache.
+// Returns { primary, roles, userRow } or null when there is no session.
 // Never throws: any failure degrades to [primary role].
-export async function getMyRoles() {
+let myRolesPromise = null;
+export async function getMyRoles(session = null) {
+    if (!myRolesPromise) myRolesPromise = fetchMyRoles(session);
+    return myRolesPromise;
+}
+
+async function fetchMyRoles(session) {
     try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) return null;
+        const sess = session || (await supabase.auth.getSession()).data?.session;
+        if (!sess) return null;
+        // One users-row fetch carries everything the page needs about the
+        // signed-in account: role (guard + menu), school (scoping) and
+        // name/avatar (header). Callers used to fetch this row separately.
         const { data: userRow } = await supabase
             .from('users')
-            .select('role')
-            .eq('id', session.user.id)
+            .select('school_id, role, name, avatar_url')
+            .eq('id', sess.user.id)
             .single();
         const primary = userRow?.role || null;
         let roles = primary ? [primary] : [];
@@ -36,7 +52,7 @@ export async function getMyRoles() {
             const { data: extra, error } = await supabase
                 .from('user_roles')
                 .select('role')
-                .eq('user_id', session.user.id);
+                .eq('user_id', sess.user.id);
             if (!error && extra) {
                 for (const r of extra) {
                     if (r.role && !roles.includes(r.role)) roles.push(r.role);
@@ -45,19 +61,19 @@ export async function getMyRoles() {
         } catch (e) { /* user_roles missing: primary role only */ }
         roles = ROLE_ORDER.filter(r => roles.includes(r));
         if (roles.length === 0 && primary) roles = [primary];
-        return { primary, roles };
+        return { primary, roles, userRow: userRow || null };
     } catch (e) {
         console.error('getMyRoles failed:', e);
-        return { primary: null, roles: [] };
+        return { primary: null, roles: [], userRow: null };
     }
 }
 
 // Page guard: redirect when the signed-in account definitively does not hold
 // this page's role. Fail-open: missing users row or any query error loads the
 // page as before (the portal has never had page role guards).
-export async function guardRole(pageRole) {
+export async function guardRole(pageRole, session = null) {
     try {
-        const mine = await getMyRoles();
+        const mine = await getMyRoles(session);
         if (!mine || !mine.primary) return; // no users row: do not lock anyone out
         // Multi-school (Phase 1): the vendor is the super admin, so every
         // page guard passes for them (their own admin dashboard included).

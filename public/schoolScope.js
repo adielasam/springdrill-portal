@@ -16,6 +16,7 @@
 // is not RLS — a crafted request could still touch another school's rows.
 // That is the known Phase 2 follow-up, not something this helper claims.
 import { supabase } from './supabaseClient.js';
+import { getMyRoles } from './roleSwitcher.js';
 
 const VIEW_KEY = 'sd_view_school';
 
@@ -42,11 +43,16 @@ export function clearViewSchool() {
 
 // The viewer's scope: who they are, which school's data the page should
 // show, and whether this is the vendor looking into a partner's workspace.
-export async function getSchoolScope() {
-    const empty = { viewerSchoolId: null, role: null, viewSchool: null, effectiveSchoolId: null, effectiveSchool: null, isViewMode: false };
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return empty;
-    const { data: viewer } = await supabase.from('users').select('school_id, role').eq('id', session.user.id).single();
+// Takes the session the caller already has (optional — fetched when not
+// passed). The users row is NOT fetched here: getMyRoles (memoized per page
+// load, PR #61) already fetched it, so this reuses that one row instead of
+// querying users a second time.
+export async function getSchoolScope(session = null) {
+    const empty = { viewerSchoolId: null, role: null, viewSchool: null, effectiveSchoolId: null, effectiveSchool: null, isViewMode: false, viewerRow: null };
+    const sess = session || (await supabase.auth.getSession()).data?.session;
+    if (!sess) return empty;
+    const mine = await getMyRoles(sess);
+    const viewer = mine?.userRow || null;
     const viewerSchoolId = viewer ? viewer.school_id : null;
     const role = viewer ? viewer.role : null;
     const isVendor = role === 'vendor';
@@ -59,7 +65,7 @@ export async function getSchoolScope() {
         const { data: school } = await supabase.from('schools').select('*').eq('id', effectiveSchoolId).single();
         if (school) effectiveSchool = school;
     }
-    return { viewerSchoolId, role, viewSchool, effectiveSchoolId, effectiveSchool, isViewMode: isVendor && !!viewSchool };
+    return { viewerSchoolId, role, viewSchool, effectiveSchoolId, effectiveSchool, isViewMode: isVendor && !!viewSchool, viewerRow: viewer };
 }
 
 // Add a school filter to a Supabase query builder, or leave it alone when
