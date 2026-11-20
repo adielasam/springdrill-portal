@@ -314,7 +314,7 @@
                 <button class="close-btn" onclick="closeDeleteConfirm()"><i data-lucide="x"></i></button>
             </div>
             <div style="padding: 20px 24px;">
-                <p style="margin: 0;">Permanently delete <strong id="deleteConfirmName">this teacher</strong>? Their login row and class/subject links are removed too. This cannot be undone.</p>
+                <p style="margin: 0;">Permanently delete <strong id="deleteConfirmName">this teacher</strong>? Their tests, questions, scores and results are deleted too, along with their login row and class/subject links. This cannot be undone.</p>
                 <p id="deleteConfirmError" style="display: none; color: #b91c1c; font-size: 13px; line-height: 1.4; margin: 12px 0 0;"></p>
             </div>
             <div class="modal-footer">
@@ -618,14 +618,47 @@
             document.getElementById('deleteConfirmOverlay').classList.remove('active');
         }
 
-        // Best-effort cleanup of a leaver's linked rows. These tables may not
-        // exist (user_roles needs the Phase 2 migration) or the row may
-        // already be gone, so failures here are logged, never fatal.
-        async function cleanupLinkedRows(table, column, value) {
-            try {
-                const { error } = await supabase.from(table).delete().eq(column, value);
-                if (error) console.warn('Delete cleanup skipped for ' + table + ':', error.message);
-            } catch(e) { console.warn('Delete cleanup skipped for ' + table + ':', e); }
+        // Hard delete for leavers (owner's decision, 20 Nov 2026): deleting
+        // a teacher also deletes everything linked to them — their tests
+        // (with scores, question links and student assignments), their
+        // questions (with links into other teachers' tests), class/subject
+        // links, extra roles and the teachers row — so nothing is left
+        // ownerless in the database. Steps run in dependency order
+        // (children first) and stop at the first failure, so a refused
+        // step shows its real error instead of deleting half a record.
+        // Only a missing table (PGRST205 — e.g. user_roles before the
+        // Phase 2 migration runs) is treated as "nothing to clean".
+        async function deleteLinked(table, column, value) {
+            let req = supabase.from(table).delete();
+            req = Array.isArray(value) ? req.in(column, value) : req.eq(column, value);
+            const { error } = await req;
+            if (error && error.code !== 'PGRST205') throw new Error('Could not delete linked ' + table + ' rows: ' + error.message);
+        }
+
+        async function deleteTeacherLinkedRows(teacherId) {
+            // 1. The teacher's tests, children first: scores, question
+            //    links and student assignments, then the tests themselves.
+            const { data: teacherTests, error: testsErr } = await supabase.from('tests').select('id').eq('teacher_id', teacherId);
+            if (testsErr) throw testsErr;
+            const testIds = (teacherTests || []).map(t => t.id);
+            if (testIds.length) {
+                await deleteLinked('test_results', 'test_id', testIds);
+                await deleteLinked('test_questions', 'test_id', testIds);
+                await deleteLinked('test_students', 'test_id', testIds);
+            }
+            await deleteLinked('tests', 'teacher_id', teacherId);
+            // 2. The teacher's questions, with their links into any test
+            //    (a leaver's question sitting in another teacher's test is
+            //    removed from that test), then the questions themselves.
+            const { data: teacherQuestions, error: qsErr } = await supabase.from('questions').select('id').eq('teacher_id', teacherId);
+            if (qsErr) throw qsErr;
+            const questionIds = (teacherQuestions || []).map(q => q.id);
+            if (questionIds.length) await deleteLinked('test_questions', 'question_id', questionIds);
+            await deleteLinked('questions', 'teacher_id', teacherId);
+            // 3. Class/subject links, extra roles, teachers row.
+            await deleteLinked('teacher_class_subjects', 'teacher_id', teacherId);
+            await deleteLinked('user_roles', 'user_id', teacherId);
+            await deleteLinked('teachers', 'user_id', teacherId);
         }
 
         window.confirmDeleteTeacher = async function() {
@@ -637,8 +670,7 @@
             btn.disabled = true;
             btn.innerText = 'Deleting...';
             try {
-                await cleanupLinkedRows('teacher_class_subjects', 'teacher_id', currentTeacher.id);
-                await cleanupLinkedRows('user_roles', 'user_id', currentTeacher.id);
+                await deleteTeacherLinkedRows(currentTeacher.id);
                 const { error } = await supabase.from('users').delete().eq('id', currentTeacher.id);
                 if (error) throw error;
                 allTeachers = allTeachers.filter(t => t.id !== currentTeacher.id);
