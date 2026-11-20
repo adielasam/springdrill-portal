@@ -238,6 +238,9 @@
         }
 
         // === LOGIC ===
+        // Multi-school (Phase 1): the signed-in creator's school, inherited
+        // by users they create (see loadInitialData). Null pre-migration.
+        let creatorSchoolId = null;
         async function loadInitialData() {
             try {
                 
@@ -257,8 +260,11 @@
                 }
 
                 
-                const { data: profile } = await supabase.from('users').select('name').eq('id', session.user.id).single();
-                if(profile) document.getElementById('adminName').innerText = profile.name;
+                const { data: profile } = await supabase.from('users').select('name, school_id').eq('id', session.user.id).single();
+                if(profile) {
+                    document.getElementById('adminName').innerText = profile.name;
+                    creatorSchoolId = profile.school_id ?? null;
+                }
 
                 const { data: classes, error } = await supabase.from('classes').select('id, name').order('name');
                 const cbContainer = document.getElementById('classCheckboxes');
@@ -347,15 +353,22 @@
 
                 // 2. EXPLICITLY CREATE THE USER IN PUBLIC.USERS
                 // ADDED THE REQUIRED "USERNAME" FIELD TO FIX THE NOT-NULL CONSTRAINT ERROR!
-                const { error: syncErr } = await supabase.from('users').upsert({
+                // Multi-school (Phase 1): inherit the creator's school when
+                // they have one; omit the key entirely pre-migration so the
+                // insert behaves exactly as today.
+                const userPayload = {
                     id: newUserId,
                     name: name,
                     email: email,
-                    username: generatedUsername, 
+                    username: generatedUsername,
                     role: role,
                     gender: gender,
                     expires_at: expiresAt
-                }, { onConflict: 'id' });
+                };
+                if (creatorSchoolId !== null && creatorSchoolId !== undefined) {
+                    userPayload.school_id = creatorSchoolId;
+                }
+                const { error: syncErr } = await supabase.from('users').upsert(userPayload, { onConflict: 'id' });
                 
                 if (syncErr) throw new Error("Database blocked user sync. " + syncErr.message);
 
@@ -391,7 +404,7 @@
                     }
 
                     // Write Student Data
-                    const { error: stuErr } = await supabase.from('students').insert([{
+                    const studentPayload = {
                         user_id: newUserId,
                         first_name: firstName,
                         surname: surname,
@@ -402,8 +415,13 @@
                         parent_name: parentName,
                         address: address,
                         passport_url: passportUrl,
-                        approved: true 
-                    }]);
+                        approved: true
+                    };
+                    // Multi-school (Phase 1): same school inheritance as the users row above.
+                    if (creatorSchoolId !== null && creatorSchoolId !== undefined) {
+                        studentPayload.school_id = creatorSchoolId;
+                    }
+                    const { error: stuErr } = await supabase.from('students').insert([studentPayload]);
 
                     if (stuErr) throw stuErr;
                 }

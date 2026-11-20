@@ -143,6 +143,18 @@
         var items = MENUS[role] || MENUS.teacher;
         var isAdmin = (role === 'admin');
         var html = '<div class="sidebar-brand"><h4 style="' + BRAND_STYLE + '">SpringDrill</h4></div>';
+        // Multi-school (Phase 1): show the signed-in school's name under the
+        // brand. The name was stored in session storage at login; nothing is
+        // shown before the Phase 1 migration, exactly as today.
+        var schoolName = '';
+        try {
+            var storedSchool = window.sessionStorage && sessionStorage.getItem('sd_school');
+            if (storedSchool) schoolName = (JSON.parse(storedSchool).name || '');
+        } catch (e) { /* no school stored */ }
+        if (schoolName) {
+            html += '<div style="font-size: 12px; color: #6b7280; padding: 0 16px 12px;">'
+                + schoolName.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>';
+        }
         html += isAdmin ? '<nav class="nav flex-column">' : '<nav class="d-flex flex-column mb-5">';
         items.forEach(function (it) {
             if (it.heading) {

@@ -7,9 +7,9 @@
 // the primary role and the guard lets the page load, exactly as before.
 import { supabase } from './supabaseClient.js';
 
-const ROLE_ORDER = ['admin', 'teacher'];
-const ROLE_LABEL = { admin: 'Admin', teacher: 'Teacher' };
-const ROLE_DASHBOARD = { admin: '/admin_dashboard.html', teacher: '/teacher_dashboard.html' };
+const ROLE_ORDER = ['vendor', 'admin', 'teacher'];
+const ROLE_LABEL = { vendor: 'Vendor', admin: 'Admin', teacher: 'Teacher' };
+const ROLE_DASHBOARD = { vendor: '/vendor_dashboard.html', admin: '/admin_dashboard.html', teacher: '/teacher_dashboard.html' };
 
 export function roleLabel(role) {
     return ROLE_LABEL[role] || role;
@@ -59,6 +59,9 @@ export async function guardRole(pageRole) {
     try {
         const mine = await getMyRoles();
         if (!mine || !mine.primary) return; // no users row: do not lock anyone out
+        // Multi-school (Phase 1): the vendor is the super admin, so every
+        // page guard passes for them (their own admin dashboard included).
+        if (mine.roles.includes('vendor')) return;
         if (mine.roles.includes(pageRole)) return;
         const fallback = mine.roles[0];
         window.location.href = fallback ? roleDashboard(fallback) : '/';

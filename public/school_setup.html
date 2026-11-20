@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Set up your school — SpringDrill</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --brand-600: #059669; --brand-dark: #004d34; --brand-100: #d1fae5; }
+        body { background: #f9fafb; font-family: 'Inter', sans-serif; color: #111827; }
+        .sd-card { max-width: 720px; margin: 32px auto; background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 28px; box-shadow: 0 4px 12px rgba(0,0,0,.05); }
+        .sd-brand { font-weight: 800; font-size: 20px; letter-spacing: -.5px; color: var(--brand-600); margin: 0; }
+        .btn-brand { background: var(--brand-600); border-color: var(--brand-600); color: #fff; font-weight: 600; }
+        .btn-brand:hover { background: #047857; border-color: #047857; color: #fff; }
+        .form-label { font-weight: 600; font-size: 13px; }
+        .form-control, .form-select { font-size: 14px; }
+        .step-pill { border: 1px solid #d1d5db; background: #fff; border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .step-pill.active { background: var(--brand-600); border-color: var(--brand-600); color: #fff; }
+        .step-pill.done { background: var(--brand-100); border-color: var(--brand-100); color: var(--brand-dark); }
+        .row-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container px-3">
+        <div class="sd-card">
+            <p class="sd-brand">SpringDrill</p>
+            <h1 class="h4 fw-bold mt-2 mb-1" id="pageTitle">Set up your school</h1>
+            <p class="text-muted" style="font-size: 14px;" id="pageSub">Complete these five steps once. You can change everything later from Settings.</p>
+
+            <div id="pageError" class="alert alert-danger" style="display:none; font-size: 14px;"></div>
+            <div id="pageOk" class="alert alert-success" style="display:none; font-size: 14px;"></div>
+
+            <div id="codeGate" style="display:none;">
+                <div class="alert alert-info" style="font-size: 14px;">Enter the one-time setup code the SpringDrill team sent you. It works once — after that it stops working.</div>
+                <label class="form-label" for="setupCodeInput">Setup code</label>
+                <input class="form-control" id="setupCodeInput" type="text" placeholder="e.g. GFT-4821" autocomplete="off" style="text-transform: uppercase;">
+                <button type="button" class="btn btn-brand w-100 py-2 mt-3" id="codeSubmitBtn">Unlock setup</button>
+                <p class="text-muted mt-3 mb-0" style="font-size: 13px;">Lost your code, or it expired? Codes last 14 days — ask the SpringDrill team for a fresh one.</p>
+            </div>
+
+            <div id="wizard" style="display:none;">
+                <div class="d-flex flex-wrap gap-2 mb-4" id="stepPills"></div>
+
+                <div class="wizard-step" data-step="1">
+                    <h2 class="h6 fw-bold">1. School details</h2>
+                    <div class="mb-3"><label class="form-label" for="fName">School name *</label><input class="form-control" id="fName" type="text" required></div>
+                    <div class="mb-3"><label class="form-label" for="fMotto">Motto</label><input class="form-control" id="fMotto" type="text"></div>
+                    <div class="mb-3"><label class="form-label" for="fAddress">Address</label><input class="form-control" id="fAddress" type="text"></div>
+                    <div class="mb-3"><label class="form-label" for="fPhone">Phone</label><input class="form-control" id="fPhone" type="tel"></div>
+                    <div class="mb-3"><label class="form-label" for="fLogo">Logo web address (optional)</label><input class="form-control" id="fLogo" type="url" placeholder="https://..."><div class="form-text">Paste the web address of your logo image. File upload comes later.</div></div>
+                    <button type="button" class="btn btn-brand" id="saveDetailsBtn">Save details</button>
+                </div>
+
+                <div class="wizard-step" data-step="2" style="display:none;">
+                    <h2 class="h6 fw-bold">2. Classes</h2>
+                    <p class="text-muted" style="font-size: 14px;">Add the classes your school runs, e.g. Year 7, Year 8 … Year 12 (or JSS / SSS names).</p>
+                    <div id="classList"></div>
+                    <div class="input-group mb-3">
+                        <input class="form-control" id="newClassName" type="text" placeholder="Class name, e.g. Year 7">
+                        <button type="button" class="btn btn-brand" id="addClassBtn">Add class</button>
+                    </div>
+                </div>
+
+                <div class="wizard-step" data-step="3" style="display:none;">
+                    <h2 class="h6 fw-bold">3. Subjects</h2>
+                    <p class="text-muted" style="font-size: 14px;">Add the subjects your school teaches.</p>
+                    <div id="subjectList"></div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-7"><input class="form-control" id="newSubjectName" type="text" placeholder="Subject name, e.g. Mathematics"></div>
+                        <div class="col-3"><input class="form-control" id="newSubjectCode" type="text" placeholder="Code, e.g. MAT"></div>
+                        <div class="col-2"><button type="button" class="btn btn-brand w-100" id="addSubjectBtn">Add</button></div>
+                    </div>
+                </div>
+
+                <div class="wizard-step" data-step="4" style="display:none;">
+                    <h2 class="h6 fw-bold">4. Fees</h2>
+                    <p class="text-muted" style="font-size: 14px;">Add your school's fee items. You can add more later from the Fees page.</p>
+                    <div id="feeList"></div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-5"><input class="form-control" id="newFeeName" type="text" placeholder="Fee name, e.g. Tuition"></div>
+                        <div class="col-3"><input class="form-control" id="newFeeAmount" type="number" min="0" placeholder="Amount"></div>
+                        <div class="col-2">
+                            <select class="form-select" id="newFeeTerm">
+                                <option value="First Term">First Term</option>
+                                <option value="Second Term">Second Term</option>
+                                <option value="Third Term">Third Term</option>
+                                <option value="Session">Session</option>
+                            </select>
+                        </div>
+                        <div class="col-2"><button type="button" class="btn btn-brand w-100" id="addFeeBtn">Add</button></div>
+                    </div>
+                </div>
+
+                <div class="wizard-step" data-step="5" style="display:none;">
+                    <h2 class="h6 fw-bold">5. Staff</h2>
+                    <p class="text-muted" style="font-size: 14px;">Create teacher accounts, and a second school admin if you want one. Students are created the same way as today, from the admin pages.</p>
+                    <div id="staffList"></div>
+                    <div class="row g-2 mb-2">
+                        <div class="col-md-6"><input class="form-control" id="newStaffName" type="text" placeholder="Full name"></div>
+                        <div class="col-md-6"><input class="form-control" id="newStaffEmail" type="email" placeholder="Email"></div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6"><input class="form-control" id="newStaffPassword" type="text" placeholder="Temporary password (min 8 characters)" autocomplete="off"></div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="newStaffRole">
+                                <option value="teacher">Teacher</option>
+                                <option value="admin">School admin</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3"><button type="button" class="btn btn-brand w-100" id="addStaffBtn">Create login</button></div>
+                    </div>
+                    <p id="staffNote" class="text-success" style="display:none; font-size: 13px;"></p>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-outline-secondary" id="prevBtn">Back</button>
+                    <button type="button" class="btn btn-brand" id="nextBtn">Next</button>
+                </div>
+                <div class="text-center mt-4">
+                    <button type="button" class="btn btn-success px-4" id="finishBtn">Finish setup — open my dashboard</button>
+                </div>
+                <p class="text-center mt-3 mb-0"><button type="button" class="btn btn-link text-muted" id="logoutBtn" style="font-size: 13px;">Log out</button></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="sd-confirm.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        const errEl = document.getElementById('pageError');
+        const okEl = document.getElementById('pageOk');
+        let session = null;
+        let school = null;
+        let currentStep = 1;
+        const STEP_NAMES = ['Details', 'Classes', 'Subjects', 'Fees', 'Staff'];
+        const doneSteps = new Set();
+
+        function showError(msg) {
+            errEl.textContent = msg;
+            errEl.style.display = 'block';
+            errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        function showOk(msg) {
+            okEl.textContent = msg;
+            okEl.style.display = 'block';
+            setTimeout(() => { okEl.style.display = 'none'; }, 5000);
+        }
+        function hideAlerts() { errEl.style.display = 'none'; okEl.style.display = 'none'; }
+        function esc(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        function renderPills() {
+            const box = document.getElementById('stepPills');
+            box.innerHTML = STEP_NAMES.map((name, i) => {
+                const n = i + 1;
+                const cls = n === currentStep ? 'active' : (doneSteps.has(n) ? 'done' : '');
+                return '<button type="button" class="step-pill ' + cls + '" data-step="' + n + '">' + n + '. ' + name + '</button>';
+            }).join('');
+            box.querySelectorAll('.step-pill').forEach((p) => {
+                p.addEventListener('click', () => showStep(Number(p.getAttribute('data-step'))));
+            });
+            document.getElementById('prevBtn').style.visibility = currentStep === 1 ? 'hidden' : '';
+            document.getElementById('nextBtn').textContent = currentStep === 5 ? 'Review' : 'Next';
+        }
+        function showStep(n) {
+            currentStep = n;
+            document.querySelectorAll('.wizard-step').forEach((el) => {
+                el.style.display = Number(el.getAttribute('data-step')) === n ? '' : 'none';
+            });
+            renderPills();
+            if (n === 2) loadClasses();
+            if (n === 3) loadSubjects();
+            if (n === 4) loadFees();
+            if (n === 5) loadStaff();
+        }
+
+        async function loadSchool() {
+            const { data, error } = await supabase.from('schools').select('*').eq('id', school.id).single();
+            if (error || !data) throw new Error('Could not load your school.');
+            school = data;
+            if (school.status === 'paused') { window.location.href = '/school_paused.html'; return false; }
+            if (school.setup_completed) { window.location.href = '/admin_dashboard.html'; return false; }
+            document.getElementById('pageTitle').textContent = 'Set up ' + school.name;
+            document.getElementById('fName').value = school.name || '';
+            document.getElementById('fMotto').value = school.motto || '';
+            document.getElementById('fAddress').value = school.address || '';
+            document.getElementById('fPhone').value = school.contact_phone || '';
+            document.getElementById('fLogo').value = school.logo_url || '';
+            return true;
+        }
+
+        function openWizard() {
+            document.getElementById('codeGate').style.display = 'none';
+            document.getElementById('wizard').style.display = 'block';
+            renderPills();
+            showStep(1);
+        }
+
+        async function loadClasses() {
+            const { data, error } = await supabase.from('classes').select('id, name').eq('school_id', school.id).order('name');
+            const box = document.getElementById('classList');
+            if (error) { box.innerHTML = '<p class="text-danger" style="font-size: 14px;">Could not load classes: ' + esc(error.message) + '</p>'; return; }
+            if (!data || !data.length) { box.innerHTML = '<p class="text-muted" style="font-size: 14px;">No classes yet.</p>'; return; }
+            box.innerHTML = data.map((c) => '<div class="row-item"><span>' + esc(c.name) + '</span><button type="button" class="btn btn-outline-danger btn-sm" data-del-class="' + c.id + '">Remove</button></div>').join('');
+            box.querySelectorAll('[data-del-class]').forEach((b) => b.addEventListener('click', async () => {
+                const ok = await window.sdConfirm({ title: 'Remove this class?', message: 'The class is removed from your school.', confirmLabel: 'Remove', danger: true });
+                if (!ok) return;
+                const { error: delErr } = await supabase.from('classes').delete().eq('id', Number(b.getAttribute('data-del-class'))).eq('school_id', school.id);
+                if (delErr) { showError('Could not remove: ' + delErr.message); return; }
+                loadClasses();
+            }));
+        }
+
+        async function loadSubjects() {
+            const { data, error } = await supabase.from('subjects').select('id, name, code').eq('school_id', school.id).order('name');
+            const box = document.getElementById('subjectList');
+            if (error) { box.innerHTML = '<p class="text-danger" style="font-size: 14px;">Could not load subjects: ' + esc(error.message) + '</p>'; return; }
+            if (!data || !data.length) { box.innerHTML = '<p class="text-muted" style="font-size: 14px;">No subjects yet.</p>'; return; }
+            box.innerHTML = data.map((s) => '<div class="row-item"><span>' + esc(s.name) + (s.code ? ' <span class="text-muted">(' + esc(s.code) + ')</span>' : '') + '</span><button type="button" class="btn btn-outline-danger btn-sm" data-del-subject="' + s.id + '">Remove</button></div>').join('');
+            box.querySelectorAll('[data-del-subject]').forEach((b) => b.addEventListener('click', async () => {
+                const ok = await window.sdConfirm({ title: 'Remove this subject?', message: 'The subject is removed from your school.', confirmLabel: 'Remove', danger: true });
+                if (!ok) return;
+                const { error: delErr } = await supabase.from('subjects').delete().eq('id', Number(b.getAttribute('data-del-subject'))).eq('school_id', school.id);
+                if (delErr) { showError('Could not remove: ' + delErr.message); return; }
+                loadSubjects();
+            }));
+        }
+
+        async function loadFees() {
+            const { data, error } = await supabase.from('fees').select('id, name, amount, term').eq('school_id', school.id).order('name');
+            const box = document.getElementById('feeList');
+            if (error) { box.innerHTML = '<p class="text-danger" style="font-size: 14px;">Could not load fees: ' + esc(error.message) + '</p>'; return; }
+            if (!data || !data.length) { box.innerHTML = '<p class="text-muted" style="font-size: 14px;">No fee items yet.</p>'; return; }
+            box.innerHTML = data.map((f) => '<div class="row-item"><span>' + esc(f.name) + ' — ' + esc(f.amount) + ' <span class="text-muted">(' + esc(f.term || '') + ')</span></span><button type="button" class="btn btn-outline-danger btn-sm" data-del-fee="' + f.id + '">Remove</button></div>').join('');
+            box.querySelectorAll('[data-del-fee]').forEach((b) => b.addEventListener('click', async () => {
+                const ok = await window.sdConfirm({ title: 'Remove this fee?', message: 'The fee item is removed from your school.', confirmLabel: 'Remove', danger: true });
+                if (!ok) return;
+                const { error: delErr } = await supabase.from('fees').delete().eq('id', Number(b.getAttribute('data-del-fee'))).eq('school_id', school.id);
+                if (delErr) { showError('Could not remove: ' + delErr.message); return; }
+                loadFees();
+            }));
+        }
+
+        async function loadStaff() {
+            const { data, error } = await supabase.from('users').select('id, name, email, role').eq('school_id', school.id).in('role', ['teacher', 'admin']).order('name');
+            const box = document.getElementById('staffList');
+            if (error) { box.innerHTML = '<p class="text-danger" style="font-size: 14px;">Could not load staff: ' + esc(error.message) + '</p>'; return; }
+            if (!data || !data.length) { box.innerHTML = '<p class="text-muted" style="font-size: 14px;">No staff logins yet.</p>'; return; }
+            box.innerHTML = data.map((u) => '<div class="row-item"><span>' + esc(u.name || '') + ' — ' + esc(u.email || '') + '</span><span class="badge bg-secondary">' + esc(u.role) + '</span></div>').join('');
+        }
+
+        document.getElementById('codeSubmitBtn').addEventListener('click', async () => {
+            hideAlerts();
+            const entered = document.getElementById('setupCodeInput').value.trim().toUpperCase();
+            if (!entered) { showError('Type the setup code first.'); return; }
+            if (!school.setup_code) { openWizard(); return; }
+            if (entered !== String(school.setup_code).trim().toUpperCase()) {
+                showError('That code does not match. Check it and try again, or ask the SpringDrill team for a fresh code.');
+                return;
+            }
+            const { error } = await supabase.from('schools').update({ setup_code: null }).eq('id', school.id);
+            if (error) { showError('Could not use the code: ' + error.message); return; }
+            school.setup_code = null;
+            showOk('Code accepted. Your setup is unlocked.');
+            openWizard();
+        });
+
+        document.getElementById('saveDetailsBtn').addEventListener('click', async () => {
+            hideAlerts();
+            const name = document.getElementById('fName').value.trim();
+            if (!name) { showError('School name is required.'); return; }
+            const { error } = await supabase.from('schools').update({
+                name,
+                motto: document.getElementById('fMotto').value.trim() || null,
+                address: document.getElementById('fAddress').value.trim() || null,
+                contact_phone: document.getElementById('fPhone').value.trim() || null,
+                logo_url: document.getElementById('fLogo').value.trim() || null,
+            }).eq('id', school.id);
+            if (error) { showError('Could not save details: ' + error.message); return; }
+            school.name = name;
+            doneSteps.add(1);
+            showOk('School details saved.');
+            showStep(2);
+        });
+
+        document.getElementById('addClassBtn').addEventListener('click', async () => {
+            hideAlerts();
+            const name = document.getElementById('newClassName').value.trim();
+            if (!name) { showError('Type a class name first.'); return; }
+            const { data: existing } = await supabase.from('classes').select('id').eq('school_id', school.id).eq('name', name).limit(1);
+            if (existing && existing.length) { showError('That class already exists for your school.'); return; }
+            const { error } = await supabase.from('classes').insert([{ name, school_id: school.id }]);
+            if (error) { showError('Could not add class: ' + error.message); return; }
+            document.getElementById('newClassName').value = '';
+            doneSteps.add(2);
+            loadClasses();
+        });
+
+        document.getElementById('newSubjectName').addEventListener('input', (e) => {
+            const codeEl = document.getElementById('newSubjectCode');
+            if (!codeEl.value) {
+                codeEl.value = e.target.value.replace(/[^A-Za-z]/g, '').slice(0, 3).toUpperCase();
+            }
+        });
+        document.getElementById('addSubjectBtn').addEventListener('click', async () => {
+            hideAlerts();
+            const name = document.getElementById('newSubjectName').value.trim();
+            const code = document.getElementById('newSubjectCode').value.trim().toUpperCase();
+            if (!name) { showError('Type a subject name first.'); return; }
+            const { error } = await supabase.from('subjects').insert([{ name, code: code || null, school_id: school.id }]);
+            if (error) { showError('Could not add subject: ' + error.message); return; }
+            document.getElementById('newSubjectName').value = '';
+            document.getElementById('newSubjectCode').value = '';
+            doneSteps.add(3);
+            loadSubjects();
+        });
+
+        document.getElementById('addFeeBtn').addEventListener('click', async () => {
+            hideAlerts();
+            const name = document.getElementById('newFeeName').value.trim();
+            const amount = parseFloat(document.getElementById('newFeeAmount').value);
+            const term = document.getElementById('newFeeTerm').value;
+            if (!name || !Number.isFinite(amount) || amount < 0) { showError('Type a fee name and an amount.'); return; }
+            const { error } = await supabase.from('fees').insert([{ name, amount, term, school_id: school.id, is_targeted: false, target_type: 'whole', target_ids: [] }]);
+            if (error) { showError('Could not add fee: ' + error.message); return; }
+            document.getElementById('newFeeName').value = '';
+            document.getElementById('newFeeAmount').value = '';
+            doneSteps.add(4);
+            loadFees();
+        });
+
+        document.getElementById('addStaffBtn').addEventListener('click', async () => {
+            hideAlerts();
+            const name = document.getElementById('newStaffName').value.trim();
+            const email = document.getElementById('newStaffEmail').value.trim();
+            const password = document.getElementById('newStaffPassword').value;
+            const role = document.getElementById('newStaffRole').value;
+            if (!name || !email || password.length < 8) {
+                showError('Fill in the name, a valid email, and a password of at least 8 characters.');
+                return;
+            }
+            const btn = document.getElementById('addStaffBtn');
+            btn.disabled = true;
+            btn.textContent = 'Creating...';
+            try {
+                const res = await fetch('/api/school/create-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+                    body: JSON.stringify({ school_id: school.id, name, email, password, role }),
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.error || 'Could not create the login.');
+                document.getElementById('staffNote').textContent = 'Login created for ' + data.email + ' (' + data.role + '). Share the password with them.';
+                document.getElementById('staffNote').style.display = 'block';
+                document.getElementById('newStaffName').value = '';
+                document.getElementById('newStaffEmail').value = '';
+                document.getElementById('newStaffPassword').value = '';
+                doneSteps.add(5);
+                loadStaff();
+            } catch (err) {
+                showError(err.message || 'Could not create the login.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Create login';
+            }
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => { if (currentStep > 1) showStep(currentStep - 1); });
+        document.getElementById('nextBtn').addEventListener('click', () => { if (currentStep < 5) showStep(currentStep + 1); });
+        document.getElementById('finishBtn').addEventListener('click', async () => {
+            const ok = await window.sdConfirm({
+                title: 'Finish setup?',
+                message: 'Your school will open its dashboard. You can change classes, subjects, fees and staff later from Settings and the admin pages.',
+                confirmLabel: 'Finish setup',
+            });
+            if (!ok) return;
+            hideAlerts();
+            const { error } = await supabase.from('schools').update({ setup_completed: true }).eq('id', school.id);
+            if (error) { showError('Could not finish setup: ' + error.message); return; }
+            window.location.href = '/admin_dashboard.html';
+        });
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = '/';
+        });
+
+        // Gate: signed-in school admin with a school. Anyone else goes home.
+        try {
+            const { data: { session: sess } } = await supabase.auth.getSession();
+            if (!sess) { window.location.href = '/'; }
+            else {
+                session = sess;
+                const { data: profile } = await supabase.from('users').select('*').eq('id', sess.user.id).single();
+                if (!profile || profile.role !== 'admin' || profile.school_id === null || profile.school_id === undefined) {
+                    window.location.href = '/';
+                } else {
+                    school = { id: profile.school_id };
+                    if (await loadSchool()) {
+                        if (school.setup_code) {
+                            document.getElementById('codeGate').style.display = 'block';
+                        } else {
+                            openWizard();
+                        }
+                    }
+                }
+            }
+        } catch (err) {
+            showError('Could not load setup: ' + (err.message || err));
+        }
+    </script>
+</body>
+</html>
