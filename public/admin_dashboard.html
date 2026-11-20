@@ -310,6 +310,40 @@
             <p>Here is what's happening across your workspace today.</p>
         </div>
 
+        <!-- SCHOOL NOTICES & SUBSCRIPTION (multi-school) -->
+        <div id="schoolNoticesWrap" style="display:none;">
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <div class="premium-card">
+                        <div class="panel-header">
+                            <h2 class="panel-title"><i data-lucide="bell"></i> Notices for your school</h2>
+                            <span id="schoolRenewalBadge" style="font-size: 13px; font-weight: 600;"></span>
+                        </div>
+                        <div class="panel-body" id="schoolNoticesBody">
+                            <div class="text-center text-muted py-4" style="font-size: 13px;">Loading notices...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-4 mb-5">
+                <div class="col-12">
+                    <div class="premium-card">
+                        <div class="panel-header">
+                            <h2 class="panel-title"><i data-lucide="badge-check"></i> Subscription</h2>
+                            <span id="schoolPlanBadge" style="font-size: 13px; font-weight: 600; color: var(--text-muted);"></span>
+                        </div>
+                        <div class="panel-body" id="schoolPlansBody">
+                            <div class="text-center text-muted py-4" style="font-size: 13px;">Loading plans...</div>
+                        </div>
+                        <div class="panel-body pt-0" id="schoolPlansNote" style="display:none;">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="requestTimeBtn">Request more time</button>
+                            <span id="requestTimeNote" class="text-muted ms-2" style="font-size: 13px;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- STAT CARDS -->
           <div class="row g-3 mb-5 justify-content-center">
               <div class="col-12 col-md-4 col-xl-2">
@@ -453,6 +487,7 @@
         lucide.createIcons();
     </script>
     
+    <script src="sd-confirm.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
         import { getMyRoles, buildMyRolesMenu, guardRole } from './roleSwitcher.js';
@@ -508,12 +543,235 @@
                     renderClassChart(),
                     fetchRecentAttendance(),
                     populateLeagueWidget(),
-                    fetchBirthdays()
+                    fetchBirthdays(),
+                    loadSchoolNotices(session)
                 ]).catch(console.error);
 
             } catch (err) {
                 console.error(err);
                 document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        }
+
+        // Multi-school notices + subscription (PR #55). Everything here
+        // is guarded: if the Phase 1 / 2a migrations have not run yet,
+        // the schools / plans tables do not exist and the sections stay
+        // hidden instead of breaking the dashboard.
+        const DEFAULT_PLANS = [
+            { name: 'Starter', monthly_price: 5000, yearly_price: 50000, student_limit: 100, features: 'Results & report cards\nCBT tests\nJAMB practice\nQuestion bank' },
+            { name: 'Growth', monthly_price: 10000, yearly_price: 100000, student_limit: 300, features: 'Everything in Starter\nFinance & fees tracking\nAttendance\nAI lesson planner' },
+            { name: 'Premium', monthly_price: 20000, yearly_price: 200000, student_limit: null, features: 'Everything in Growth\nPriority support\nCustom subdomain\nData migration help' },
+        ];
+        let schoolNoticesState = { session: null, schoolId: null, school: null, plans: DEFAULT_PLANS, announcements: [], pendingRequests: [] };
+
+        function fmtNaira(n) {
+            if (n === null || n === undefined || isNaN(Number(n))) return '—';
+            return '₦' + Number(n).toLocaleString('en-NG');
+        }
+        function escHtml(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+        function daysUntil(iso) {
+            if (!iso) return null;
+            const ms = new Date(iso).getTime() - Date.now();
+            if (isNaN(ms)) return null;
+            return Math.ceil(ms / 86400000);
+        }
+
+        async function loadSchoolNotices(session) {
+            const wrap = document.getElementById('schoolNoticesWrap');
+            try {
+                schoolNoticesState.session = session;
+                // The admin's school. A separate guarded query so the
+                // dashboard keeps working if school_id does not exist yet.
+                const { data: me, error: meErr } = await supabase.from('users').select('school_id').eq('id', session.user.id).single();
+                if (meErr || !me || !me.school_id) return; // Not linked to a school: nothing to show.
+                const schoolId = me.school_id;
+                const { data: school, error: schoolErr } = await supabase.from('schools').select('*').eq('id', schoolId).single();
+                if (schoolErr || !school) return;
+                schoolNoticesState.schoolId = schoolId;
+                schoolNoticesState.school = school;
+
+                // Plans from the database when the migration has run,
+                // otherwise the built-in defaults (same prices).
+                try {
+                    const { data: plans, error: plansErr } = await supabase.from('plans').select('*').eq('is_active', true).order('monthly_price', { ascending: true });
+                    if (!plansErr && plans && plans.length) schoolNoticesState.plans = plans;
+                } catch (e) { /* defaults stand */ }
+                // Vendor announcements for this school, plus all-school ones.
+                try {
+                    const { data, error } = await supabase.from('school_announcements').select('*').or('school_id.is.null,school_id.eq.' + schoolId).order('created_at', { ascending: false }).limit(5);
+                    if (!error && data) schoolNoticesState.announcements = data;
+                } catch (e) { /* none */ }
+                // Pending requests, so buttons can say "request pending".
+                try {
+                    const { data, error } = await supabase.from('school_requests').select('*').eq('school_id', schoolId).eq('status', 'pending');
+                    if (!error && data) schoolNoticesState.pendingRequests = data;
+                } catch (e) { /* none */ }
+
+                wrap.style.display = 'block';
+                renderSchoolNotices();
+                renderSchoolPlans();
+            } catch (err) {
+                console.error('School notices failed:', err);
+            }
+        }
+
+        function renderSchoolNotices() {
+            const school = schoolNoticesState.school;
+            const body = document.getElementById('schoolNoticesBody');
+            const badge = document.getElementById('schoolRenewalBadge');
+            const items = [];
+            const days = daysUntil(school.expires_at);
+            const trialEnd = school.approved_at ? new Date(new Date(school.approved_at).getTime() + 14 * 86400000) : null;
+            const inTrial = trialEnd && trialEnd > new Date();
+
+            if (days !== null) {
+                const dateStr = new Date(school.expires_at).toLocaleDateString();
+                if (days < 0) {
+                    badge.textContent = 'Membership expired';
+                    badge.style.color = '#dc2626';
+                    items.push({ tone: 'danger', title: 'Membership expired on ' + dateStr + '.', text: 'Your members cannot sign in until the membership is renewed. Tap "Request more time" below and the SpringDrill team will extend it.' });
+                } else if (days <= 3) {
+                    badge.textContent = days + (days === 1 ? ' day left' : ' days left');
+                    badge.style.color = '#dc2626';
+                    items.push({ tone: 'danger', title: 'Only ' + days + (days === 1 ? ' day' : ' days') + ' left — renews ' + dateStr + '.', text: 'Renew now so your school is not locked out. Tap "Request more time" below.' });
+                } else if (days <= 7) {
+                    badge.textContent = days + ' days left';
+                    badge.style.color = '#d97706';
+                    items.push({ tone: 'warning', title: days + ' days left — renews ' + dateStr + '.', text: 'Your membership runs out in a week. Plan your renewal so classes are not interrupted.' });
+                } else if (days <= 14) {
+                    badge.textContent = days + ' days left';
+                    badge.style.color = '#d97706';
+                    items.push({ tone: 'warning', title: days + ' days left — renews ' + dateStr + '.', text: 'Your membership renews in two weeks.' });
+                } else {
+                    badge.textContent = days + ' days left';
+                    badge.style.color = '#059669';
+                    items.push({ tone: 'success', title: 'Membership renews in ' + days + ' days (' + dateStr + ').', text: '' });
+                }
+            } else {
+                badge.textContent = '';
+            }
+            if (inTrial) {
+                items.push({ tone: 'success', title: 'You are in your 14-day free trial.', text: 'Your trial ends ' + trialEnd.toLocaleDateString() + '. Pick a plan below before it ends.' });
+            }
+            if (school.setup_completed === false) {
+                items.push({ tone: 'warning', title: 'Finish your school setup.', text: 'Your school setup is not complete yet. Open the setup wizard to finish it.', link: { href: 'school_setup.html', label: 'Open setup' } });
+            }
+
+            const toneClass = { danger: 'alert-danger', warning: 'alert-warning', success: 'alert-success' };
+            let html = items.map((it) => `
+                <div class="alert ${toneClass[it.tone] || 'alert-success'} mb-2" style="font-size: 14px;">
+                    <strong>${escHtml(it.title)}</strong>${it.text ? '<br>' + escHtml(it.text) : ''}
+                    ${it.link ? `<br><a href="${it.link.href}">${escHtml(it.link.label)}</a>` : ''}
+                </div>`).join('');
+            if (schoolNoticesState.announcements.length) {
+                html += '<h3 style="font-size: 14px; font-weight: 700; margin: 16px 0 8px;">From SpringDrill</h3>' +
+                    schoolNoticesState.announcements.map((a) => `
+                        <div class="border rounded p-3 mb-2" style="font-size: 14px;">
+                            <strong>${escHtml(a.title)}</strong>
+                            <span class="text-muted" style="font-size: 12px;"> — ${a.created_at ? new Date(a.created_at).toLocaleDateString() : ''}</span><br>
+                            ${escHtml(a.body)}
+                        </div>`).join('');
+            }
+            if (!items.length && !schoolNoticesState.announcements.length) {
+                html = '<div class="text-muted" style="font-size: 14px;">No notices — everything is up to date.</div>';
+            }
+            body.innerHTML = html;
+        }
+
+        function renderSchoolPlans() {
+            const school = schoolNoticesState.school;
+            const body = document.getElementById('schoolPlansBody');
+            const badge = document.getElementById('schoolPlanBadge');
+            const note = document.getElementById('schoolPlansNote');
+            const plans = schoolNoticesState.plans;
+            const pending = schoolNoticesState.pendingRequests;
+            const pendingPlan = pending.find((r) => r.type === 'plan_change');
+            const pendingExt = pending.find((r) => r.type === 'extension');
+            badge.textContent = school.plan ? ('Current plan: ' + school.plan) : 'No plan chosen yet';
+            body.innerHTML = '<div class="row g-3">' + plans.map((p) => {
+                const isCurrent = school.plan === p.name;
+                const features = String(p.features || '').split('\n').filter(Boolean);
+                const limit = (p.student_limit === null || p.student_limit === undefined) ? 'Unlimited students' : ('Up to ' + p.student_limit + ' students');
+                return `<div class="col-12 col-md-4">
+                    <div style="border: 1px solid ${isCurrent ? '#059669' : '#e5e7eb'}; border-radius: 12px; padding: 16px; height: 100%; ${isCurrent ? 'background: #ecfdf5;' : ''}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong style="font-size: 15px;">${escHtml(p.name)}</strong>
+                            ${isCurrent ? '<span class="badge" style="background:#059669;">Current</span>' : ''}
+                        </div>
+                        <div style="font-size: 22px; font-weight: 800; margin: 8px 0 0;">${fmtNaira(p.monthly_price)}<span style="font-size: 13px; font-weight: 500; color: var(--text-muted);"> / month</span></div>
+                        <div style="font-size: 13px; color: var(--text-muted);">${fmtNaira(p.yearly_price)} / year · ${escHtml(limit)}</div>
+                        <ul style="font-size: 13px; padding-left: 18px; margin: 12px 0;">${features.map((f) => '<li>' + escHtml(f) + '</li>').join('')}</ul>
+                        <button type="button" class="btn btn-sm" data-plan="${escHtml(p.name)}" ${isCurrent || pendingPlan ? 'disabled' : ''} style="${isCurrent ? '' : 'background: var(--brand-600); border-color: var(--brand-600); color: #fff;'}">${isCurrent ? 'Your plan' : 'Choose this plan'}</button>
+                    </div>
+                </div>`;
+            }).join('') + '</div>' +
+            '<p class="text-muted mt-3 mb-0" style="font-size: 13px;">Every plan starts with a 14-day free trial. No payment is taken here yet — when you choose a plan, the SpringDrill team confirms it and tells you how to pay.</p>' +
+            (pendingPlan ? '<p class="text-muted mt-2 mb-0" style="font-size: 13px;">Your request to move to <strong>' + escHtml(pendingPlan.details || '') + '</strong> is waiting for the SpringDrill team.</p>' : '') +
+            '<p id="planActionMsg" class="mt-2 mb-0" style="font-size: 13px;"></p>';
+            body.querySelectorAll('[data-plan]').forEach((btn) => {
+                btn.addEventListener('click', () => choosePlan(btn.getAttribute('data-plan'), btn));
+            });
+            note.style.display = 'block';
+            const reqBtn = document.getElementById('requestTimeBtn');
+            const reqNote = document.getElementById('requestTimeNote');
+            if (pendingExt) {
+                reqBtn.disabled = true;
+                reqNote.textContent = 'Your request for more time is waiting for the SpringDrill team.';
+            } else {
+                reqBtn.disabled = false;
+                reqNote.textContent = '';
+            }
+            reqBtn.onclick = () => requestMoreTime(reqBtn);
+        }
+
+        function planActionMsg(text, isError) {
+            const el = document.getElementById('planActionMsg');
+            if (!el) return;
+            el.textContent = text;
+            el.style.color = isError ? '#dc2626' : '#059669';
+        }
+
+        async function choosePlan(planName, btn) {
+            const schoolId = schoolNoticesState.schoolId;
+            if (!schoolId) return;
+            const ok = await window.sdConfirm({
+                title: 'Choose the ' + planName + ' plan?',
+                message: 'This sends a request to the SpringDrill team. They will confirm the plan and tell you how to pay. Nothing is charged here.',
+                confirmLabel: 'Send request',
+            });
+            if (!ok) return;
+            btn.disabled = true;
+            try {
+                const { error } = await supabase.from('school_requests').insert({ school_id: schoolId, type: 'plan_change', details: planName, status: 'pending' });
+                if (error) throw new Error(error.message);
+                await loadSchoolNotices(schoolNoticesState.session);
+                planActionMsg('Request sent — the SpringDrill team will confirm the ' + planName + ' plan.', false);
+            } catch (err) {
+                btn.disabled = false;
+                planActionMsg('Could not send the request: ' + (err.message || err) + ' (If the school tables are not set up yet, ask the SpringDrill team.)', true);
+            }
+        }
+
+        async function requestMoreTime(btn) {
+            const schoolId = schoolNoticesState.schoolId;
+            if (!schoolId) return;
+            const ok = await window.sdConfirm({
+                title: 'Request more time?',
+                message: 'This asks the SpringDrill team to extend your membership by 1 month. They will confirm it after you renew.',
+                confirmLabel: 'Send request',
+            });
+            if (!ok) return;
+            btn.disabled = true;
+            try {
+                const { error } = await supabase.from('school_requests').insert({ school_id: schoolId, type: 'extension', details: '1 more month', status: 'pending' });
+                if (error) throw new Error(error.message);
+                await loadSchoolNotices(schoolNoticesState.session);
+                planActionMsg('Request sent — the SpringDrill team will extend your membership by 1 month.', false);
+            } catch (err) {
+                btn.disabled = false;
+                planActionMsg('Could not send the request: ' + (err.message || err) + ' (If the school tables are not set up yet, ask the SpringDrill team.)', true);
             }
         }
 
