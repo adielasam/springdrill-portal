@@ -150,6 +150,14 @@ END $$;
 -- The current admin login becomes the vendor (super admin). Vendor logins
 -- have NO school: school_id stays NULL for this account.
 -- ---------------------------------------------------------------------------
+-- 'vendor' must be added to the user_role enum FIRST: public.users.role
+-- is an enum, and the UPDATE below fails with 22P02 ("invalid input
+-- value for enum user_role") if the value does not exist yet — the
+-- first run of this file hit exactly that, and the DO block's
+-- EXCEPTION handler swallowed it. This is a top-level statement on
+-- purpose: ALTER TYPE ... ADD VALUE cannot run inside a transaction
+-- block or a DO block.
+ALTER TYPE public.user_role ADD VALUE IF NOT EXISTS 'vendor';
 DO $$
 DECLARE
   n INTEGER;
