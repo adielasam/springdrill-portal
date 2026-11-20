@@ -644,6 +644,11 @@
             try {
                 const { error } = await supabase.from('students').delete().eq('user_id', currentStudentData.user_id);
                 if(error) throw error;
+                // Also remove the login row, so a leaver leaves nothing behind.
+                // If the Phase 3 migration has not been run yet this fails and
+                // the message says so; the student record itself is already gone.
+                const { error: userError } = await supabase.from('users').delete().eq('id', currentStudentData.user_id);
+                if(userError) throw new Error('Student record deleted, but the login row could not be removed: ' + userError.message + ' Run supabase/migrations/phase3-admin-delete-users.sql in the Supabase SQL editor, then delete the login row from User Management.');
                 alert('Student deleted.');
                 window.location.href = 'class_list.html';
             } catch (err) { alert('Failed to delete student: ' + err.message); }
