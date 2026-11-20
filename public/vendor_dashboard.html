@@ -85,6 +85,12 @@
         </div>
 
         <div class="sd-card mb-4">
+            <h2 class="h6 fw-bold mb-3">School requests</h2>
+            <p class="text-muted mb-3" style="font-size: 13px;">Schools asking for more time or a different plan. Approving an extension adds 1 month to the membership; approving a plan change sets the school's plan. No payment is taken yet.</p>
+            <div id="requestsList"></div>
+        </div>
+
+        <div class="sd-card mb-4">
             <h2 class="h6 fw-bold mb-3">All partner schools</h2>
             <div class="table-responsive">
                 <table class="table table-hover align-middle" style="font-size: 14px;">
@@ -92,6 +98,33 @@
                     <tbody id="schoolsTable"></tbody>
                 </table>
             </div>
+        </div>
+
+        <div class="sd-card mb-4">
+            <h2 class="h6 fw-bold mb-3">Announcements to schools</h2>
+            <p class="text-muted mb-3" style="font-size: 13px;">Post once and it shows on the school admin dashboard — use it for upgrades, maintenance, or anything a school should pay attention to. "All schools" reaches every partner school.</p>
+            <div class="mb-2">
+                <label class="form-label" for="annTitle">Title</label>
+                <input class="form-control" id="annTitle" type="text" placeholder="e.g. New report card layout coming Monday" maxlength="160">
+            </div>
+            <div class="mb-2">
+                <label class="form-label" for="annBody">Message</label>
+                <textarea class="form-control" id="annBody" rows="3" placeholder="What should the school know or do?" maxlength="1000"></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="annAudience">Send to</label>
+                <select class="form-select" id="annAudience" style="max-width: 320px;">
+                    <option value="">All schools</option>
+                </select>
+            </div>
+            <button type="button" class="btn btn-brand btn-sm" id="postAnnBtn">Post announcement</button>
+            <div id="announcementsList" class="mt-3"></div>
+        </div>
+
+        <div class="sd-card mb-4">
+            <h2 class="h6 fw-bold mb-3">Subscription plans</h2>
+            <p class="text-muted mb-3" style="font-size: 13px;">Flat price per school per month — not per student. Change a price here and the signup page and school dashboards show the new price. Yearly is 10× monthly (2 months free); every plan starts with a 14-day free trial.</p>
+            <div id="plansList"></div>
         </div>
 
         <div id="detailPanel" class="sd-card mb-4" style="display:none;">
@@ -115,7 +148,8 @@
                     <h3 class="h6 fw-bold">Plan &amp; expiry</h3>
                     <div class="mb-2">
                         <label class="form-label" for="planInput">Plan</label>
-                        <input class="form-control" id="planInput" type="text" placeholder="e.g. yearly">
+                        <select class="form-select" id="planInput"></select>
+                        <div class="form-text">Plans and prices are set in the Subscription plans section below.</div>
                     </div>
                     <div class="mb-2">
                         <label class="form-label" for="expiryInput">Membership expires</label>
@@ -232,6 +266,210 @@
             await renderTable();
         }
 
+        // Subscription plans + school requests + announcements (PR #55).
+        // Same direct-Supabase pattern as the rest of this page (RLS is
+        // off). Every loader falls back gracefully if the Phase 2a
+        // migration has not run yet: plans show the built-in defaults
+        // and cannot be saved, requests/announcements show a short note.
+        const DEFAULT_PLANS = [
+            { name: 'Starter', monthly_price: 5000, yearly_price: 50000, student_limit: 100, features: 'Results & report cards\nCBT tests\nJAMB practice\nQuestion bank' },
+            { name: 'Growth', monthly_price: 10000, yearly_price: 100000, student_limit: 300, features: 'Everything in Starter\nFinance & fees tracking\nAttendance\nAI lesson planner' },
+            { name: 'Premium', monthly_price: 20000, yearly_price: 200000, student_limit: null, features: 'Everything in Growth\nPriority support\nCustom subdomain\nData migration help' },
+        ];
+        let plans = [];
+        let plansFromDb = false;
+        let requests = [];
+
+        function fmtNaira(n) {
+            if (n === null || n === undefined || isNaN(Number(n))) return '—';
+            return '₦' + Number(n).toLocaleString('en-NG');
+        }
+
+        async function loadPlans() {
+            plans = DEFAULT_PLANS.map((p) => ({ ...p }));
+            plansFromDb = false;
+            try {
+                const { data, error } = await supabase.from('plans').select('*').order('monthly_price', { ascending: true });
+                if (!error && data && data.length) { plans = data; plansFromDb = true; }
+            } catch (e) { /* defaults stand */ }
+            renderPlans();
+            fillPlanSelect(null);
+        }
+
+        function renderPlans() {
+            const box = document.getElementById('plansList');
+            box.innerHTML = plans.map((p) => `
+                <div class="border rounded p-3 mb-2">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-3"><strong>${esc(p.name)}</strong><br><span class="text-muted" style="font-size: 12px;">${p.student_limit === null || p.student_limit === undefined ? 'Unlimited students' : 'Up to ' + p.student_limit + ' students'}</span></div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="plan-monthly-${p.id}">Monthly price (₦)</label>
+                            <input class="form-control" id="plan-monthly-${p.id}" type="number" min="0" step="500" value="${p.monthly_price}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="plan-yearly-${p.id}">Yearly price (₦)</label>
+                            <input class="form-control" id="plan-yearly-${p.id}" type="number" min="0" step="1000" value="${p.yearly_price}">
+                        </div>
+                        <div class="col-md-3">
+                            <button type="button" class="btn btn-brand btn-sm" data-save-plan="${p.id}">Save price</button>
+                        </div>
+                    </div>
+                </div>`).join('') +
+                (plansFromDb ? '' : '<p class="text-muted mb-0" style="font-size: 13px;">Plans are not saved yet — run the Phase 2a migration first (phase2a-plans-notifications.sql), then the prices here are stored and shown to schools.</p>');
+            box.querySelectorAll('[data-save-plan]').forEach((btn) => {
+                btn.addEventListener('click', () => savePlanPrice(Number(btn.getAttribute('data-save-plan')), btn));
+            });
+        }
+
+        async function savePlanPrice(planId, btn) {
+            if (!plansFromDb) { showError('Run the Phase 2a migration first — plan prices are not stored yet.'); return; }
+            const monthly = Number(document.getElementById('plan-monthly-' + planId).value);
+            const yearly = Number(document.getElementById('plan-yearly-' + planId).value);
+            if (isNaN(monthly) || monthly < 0 || isNaN(yearly) || yearly < 0) { showError('Prices must be 0 or more.'); return; }
+            hideAlerts();
+            btn.disabled = true;
+            const { error } = await supabase.from('plans').update({ monthly_price: monthly, yearly_price: yearly }).eq('id', planId);
+            btn.disabled = false;
+            if (error) { showError('Could not save: ' + error.message); return; }
+            showOk('Plan price saved.');
+            await loadPlans();
+        }
+
+        function fillPlanSelect(current) {
+            const sel = document.getElementById('planInput');
+            if (!sel) return;
+            const names = plans.map((p) => p.name);
+            if (current && !names.includes(current)) names.push(current);
+            sel.innerHTML = '<option value="">No plan yet</option>' + names.map((n) => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+            if (current) sel.value = current;
+        }
+
+        async function loadRequests() {
+            const box = document.getElementById('requestsList');
+            requests = [];
+            try {
+                const { data, error } = await supabase.from('school_requests').select('*').eq('status', 'pending').order('created_at', { ascending: true });
+                if (error) throw error;
+                requests = data || [];
+            } catch (e) {
+                box.innerHTML = '<p class="text-muted mb-0" style="font-size: 14px;">Requests are not set up yet — run the Phase 2a migration first (phase2a-plans-notifications.sql).</p>';
+                return;
+            }
+            renderRequests();
+        }
+
+        function renderRequests() {
+            const box = document.getElementById('requestsList');
+            if (!requests.length) {
+                box.innerHTML = '<p class="text-muted mb-0" style="font-size: 14px;">No school requests waiting.</p>';
+                return;
+            }
+            box.innerHTML = requests.map((r) => {
+                const s = schools.find((x) => x.id === r.school_id);
+                const label = r.type === 'extension' ? 'More time' : 'Plan change';
+                const detail = r.type === 'extension'
+                    ? 'Wants its membership extended by 1 month.'
+                    : 'Wants to move to the ' + (r.details || '') + ' plan.';
+                return `
+                <div class="border rounded p-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                        <div>
+                            <strong>${esc(s ? s.name : 'School #' + r.school_id)}</strong>
+                            <span class="badge-status badge-pending ms-1">${label}</span><br>
+                            <span style="font-size: 13px;">${esc(detail)}</span><br>
+                            <span class="text-muted" style="font-size: 12px;">${r.created_at ? new Date(r.created_at).toLocaleDateString() : ''}</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-brand btn-sm" data-approve-req="${r.id}">Approve</button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" data-decline-req="${r.id}">Decline</button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+            box.querySelectorAll('[data-approve-req]').forEach((btn) => {
+                btn.addEventListener('click', () => decideRequest(Number(btn.getAttribute('data-approve-req')), true, btn));
+            });
+            box.querySelectorAll('[data-decline-req]').forEach((btn) => {
+                btn.addEventListener('click', () => decideRequest(Number(btn.getAttribute('data-decline-req')), false, btn));
+            });
+        }
+
+        async function decideRequest(id, approve, btn) {
+            const r = requests.find((x) => x.id === id);
+            if (!r) return;
+            const s = schools.find((x) => x.id === r.school_id);
+            const name = s ? s.name : 'this school';
+            const what = r.type === 'extension'
+                ? 'Extend ' + name + ' by 1 month?'
+                : 'Move ' + name + ' to the ' + (r.details || '') + ' plan?';
+            const ok = await window.sdConfirm({
+                title: approve ? what : 'Decline this request?',
+                message: approve
+                    ? (r.type === 'extension' ? 'The membership runs one month further from its current expiry (or from today if it has already run out).' : 'The school’s plan changes straight away. No payment is taken yet.') + (s && effStatus(s) === 'expired' && r.type === 'extension' ? ' The school is expired now, so extending switches it back on.' : '')
+                    : 'The school is not told why — tell them directly if they need to know.',
+                confirmLabel: approve ? 'Approve' : 'Decline',
+                danger: !approve,
+            });
+            if (!ok) return;
+            hideAlerts();
+            btn.disabled = true;
+            try {
+                if (approve) {
+                    if (r.type === 'extension') {
+                        const current = s && s.expires_at ? new Date(s.expires_at) : null;
+                        const base = (current && !isNaN(current.getTime()) && current > new Date()) ? current : new Date();
+                        const next = new Date(base);
+                        next.setMonth(next.getMonth() + 1);
+                        const { error } = await supabase.from('schools').update({ expires_at: next.toISOString() }).eq('id', r.school_id);
+                        if (error) throw new Error(error.message);
+                    } else {
+                        const { error } = await supabase.from('schools').update({ plan: r.details || null }).eq('id', r.school_id);
+                        if (error) throw new Error(error.message);
+                    }
+                }
+                const { error: reqErr } = await supabase.from('school_requests').update({ status: approve ? 'approved' : 'declined' }).eq('id', id);
+                if (reqErr) throw new Error(reqErr.message);
+                showOk(approve ? 'Request approved.' : 'Request declined.');
+                await loadSchools();
+                await loadRequests();
+            } catch (err) {
+                showError(err.message || 'Could not decide the request.');
+                btn.disabled = false;
+            }
+        }
+
+        async function loadAnnouncements() {
+            const box = document.getElementById('announcementsList');
+            let rows = [];
+            try {
+                const { data, error } = await supabase.from('school_announcements').select('*').order('created_at', { ascending: false }).limit(10);
+                if (error) throw error;
+                rows = data || [];
+            } catch (e) {
+                box.innerHTML = '<p class="text-muted mb-0" style="font-size: 14px;">Announcements are not set up yet — run the Phase 2a migration first (phase2a-plans-notifications.sql).</p>';
+                return;
+            }
+            if (!rows.length) {
+                box.innerHTML = '<p class="text-muted mb-0" style="font-size: 14px;">No announcements posted yet.</p>';
+                return;
+            }
+            box.innerHTML = rows.map((a) => {
+                const s = a.school_id ? schools.find((x) => x.id === a.school_id) : null;
+                return `
+                <div class="border rounded p-3 mb-2" style="font-size: 14px;">
+                    <strong>${esc(a.title)}</strong>
+                    <span class="text-muted" style="font-size: 12px;"> — ${a.school_id ? esc(s ? s.name : 'School #' + a.school_id) : 'All schools'} · ${a.created_at ? new Date(a.created_at).toLocaleDateString() : ''}</span><br>
+                    ${esc(a.body)}
+                </div>`;
+            }).join('');
+        }
+
+        function fillAnnAudience() {
+            const sel = document.getElementById('annAudience');
+            if (!sel) return;
+            sel.innerHTML = '<option value="">All schools</option>' + schools.map((s) => `<option value="${s.id}">${esc(s.name)}</option>`).join('');
+        }
+
         function renderApprovals() {
             const box = document.getElementById('approvalsList');
             const pending = schools.filter((s) => s.status === 'pending');
@@ -306,7 +544,7 @@
             document.getElementById('detailName').textContent = s.name;
             document.getElementById('detailSlug').textContent = '/' + (s.slug || '') + ' · ' + (effStatus(s) || '');
             document.getElementById('detailCode').textContent = s.setup_code || '—';
-            document.getElementById('planInput').value = s.plan || '';
+            fillPlanSelect(s.plan || null);
             document.getElementById('expiryInput').value = s.expires_at ? new Date(s.expires_at).toISOString().slice(0, 10) : '';
             document.getElementById('regenCodeBtn').style.display = (!s.setup_completed && s.status === 'active') ? '' : 'none';
             document.getElementById('extendBtn').style.display = (s.status === 'pending' || s.status === 'declined') ? 'none' : '';
@@ -405,6 +643,23 @@
         });
         document.getElementById('dismissApproveBtn').addEventListener('click', () => {
             document.getElementById('approveResult').style.display = 'none';
+        });
+        document.getElementById('postAnnBtn').addEventListener('click', async () => {
+            const title = document.getElementById('annTitle').value.trim();
+            const body = document.getElementById('annBody').value.trim();
+            const audience = document.getElementById('annAudience').value;
+            if (!title || !body) { showError('Write a title and a message first.'); return; }
+            hideAlerts();
+            const { error } = await supabase.from('school_announcements').insert({
+                school_id: audience ? Number(audience) : null,
+                title, body,
+                created_by: document.getElementById('vendorName').textContent || null,
+            });
+            if (error) { showError('Could not post: ' + error.message + ' (If the school tables are not set up yet, run the Phase 2a migration first.)'); return; }
+            document.getElementById('annTitle').value = '';
+            document.getElementById('annBody').value = '';
+            showOk('Announcement posted — schools will see it on their admin dashboard.');
+            await loadAnnouncements();
         });
         document.getElementById('searchBox').addEventListener('input', () => renderTable());
         document.getElementById('closeDetailBtn').addEventListener('click', () => {
@@ -561,6 +816,10 @@
                 } else {
                     document.getElementById('vendorName').textContent = profile.name || '';
                     await loadSchools();
+                    fillAnnAudience();
+                    await loadPlans();
+                    await loadRequests();
+                    await loadAnnouncements();
                 }
             }
         } catch (err) {
