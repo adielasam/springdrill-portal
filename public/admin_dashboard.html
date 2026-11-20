@@ -307,7 +307,7 @@
         <!-- HEADER -->
         <div class="page-header">
             <h1>Welcome back</h1>
-            <p>Here is what's happening across your workspace today.</p>
+            <p id="pageHeaderSub">Here is what's happening across your workspace today.</p>
         </div>
 
         <!-- SCHOOL NOTICES & SUBSCRIPTION (multi-school) -->
@@ -317,10 +317,15 @@
                     <div class="premium-card">
                         <div class="panel-header">
                             <h2 class="panel-title"><i data-lucide="bell"></i> Notices for your school</h2>
-                            <span id="schoolRenewalBadge" style="font-size: 13px; font-weight: 600;"></span>
+                            <span style="display: flex; gap: 8px; align-items: center;">
+                                <span id="schoolRenewalBadge" style="font-size: 13px; font-weight: 600;"></span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="schoolNoticesToggle" style="font-size: 12px;">Show details</button>
+                            </span>
                         </div>
-                        <div class="panel-body" id="schoolNoticesBody">
-                            <div class="text-center text-muted py-4" style="font-size: 13px;">Loading notices...</div>
+                        <div id="schoolNoticesCollapse" style="display: none;">
+                            <div class="panel-body" id="schoolNoticesBody">
+                                <div class="text-center text-muted py-4" style="font-size: 13px;">Loading notices...</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -330,14 +335,19 @@
                     <div class="premium-card">
                         <div class="panel-header">
                             <h2 class="panel-title"><i data-lucide="badge-check"></i> Subscription</h2>
-                            <span id="schoolPlanBadge" style="font-size: 13px; font-weight: 600; color: var(--text-muted);"></span>
+                            <span style="display: flex; gap: 8px; align-items: center;">
+                                <span id="schoolPlanBadge" style="font-size: 13px; font-weight: 600; color: var(--text-muted);"></span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="schoolPlansToggle" style="font-size: 12px;">Show details</button>
+                            </span>
                         </div>
-                        <div class="panel-body" id="schoolPlansBody">
-                            <div class="text-center text-muted py-4" style="font-size: 13px;">Loading plans...</div>
-                        </div>
-                        <div class="panel-body pt-0" id="schoolPlansNote" style="display:none;">
-                            <button type="button" class="btn btn-outline-secondary btn-sm" id="requestTimeBtn">Request more time</button>
-                            <span id="requestTimeNote" class="text-muted ms-2" style="font-size: 13px;"></span>
+                        <div id="schoolPlansCollapse" style="display: none;">
+                            <div class="panel-body" id="schoolPlansBody">
+                                <div class="text-center text-muted py-4" style="font-size: 13px;">Loading plans...</div>
+                            </div>
+                            <div class="panel-body pt-0" id="schoolPlansNote" style="display:none;">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="requestTimeBtn">Request more time</button>
+                                <span id="requestTimeNote" class="text-muted ms-2" style="font-size: 13px;"></span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -497,6 +507,14 @@
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) return window.location.href = '/';
 
+                // Multi-school scoping (PR #59): the signed-in admin's
+                // school, fetched first so every count below can be
+                // scoped to it. NULL (the vendor/owner) means no filter
+                // — the global view, and Spring Valley behaviour is
+                // unchanged.
+                const { data: viewer } = await supabase.from('users').select('school_id').eq('id', session.user.id).single();
+                viewerSchoolId = viewer ? viewer.school_id : null;
+
                 // Role switcher (PR #41): only accounts holding the admin role
                 // stay here; anyone else is sent to a dashboard they do hold.
                 await guardRole('admin');
@@ -521,12 +539,12 @@
                     { count: maleCount }, { count: femaleCount },
                     { count: classCount }, { count: teacherCount }
                 ] = await Promise.all([
-                    supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', true),
-                    supabase.from('students').select('*', { count: 'exact', head: true }).eq('approved', false),
-                    supabase.from('students').select('*', { count: 'exact', head: true }).eq('gender', 'Male').eq('approved', true),
-                    supabase.from('students').select('*', { count: 'exact', head: true }).eq('gender', 'Female').eq('approved', true),
-                    supabase.from('classes').select('*', { count: 'exact', head: true }),
-                    supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'teacher')
+                    scopeEq(supabase.from('students').select('*', { count: 'exact', head: true })).eq('approved', true),
+                    scopeEq(supabase.from('students').select('*', { count: 'exact', head: true })).eq('approved', false),
+                    scopeEq(supabase.from('students').select('*', { count: 'exact', head: true })).eq('gender', 'Male').eq('approved', true),
+                    scopeEq(supabase.from('students').select('*', { count: 'exact', head: true })).eq('gender', 'Female').eq('approved', true),
+                    scopeEq(supabase.from('classes').select('*', { count: 'exact', head: true })),
+                    scopeEq(supabase.from('users').select('*', { count: 'exact', head: true })).eq('role', 'teacher')
                 ]);
 
                 document.getElementById('statActiveStudents').innerText = activeStudents || 0;
@@ -564,6 +582,30 @@
         ];
         let schoolNoticesState = { session: null, schoolId: null, school: null, plans: DEFAULT_PLANS, announcements: [], pendingRequests: [] };
 
+        // Multi-school scoping (PR #59): the signed-in admin's school,
+        // set in initializeDashboard before any count runs. NULL means
+        // the vendor/owner, who sees everything (no filter).
+        let viewerSchoolId = null;
+        function scopeEq(q) { return viewerSchoolId ? q.eq('school_id', viewerSchoolId) : q; }
+
+        // Notices + Subscription panels start collapsed so the stat cards
+        // sit at the top; the header (with its badge) stays visible.
+        // The flags survive re-renders (choosePlan / requestMoreTime call
+        // loadSchoolNotices again) — except that a danger notice always
+        // expands the notices panel (see renderSchoolNotices).
+        let schoolNoticesExpanded = false;
+        let schoolPlansExpanded = false;
+        function applyPanelVisibility() {
+            const n = document.getElementById('schoolNoticesCollapse');
+            const p = document.getElementById('schoolPlansCollapse');
+            const nt = document.getElementById('schoolNoticesToggle');
+            const pt = document.getElementById('schoolPlansToggle');
+            if (n) n.style.display = schoolNoticesExpanded ? 'block' : 'none';
+            if (p) p.style.display = schoolPlansExpanded ? 'block' : 'none';
+            if (nt) nt.textContent = schoolNoticesExpanded ? 'Hide details' : 'Show details';
+            if (pt) pt.textContent = schoolPlansExpanded ? 'Hide details' : 'Show details';
+        }
+
         function fmtNaira(n) {
             if (n === null || n === undefined || isNaN(Number(n))) return '—';
             return '₦' + Number(n).toLocaleString('en-NG');
@@ -591,6 +633,15 @@
                 if (schoolErr || !school) return;
                 schoolNoticesState.schoolId = schoolId;
                 schoolNoticesState.school = school;
+
+                // School identity (PR #59): the dashboard says whose it
+                // is — browser tab, page header, and a link to the
+                // school's own front door.
+                document.title = school.name + ' — Admin Dashboard';
+                const pageSub = document.getElementById('pageHeaderSub');
+                if (pageSub) {
+                    pageSub.innerHTML = '<strong>' + escHtml(school.name) + '</strong> · <a href="/' + escHtml(school.slug) + '">' + escHtml(location.origin + '/' + school.slug) + '</a>' + (school.plan ? ' · ' + escHtml(school.plan) + ' plan' : '');
+                }
 
                 // Plans from the database when the migration has run,
                 // otherwise the built-in defaults (same prices).
@@ -677,7 +728,11 @@
             if (!items.length && !schoolNoticesState.announcements.length) {
                 html = '<div class="text-muted" style="font-size: 14px;">No notices — everything is up to date.</div>';
             }
+            // A danger notice (expired / about to expire) must be seen:
+            // expand the panel even though it starts collapsed.
+            if (items.some((it) => it.tone === 'danger')) schoolNoticesExpanded = true;
             body.innerHTML = html;
+            applyPanelVisibility();
         }
 
         function renderSchoolPlans() {
@@ -724,6 +779,7 @@
                 reqNote.textContent = '';
             }
             reqBtn.onclick = () => requestMoreTime(reqBtn);
+            applyPanelVisibility();
         }
 
         function planActionMsg(text, isError) {
@@ -777,7 +833,7 @@
 
         async function renderClassChart() {
             try {
-                const { data: students } = await supabase.from('students').select('classes(name)').eq('approved', true);
+                const { data: students } = await scopeEq(supabase.from('students').select('classes(name)')).eq('approved', true);
                 const classCounts = {};
                 if (students) {
                     students.forEach(s => {
@@ -829,8 +885,8 @@
                 const attContainer = document.getElementById('attendanceListWidget');
                 const [rawAtt, allStudents, allClasses] = await Promise.all([
                     supabase.from('attendance').select('*').order('created_at', { ascending: false }),
-                    supabase.from('students').select('*'),
-                    supabase.from('classes').select('*')
+                    scopeEq(supabase.from('students').select('*')),
+                    scopeEq(supabase.from('classes').select('*'))
                 ]);
 
                 if (rawAtt.error || !rawAtt.data || rawAtt.data.length === 0) {
@@ -862,19 +918,40 @@
                         const rawId = record.student_id || record.user_id || record.studentId || record.reg_number || "";
                         const cleanId = String(rawId).trim().toLowerCase();
                         const stu = studentMap[cleanId];
-                        
+
+                        // Scoped view (a partner school): never count
+                        // another school's records. A student id that is
+                        // not in this school's student list, or a class
+                        // id that is not one of this school's classes,
+                        // means the record belongs elsewhere — skip it.
+                        // (Unscoped — the vendor/owner — keeps the old
+                        // behaviour: everything counts, unknown classes
+                        // show as 'Unknown'.)
+                        if (viewerSchoolId && rawId && !stu) return;
+                        if (viewerSchoolId && record.class_id && !classMap[record.class_id]) return;
+
                         let cName = 'Unknown';
                         if (stu && classMap[stu.class_id]) cName = classMap[stu.class_id];
                         else if (classMap[record.class_id]) cName = classMap[record.class_id];
-                        else if (record.class_id) cName = record.class_id; 
+                        else if (record.class_id) cName = record.class_id;
                         else if (record.className) cName = record.className;
-                        
+
+                        // Scoped view: a record with no class of this
+                        // school is not ours — skip it instead of
+                        // counting it as 'Unknown'.
+                        if (viewerSchoolId && cName === 'Unknown') return;
+
                         if (!classCounts[cName]) classCounts[cName] = { present: 0, absent: 0 };
                         const stat = String(record.status).toLowerCase();
                         if (stat.includes('present') || stat.includes('late')) classCounts[cName].present++;
                         else classCounts[cName].absent++;
                     }
                 });
+
+                if (Object.keys(classCounts).length === 0) {
+                    attContainer.innerHTML = '<div class="text-center text-muted py-5" style="font-size:13px;">No records found.</div>';
+                    return;
+                }
 
                 attContainer.innerHTML = Object.entries(classCounts).map(([className, counts]) => `
                     <div class="att-item">
@@ -897,7 +974,7 @@
 
         async function populateLeagueWidget() {
             try {
-                const { data: students } = await supabase.from('students').select('user_id, first_name, surname, classes(name)').eq('approved', true);
+                const { data: students } = await scopeEq(supabase.from('students').select('user_id, first_name, surname, classes(name)')).eq('approved', true);
                 const { data: results } = await supabase.from('test_results').select('student_id, score');
                 const pointsMap = {};
                 if (results) {
@@ -936,7 +1013,7 @@
             try {
                 const currentMonth = new Date().getMonth();
                 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                const { data: students } = await supabase.from('students').select('first_name, surname, dob').not('dob', 'is', null);
+                const { data: students } = await scopeEq(supabase.from('students').select('first_name, surname, dob')).not('dob', 'is', null);
                 const bdayContainer = document.getElementById('birthdayWidgetBody');
 
                 if (!students || students.length === 0) { bdayContainer.innerHTML = '<div class="text-center text-muted py-5" style="font-size:13px;">No birthdays recorded.</div>'; return; }
@@ -966,6 +1043,13 @@
         }
 
         
+        // Notices + Subscription collapse toggles (PR #59). The flags
+        // live at module level, so re-renders keep the user's choice.
+        const noticesToggle = document.getElementById('schoolNoticesToggle');
+        if (noticesToggle) noticesToggle.addEventListener('click', () => { schoolNoticesExpanded = !schoolNoticesExpanded; applyPanelVisibility(); });
+        const plansToggle = document.getElementById('schoolPlansToggle');
+        if (plansToggle) plansToggle.addEventListener('click', () => { schoolPlansExpanded = !schoolPlansExpanded; applyPanelVisibility(); });
+
         const logoutBtn = document.getElementById('logoutBtn');
         if(logoutBtn) {
             logoutBtn.addEventListener('click', async (e) => {

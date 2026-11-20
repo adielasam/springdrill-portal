@@ -411,20 +411,25 @@ function LoginForm() {
         sessionStorage.setItem('sd_school', JSON.stringify(school));
       }
 
+      // Multi-school (PR #59): school members land inside their school's
+      // address (/slug/admin_dashboard.html, ...), so the slug survives
+      // navigation and the sidebar stays school-scoped. The vendor and
+      // paused redirects above are unchanged.
+      const stored = sessionStorage.getItem('sd_school');
+      const mySchool = stored ? JSON.parse(stored) : null;
+      const schoolPrefix = mySchool && mySchool.slug ? '/' + mySchool.slug : '';
       if (profile.role === 'vendor') {
         window.location.href = '/vendor_dashboard.html';
       } else if (profile.role === 'admin') {
-        const stored = sessionStorage.getItem('sd_school');
-        const school = stored ? JSON.parse(stored) : null;
-        if (school && !school.setup_completed) {
-          window.location.href = '/school_setup.html';
+        if (mySchool && !mySchool.setup_completed) {
+          window.location.href = schoolPrefix + '/school_setup.html';
         } else {
-          window.location.href = '/admin_dashboard.html';
+          window.location.href = schoolPrefix + '/admin_dashboard.html';
         }
       } else if (profile.role === 'teacher') {
-        window.location.href = '/teacher_dashboard.html';
+        window.location.href = schoolPrefix + '/teacher_dashboard.html';
       } else if (profile.role === 'student') {
-        window.location.href = '/student_dashboard.html';
+        window.location.href = schoolPrefix + '/student_dashboard.html';
       } else {
         throw new Error('Invalid role assigned to this account.');
       }
