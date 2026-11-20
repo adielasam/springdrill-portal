@@ -114,8 +114,34 @@
     </footer>
 
 <script type="module">
-        const params = new URLSearchParams(window.location.search);
-        const slug = (params.get('slug') || '').trim().toLowerCase();
+        function isValidSlug(s) {
+            return /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(s || '');
+        }
+        // Where the school's slug comes from, in order. The front door is
+        // reached three ways and the browser address looks different in
+        // each, so check all three:
+        // 1. ?slug= in the address (links from the vendor dashboard).
+        // 2. First path segment: /giftedhands is rewritten server-side to
+        //    this page, but the browser still shows the clean path — and
+        //    the rewrite's ?slug= never reaches window.location.search,
+        //    so the path is the only place the slug survives.
+        // 3. First hostname label: giftedhands.springdrill.com.ng — only
+        //    when the host has at least four labels, so the apex domain
+        //    itself (springdrill.com.ng, three labels) never matches, and
+        //    never on Vercel hosts or www.
+        function resolveSchoolSlug() {
+            const fromQuery = (new URLSearchParams(window.location.search).get('slug') || '').trim().toLowerCase();
+            if (isValidSlug(fromQuery)) return fromQuery;
+            const seg = (window.location.pathname.split('/').filter(Boolean)[0] || '').toLowerCase();
+            if (isValidSlug(seg)) return seg;
+            const host = window.location.hostname.toLowerCase();
+            if (!host.endsWith('.vercel.app')) {
+                const labels = host.split('.');
+                if (labels.length >= 4 && isValidSlug(labels[0]) && labels[0] !== 'www' && labels[0] !== 'api') return labels[0];
+            }
+            return '';
+        }
+        const slug = resolveSchoolSlug();
         const loadingEl = document.getElementById('loadingState');
         const schoolEl = document.getElementById('schoolState');
         const notFoundEl = document.getElementById('notFoundState');

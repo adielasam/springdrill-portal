@@ -282,6 +282,12 @@
                     b.className = 'btn sd-plan-choose ' + (on ? 'btn-success' : 'btn-outline-success');
                 }
             });
+            // Choosing a plan is step one of applying, so take the user to
+            // the next step: the registration form below the plans. (Before
+            // this, tapping a plan only changed the label and felt like
+            // nothing had happened.)
+            const applyEl = document.getElementById('apply');
+            if (applyEl) applyEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         async function loadPlans() {
