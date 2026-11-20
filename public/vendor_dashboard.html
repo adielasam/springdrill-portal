@@ -9,13 +9,32 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --brand-600: #059669; --brand-dark: #004d34; --brand-100: #d1fae5; }
-        body { background: #f9fafb; font-family: 'Inter', sans-serif; color: #111827; }
-        .sd-topbar { background: #fff; border-bottom: 1px solid #e5e7eb; }
-        .sd-brand { font-weight: 800; font-size: 20px; letter-spacing: -.5px; color: var(--brand-600); margin: 0; }
-        .sd-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; }
+        :root { --brand-600: #059669; --brand-700: #047857; --brand-dark: #004d34; --brand-100: #d1fae5; --ink: #111827; --muted: #6b7280; --line: #e5e7eb; --soft: #f4f7f5; }
+        body { background: var(--soft); font-family: 'Inter', sans-serif; color: var(--ink); }
+        a { text-decoration: none; }
+
+        /* Shared top bar (same on all school pages) */
+        .sd-topbar { background: #fff; border-bottom: 1px solid var(--line); }
+        .sd-topbar-inner { max-width: 1120px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+        .sd-topbar-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; color: var(--brand-600); letter-spacing: -.5px; }
+        .sd-topbar-brand img { display: block; }
+        .sd-topbar-links { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+        .sd-topbar-links a { color: #374151; font-size: 13px; font-weight: 600; }
+        .sd-topbar-links a:hover { color: var(--brand-600); }
+
+        /* Hero banner */
+        .sd-hero { background: linear-gradient(135deg, var(--brand-dark) 0%, #036b4a 60%, var(--brand-600) 100%); color: #fff; }
+        .sd-hero-inner { max-width: 1120px; margin: 0 auto; padding: 36px 20px 32px; }
+        .sd-hero h1 { font-weight: 800; font-size: clamp(24px, 3.5vw, 32px); letter-spacing: -.5px; margin: 0 0 8px; }
+        .sd-hero p { color: #d1fae5; font-size: 14px; line-height: 1.6; margin: 0; max-width: 720px; }
+
+        /* Cards + sections */
+        .sd-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 22px; box-shadow: 0 2px 10px rgba(0,0,0,.04); }
+        .sd-section-card > h2 { font-size: 17px; margin-bottom: 4px; }
+        .sd-stat { text-align: center; border-top: 3px solid var(--brand-600); }
+        .sd-stat .h4 { color: var(--brand-dark); }
         .btn-brand { background: var(--brand-600); border-color: var(--brand-600); color: #fff; font-weight: 600; }
-        .btn-brand:hover { background: #047857; border-color: #047857; color: #fff; }
+        .btn-brand:hover { background: var(--brand-700); border-color: var(--brand-700); color: #fff; }
         .badge-status { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; }
         .badge-pending { background: #fef3c7; color: #92400e; }
         .badge-active { background: var(--brand-100); color: var(--brand-dark); }
@@ -27,38 +46,59 @@
         .school-row.selected { background: #ecfdf5; }
         .form-label { font-weight: 600; font-size: 13px; }
         .form-control, .form-select { font-size: 14px; }
+        .form-control:focus, .form-select:focus { border-color: var(--brand-600); box-shadow: 0 0 0 3px rgba(5,150,105,.18); }
         .code-big { font-size: 28px; font-weight: 800; letter-spacing: 2px; color: var(--brand-dark); }
+        #approveResult { background: #f0fdf4; }
+        #detailPanel { border-top: 3px solid var(--brand-600); }
+        #plansList > div, #requestsList > div, #approvalsList > div, #announcementsList > div { border-radius: 12px !important; }
+        .table thead th { font-size: 12px; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); border-bottom: 2px solid var(--line); }
+
+        /* Shared footer */
+        .sd-footer { background: var(--brand-dark); color: #d1fae5; margin-top: 72px; }
+        .sd-footer-inner { max-width: 1120px; margin: 0 auto; padding: 44px 20px 36px; text-align: center; }
+        .sd-footer-brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; color: #fff; letter-spacing: -.5px; }
+        .sd-footer-tag { font-size: 14px; margin: 12px 0 4px; }
+        .sd-footer-contact { font-size: 14px; margin: 0 0 18px; }
+        .sd-footer-contact strong { color: #fff; }
+        .sd-footer-nav { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }
+        .sd-footer-nav a { color: #d1fae5; font-size: 14px; font-weight: 600; }
+        .sd-footer-nav a:hover { color: #fff; }
+        .sd-footer-copy { font-size: 12px; color: #a7f3d0; margin: 22px 0 0; }
     </style>
 </head>
 <body>
     <header class="sd-topbar">
-        <div class="container-fluid d-flex align-items-center justify-content-between py-3 px-4">
+        <div class="sd-topbar-inner">
             <div class="d-flex align-items-center gap-3">
-                <p class="sd-brand">SpringDrill</p>
+                <a href="/" class="sd-topbar-brand"><img src="/springdrill-emblem.png" alt="" width="30" height="30"><span>SpringDrill</span></a>
                 <span class="badge bg-dark" style="font-size: 12px;">VENDOR</span>
             </div>
-            <div class="d-flex align-items-center gap-3">
-                <a href="/admin_dashboard.html" class="text-muted text-decoration-none" style="font-size: 13px;">Spring Valley admin</a>
-                <a href="/" class="text-muted text-decoration-none" style="font-size: 13px;">Portal home</a>
+            <div class="sd-topbar-links">
+                <a href="/admin_dashboard.html">Spring Valley admin</a>
+                <a href="/">Portal home</a>
                 <span id="vendorName" class="fw-semibold" style="font-size: 14px;"></span>
                 <button type="button" class="btn btn-outline-secondary btn-sm" id="logoutBtn">Log out</button>
             </div>
         </div>
     </header>
 
-    <main class="container-fluid px-4 py-4" style="max-width: 1100px;">
-        <h1 class="h4 fw-bold mb-1">Schools</h1>
-        <p class="text-muted" style="font-size: 14px;">Approve new schools, send their setup codes, and pause or resume them. Only partner schools are listed here — SpringDrill's own Nursery, Primary and High sections are managed under Subjects, as before.</p>
+    <section class="sd-hero">
+        <div class="sd-hero-inner">
+            <h1>Vendor dashboard</h1>
+            <p>Approve new schools, send their setup codes, and pause or resume them. Only partner schools are listed here — SpringDrill's own Nursery, Primary and High sections are managed under Subjects, as before.</p>
+        </div>
+    </section>
 
+    <main class="container-fluid px-4 py-4" style="max-width: 1100px;">
         <div id="pageError" class="alert alert-danger" style="display:none; font-size: 14px;"></div>
         <div id="pageOk" class="alert alert-success" style="display:none; font-size: 14px;"></div>
 
         <div class="row g-3 mb-4" id="statsRow">
-            <div class="col-6 col-md"><div class="sd-card text-center"><div class="h4 fw-bold mb-0" id="statPending">0</div><div class="text-muted" style="font-size: 13px;">Waiting approval</div></div></div>
-            <div class="col-6 col-md"><div class="sd-card text-center"><div class="h4 fw-bold mb-0" id="statActive">0</div><div class="text-muted" style="font-size: 13px;">Active</div></div></div>
-            <div class="col-6 col-md"><div class="sd-card text-center"><div class="h4 fw-bold mb-0" id="statPaused">0</div><div class="text-muted" style="font-size: 13px;">Paused</div></div></div>
-            <div class="col-6 col-md"><div class="sd-card text-center"><div class="h4 fw-bold mb-0" id="statExpired">0</div><div class="text-muted" style="font-size: 13px;">Expired</div></div></div>
-            <div class="col-6 col-md"><div class="sd-card text-center"><div class="h4 fw-bold mb-0" id="statTotal">0</div><div class="text-muted" style="font-size: 13px;">Partner schools</div></div></div>
+            <div class="col-6 col-md"><div class="sd-card sd-stat"><div class="h4 fw-bold mb-0" id="statPending">0</div><div class="text-muted" style="font-size: 13px;">Waiting approval</div></div></div>
+            <div class="col-6 col-md"><div class="sd-card sd-stat"><div class="h4 fw-bold mb-0" id="statActive">0</div><div class="text-muted" style="font-size: 13px;">Active</div></div></div>
+            <div class="col-6 col-md"><div class="sd-card sd-stat"><div class="h4 fw-bold mb-0" id="statPaused">0</div><div class="text-muted" style="font-size: 13px;">Paused</div></div></div>
+            <div class="col-6 col-md"><div class="sd-card sd-stat"><div class="h4 fw-bold mb-0" id="statExpired">0</div><div class="text-muted" style="font-size: 13px;">Expired</div></div></div>
+            <div class="col-6 col-md"><div class="sd-card sd-stat"><div class="h4 fw-bold mb-0" id="statTotal">0</div><div class="text-muted" style="font-size: 13px;">Partner schools</div></div></div>
         </div>
 
         <div id="approveResult" class="sd-card mb-4" style="display:none; border-color: var(--brand-600);">
@@ -76,7 +116,7 @@
             <p id="copyNote" class="text-success mt-2 mb-0" style="display:none; font-size: 13px;">Copied.</p>
         </div>
 
-        <div class="sd-card mb-4">
+        <div class="sd-card sd-section-card mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="h6 fw-bold mb-0">Waiting for approval</h2>
                 <input class="form-control form-control-sm" id="searchBox" type="search" placeholder="Search schools..." style="max-width: 220px;">
@@ -84,13 +124,13 @@
             <div id="approvalsList"></div>
         </div>
 
-        <div class="sd-card mb-4">
+        <div class="sd-card sd-section-card mb-4">
             <h2 class="h6 fw-bold mb-3">School requests</h2>
             <p class="text-muted mb-3" style="font-size: 13px;">Schools asking for more time or a different plan. Approving an extension adds 1 month to the membership; approving a plan change sets the school's plan. No payment is taken yet.</p>
             <div id="requestsList"></div>
         </div>
 
-        <div class="sd-card mb-4">
+        <div class="sd-card sd-section-card mb-4">
             <h2 class="h6 fw-bold mb-3">All partner schools</h2>
             <div class="table-responsive">
                 <table class="table table-hover align-middle" style="font-size: 14px;">
@@ -100,7 +140,7 @@
             </div>
         </div>
 
-        <div class="sd-card mb-4">
+        <div class="sd-card sd-section-card mb-4">
             <h2 class="h6 fw-bold mb-3">Announcements to schools</h2>
             <p class="text-muted mb-3" style="font-size: 13px;">Post once and it shows on the school admin dashboard — use it for upgrades, maintenance, or anything a school should pay attention to. "All schools" reaches every partner school.</p>
             <div class="mb-2">
@@ -121,7 +161,7 @@
             <div id="announcementsList" class="mt-3"></div>
         </div>
 
-        <div class="sd-card mb-4">
+        <div class="sd-card sd-section-card mb-4">
             <h2 class="h6 fw-bold mb-3">Subscription plans</h2>
             <p class="text-muted mb-3" style="font-size: 13px;">Flat price per school per month — not per student. Change a price here and the signup page and school dashboards show the new price. Yearly is 10× monthly (2 months free); every plan starts with a 14-day free trial.</p>
             <div id="plansList"></div>
@@ -182,7 +222,22 @@
         </div>
     </main>
 
-    <script src="sd-confirm.js"></script>
+    <footer class="sd-footer">
+        <div class="sd-footer-inner">
+            <div class="sd-footer-brand"><img src="/springdrill-emblem.png" alt="" width="30" height="30"><span>SpringDrill</span></div>
+            <p class="sd-footer-tag">CBT tests, results and report cards for Nigerian schools.</p>
+            <p class="sd-footer-contact">For partnerships and purchases, call <strong>08162337303</strong></p>
+            <nav class="sd-footer-nav">
+                <a href="/">Home</a>
+                <a href="/school_signup.html">Register your school</a>
+                <a href="/contact">Contact</a>
+                <a href="/#signin">Portal sign-in</a>
+            </nav>
+            <p class="sd-footer-copy">© 2026 SpringDrill</p>
+        </div>
+    </footer>
+
+<script src="sd-confirm.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';

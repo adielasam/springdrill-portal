@@ -28,6 +28,13 @@ export async function POST(request: Request) {
                 ? null
                 : parseInt(String(body.students_count), 10);
         const wants = String(body.wants || '').trim() || null;
+        // The plan the school picked on the signup page (optional).
+        // schools.plan exists (Phase 1 migration); anything that is not
+        // one of the three plan names is ignored, never stored.
+        const PLAN_NAMES = ['Starter', 'Growth', 'Premium'];
+        const plan = PLAN_NAMES.includes(String(body.plan || '').trim())
+            ? String(body.plan).trim()
+            : null;
 
         if (!name) return NextResponse.json({ error: 'School name is required.' }, { status: 400 });
         if (!town) return NextResponse.json({ error: 'Town / state is required.' }, { status: 400 });
@@ -82,6 +89,7 @@ export async function POST(request: Request) {
                 contact_phone: contactPhone,
                 students_count: studentsCount,
                 wants,
+                plan,
                 slug,
                 status: 'pending',
                 address: town,
