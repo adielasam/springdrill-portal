@@ -193,6 +193,11 @@ const PRACTICE_STYLES = `
   .sd-jp-q-meta { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 10px 0; }
   .sd-jp-chip { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: #004d34; background: #eef6f1; border-radius: 999px; padding: 5px 11px; }
   .sd-jp-stem { font-size: 1.2rem; line-height: 1.65; font-weight: 700; color: #123227; margin: 0 0 20px 0; white-space: pre-wrap; overflow-wrap: break-word; }
+  /* Labelled diagram (SVG string from the pack): light card above the stem.
+     On narrow phones the SVG keeps a readable width (min-width) and the
+     card scrolls sideways — labels never shrink to unreadable sizes. */
+  .sd-jp-diagram { background: #fbfdfc; border: 1px solid #dfe7e2; border-radius: 8px; padding: 10px; margin: 0 0 20px 0; overflow-x: auto; text-align: center; }
+  .sd-jp-diagram svg { max-width: 100%; min-width: 480px; height: auto; }
   .sd-jp-options { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .sd-jp-option { display: flex; align-items: flex-start; gap: 12px; text-align: left; min-height: 56px; padding: 16px; border-radius: 16px; border: 2px solid #dce6df; background: #ffffff; color: #123227; font-size: 1rem; line-height: 1.55; cursor: pointer; font-family: inherit; transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease; }
   .sd-jp-option:hover:not(:disabled) { border-color: #007a4d; box-shadow: 0 4px 14px rgba(18, 50, 39, 0.08); transform: translateY(-1px); }
