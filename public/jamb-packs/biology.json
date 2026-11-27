@@ -1,921 +1,1001 @@
 {
- "subject": "Biology",
- "version": 2,
- "questions": [
-  {
-   "id": "biology-001",
-   "year": "2020",
-   "topic": "Living Organisms",
-   "text": "Which of the following is a characteristic of all living things?",
-   "options": [
-    "Movement from place to place",
-    "Irritability",
-    "Photosynthesis",
-    "Hibernation"
-   ],
-   "answer": 1,
-   "explanation": "All living things respond to stimuli (irritability). Movement, photosynthesis and hibernation are not shown by all living things."
-  },
-  {
-   "id": "biology-002",
-   "year": "2021",
-   "topic": "Living Organisms",
-   "text": "The organelle responsible for energy production in the cell is the ___.",
-   "options": [
-    "nucleus",
-    "ribosome",
-    "lysosome",
-    "mitochondrion"
-   ],
-   "answer": 3,
-   "explanation": "The mitochondrion is the site of aerobic respiration, which releases energy as ATP."
-  },
-  {
-   "id": "biology-003",
-   "year": "2022",
-   "topic": "Living Organisms",
-   "text": "Which of the following structures is found in plant cells but NOT in animal cells?",
-   "options": [
-    "Mitochondrion",
-    "Cell membrane",
-    "Chloroplast",
-    "Nucleus"
-   ],
-   "answer": 2,
-   "explanation": "Chloroplasts, which contain chlorophyll for photosynthesis, occur in plant cells but not in animal cells."
-  },
-  {
-   "id": "biology-004",
-   "year": "2023",
-   "topic": "Evolution Among Organisms",
-   "text": "Bacteria belong to the kingdom ___.",
-   "options": [
-    "Monera",
-    "Protista",
-    "Fungi",
-    "Plantae"
-   ],
-   "answer": 0,
-   "explanation": "In the five-kingdom classification, the prokaryotes (bacteria and blue-green algae) form the kingdom Monera."
-  },
-  {
-   "id": "biology-005",
-   "year": "2024",
-   "topic": "Evolution Among Organisms",
-   "text": "Which of the following organisms is a fungus?",
-   "options": [
-    "Spirogyra",
-    "Euglena",
-    "Paramecium",
-    "Rhizopus"
-   ],
-   "answer": 3,
-   "explanation": "Rhizopus (bread mould) is a fungus. Spirogyra is an alga, while Euglena and Paramecium are protists."
-  },
-  {
-   "id": "biology-006",
-   "year": "2025",
-   "topic": "Evolution Among Organisms",
-   "text": "The bryophytes are distinguished from the pteridophytes by the absence of ___.",
-   "options": [
-    "true vascular tissues",
-    "leaves",
-    "spores",
-    "chlorophyll"
-   ],
-   "answer": 0,
-   "explanation": "Mosses (bryophytes) lack true xylem and phloem, whereas ferns (pteridophytes) possess vascular tissues."
-  },
-  {
-   "id": "biology-007",
-   "year": "2020",
-   "topic": "Adaptations",
-   "text": "Countershading in fish is an adaptation for ___.",
-   "options": [
-    "faster swimming",
-    "protection from predators",
-    "finding food",
-    "reproduction"
-   ],
-   "answer": 1,
-   "explanation": "Countershading (dark above, light below) breaks up the fish's outline and camouflages it from predators."
-  },
-  {
-   "id": "biology-008",
-   "year": "2021",
-   "topic": "Adaptations",
-   "text": "In a termite colony, the caste responsible for reproduction is the ___.",
-   "options": [
-    "workers",
-    "soldiers",
-    "king and queen",
-    "nymphs"
-   ],
-   "answer": 2,
-   "explanation": "The king and queen are the reproductive caste; workers and soldiers are sterile."
-  },
-  {
-   "id": "biology-009",
-   "year": "2022",
-   "topic": "Internal Structure",
-   "text": "In a transverse section of a dicotyledonous stem, the vascular bundles are arranged in a ___.",
-   "options": [
-    "ring",
-    "scattered manner",
-    "single central column",
-    "star shape"
-   ],
-   "answer": 0,
-   "explanation": "In dicot stems the vascular bundles form a ring; in monocot stems they are scattered."
-  },
-  {
-   "id": "biology-010",
-   "year": "2023",
-   "topic": "Internal Structure",
-   "text": "The tissue that provides flexibility and support in young plant stems is ___.",
-   "options": [
-    "xylem",
-    "collenchyma",
-    "phloem",
-    "sclerenchyma"
-   ],
-   "answer": 1,
-   "explanation": "Collenchyma is a living supporting tissue that gives flexible strength; sclerenchyma is rigid and dead at maturity."
-  },
-  {
-   "id": "biology-011",
-   "year": "2024",
-   "topic": "Nutrition",
-   "text": "Photosynthesis takes place in the ___.",
-   "options": [
-    "mitochondrion",
-    "nucleus",
-    "chloroplast",
-    "vacuole"
-   ],
-   "answer": 2,
-   "explanation": "Photosynthesis occurs in the chloroplast, where chlorophyll traps sunlight."
-  },
-  {
-   "id": "biology-012",
-   "year": "2025",
-   "topic": "Nutrition",
-   "text": "Which of the following is a macro-element required by plants?",
-   "options": [
-    "Zinc",
-    "Boron",
-    "Copper",
-    "Nitrogen"
-   ],
-   "answer": 3,
-   "explanation": "Nitrogen is required in large amounts (a macro-element). Zinc, boron and copper are micro-elements needed in tiny amounts."
-  },
-  {
-   "id": "biology-013",
-   "year": "2020",
-   "topic": "Nutrition",
-   "text": "The food test for starch uses ___.",
-   "options": [
-    "iodine solution",
-    "Benedict's solution",
-    "Biuret reagent",
-    "Sudan III"
-   ],
-   "answer": 0,
-   "explanation": "Iodine solution turns blue-black in the presence of starch. Benedict's solution tests for reducing sugars."
-  },
-  {
-   "id": "biology-014",
-   "year": "2021",
-   "topic": "Nutrition",
-   "text": "The enzyme ptyalin in saliva acts on ___.",
-   "options": [
-    "proteins",
-    "starch",
-    "fats",
-    "vitamins"
-   ],
-   "answer": 1,
-   "explanation": "Ptyalin (salivary amylase) begins the digestion of starch, breaking it down to maltose."
-  },
-  {
-   "id": "biology-015",
-   "year": "2022",
-   "topic": "Transport",
-   "text": "In mammals, oxygenated blood is carried from the lungs to the heart by the ___.",
-   "options": [
-    "pulmonary artery",
-    "aorta",
-    "pulmonary vein",
-    "vena cava"
-   ],
-   "answer": 2,
-   "explanation": "The pulmonary vein is the only vein that carries oxygenated blood, from the lungs to the left atrium."
-  },
-  {
-   "id": "biology-016",
-   "year": "2023",
-   "topic": "Transport",
-   "text": "Water absorbed by the roots is transported to the leaves through the ___.",
-   "options": [
-    "phloem",
-    "cambium",
-    "epidermis",
-    "xylem"
-   ],
-   "answer": 3,
-   "explanation": "The xylem vessels carry water and mineral salts upwards; the phloem carries manufactured food."
-  },
-  {
-   "id": "biology-017",
-   "year": "2024",
-   "topic": "Transport",
-   "text": "The blood cells responsible for carrying oxygen are the ___.",
-   "options": [
-    "white blood cells",
-    "red blood cells",
-    "platelets",
-    "plasma cells"
-   ],
-   "answer": 1,
-   "explanation": "Red blood cells contain haemoglobin, which binds and carries oxygen."
-  },
-  {
-   "id": "biology-018",
-   "year": "2025",
-   "topic": "Transport",
-   "text": "The movement of water molecules from a dilute solution to a concentrated solution through a semi-permeable membrane is ___.",
-   "options": [
-    "diffusion",
-    "plasmolysis",
-    "osmosis",
-    "active transport"
-   ],
-   "answer": 2,
-   "explanation": "Osmosis is the movement of water molecules across a semi-permeable membrane from a dilute to a concentrated solution."
-  },
-  {
-   "id": "biology-019",
-   "year": "2020",
-   "topic": "Respiration",
-   "text": "The energy currency of the cell is ___.",
-   "options": [
-    "ATP",
-    "ADP",
-    "DNA",
-    "RNA"
-   ],
-   "answer": 0,
-   "explanation": "ATP (adenosine triphosphate) stores and supplies energy for cellular activities."
-  },
-  {
-   "id": "biology-020",
-   "year": "2021",
-   "topic": "Respiration",
-   "text": "Anaerobic respiration in yeast produces ___.",
-   "options": [
-    "lactic acid and energy",
-    "water and energy",
-    "oxygen and glucose",
-    "carbon dioxide, ethanol and energy"
-   ],
-   "answer": 3,
-   "explanation": "Yeast ferments glucose to ethanol and carbon dioxide, releasing energy, when oxygen is absent."
-  },
-  {
-   "id": "biology-021",
-   "year": "2022",
-   "topic": "Respiration",
-   "text": "Gaseous exchange in mammals takes place in the ___.",
-   "options": [
-    "bronchi",
-    "trachea",
-    "alveoli",
-    "diaphragm"
-   ],
-   "answer": 2,
-   "explanation": "The alveoli are the thin-walled air sacs where oxygen and carbon dioxide are exchanged with the blood."
-  },
-  {
-   "id": "biology-022",
-   "year": "2023",
-   "topic": "Excretion",
-   "text": "The functional unit of the mammalian kidney is the ___.",
-   "options": [
-    "neuron",
-    "alveolus",
-    "villus",
-    "nephron"
-   ],
-   "answer": 3,
-   "explanation": "The nephron is the structural and functional unit of the kidney, filtering blood and forming urine."
-  },
-  {
-   "id": "biology-023",
-   "year": "2024",
-   "topic": "Excretion",
-   "text": "The main nitrogenous waste product excreted by mammals is ___.",
-   "options": [
-    "ammonia",
-    "urea",
-    "uric acid",
-    "amino acid"
-   ],
-   "answer": 1,
-   "explanation": "Mammals convert toxic ammonia to urea in the liver and excrete it in urine."
-  },
-  {
-   "id": "biology-024",
-   "year": "2025",
-   "topic": "Support and Movement",
-   "text": "The movement of a plant shoot towards light is called ___.",
-   "options": [
-    "phototropism",
-    "geotropism",
-    "hydrotropism",
-    "thigmotropism"
-   ],
-   "answer": 0,
-   "explanation": "Phototropism is growth towards light; shoots are positively phototropic."
-  },
-  {
-   "id": "biology-025",
-   "year": "2020",
-   "topic": "Support and Movement",
-   "text": "The joint between the humerus and the radius and ulna (the elbow) is a ___ joint.",
-   "options": [
-    "ball-and-socket",
-    "pivot",
-    "gliding",
-    "hinge"
-   ],
-   "answer": 3,
-   "explanation": "The elbow is a hinge joint, allowing movement in one plane like a door hinge."
-  },
-  {
-   "id": "biology-026",
-   "year": "2021",
-   "topic": "Support and Movement",
-   "text": "The plant hormone mainly responsible for cell elongation in shoots is ___.",
-   "options": [
-    "auxin",
-    "gibberellin",
-    "cytokinin",
-    "abscisic acid"
-   ],
-   "answer": 0,
-   "explanation": "Auxins promote cell elongation in shoots and control tropic responses."
-  },
-  {
-   "id": "biology-027",
-   "year": "2022",
-   "topic": "Reproduction",
-   "text": "The transfer of pollen grains from the anther to the stigma of the same flower is ___.",
-   "options": [
-    "cross-pollination",
-    "self-pollination",
-    "fertilization",
-    "germination"
-   ],
-   "answer": 1,
-   "explanation": "Self-pollination is the transfer of pollen within the same flower (or the same plant)."
-  },
-  {
-   "id": "biology-028",
-   "year": "2023",
-   "topic": "Reproduction",
-   "text": "In flowering plants, double fertilization results in the formation of the ___.",
-   "options": [
-    "seed and fruit",
-    "pollen and ovule",
-    "zygote and endosperm",
-    "embryo and testa"
-   ],
-   "answer": 2,
-   "explanation": "One male gamete fuses with the egg to form the zygote, while the other fuses with the polar nuclei to form the endosperm."
-  },
-  {
-   "id": "biology-029",
-   "year": "2024",
-   "topic": "Reproduction",
-   "text": "Fertilization in mammals normally takes place in the ___.",
-   "options": [
-    "ovary",
-    "fallopian tube",
-    "uterus",
-    "vagina"
-   ],
-   "answer": 1,
-   "explanation": "The sperm meets and fertilizes the ovum in the fallopian tube (oviduct)."
-  },
-  {
-   "id": "biology-030",
-   "year": "2025",
-   "topic": "Reproduction",
-   "text": "Which of the following is a form of asexual reproduction in Hydra?",
-   "options": [
-    "Budding",
-    "Fission",
-    "Fragmentation",
-    "Spore formation"
-   ],
-   "answer": 0,
-   "explanation": "Hydra reproduces asexually by budding: a small outgrowth develops and detaches as a new individual."
-  },
-  {
-   "id": "biology-031",
-   "year": "2020",
-   "topic": "Growth",
-   "text": "Epigeal germination differs from hypogeal germination in that in epigeal germination the ___.",
-   "options": [
-    "cotyledons remain below the soil",
-    "radicle emerges first",
-    "plumule emerges first",
-    "cotyledons are carried above the soil"
-   ],
-   "answer": 3,
-   "explanation": "In epigeal germination the cotyledons are carried above the ground (e.g. beans); in hypogeal germination they stay below (e.g. maize)."
-  },
-  {
-   "id": "biology-032",
-   "year": "2021",
-   "topic": "Growth",
-   "text": "Which of the following conditions is NOT generally necessary for seed germination?",
-   "options": [
-    "Water",
-    "Oxygen",
-    "Light",
-    "Suitable temperature"
-   ],
-   "answer": 2,
-   "explanation": "Seeds generally require water, oxygen and a suitable temperature; light is not a general requirement for germination."
-  },
-  {
-   "id": "biology-033",
-   "year": "2022",
-   "topic": "Coordination and Control",
-   "text": "The part of the brain that controls balance and posture is the ___.",
-   "options": [
-    "cerebellum",
-    "cerebrum",
-    "medulla oblongata",
-    "hypothalamus"
-   ],
-   "answer": 0,
-   "explanation": "The cerebellum coordinates movement, balance and posture."
-  },
-  {
-   "id": "biology-034",
-   "year": "2023",
-   "topic": "Coordination and Control",
-   "text": "Insulin is produced by the ___.",
-   "options": [
-    "thyroid gland",
-    "adrenal gland",
-    "pituitary gland",
-    "islets of Langerhans in the pancreas"
-   ],
-   "answer": 3,
-   "explanation": "The beta cells of the islets of Langerhans in the pancreas secrete insulin, which lowers blood sugar."
-  },
-  {
-   "id": "biology-035",
-   "year": "2024",
-   "topic": "Coordination and Control",
-   "text": "A simple reflex action such as withdrawing the hand from a hot object is controlled by the ___.",
-   "options": [
-    "cerebrum",
-    "cerebellum",
-    "spinal cord",
-    "medulla"
-   ],
-   "answer": 2,
-   "explanation": "The reflex arc passes through the spinal cord, producing a rapid response without involving conscious thought."
-  },
-  {
-   "id": "biology-036",
-   "year": "2025",
-   "topic": "Factors Affecting Distribution",
-   "text": "The instrument used to measure the turbidity of water is the ___.",
-   "options": [
-    "rain gauge",
-    "secchi disc",
-    "thermometer",
-    "anemometer"
-   ],
-   "answer": 1,
-   "explanation": "The secchi disc is lowered into water to judge its clarity (turbidity)."
-  },
-  {
-   "id": "biology-037",
-   "year": "2020",
-   "topic": "Factors Affecting Distribution",
-   "text": "Which of the following is a biotic factor affecting the distribution of organisms?",
-   "options": [
-    "Temperature",
-    "Rainfall",
-    "Predation",
-    "Soil pH"
-   ],
-   "answer": 2,
-   "explanation": "Predation is a biotic (living) factor; temperature, rainfall and soil pH are abiotic factors."
-  },
-  {
-   "id": "biology-038",
-   "year": "2021",
-   "topic": "Symbiotic Interactions",
-   "text": "The association between a tick and a cow is an example of ___.",
-   "options": [
-    "mutualism",
-    "parasitism",
-    "commensalism",
-    "saprophytism"
-   ],
-   "answer": 1,
-   "explanation": "The tick benefits by feeding on the cow's blood while the cow is harmed, which is parasitism."
-  },
-  {
-   "id": "biology-039",
-   "year": "2022",
-   "topic": "Symbiotic Interactions",
-   "text": "In a food chain, green plants occupy the ___ trophic level.",
-   "options": [
-    "second",
-    "third",
-    "fourth",
-    "first"
-   ],
-   "answer": 3,
-   "explanation": "Green plants are producers and form the first trophic level, on which all other levels depend."
-  },
-  {
-   "id": "biology-040",
-   "year": "2023",
-   "topic": "Symbiotic Interactions",
-   "text": "The bacteria found in the root nodules of leguminous plants that fix atmospheric nitrogen are ___.",
-   "options": [
-    "nitrogen-fixing bacteria",
-    "denitrifying bacteria",
-    "putrefying bacteria",
-    "sulphur bacteria"
-   ],
-   "answer": 0,
-   "explanation": "Rhizobium bacteria in legume root nodules fix atmospheric nitrogen into forms plants can use."
-  },
-  {
-   "id": "biology-041",
-   "year": "2024",
-   "topic": "Natural Habitats",
-   "text": "Mangrove swamps are characterized by ___.",
-   "options": [
-    "fresh water only",
-    "waterlogged saline soils and stilt roots",
-    "dry sandy soils",
-    "permanent ice"
-   ],
-   "answer": 1,
-   "explanation": "Mangroves grow in waterlogged, salty coastal soils, and their trees have stilt roots and breathing roots."
-  },
-  {
-   "id": "biology-042",
-   "year": "2025",
-   "topic": "Natural Habitats",
-   "text": "Which of the following animals is adapted to arboreal life?",
-   "options": [
-    "Earthworm",
-    "Tilapia",
-    "Snail",
-    "Monkey"
-   ],
-   "answer": 3,
-   "explanation": "Monkeys live in trees (arboreal life), with grasping limbs and tails adapted for climbing."
-  },
-  {
-   "id": "biology-043",
-   "year": "2020",
-   "topic": "Local Biomes",
-   "text": "The natural vegetation of southern Nigeria is mainly ___.",
-   "options": [
-    "tropical rainforest",
-    "Sudan savanna",
-    "desert",
-    "montane forest"
-   ],
-   "answer": 0,
-   "explanation": "Southern Nigeria, with its high rainfall, is covered mainly by tropical rainforest."
-  },
-  {
-   "id": "biology-044",
-   "year": "2021",
-   "topic": "Local Biomes",
-   "text": "The Guinea savanna lies between the ___.",
-   "options": [
-    "desert and the rainforest",
-    "highlands and the coast",
-    "rainforest and the Sudan savanna",
-    "mangrove swamp and the desert"
-   ],
-   "answer": 2,
-   "explanation": "The Guinea savanna belt lies between the southern rainforest and the drier Sudan savanna to the north."
-  },
-  {
-   "id": "biology-045",
-   "year": "2022",
-   "topic": "Ecology of Populations",
-   "text": "Population density is defined as the number of individuals per unit ___.",
-   "options": [
-    "time",
-    "mass",
-    "birth rate",
-    "area or volume"
-   ],
-   "answer": 3,
-   "explanation": "Population density = number of individuals divided by the area (or volume) they occupy."
-  },
-  {
-   "id": "biology-046",
-   "year": "2023",
-   "topic": "Ecology of Populations",
-   "text": "The orderly and progressive replacement of one community by another until a stable climax community is reached is called ___.",
-   "options": [
-    "competition",
-    "migration",
-    "succession",
-    "adaptation"
-   ],
-   "answer": 2,
-   "explanation": "Ecological succession is the gradual change in community composition over time towards a stable climax."
-  },
-  {
-   "id": "biology-047",
-   "year": "2024",
-   "topic": "Soil",
-   "text": "Which soil type has the highest water-retaining capacity?",
-   "options": [
-    "Sandy soil",
-    "Clayey soil",
-    "Loamy soil",
-    "Gravelly soil"
-   ],
-   "answer": 1,
-   "explanation": "Clay particles are the smallest and pack closely, so clayey soil holds the most water."
-  },
-  {
-   "id": "biology-048",
-   "year": "2025",
-   "topic": "Soil",
-   "text": "The loss of soil nutrients by the downward movement of water through the soil is called ___.",
-   "options": [
-    "leaching",
-    "erosion",
-    "mulching",
-    "weathering"
-   ],
-   "answer": 0,
-   "explanation": "Leaching is the washing down of soluble nutrients below the reach of plant roots."
-  },
-  {
-   "id": "biology-049",
-   "year": "2020",
-   "topic": "Humans and Environment",
-   "text": "Cholera is caused by ___.",
-   "options": [
-    "a virus",
-    "a fungus",
-    "a protozoan",
-    "a bacterium"
-   ],
-   "answer": 3,
-   "explanation": "Cholera is caused by the bacterium Vibrio cholerae, spread through contaminated water and food."
-  },
-  {
-   "id": "biology-050",
-   "year": "2021",
-   "topic": "Humans and Environment",
-   "text": "The Anopheles mosquito is the vector of ___.",
-   "options": [
-    "cholera",
-    "tuberculosis",
-    "malaria",
-    "poliomyelitis"
-   ],
-   "answer": 2,
-   "explanation": "The female Anopheles mosquito transmits the Plasmodium parasite that causes malaria."
-  },
-  {
-   "id": "biology-051",
-   "year": "2022",
-   "topic": "Humans and Environment",
-   "text": "Which of the following is a method of conserving soil fertility?",
-   "options": [
-    "Crop rotation",
-    "Monoculture",
-    "Bush burning",
-    "Overgrazing"
-   ],
-   "answer": 0,
-   "explanation": "Crop rotation, especially including legumes, restores soil nutrients; the other practices deplete them."
-  },
-  {
-   "id": "biology-052",
-   "year": "2023",
-   "topic": "Variation in Population",
-   "text": "Height in humans is an example of ___ variation.",
-   "options": [
-    "discontinuous",
-    "continuous",
-    "physiological",
-    "environmental only"
-   ],
-   "answer": 1,
-   "explanation": "Height shows a continuous range of values influenced by many genes and the environment."
-  },
-  {
-   "id": "biology-053",
-   "year": "2024",
-   "topic": "Variation in Population",
-   "text": "A person with blood group O can donate red blood cells to a person with blood group ___.",
-   "options": [
-    "A, B, AB or O",
-    "O only",
-    "AB only",
-    "A only"
-   ],
-   "answer": 0,
-   "explanation": "Group O red cells carry no A or B antigens, so group O is the universal red-cell donor."
-  },
-  {
-   "id": "biology-054",
-   "year": "2025",
-   "topic": "Heredity",
-   "text": "The chromosome number in a normal human body cell is ___.",
-   "options": [
-    "23",
-    "44",
-    "48",
-    "46"
-   ],
-   "answer": 3,
-   "explanation": "Human body (somatic) cells contain 46 chromosomes in 23 pairs; gametes contain 23."
-  },
-  {
-   "id": "biology-055",
-   "year": "2020",
-   "topic": "Heredity",
-   "text": "In a cross between two heterozygous tall plants (Tt x Tt), the expected phenotypic ratio of tall to short offspring is ___.",
-   "options": [
-    "1:1",
-    "1:3",
-    "3:1",
-    "2:1"
-   ],
-   "answer": 2,
-   "explanation": "The cross gives TT, Tt, Tt and tt: three tall phenotypes to one short, a 3:1 ratio."
-  },
-  {
-   "id": "biology-056",
-   "year": "2021",
-   "topic": "Heredity",
-   "text": "Haemophilia is a ___.",
-   "options": [
-    "dominant autosomal disorder",
-    "sex-linked recessive disorder",
-    "sex-linked dominant disorder",
-    "non-heritable disease"
-   ],
-   "answer": 1,
-   "explanation": "Haemophilia is caused by a recessive gene carried on the X chromosome."
-  },
-  {
-   "id": "biology-057",
-   "year": "2022",
-   "topic": "Heredity",
-   "text": "The sex of a child is determined by the ___.",
-   "options": [
-    "father only",
-    "mother only",
-    "both parents equally",
-    "environment"
-   ],
-   "answer": 0,
-   "explanation": "The father's sperm carries either an X or a Y chromosome, which determines whether the child is female (XX) or male (XY)."
-  },
-  {
-   "id": "biology-058",
-   "year": "2023",
-   "topic": "Theories of Evolution",
-   "text": "The theory of evolution by natural selection was proposed by ___.",
-   "options": [
-    "Lamarck",
-    "Mendel",
-    "Linnaeus",
-    "Darwin"
-   ],
-   "answer": 3,
-   "explanation": "Charles Darwin proposed natural selection: organisms best adapted to their environment survive and reproduce."
-  },
-  {
-   "id": "biology-059",
-   "year": "2024",
-   "topic": "Theories of Evolution",
-   "text": "Lamarck's theory of evolution is based on the inheritance of ___.",
-   "options": [
-    "genetic mutations",
-    "natural selection",
-    "acquired characteristics",
-    "artificial selection"
-   ],
-   "answer": 2,
-   "explanation": "Lamarck proposed that characteristics acquired during an organism's lifetime could be inherited by its offspring."
-  },
-  {
-   "id": "biology-060",
-   "year": "2025",
-   "topic": "Evidence of Evolution",
-   "text": "The fossil record provides evidence for evolution by showing ___.",
-   "options": [
-    "that all organisms lived at the same time",
-    "the gradual changes in organisms over time",
-    "that evolution does not occur",
-    "the exact age of the earth"
-   ],
-   "answer": 1,
-   "explanation": "Fossils in successive rock layers show organisms changing gradually over geological time."
-  },
-  {
-   "id": "biology-061",
-   "year": "2025",
-   "topic": "Reproduction",
-   "text": "In the diagram of a flower, in which labelled part are pollen grains produced?",
-   "options": [
-    "Stigma",
-    "Anther",
-    "Ovary",
-    "Filament"
-   ],
-   "answer": 1,
-   "explanation": "The anther is the pollen-bearing part of the stamen; the filament only supports it. The stigma receives pollen and the ovary contains the ovules.",
-   "diagram": "<svg width=\"560\" height=\"420\" viewBox=\"0 0 560 420\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"sans-serif\" font-size=\"15\">\n  <ellipse cx=\"260\" cy=\"110\" rx=\"34\" ry=\"72\" fill=\"#f7c6d9\" stroke=\"#c2185b\" stroke-width=\"2\" transform=\"rotate(-28 260 110)\"/>\n  <ellipse cx=\"260\" cy=\"110\" rx=\"34\" ry=\"72\" fill=\"#f7c6d9\" stroke=\"#c2185b\" stroke-width=\"2\" transform=\"rotate(28 260 110)\"/>\n  <ellipse cx=\"260\" cy=\"95\" rx=\"30\" ry=\"66\" fill=\"#f9d3e3\" stroke=\"#c2185b\" stroke-width=\"2\"/>\n  <path d=\"M232 300 L214 348 L248 322 Z\" fill=\"#66bb6a\" stroke=\"#2e7d32\" stroke-width=\"2\"/>\n  <path d=\"M288 300 L306 348 L272 322 Z\" fill=\"#66bb6a\" stroke=\"#2e7d32\" stroke-width=\"2\"/>\n  <ellipse cx=\"260\" cy=\"312\" rx=\"34\" ry=\"26\" fill=\"#fff9c4\" stroke=\"#f57f17\" stroke-width=\"2\"/>\n  <circle cx=\"250\" cy=\"308\" r=\"5\" fill=\"#f57f17\"/><circle cx=\"268\" cy=\"316\" r=\"5\" fill=\"#f57f17\"/><circle cx=\"262\" cy=\"302\" r=\"5\" fill=\"#f57f17\"/>\n  <rect x=\"255\" y=\"150\" width=\"10\" height=\"140\" fill=\"#fff59d\" stroke=\"#f57f17\" stroke-width=\"2\"/>\n  <circle cx=\"260\" cy=\"142\" r=\"14\" fill=\"#ffca28\" stroke=\"#f57f17\" stroke-width=\"2\"/>\n  <line x1=\"216\" y1=\"300\" x2=\"196\" y2=\"180\" stroke=\"#8d6e63\" stroke-width=\"3\"/>\n  <ellipse cx=\"192\" cy=\"168\" rx=\"10\" ry=\"18\" fill=\"#8d6e63\" stroke=\"#5d4037\" stroke-width=\"2\"/>\n  <line x1=\"304\" y1=\"300\" x2=\"324\" y2=\"180\" stroke=\"#8d6e63\" stroke-width=\"3\"/>\n  <ellipse cx=\"328\" cy=\"168\" rx=\"10\" ry=\"18\" fill=\"#8d6e63\" stroke=\"#5d4037\" stroke-width=\"2\"/>\n  <rect x=\"252\" y=\"338\" width=\"16\" height=\"52\" fill=\"#66bb6a\" stroke=\"#2e7d32\" stroke-width=\"2\"/>\n  <line x1=\"260\" y1=\"142\" x2=\"330\" y2=\"100\" stroke=\"#333\"/><text x=\"336\" y=\"104\">Stigma</text>\n  <line x1=\"192\" y1=\"168\" x2=\"120\" y2=\"130\" stroke=\"#333\"/><text x=\"30\" y=\"134\">Anther</text>\n  <line x1=\"216\" y1=\"240\" x2=\"120\" y2=\"240\" stroke=\"#333\"/><text x=\"30\" y=\"244\">Filament</text>\n  <line x1=\"290\" y1=\"110\" x2=\"380\" y2=\"70\" stroke=\"#333\"/><text x=\"386\" y=\"74\">Petal</text>\n  <line x1=\"232\" y1=\"320\" x2=\"120\" y2=\"350\" stroke=\"#333\"/><text x=\"52\" y=\"354\">Sepal</text>\n  <line x1=\"260\" y1=\"312\" x2=\"380\" y2=\"330\" stroke=\"#333\"/><text x=\"386\" y=\"334\">Ovary (ovules inside)</text>\n  <line x1=\"260\" y1=\"200\" x2=\"380\" y2=\"200\" stroke=\"#333\"/><text x=\"386\" y=\"204\">Style</text>\n</svg>"
-  },
-  {
-   "id": "biology-062",
-   "year": "2025",
-   "topic": "Transport",
-   "text": "Which part is labelled II in the diagram of the heart?",
-   "options": [
-    "Aorta",
-    "Pulmonary vein",
-    "Right ventricle",
-    "Left ventricle"
-   ],
-   "answer": 1,
-   "explanation": "The pulmonary vein carries oxygenated blood from the lungs into the left atrium. I is the aorta, III the right ventricle and IV the left ventricle.",
-   "diagram": "<svg width=\"440\" height=\"360\" viewBox=\"0 0 440 360\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"sans-serif\" font-size=\"15\">\n  <!-- superior vena cava (blue, into right atrium from above) -->\n  <rect x=\"138\" y=\"6\" width=\"20\" height=\"104\" fill=\"#90caf9\" stroke=\"#1565c0\" stroke-width=\"2\"/>\n  <!-- heart body -->\n  <path d=\"M138,108 C128,175 138,245 172,288 C188,308 198,326 204,332 C236,322 284,292 304,246 C324,204 324,152 308,116 C292,94 258,88 234,92 C208,96 168,90 138,108 Z\" fill=\"#ef9a9a\" stroke=\"#b71c1c\" stroke-width=\"2.5\"/>\n  <!-- septum: divides right (viewer left) from left (viewer right) -->\n  <path d=\"M234,94 C230,160 224,240 208,318\" fill=\"none\" stroke=\"#b71c1c\" stroke-width=\"2\"/>\n  <!-- thick left-ventricle wall -->\n  <path d=\"M296,130 C306,175 300,225 272,262\" fill=\"none\" stroke=\"#b71c1c\" stroke-width=\"7\" opacity=\"0.55\"/>\n  <!-- valves + chordae tendineae + papillary muscles -->\n  <path d=\"M196,178 l14,10 M196,178 l-4,14\" fill=\"none\" stroke=\"#b71c1c\" stroke-width=\"2\"/>\n  <path d=\"M272,178 l-14,10 M272,178 l4,14\" fill=\"none\" stroke=\"#b71c1c\" stroke-width=\"2\"/>\n  <line x1=\"203\" y1=\"188\" x2=\"196\" y2=\"240\" stroke=\"#b71c1c\" stroke-width=\"1\"/>\n  <line x1=\"210\" y1=\"188\" x2=\"216\" y2=\"240\" stroke=\"#b71c1c\" stroke-width=\"1\"/>\n  <line x1=\"265\" y1=\"188\" x2=\"258\" y2=\"240\" stroke=\"#b71c1c\" stroke-width=\"1\"/>\n  <line x1=\"272\" y1=\"188\" x2=\"280\" y2=\"240\" stroke=\"#b71c1c\" stroke-width=\"1\"/>\n  <circle cx=\"196\" cy=\"242\" r=\"5\" fill=\"#b71c1c\"/><circle cx=\"216\" cy=\"242\" r=\"5\" fill=\"#b71c1c\"/>\n  <circle cx=\"258\" cy=\"242\" r=\"5\" fill=\"#b71c1c\"/><circle cx=\"280\" cy=\"242\" r=\"5\" fill=\"#b71c1c\"/>\n  <!-- pulmonary artery (blue): from right ventricle, splits left/right -->\n  <path d=\"M172,130 C172,92 196,70 230,64\" fill=\"none\" stroke=\"#1565c0\" stroke-width=\"11\" stroke-linecap=\"round\"/>\n  <path d=\"M230,64 C250,62 268,66 282,76\" fill=\"none\" stroke=\"#1565c0\" stroke-width=\"11\" stroke-linecap=\"round\"/>\n  <path d=\"M230,64 C210,62 192,66 180,76\" fill=\"none\" stroke=\"#1565c0\" stroke-width=\"11\" stroke-linecap=\"round\"/>\n  <!-- aorta (red): from left ventricle, arches over the top -->\n  <path d=\"M288,118 C288,58 252,28 212,32 C178,36 162,62 166,94\" fill=\"none\" stroke=\"#c62828\" stroke-width=\"15\" stroke-linecap=\"round\"/>\n  <line x1=\"196\" y1=\"32\" x2=\"196\" y2=\"12\" stroke=\"#c62828\" stroke-width=\"6\"/>\n  <line x1=\"216\" y1=\"28\" x2=\"216\" y2=\"10\" stroke=\"#c62828\" stroke-width=\"6\"/>\n  <line x1=\"236\" y1=\"30\" x2=\"236\" y2=\"12\" stroke=\"#c62828\" stroke-width=\"6\"/>\n  <!-- pulmonary veins (blue): into left atrium from the right -->\n  <line x1=\"432\" y1=\"96\" x2=\"312\" y2=\"112\" stroke=\"#64b5f6\" stroke-width=\"9\" stroke-linecap=\"round\"/>\n  <line x1=\"436\" y1=\"140\" x2=\"312\" y2=\"132\" stroke=\"#64b5f6\" stroke-width=\"9\" stroke-linecap=\"round\"/>\n  <!-- Roman-numeral labels -->\n  <line x1=\"64\" y1=\"42\" x2=\"195\" y2=\"34\" stroke=\"#333\"/><text x=\"48\" y=\"46\" font-size=\"17\" font-weight=\"bold\">I</text>\n  <line x1=\"390\" y1=\"94\" x2=\"345\" y2=\"110\" stroke=\"#333\"/><text x=\"396\" y=\"98\" font-size=\"17\" font-weight=\"bold\">II</text>\n  <line x1=\"56\" y1=\"270\" x2=\"160\" y2=\"252\" stroke=\"#333\"/><text x=\"34\" y=\"274\" font-size=\"17\" font-weight=\"bold\">III</text>\n  <line x1=\"390\" y1=\"270\" x2=\"292\" y2=\"252\" stroke=\"#333\"/><text x=\"396\" y=\"274\" font-size=\"17\" font-weight=\"bold\">IV</text>\n</svg>"
-  },
-  {
-   "id": "biology-063",
-   "year": "2025",
-   "topic": "Nutrition",
-   "text": "In the diagram of a leaf section, in which labelled part does photosynthesis take place mainly?",
-   "options": [
-    "Palisade mesophyll",
-    "Upper epidermis",
-    "Spongy mesophyll",
-    "Vein (vascular bundle)"
-   ],
-   "answer": 0,
-   "explanation": "Palisade cells are packed with chloroplasts and receive the most light, so most photosynthesis happens there.",
-   "diagram": "<svg width=\"560\" height=\"320\" viewBox=\"0 0 560 320\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"sans-serif\" font-size=\"15\">\n  <!-- blade -->\n  <rect x=\"60\" y=\"80\" width=\"440\" height=\"150\" rx=\"20\" fill=\"#e8f5e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/>\n  <!-- upper epidermis -->\n  <rect x=\"60\" y=\"80\" width=\"440\" height=\"16\" fill=\"#a5d6a7\" stroke=\"#2e7d32\" stroke-width=\"1.5\"/>\n  <!-- palisade mesophyll: vertical columns -->\n  <g fill=\"#66bb6a\" stroke=\"#2e7d32\" stroke-width=\"1.5\">\n    <rect x=\"72\" y=\"96\" width=\"24\" height=\"64\"/><rect x=\"102\" y=\"96\" width=\"24\" height=\"64\"/>\n    <rect x=\"132\" y=\"96\" width=\"24\" height=\"64\"/><rect x=\"162\" y=\"96\" width=\"24\" height=\"64\"/>\n    <rect x=\"192\" y=\"96\" width=\"24\" height=\"64\"/><rect x=\"222\" y=\"96\" width=\"24\" height=\"64\"/>\n    <rect x=\"312\" y=\"96\" width=\"24\" height=\"64\"/><rect x=\"342\" y=\"96\" width=\"24\" height=\"64\"/>\n    <rect x=\"372\" y=\"96\" width=\"24\" height=\"64\"/><rect x=\"402\" y=\"96\" width=\"24\" height=\"64\"/>\n    <rect x=\"432\" y=\"96\" width=\"24\" height=\"64\"/><rect x=\"462\" y=\"96\" width=\"24\" height=\"64\"/>\n  </g>\n  <!-- vascular bundle (vein) in the middle -->\n  <ellipse cx=\"279\" cy=\"172\" rx=\"30\" ry=\"20\" fill=\"#fff9c4\" stroke=\"#f57f17\" stroke-width=\"2\"/>\n  <circle cx=\"272\" cy=\"168\" r=\"4\" fill=\"#f57f17\"/><circle cx=\"286\" cy=\"176\" r=\"4\" fill=\"#f57f17\"/>\n  <!-- spongy mesophyll: round cells with air spaces -->\n  <g fill=\"#81c784\" stroke=\"#2e7d32\" stroke-width=\"1.5\">\n    <circle cx=\"90\" cy=\"188\" r=\"12\"/><circle cx=\"122\" cy=\"196\" r=\"12\"/><circle cx=\"154\" cy=\"188\" r=\"12\"/>\n    <circle cx=\"186\" cy=\"196\" r=\"12\"/><circle cx=\"218\" cy=\"188\" r=\"12\"/><circle cx=\"338\" cy=\"196\" r=\"12\"/>\n    <circle cx=\"370\" cy=\"188\" r=\"12\"/><circle cx=\"402\" cy=\"196\" r=\"12\"/><circle cx=\"434\" cy=\"188\" r=\"12\"/>\n    <circle cx=\"466\" cy=\"196\" r=\"12\"/>\n  </g>\n  <!-- lower epidermis with stoma gap -->\n  <rect x=\"60\" y=\"214\" width=\"220\" height=\"16\" fill=\"#a5d6a7\" stroke=\"#2e7d32\" stroke-width=\"1.5\"/>\n  <rect x=\"320\" y=\"214\" width=\"180\" height=\"16\" fill=\"#a5d6a7\" stroke=\"#2e7d32\" stroke-width=\"1.5\"/>\n  <!-- guard cells (stoma) -->\n  <ellipse cx=\"292\" cy=\"222\" rx=\"9\" ry=\"6\" fill=\"#66bb6a\" stroke=\"#2e7d32\" stroke-width=\"1.5\" transform=\"rotate(-30 292 222)\"/>\n  <ellipse cx=\"308\" cy=\"222\" rx=\"9\" ry=\"6\" fill=\"#66bb6a\" stroke=\"#2e7d32\" stroke-width=\"1.5\" transform=\"rotate(30 308 222)\"/>\n  <!-- labels -->\n  <line x1=\"140\" y1=\"88\" x2=\"120\" y2=\"52\" stroke=\"#333\"/><text x=\"18\" y=\"56\">Upper epidermis</text>\n  <line x1=\"120\" y1=\"128\" x2=\"104\" y2=\"128\" stroke=\"#333\"/><text x=\"8\" y=\"132\">Palisade mesophyll</text>\n  <line x1=\"120\" y1=\"190\" x2=\"104\" y2=\"190\" stroke=\"#333\"/><text x=\"8\" y=\"194\">Spongy mesophyll</text>\n  <line x1=\"310\" y1=\"165\" x2=\"380\" y2=\"120\" stroke=\"#333\"/><text x=\"386\" y=\"124\">Vein (vascular bundle)</text>\n  <line x1=\"330\" y1=\"222\" x2=\"380\" y2=\"252\" stroke=\"#333\"/><text x=\"386\" y=\"256\">Lower epidermis</text>\n  <line x1=\"306\" y1=\"228\" x2=\"380\" y2=\"292\" stroke=\"#333\"/><text x=\"386\" y=\"296\">Stoma</text>\n</svg>"
-  },
-  {
-   "id": "biology-064",
-   "year": "2025",
-   "topic": "Ecology of Populations",
-   "text": "If the frogs are removed from the food web, the population of grasshoppers will",
-   "options": [
-    "Increase",
-    "Decrease",
-    "Remain the same",
-    "Become extinct"
-   ],
-   "answer": 0,
-   "explanation": "Frogs prey on grasshoppers; with the predator gone, more grasshoppers survive and their population grows.",
-   "diagram": "<svg width=\"560\" height=\"360\" viewBox=\"0 0 560 360\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"sans-serif\" font-size=\"15\">\n  <defs>\n    <marker id=\"arr\" markerWidth=\"9\" markerHeight=\"9\" refX=\"7\" refY=\"4.5\" orient=\"auto\">\n      <path d=\"M0,0 L9,4.5 L0,9 Z\" fill=\"#333\"/>\n    </marker>\n  </defs>\n  <!-- arrows: eaten -> eater -->\n  <line x1=\"250\" y1=\"300\" x2=\"140\" y2=\"240\" stroke=\"#333\" stroke-width=\"2\" marker-end=\"url(#arr)\"/>\n  <line x1=\"310\" y1=\"300\" x2=\"428\" y2=\"240\" stroke=\"#333\" stroke-width=\"2\" marker-end=\"url(#arr)\"/>\n  <line x1=\"125\" y1=\"200\" x2=\"125\" y2=\"140\" stroke=\"#333\" stroke-width=\"2\" marker-end=\"url(#arr)\"/>\n  <line x1=\"165\" y1=\"200\" x2=\"252\" y2=\"140\" stroke=\"#333\" stroke-width=\"2\" marker-end=\"url(#arr)\"/>\n  <line x1=\"432\" y1=\"200\" x2=\"305\" y2=\"50\" stroke=\"#333\" stroke-width=\"2\" marker-end=\"url(#arr)\"/>\n  <line x1=\"125\" y1=\"100\" x2=\"125\" y2=\"50\" stroke=\"#333\" stroke-width=\"2\" marker-end=\"url(#arr)\"/>\n  <line x1=\"272\" y1=\"100\" x2=\"290\" y2=\"50\" stroke=\"#333\" stroke-width=\"2\" marker-end=\"url(#arr)\"/>\n  <line x1=\"182\" y1=\"28\" x2=\"222\" y2=\"28\" stroke=\"#333\" stroke-width=\"2\" marker-end=\"url(#arr)\"/>\n  <!-- boxes -->\n  <g text-anchor=\"middle\">\n    <rect x=\"225\" y=\"300\" width=\"110\" height=\"36\" rx=\"8\" fill=\"#c8e6c9\" stroke=\"#2e7d32\" stroke-width=\"2\"/>\n    <text x=\"280\" y=\"323\">Grass</text>\n    <rect x=\"70\" y=\"200\" width=\"110\" height=\"36\" rx=\"8\" fill=\"#fff\" stroke=\"#333\" stroke-width=\"2\"/>\n    <text x=\"125\" y=\"223\">Grasshopper</text>\n    <rect x=\"380\" y=\"200\" width=\"110\" height=\"36\" rx=\"8\" fill=\"#fff\" stroke=\"#333\" stroke-width=\"2\"/>\n    <text x=\"435\" y=\"223\">Rabbit</text>\n    <rect x=\"70\" y=\"100\" width=\"110\" height=\"36\" rx=\"8\" fill=\"#fff\" stroke=\"#333\" stroke-width=\"2\"/>\n    <text x=\"125\" y=\"123\">Frog</text>\n    <rect x=\"225\" y=\"100\" width=\"110\" height=\"36\" rx=\"8\" fill=\"#fff\" stroke=\"#333\" stroke-width=\"2\"/>\n    <text x=\"280\" y=\"123\">Bird</text>\n    <rect x=\"70\" y=\"10\" width=\"110\" height=\"36\" rx=\"8\" fill=\"#fff\" stroke=\"#333\" stroke-width=\"2\"/>\n    <text x=\"125\" y=\"33\">Snake</text>\n    <rect x=\"225\" y=\"10\" width=\"110\" height=\"36\" rx=\"8\" fill=\"#fff\" stroke=\"#333\" stroke-width=\"2\"/>\n    <text x=\"280\" y=\"33\">Hawk</text>\n  </g>\n</svg>"
-  },
-  {
-   "id": "biology-065",
-   "year": "2025",
-   "topic": "Living Organisms",
-   "text": "Which labelled part controls all the activities of the cell?",
-   "options": [
-    "Nucleus",
-    "Chloroplast",
-    "Vacuole",
-    "Cell wall"
-   ],
-   "answer": 0,
-   "explanation": "The nucleus contains the genetic material (DNA) that controls all the activities of the cell.",
-   "diagram": "<svg width=\"560\" height=\"360\" viewBox=\"0 0 560 360\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"sans-serif\" font-size=\"15\">\n  <!-- cell wall -->\n  <rect x=\"80\" y=\"50\" width=\"400\" height=\"260\" rx=\"30\" fill=\"#f1f8e9\" stroke=\"#33691e\" stroke-width=\"3\"/>\n  <!-- cell membrane -->\n  <rect x=\"92\" y=\"62\" width=\"376\" height=\"236\" rx=\"24\" fill=\"none\" stroke=\"#558b2f\" stroke-width=\"1.5\"/>\n  <!-- central vacuole -->\n  <ellipse cx=\"300\" cy=\"190\" rx=\"95\" ry=\"70\" fill=\"#e3f2fd\" stroke=\"#64b5f6\" stroke-width=\"2\"/>\n  <!-- nucleus + nucleolus -->\n  <circle cx=\"170\" cy=\"120\" r=\"28\" fill=\"#ce93d8\" stroke=\"#7b1fa2\" stroke-width=\"2\"/>\n  <circle cx=\"170\" cy=\"120\" r=\"9\" fill=\"#7b1fa2\"/>\n  <!-- chloroplasts -->\n  <g fill=\"#66bb6a\" stroke=\"#2e7d32\" stroke-width=\"1.5\">\n    <ellipse cx=\"200\" cy=\"232\" rx=\"16\" ry=\"9\"/>\n    <ellipse cx=\"380\" cy=\"118\" rx=\"16\" ry=\"9\"/>\n    <ellipse cx=\"420\" cy=\"232\" rx=\"16\" ry=\"9\"/>\n    <ellipse cx=\"148\" cy=\"252\" rx=\"16\" ry=\"9\"/>\n  </g>\n  <!-- labels -->\n  <line x1=\"145\" y1=\"115\" x2=\"70\" y2=\"105\" stroke=\"#333\"/><text x=\"8\" y=\"109\">Nucleus</text>\n  <line x1=\"186\" y1=\"232\" x2=\"70\" y2=\"238\" stroke=\"#333\"/><text x=\"8\" y=\"242\">Chloroplast</text>\n  <line x1=\"420\" y1=\"52\" x2=\"440\" y2=\"40\" stroke=\"#333\"/><text x=\"446\" y=\"44\">Cell wall</text>\n  <line x1=\"410\" y1=\"70\" x2=\"440\" y2=\"88\" stroke=\"#333\"/><text x=\"446\" y=\"92\">Cell membrane</text>\n  <line x1=\"395\" y1=\"190\" x2=\"440\" y2=\"190\" stroke=\"#333\"/><text x=\"446\" y=\"194\">Vacuole</text>\n  <line x1=\"420\" y1=\"285\" x2=\"440\" y2=\"296\" stroke=\"#333\"/><text x=\"446\" y=\"300\">Cytoplasm</text>\n</svg>"
-  }
- ]
+  "subject": "Biology",
+  "version": 3,
+  "questions": [
+    {
+      "id": "biology-001",
+      "year": "2020",
+      "topic": "Living Organisms",
+      "text": "Which of the following is a characteristic of all living things?",
+      "options": [
+        "Movement from place to place",
+        "Irritability",
+        "Photosynthesis",
+        "Hibernation"
+      ],
+      "answer": 1,
+      "explanation": "All living things respond to stimuli (irritability). Movement, photosynthesis and hibernation are not shown by all living things."
+    },
+    {
+      "id": "biology-002",
+      "year": "2021",
+      "topic": "Living Organisms",
+      "text": "The organelle responsible for energy production in the cell is the ___.",
+      "options": [
+        "nucleus",
+        "ribosome",
+        "lysosome",
+        "mitochondrion"
+      ],
+      "answer": 3,
+      "explanation": "The mitochondrion is the site of aerobic respiration, which releases energy as ATP."
+    },
+    {
+      "id": "biology-003",
+      "year": "2022",
+      "topic": "Living Organisms",
+      "text": "Which of the following structures is found in plant cells but NOT in animal cells?",
+      "options": [
+        "Mitochondrion",
+        "Cell membrane",
+        "Chloroplast",
+        "Nucleus"
+      ],
+      "answer": 2,
+      "explanation": "Chloroplasts, which contain chlorophyll for photosynthesis, occur in plant cells but not in animal cells."
+    },
+    {
+      "id": "biology-004",
+      "year": "2023",
+      "topic": "Evolution Among Organisms",
+      "text": "Bacteria belong to the kingdom ___.",
+      "options": [
+        "Monera",
+        "Protista",
+        "Fungi",
+        "Plantae"
+      ],
+      "answer": 0,
+      "explanation": "In the five-kingdom classification, the prokaryotes (bacteria and blue-green algae) form the kingdom Monera."
+    },
+    {
+      "id": "biology-005",
+      "year": "2024",
+      "topic": "Evolution Among Organisms",
+      "text": "Which of the following organisms is a fungus?",
+      "options": [
+        "Spirogyra",
+        "Euglena",
+        "Paramecium",
+        "Rhizopus"
+      ],
+      "answer": 3,
+      "explanation": "Rhizopus (bread mould) is a fungus. Spirogyra is an alga, while Euglena and Paramecium are protists."
+    },
+    {
+      "id": "biology-006",
+      "year": "2025",
+      "topic": "Evolution Among Organisms",
+      "text": "The bryophytes are distinguished from the pteridophytes by the absence of ___.",
+      "options": [
+        "true vascular tissues",
+        "leaves",
+        "spores",
+        "chlorophyll"
+      ],
+      "answer": 0,
+      "explanation": "Mosses (bryophytes) lack true xylem and phloem, whereas ferns (pteridophytes) possess vascular tissues."
+    },
+    {
+      "id": "biology-007",
+      "year": "2020",
+      "topic": "Adaptations",
+      "text": "Countershading in fish is an adaptation for ___.",
+      "options": [
+        "faster swimming",
+        "protection from predators",
+        "finding food",
+        "reproduction"
+      ],
+      "answer": 1,
+      "explanation": "Countershading (dark above, light below) breaks up the fish's outline and camouflages it from predators."
+    },
+    {
+      "id": "biology-008",
+      "year": "2021",
+      "topic": "Adaptations",
+      "text": "In a termite colony, the caste responsible for reproduction is the ___.",
+      "options": [
+        "workers",
+        "soldiers",
+        "king and queen",
+        "nymphs"
+      ],
+      "answer": 2,
+      "explanation": "The king and queen are the reproductive caste; workers and soldiers are sterile."
+    },
+    {
+      "id": "biology-009",
+      "year": "2022",
+      "topic": "Internal Structure",
+      "text": "In a transverse section of a dicotyledonous stem, the vascular bundles are arranged in a ___.",
+      "options": [
+        "ring",
+        "scattered manner",
+        "single central column",
+        "star shape"
+      ],
+      "answer": 0,
+      "explanation": "In dicot stems the vascular bundles form a ring; in monocot stems they are scattered."
+    },
+    {
+      "id": "biology-010",
+      "year": "2023",
+      "topic": "Internal Structure",
+      "text": "The tissue that provides flexibility and support in young plant stems is ___.",
+      "options": [
+        "xylem",
+        "collenchyma",
+        "phloem",
+        "sclerenchyma"
+      ],
+      "answer": 1,
+      "explanation": "Collenchyma is a living supporting tissue that gives flexible strength; sclerenchyma is rigid and dead at maturity."
+    },
+    {
+      "id": "biology-011",
+      "year": "2024",
+      "topic": "Nutrition",
+      "text": "Photosynthesis takes place in the ___.",
+      "options": [
+        "mitochondrion",
+        "nucleus",
+        "chloroplast",
+        "vacuole"
+      ],
+      "answer": 2,
+      "explanation": "Photosynthesis occurs in the chloroplast, where chlorophyll traps sunlight."
+    },
+    {
+      "id": "biology-012",
+      "year": "2025",
+      "topic": "Nutrition",
+      "text": "Which of the following is a macro-element required by plants?",
+      "options": [
+        "Zinc",
+        "Boron",
+        "Copper",
+        "Nitrogen"
+      ],
+      "answer": 3,
+      "explanation": "Nitrogen is required in large amounts (a macro-element). Zinc, boron and copper are micro-elements needed in tiny amounts."
+    },
+    {
+      "id": "biology-013",
+      "year": "2020",
+      "topic": "Nutrition",
+      "text": "The food test for starch uses ___.",
+      "options": [
+        "iodine solution",
+        "Benedict's solution",
+        "Biuret reagent",
+        "Sudan III"
+      ],
+      "answer": 0,
+      "explanation": "Iodine solution turns blue-black in the presence of starch. Benedict's solution tests for reducing sugars."
+    },
+    {
+      "id": "biology-014",
+      "year": "2021",
+      "topic": "Nutrition",
+      "text": "The enzyme ptyalin in saliva acts on ___.",
+      "options": [
+        "proteins",
+        "starch",
+        "fats",
+        "vitamins"
+      ],
+      "answer": 1,
+      "explanation": "Ptyalin (salivary amylase) begins the digestion of starch, breaking it down to maltose."
+    },
+    {
+      "id": "biology-015",
+      "year": "2022",
+      "topic": "Transport",
+      "text": "In mammals, oxygenated blood is carried from the lungs to the heart by the ___.",
+      "options": [
+        "pulmonary artery",
+        "aorta",
+        "pulmonary vein",
+        "vena cava"
+      ],
+      "answer": 2,
+      "explanation": "The pulmonary vein is the only vein that carries oxygenated blood, from the lungs to the left atrium."
+    },
+    {
+      "id": "biology-016",
+      "year": "2023",
+      "topic": "Transport",
+      "text": "Water absorbed by the roots is transported to the leaves through the ___.",
+      "options": [
+        "phloem",
+        "cambium",
+        "epidermis",
+        "xylem"
+      ],
+      "answer": 3,
+      "explanation": "The xylem vessels carry water and mineral salts upwards; the phloem carries manufactured food."
+    },
+    {
+      "id": "biology-017",
+      "year": "2024",
+      "topic": "Transport",
+      "text": "The blood cells responsible for carrying oxygen are the ___.",
+      "options": [
+        "white blood cells",
+        "red blood cells",
+        "platelets",
+        "plasma cells"
+      ],
+      "answer": 1,
+      "explanation": "Red blood cells contain haemoglobin, which binds and carries oxygen."
+    },
+    {
+      "id": "biology-018",
+      "year": "2025",
+      "topic": "Transport",
+      "text": "The movement of water molecules from a dilute solution to a concentrated solution through a semi-permeable membrane is ___.",
+      "options": [
+        "diffusion",
+        "plasmolysis",
+        "osmosis",
+        "active transport"
+      ],
+      "answer": 2,
+      "explanation": "Osmosis is the movement of water molecules across a semi-permeable membrane from a dilute to a concentrated solution."
+    },
+    {
+      "id": "biology-019",
+      "year": "2020",
+      "topic": "Respiration",
+      "text": "The energy currency of the cell is ___.",
+      "options": [
+        "ATP",
+        "ADP",
+        "DNA",
+        "RNA"
+      ],
+      "answer": 0,
+      "explanation": "ATP (adenosine triphosphate) stores and supplies energy for cellular activities."
+    },
+    {
+      "id": "biology-020",
+      "year": "2021",
+      "topic": "Respiration",
+      "text": "Anaerobic respiration in yeast produces ___.",
+      "options": [
+        "lactic acid and energy",
+        "water and energy",
+        "oxygen and glucose",
+        "carbon dioxide, ethanol and energy"
+      ],
+      "answer": 3,
+      "explanation": "Yeast ferments glucose to ethanol and carbon dioxide, releasing energy, when oxygen is absent."
+    },
+    {
+      "id": "biology-021",
+      "year": "2022",
+      "topic": "Respiration",
+      "text": "Gaseous exchange in mammals takes place in the ___.",
+      "options": [
+        "bronchi",
+        "trachea",
+        "alveoli",
+        "diaphragm"
+      ],
+      "answer": 2,
+      "explanation": "The alveoli are the thin-walled air sacs where oxygen and carbon dioxide are exchanged with the blood."
+    },
+    {
+      "id": "biology-022",
+      "year": "2023",
+      "topic": "Excretion",
+      "text": "The functional unit of the mammalian kidney is the ___.",
+      "options": [
+        "neuron",
+        "alveolus",
+        "villus",
+        "nephron"
+      ],
+      "answer": 3,
+      "explanation": "The nephron is the structural and functional unit of the kidney, filtering blood and forming urine."
+    },
+    {
+      "id": "biology-023",
+      "year": "2024",
+      "topic": "Excretion",
+      "text": "The main nitrogenous waste product excreted by mammals is ___.",
+      "options": [
+        "ammonia",
+        "urea",
+        "uric acid",
+        "amino acid"
+      ],
+      "answer": 1,
+      "explanation": "Mammals convert toxic ammonia to urea in the liver and excrete it in urine."
+    },
+    {
+      "id": "biology-024",
+      "year": "2025",
+      "topic": "Support and Movement",
+      "text": "The movement of a plant shoot towards light is called ___.",
+      "options": [
+        "phototropism",
+        "geotropism",
+        "hydrotropism",
+        "thigmotropism"
+      ],
+      "answer": 0,
+      "explanation": "Phototropism is growth towards light; shoots are positively phototropic."
+    },
+    {
+      "id": "biology-025",
+      "year": "2020",
+      "topic": "Support and Movement",
+      "text": "The joint between the humerus and the radius and ulna (the elbow) is a ___ joint.",
+      "options": [
+        "ball-and-socket",
+        "pivot",
+        "gliding",
+        "hinge"
+      ],
+      "answer": 3,
+      "explanation": "The elbow is a hinge joint, allowing movement in one plane like a door hinge."
+    },
+    {
+      "id": "biology-026",
+      "year": "2021",
+      "topic": "Support and Movement",
+      "text": "The plant hormone mainly responsible for cell elongation in shoots is ___.",
+      "options": [
+        "auxin",
+        "gibberellin",
+        "cytokinin",
+        "abscisic acid"
+      ],
+      "answer": 0,
+      "explanation": "Auxins promote cell elongation in shoots and control tropic responses."
+    },
+    {
+      "id": "biology-027",
+      "year": "2022",
+      "topic": "Reproduction",
+      "text": "The transfer of pollen grains from the anther to the stigma of the same flower is ___.",
+      "options": [
+        "cross-pollination",
+        "self-pollination",
+        "fertilization",
+        "germination"
+      ],
+      "answer": 1,
+      "explanation": "Self-pollination is the transfer of pollen within the same flower (or the same plant)."
+    },
+    {
+      "id": "biology-028",
+      "year": "2023",
+      "topic": "Reproduction",
+      "text": "In flowering plants, double fertilization results in the formation of the ___.",
+      "options": [
+        "seed and fruit",
+        "pollen and ovule",
+        "zygote and endosperm",
+        "embryo and testa"
+      ],
+      "answer": 2,
+      "explanation": "One male gamete fuses with the egg to form the zygote, while the other fuses with the polar nuclei to form the endosperm."
+    },
+    {
+      "id": "biology-029",
+      "year": "2024",
+      "topic": "Reproduction",
+      "text": "Fertilization in mammals normally takes place in the ___.",
+      "options": [
+        "ovary",
+        "fallopian tube",
+        "uterus",
+        "vagina"
+      ],
+      "answer": 1,
+      "explanation": "The sperm meets and fertilizes the ovum in the fallopian tube (oviduct)."
+    },
+    {
+      "id": "biology-030",
+      "year": "2025",
+      "topic": "Reproduction",
+      "text": "Which of the following is a form of asexual reproduction in Hydra?",
+      "options": [
+        "Budding",
+        "Fission",
+        "Fragmentation",
+        "Spore formation"
+      ],
+      "answer": 0,
+      "explanation": "Hydra reproduces asexually by budding: a small outgrowth develops and detaches as a new individual."
+    },
+    {
+      "id": "biology-031",
+      "year": "2020",
+      "topic": "Growth",
+      "text": "Epigeal germination differs from hypogeal germination in that in epigeal germination the ___.",
+      "options": [
+        "cotyledons remain below the soil",
+        "radicle emerges first",
+        "plumule emerges first",
+        "cotyledons are carried above the soil"
+      ],
+      "answer": 3,
+      "explanation": "In epigeal germination the cotyledons are carried above the ground (e.g. beans); in hypogeal germination they stay below (e.g. maize)."
+    },
+    {
+      "id": "biology-032",
+      "year": "2021",
+      "topic": "Growth",
+      "text": "Which of the following conditions is NOT generally necessary for seed germination?",
+      "options": [
+        "Water",
+        "Oxygen",
+        "Light",
+        "Suitable temperature"
+      ],
+      "answer": 2,
+      "explanation": "Seeds generally require water, oxygen and a suitable temperature; light is not a general requirement for germination."
+    },
+    {
+      "id": "biology-033",
+      "year": "2022",
+      "topic": "Coordination and Control",
+      "text": "The part of the brain that controls balance and posture is the ___.",
+      "options": [
+        "cerebellum",
+        "cerebrum",
+        "medulla oblongata",
+        "hypothalamus"
+      ],
+      "answer": 0,
+      "explanation": "The cerebellum coordinates movement, balance and posture."
+    },
+    {
+      "id": "biology-034",
+      "year": "2023",
+      "topic": "Coordination and Control",
+      "text": "Insulin is produced by the ___.",
+      "options": [
+        "thyroid gland",
+        "adrenal gland",
+        "pituitary gland",
+        "islets of Langerhans in the pancreas"
+      ],
+      "answer": 3,
+      "explanation": "The beta cells of the islets of Langerhans in the pancreas secrete insulin, which lowers blood sugar."
+    },
+    {
+      "id": "biology-035",
+      "year": "2024",
+      "topic": "Coordination and Control",
+      "text": "A simple reflex action such as withdrawing the hand from a hot object is controlled by the ___.",
+      "options": [
+        "cerebrum",
+        "cerebellum",
+        "spinal cord",
+        "medulla"
+      ],
+      "answer": 2,
+      "explanation": "The reflex arc passes through the spinal cord, producing a rapid response without involving conscious thought."
+    },
+    {
+      "id": "biology-036",
+      "year": "2025",
+      "topic": "Factors Affecting Distribution",
+      "text": "The instrument used to measure the turbidity of water is the ___.",
+      "options": [
+        "rain gauge",
+        "secchi disc",
+        "thermometer",
+        "anemometer"
+      ],
+      "answer": 1,
+      "explanation": "The secchi disc is lowered into water to judge its clarity (turbidity)."
+    },
+    {
+      "id": "biology-037",
+      "year": "2020",
+      "topic": "Factors Affecting Distribution",
+      "text": "Which of the following is a biotic factor affecting the distribution of organisms?",
+      "options": [
+        "Temperature",
+        "Rainfall",
+        "Predation",
+        "Soil pH"
+      ],
+      "answer": 2,
+      "explanation": "Predation is a biotic (living) factor; temperature, rainfall and soil pH are abiotic factors."
+    },
+    {
+      "id": "biology-038",
+      "year": "2021",
+      "topic": "Symbiotic Interactions",
+      "text": "The association between a tick and a cow is an example of ___.",
+      "options": [
+        "mutualism",
+        "parasitism",
+        "commensalism",
+        "saprophytism"
+      ],
+      "answer": 1,
+      "explanation": "The tick benefits by feeding on the cow's blood while the cow is harmed, which is parasitism."
+    },
+    {
+      "id": "biology-039",
+      "year": "2022",
+      "topic": "Symbiotic Interactions",
+      "text": "In a food chain, green plants occupy the ___ trophic level.",
+      "options": [
+        "second",
+        "third",
+        "fourth",
+        "first"
+      ],
+      "answer": 3,
+      "explanation": "Green plants are producers and form the first trophic level, on which all other levels depend."
+    },
+    {
+      "id": "biology-040",
+      "year": "2023",
+      "topic": "Symbiotic Interactions",
+      "text": "The bacteria found in the root nodules of leguminous plants that fix atmospheric nitrogen are ___.",
+      "options": [
+        "nitrogen-fixing bacteria",
+        "denitrifying bacteria",
+        "putrefying bacteria",
+        "sulphur bacteria"
+      ],
+      "answer": 0,
+      "explanation": "Rhizobium bacteria in legume root nodules fix atmospheric nitrogen into forms plants can use."
+    },
+    {
+      "id": "biology-041",
+      "year": "2024",
+      "topic": "Natural Habitats",
+      "text": "Mangrove swamps are characterized by ___.",
+      "options": [
+        "fresh water only",
+        "waterlogged saline soils and stilt roots",
+        "dry sandy soils",
+        "permanent ice"
+      ],
+      "answer": 1,
+      "explanation": "Mangroves grow in waterlogged, salty coastal soils, and their trees have stilt roots and breathing roots."
+    },
+    {
+      "id": "biology-042",
+      "year": "2025",
+      "topic": "Natural Habitats",
+      "text": "Which of the following animals is adapted to arboreal life?",
+      "options": [
+        "Earthworm",
+        "Tilapia",
+        "Snail",
+        "Monkey"
+      ],
+      "answer": 3,
+      "explanation": "Monkeys live in trees (arboreal life), with grasping limbs and tails adapted for climbing."
+    },
+    {
+      "id": "biology-043",
+      "year": "2020",
+      "topic": "Local Biomes",
+      "text": "The natural vegetation of southern Nigeria is mainly ___.",
+      "options": [
+        "tropical rainforest",
+        "Sudan savanna",
+        "desert",
+        "montane forest"
+      ],
+      "answer": 0,
+      "explanation": "Southern Nigeria, with its high rainfall, is covered mainly by tropical rainforest."
+    },
+    {
+      "id": "biology-044",
+      "year": "2021",
+      "topic": "Local Biomes",
+      "text": "The Guinea savanna lies between the ___.",
+      "options": [
+        "desert and the rainforest",
+        "highlands and the coast",
+        "rainforest and the Sudan savanna",
+        "mangrove swamp and the desert"
+      ],
+      "answer": 2,
+      "explanation": "The Guinea savanna belt lies between the southern rainforest and the drier Sudan savanna to the north."
+    },
+    {
+      "id": "biology-045",
+      "year": "2022",
+      "topic": "Ecology of Populations",
+      "text": "Population density is defined as the number of individuals per unit ___.",
+      "options": [
+        "time",
+        "mass",
+        "birth rate",
+        "area or volume"
+      ],
+      "answer": 3,
+      "explanation": "Population density = number of individuals divided by the area (or volume) they occupy."
+    },
+    {
+      "id": "biology-046",
+      "year": "2023",
+      "topic": "Ecology of Populations",
+      "text": "The orderly and progressive replacement of one community by another until a stable climax community is reached is called ___.",
+      "options": [
+        "competition",
+        "migration",
+        "succession",
+        "adaptation"
+      ],
+      "answer": 2,
+      "explanation": "Ecological succession is the gradual change in community composition over time towards a stable climax."
+    },
+    {
+      "id": "biology-047",
+      "year": "2024",
+      "topic": "Soil",
+      "text": "Which soil type has the highest water-retaining capacity?",
+      "options": [
+        "Sandy soil",
+        "Clayey soil",
+        "Loamy soil",
+        "Gravelly soil"
+      ],
+      "answer": 1,
+      "explanation": "Clay particles are the smallest and pack closely, so clayey soil holds the most water."
+    },
+    {
+      "id": "biology-048",
+      "year": "2025",
+      "topic": "Soil",
+      "text": "The loss of soil nutrients by the downward movement of water through the soil is called ___.",
+      "options": [
+        "leaching",
+        "erosion",
+        "mulching",
+        "weathering"
+      ],
+      "answer": 0,
+      "explanation": "Leaching is the washing down of soluble nutrients below the reach of plant roots."
+    },
+    {
+      "id": "biology-049",
+      "year": "2020",
+      "topic": "Humans and Environment",
+      "text": "Cholera is caused by ___.",
+      "options": [
+        "a virus",
+        "a fungus",
+        "a protozoan",
+        "a bacterium"
+      ],
+      "answer": 3,
+      "explanation": "Cholera is caused by the bacterium Vibrio cholerae, spread through contaminated water and food."
+    },
+    {
+      "id": "biology-050",
+      "year": "2021",
+      "topic": "Humans and Environment",
+      "text": "The Anopheles mosquito is the vector of ___.",
+      "options": [
+        "cholera",
+        "tuberculosis",
+        "malaria",
+        "poliomyelitis"
+      ],
+      "answer": 2,
+      "explanation": "The female Anopheles mosquito transmits the Plasmodium parasite that causes malaria."
+    },
+    {
+      "id": "biology-051",
+      "year": "2022",
+      "topic": "Humans and Environment",
+      "text": "Which of the following is a method of conserving soil fertility?",
+      "options": [
+        "Crop rotation",
+        "Monoculture",
+        "Bush burning",
+        "Overgrazing"
+      ],
+      "answer": 0,
+      "explanation": "Crop rotation, especially including legumes, restores soil nutrients; the other practices deplete them."
+    },
+    {
+      "id": "biology-052",
+      "year": "2023",
+      "topic": "Variation in Population",
+      "text": "Height in humans is an example of ___ variation.",
+      "options": [
+        "discontinuous",
+        "continuous",
+        "physiological",
+        "environmental only"
+      ],
+      "answer": 1,
+      "explanation": "Height shows a continuous range of values influenced by many genes and the environment."
+    },
+    {
+      "id": "biology-053",
+      "year": "2024",
+      "topic": "Variation in Population",
+      "text": "A person with blood group O can donate red blood cells to a person with blood group ___.",
+      "options": [
+        "A, B, AB or O",
+        "O only",
+        "AB only",
+        "A only"
+      ],
+      "answer": 0,
+      "explanation": "Group O red cells carry no A or B antigens, so group O is the universal red-cell donor."
+    },
+    {
+      "id": "biology-054",
+      "year": "2025",
+      "topic": "Heredity",
+      "text": "The chromosome number in a normal human body cell is ___.",
+      "options": [
+        "23",
+        "44",
+        "48",
+        "46"
+      ],
+      "answer": 3,
+      "explanation": "Human body (somatic) cells contain 46 chromosomes in 23 pairs; gametes contain 23."
+    },
+    {
+      "id": "biology-055",
+      "year": "2020",
+      "topic": "Heredity",
+      "text": "In a cross between two heterozygous tall plants (Tt x Tt), the expected phenotypic ratio of tall to short offspring is ___.",
+      "options": [
+        "1:1",
+        "1:3",
+        "3:1",
+        "2:1"
+      ],
+      "answer": 2,
+      "explanation": "The cross gives TT, Tt, Tt and tt: three tall phenotypes to one short, a 3:1 ratio."
+    },
+    {
+      "id": "biology-056",
+      "year": "2021",
+      "topic": "Heredity",
+      "text": "Haemophilia is a ___.",
+      "options": [
+        "dominant autosomal disorder",
+        "sex-linked recessive disorder",
+        "sex-linked dominant disorder",
+        "non-heritable disease"
+      ],
+      "answer": 1,
+      "explanation": "Haemophilia is caused by a recessive gene carried on the X chromosome."
+    },
+    {
+      "id": "biology-057",
+      "year": "2022",
+      "topic": "Heredity",
+      "text": "The sex of a child is determined by the ___.",
+      "options": [
+        "father only",
+        "mother only",
+        "both parents equally",
+        "environment"
+      ],
+      "answer": 0,
+      "explanation": "The father's sperm carries either an X or a Y chromosome, which determines whether the child is female (XX) or male (XY)."
+    },
+    {
+      "id": "biology-058",
+      "year": "2023",
+      "topic": "Theories of Evolution",
+      "text": "The theory of evolution by natural selection was proposed by ___.",
+      "options": [
+        "Lamarck",
+        "Mendel",
+        "Linnaeus",
+        "Darwin"
+      ],
+      "answer": 3,
+      "explanation": "Charles Darwin proposed natural selection: organisms best adapted to their environment survive and reproduce."
+    },
+    {
+      "id": "biology-059",
+      "year": "2024",
+      "topic": "Theories of Evolution",
+      "text": "Lamarck's theory of evolution is based on the inheritance of ___.",
+      "options": [
+        "genetic mutations",
+        "natural selection",
+        "acquired characteristics",
+        "artificial selection"
+      ],
+      "answer": 2,
+      "explanation": "Lamarck proposed that characteristics acquired during an organism's lifetime could be inherited by its offspring."
+    },
+    {
+      "id": "biology-060",
+      "year": "2025",
+      "topic": "Evidence of Evolution",
+      "text": "The fossil record provides evidence for evolution by showing ___.",
+      "options": [
+        "that all organisms lived at the same time",
+        "the gradual changes in organisms over time",
+        "that evolution does not occur",
+        "the exact age of the earth"
+      ],
+      "answer": 1,
+      "explanation": "Fossils in successive rock layers show organisms changing gradually over geological time."
+    },
+    {
+      "id": "biology-061",
+      "year": "2025",
+      "topic": "Reproduction",
+      "text": "In the diagram of a flower, in which labelled part are pollen grains produced?",
+      "options": [
+        "Stigma",
+        "Anther",
+        "Ovary",
+        "Filament"
+      ],
+      "answer": 1,
+      "explanation": "The anther is the pollen-bearing part of the stamen; the filament only supports it. The stigma receives pollen and the ovary contains the ovules.",
+      "diagram": "<svg width=\"560\" height=\"420\" viewBox=\"0 0 560 420\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"sans-serif\" font-size=\"15\">\n  <ellipse cx=\"260\" cy=\"110\" rx=\"34\" ry=\"72\" fill=\"#f7c6d9\" stroke=\"#c2185b\" stroke-width=\"2\" transform=\"rotate(-28 260 110)\"/>\n  <ellipse cx=\"260\" cy=\"110\" rx=\"34\" ry=\"72\" fill=\"#f7c6d9\" stroke=\"#c2185b\" stroke-width=\"2\" transform=\"rotate(28 260 110)\"/>\n  <ellipse cx=\"260\" cy=\"95\" rx=\"30\" ry=\"66\" fill=\"#f9d3e3\" stroke=\"#c2185b\" stroke-width=\"2\"/>\n  <path d=\"M232 300 L214 348 L248 322 Z\" fill=\"#66bb6a\" stroke=\"#2e7d32\" stroke-width=\"2\"/>\n  <path d=\"M288 300 L306 348 L272 322 Z\" fill=\"#66bb6a\" stroke=\"#2e7d32\" stroke-width=\"2\"/>\n  <ellipse cx=\"260\" cy=\"312\" rx=\"34\" ry=\"26\" fill=\"#fff9c4\" stroke=\"#f57f17\" stroke-width=\"2\"/>\n  <circle cx=\"250\" cy=\"308\" r=\"5\" fill=\"#f57f17\"/><circle cx=\"268\" cy=\"316\" r=\"5\" fill=\"#f57f17\"/><circle cx=\"262\" cy=\"302\" r=\"5\" fill=\"#f57f17\"/>\n  <rect x=\"255\" y=\"150\" width=\"10\" height=\"140\" fill=\"#fff59d\" stroke=\"#f57f17\" stroke-width=\"2\"/>\n  <circle cx=\"260\" cy=\"142\" r=\"14\" fill=\"#ffca28\" stroke=\"#f57f17\" stroke-width=\"2\"/>\n  <line x1=\"216\" y1=\"300\" x2=\"196\" y2=\"180\" stroke=\"#8d6e63\" stroke-width=\"3\"/>\n  <ellipse cx=\"192\" cy=\"168\" rx=\"10\" ry=\"18\" fill=\"#8d6e63\" stroke=\"#5d4037\" stroke-width=\"2\"/>\n  <line x1=\"304\" y1=\"300\" x2=\"324\" y2=\"180\" stroke=\"#8d6e63\" stroke-width=\"3\"/>\n  <ellipse cx=\"328\" cy=\"168\" rx=\"10\" ry=\"18\" fill=\"#8d6e63\" stroke=\"#5d4037\" stroke-width=\"2\"/>\n  <rect x=\"252\" y=\"338\" width=\"16\" height=\"52\" fill=\"#66bb6a\" stroke=\"#2e7d32\" stroke-width=\"2\"/>\n  <line x1=\"260\" y1=\"142\" x2=\"330\" y2=\"100\" stroke=\"#333\"/><text x=\"336\" y=\"104\">Stigma</text>\n  <line x1=\"192\" y1=\"168\" x2=\"120\" y2=\"130\" stroke=\"#333\"/><text x=\"30\" y=\"134\">Anther</text>\n  <line x1=\"216\" y1=\"240\" x2=\"120\" y2=\"240\" stroke=\"#333\"/><text x=\"30\" y=\"244\">Filament</text>\n  <line x1=\"290\" y1=\"110\" x2=\"380\" y2=\"70\" stroke=\"#333\"/><text x=\"386\" y=\"74\">Petal</text>\n  <line x1=\"232\" y1=\"320\" x2=\"120\" y2=\"350\" stroke=\"#333\"/><text x=\"52\" y=\"354\">Sepal</text>\n  <line x1=\"260\" y1=\"312\" x2=\"380\" y2=\"330\" stroke=\"#333\"/><text x=\"386\" y=\"334\">Ovary (ovules inside)</text>\n  <line x1=\"260\" y1=\"200\" x2=\"380\" y2=\"200\" stroke=\"#333\"/><text x=\"386\" y=\"204\">Style</text>\n</svg>"
+    },
+    {
+      "id": "biology-062",
+      "year": "2025",
+      "topic": "Transport",
+      "text": "Which part is labelled II in the diagram of the heart?",
+      "options": [
+        "Aorta",
+        "Pulmonary vein",
+        "Right ventricle",
+        "Left ventricle"
+      ],
+      "answer": 1,
+      "explanation": "The pulmonary vein carries oxygenated blood from the lungs into the left atrium. I is the aorta, III the right ventricle and IV the left ventricle.",
+      "diagram": "<svg width=\"440\" height=\"360\" viewBox=\"0 0 440 360\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"sans-serif\" font-size=\"15\">\n  <!-- superior vena cava (blue, into right atrium from above) -->\n  <rect x=\"138\" y=\"6\" width=\"20\" height=\"104\" fill=\"#90caf9\" stroke=\"#1565c0\" stroke-width=\"2\"/>\n  <!-- heart body -->\n  <path d=\"M138,108 C128,175 138,245 172,288 C188,308 198,326 204,332 C236,322 284,292 304,246 C324,204 324,152 308,116 C292,94 258,88 234,92 C208,96 168,90 138,108 Z\" fill=\"#ef9a9a\" stroke=\"#b71c1c\" stroke-width=\"2.5\"/>\n  <!-- septum: divides right (viewer left) from left (viewer right) -->\n  <path d=\"M234,94 C230,160 224,240 208,318\" fill=\"none\" stroke=\"#b71c1c\" stroke-width=\"2\"/>\n  <!-- thick left-ventricle wall -->\n  <path d=\"M296,130 C306,175 300,225 272,262\" fill=\"none\" stroke=\"#b71c1c\" stroke-width=\"7\" opacity=\"0.55\"/>\n  <!-- valves + chordae tendineae + papillary muscles -->\n  <path d=\"M196,178 l14,10 M196,178 l-4,14\" fill=\"none\" stroke=\"#b71c1c\" stroke-width=\"2\"/>\n  <path d=\"M272,178 l-14,10 M272,178 l4,14\" fill=\"none\" stroke=\"#b71c1c\" stroke-width=\"2\"/>\n  <line x1=\"203\" y1=\"188\" x2=\"196\" y2=\"240\" stroke=\"#b71c1c\" stroke-width=\"1\"/>\n  <line x1=\"210\" y1=\"188\" x2=\"216\" y2=\"240\" stroke=\"#b71c1c\" stroke-width=\"1\"/>\n  <line x1=\"265\" y1=\"188\" x2=\"258\" y2=\"240\" stroke=\"#b71c1c\" stroke-width=\"1\"/>\n  <line x1=\"272\" y1=\"188\" x2=\"280\" y2=\"240\" stroke=\"#b71c1c\" stroke-width=\"1\"/>\n  <circle cx=\"196\" cy=\"242\" r=\"5\" fill=\"#b71c1c\"/><circle cx=\"216\" cy=\"242\" r=\"5\" fill=\"#b71c1c\"/>\n  <circle cx=\"258\" cy=\"242\" r=\"5\" fill=\"#b71c1c\"/><circle cx=\"280\" cy=\"242\" r=\"5\" fill=\"#b71c1c\"/>\n  <!-- pulmonary artery (blue): from right ventricle, splits left/right -->\n  <path d=\"M172,130 C172,92 196,70 230,64\" fill=\"none\" stroke=\"#1565c0\" stroke-width=\"11\" stroke-linecap=\"round\"/>\n  <path d=\"M230,64 C250,62 268,66 282,76\" fill=\"none\" stroke=\"#1565c0\" stroke-width=\"11\" stroke-linecap=\"round\"/>\n  <path d=\"M230,64 C210,62 192,66 180,76\" fill=\"none\" stroke=\"#1565c0\" stroke-width=\"11\" stroke-linecap=\"round\"/>\n  <!-- aorta (red): from left ventricle, arches over the top -->\n  <path d=\"M288,118 C288,58 252,28 212,32 C178,36 162,62 166,94\" fill=\"none\" stroke=\"#c62828\" stroke-width=\"15\" stroke-linecap=\"round\"/>\n  <line x1=\"196\" y1=\"32\" x2=\"196\" y2=\"12\" stroke=\"#c62828\" stroke-width=\"6\"/>\n  <line x1=\"216\" y1=\"28\" x2=\"216\" y2=\"10\" stroke=\"#c62828\" stroke-width=\"6\"/>\n  <line x1=\"236\" y1=\"30\" x2=\"236\" y2=\"12\" stroke=\"#c62828\" stroke-width=\"6\"/>\n  <!-- pulmonary veins (blue): into left atrium from the right -->\n  <line x1=\"432\" y1=\"96\" x2=\"312\" y2=\"112\" stroke=\"#64b5f6\" stroke-width=\"9\" stroke-linecap=\"round\"/>\n  <line x1=\"436\" y1=\"140\" x2=\"312\" y2=\"132\" stroke=\"#64b5f6\" stroke-width=\"9\" stroke-linecap=\"round\"/>\n  <!-- Roman-numeral labels -->\n  <line x1=\"64\" y1=\"42\" x2=\"195\" y2=\"34\" stroke=\"#333\"/><text x=\"48\" y=\"46\" font-size=\"17\" font-weight=\"bold\">I</text>\n  <line x1=\"390\" y1=\"94\" x2=\"345\" y2=\"110\" stroke=\"#333\"/><text x=\"396\" y=\"98\" font-size=\"17\" font-weight=\"bold\">II</text>\n  <line x1=\"56\" y1=\"270\" x2=\"160\" y2=\"252\" stroke=\"#333\"/><text x=\"34\" y=\"274\" font-size=\"17\" font-weight=\"bold\">III</text>\n  <line x1=\"390\" y1=\"270\" x2=\"292\" y2=\"252\" stroke=\"#333\"/><text x=\"396\" y=\"274\" font-size=\"17\" font-weight=\"bold\">IV</text>\n</svg>"
+    },
+    {
+      "id": "biology-063",
+      "year": "2025",
+      "topic": "Nutrition",
+      "text": "In the diagram of a leaf section, in which labelled part does photosynthesis take place mainly?",
+      "options": [
+        "Palisade mesophyll",
+        "Upper epidermis",
+        "Spongy mesophyll",
+        "Vein (vascular bundle)"
+      ],
+      "answer": 0,
+      "explanation": "Palisade cells are packed with chloroplasts and receive the most light, so most photosynthesis happens there.",
+      "diagram": "<svg width=\"560\" height=\"320\" viewBox=\"0 0 560 320\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"sans-serif\" font-size=\"15\">\n  <!-- blade -->\n  <rect x=\"60\" y=\"80\" width=\"440\" height=\"150\" rx=\"20\" fill=\"#e8f5e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/>\n  <!-- upper epidermis -->\n  <rect x=\"60\" y=\"80\" width=\"440\" height=\"16\" fill=\"#a5d6a7\" stroke=\"#2e7d32\" stroke-width=\"1.5\"/>\n  <!-- palisade mesophyll: vertical columns -->\n  <g fill=\"#66bb6a\" stroke=\"#2e7d32\" stroke-width=\"1.5\">\n    <rect x=\"72\" y=\"96\" width=\"24\" height=\"64\"/><rect x=\"102\" y=\"96\" width=\"24\" height=\"64\"/>\n    <rect x=\"132\" y=\"96\" width=\"24\" height=\"64\"/><rect x=\"162\" y=\"96\" width=\"24\" height=\"64\"/>\n    <rect x=\"192\" y=\"96\" width=\"24\" height=\"64\"/><rect x=\"222\" y=\"96\" width=\"24\" height=\"64\"/>\n    <rect x=\"312\" y=\"96\" width=\"24\" height=\"64\"/><rect x=\"342\" y=\"96\" width=\"24\" height=\"64\"/>\n    <rect x=\"372\" y=\"96\" width=\"24\" height=\"64\"/><rect x=\"402\" y=\"96\" width=\"24\" height=\"64\"/>\n    <rect x=\"432\" y=\"96\" width=\"24\" height=\"64\"/><rect x=\"462\" y=\"96\" width=\"24\" height=\"64\"/>\n  </g>\n  <!-- vascular bundle (vein) in the middle -->\n  <ellipse cx=\"279\" cy=\"172\" rx=\"30\" ry=\"20\" fill=\"#fff9c4\" stroke=\"#f57f17\" stroke-width=\"2\"/>\n  <circle cx=\"272\" cy=\"168\" r=\"4\" fill=\"#f57f17\"/><circle cx=\"286\" cy=\"176\" r=\"4\" fill=\"#f57f17\"/>\n  <!-- spongy mesophyll: round cells with air spaces -->\n  <g fill=\"#81c784\" stroke=\"#2e7d32\" stroke-width=\"1.5\">\n    <circle cx=\"90\" cy=\"188\" r=\"12\"/><circle cx=\"122\" cy=\"196\" r=\"12\"/><circle cx=\"154\" cy=\"188\" r=\"12\"/>\n    <circle cx=\"186\" cy=\"196\" r=\"12\"/><circle cx=\"218\" cy=\"188\" r=\"12\"/><circle cx=\"338\" cy=\"196\" r=\"12\"/>\n    <circle cx=\"370\" cy=\"188\" r=\"12\"/><circle cx=\"402\" cy=\"196\" r=\"12\"/><circle cx=\"434\" cy=\"188\" r=\"12\"/>\n    <circle cx=\"466\" cy=\"196\" r=\"12\"/>\n  </g>\n  <!-- lower epidermis with stoma gap -->\n  <rect x=\"60\" y=\"214\" width=\"220\" height=\"16\" fill=\"#a5d6a7\" stroke=\"#2e7d32\" stroke-width=\"1.5\"/>\n  <rect x=\"320\" y=\"214\" width=\"180\" height=\"16\" fill=\"#a5d6a7\" stroke=\"#2e7d32\" stroke-width=\"1.5\"/>\n  <!-- guard cells (stoma) -->\n  <ellipse cx=\"292\" cy=\"222\" rx=\"9\" ry=\"6\" fill=\"#66bb6a\" stroke=\"#2e7d32\" stroke-width=\"1.5\" transform=\"rotate(-30 292 222)\"/>\n  <ellipse cx=\"308\" cy=\"222\" rx=\"9\" ry=\"6\" fill=\"#66bb6a\" stroke=\"#2e7d32\" stroke-width=\"1.5\" transform=\"rotate(30 308 222)\"/>\n  <!-- labels -->\n  <line x1=\"140\" y1=\"88\" x2=\"120\" y2=\"52\" stroke=\"#333\"/><text x=\"18\" y=\"56\">Upper epidermis</text>\n  <line x1=\"120\" y1=\"128\" x2=\"104\" y2=\"128\" stroke=\"#333\"/><text x=\"8\" y=\"132\">Palisade mesophyll</text>\n  <line x1=\"120\" y1=\"190\" x2=\"104\" y2=\"190\" stroke=\"#333\"/><text x=\"8\" y=\"194\">Spongy mesophyll</text>\n  <line x1=\"310\" y1=\"165\" x2=\"380\" y2=\"120\" stroke=\"#333\"/><text x=\"386\" y=\"124\">Vein (vascular bundle)</text>\n  <line x1=\"330\" y1=\"222\" x2=\"380\" y2=\"252\" stroke=\"#333\"/><text x=\"386\" y=\"256\">Lower epidermis</text>\n  <line x1=\"306\" y1=\"228\" x2=\"380\" y2=\"292\" stroke=\"#333\"/><text x=\"386\" y=\"296\">Stoma</text>\n</svg>"
+    },
+    {
+      "id": "biology-064",
+      "year": "2025",
+      "topic": "Ecology of Populations",
+      "text": "If the frogs are removed from the food web, the population of grasshoppers will",
+      "options": [
+        "Increase",
+        "Decrease",
+        "Remain the same",
+        "Become extinct"
+      ],
+      "answer": 0,
+      "explanation": "Frogs prey on grasshoppers; with the predator gone, more grasshoppers survive and their population grows.",
+      "diagram": "<svg width=\"560\" height=\"360\" viewBox=\"0 0 560 360\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"sans-serif\" font-size=\"15\">\n  <defs>\n    <marker id=\"arr\" markerWidth=\"9\" markerHeight=\"9\" refX=\"7\" refY=\"4.5\" orient=\"auto\">\n      <path d=\"M0,0 L9,4.5 L0,9 Z\" fill=\"#333\"/>\n    </marker>\n  </defs>\n  <!-- arrows: eaten -> eater -->\n  <line x1=\"250\" y1=\"300\" x2=\"140\" y2=\"240\" stroke=\"#333\" stroke-width=\"2\" marker-end=\"url(#arr)\"/>\n  <line x1=\"310\" y1=\"300\" x2=\"428\" y2=\"240\" stroke=\"#333\" stroke-width=\"2\" marker-end=\"url(#arr)\"/>\n  <line x1=\"125\" y1=\"200\" x2=\"125\" y2=\"140\" stroke=\"#333\" stroke-width=\"2\" marker-end=\"url(#arr)\"/>\n  <line x1=\"165\" y1=\"200\" x2=\"252\" y2=\"140\" stroke=\"#333\" stroke-width=\"2\" marker-end=\"url(#arr)\"/>\n  <line x1=\"432\" y1=\"200\" x2=\"305\" y2=\"50\" stroke=\"#333\" stroke-width=\"2\" marker-end=\"url(#arr)\"/>\n  <line x1=\"125\" y1=\"100\" x2=\"125\" y2=\"50\" stroke=\"#333\" stroke-width=\"2\" marker-end=\"url(#arr)\"/>\n  <line x1=\"272\" y1=\"100\" x2=\"290\" y2=\"50\" stroke=\"#333\" stroke-width=\"2\" marker-end=\"url(#arr)\"/>\n  <line x1=\"182\" y1=\"28\" x2=\"222\" y2=\"28\" stroke=\"#333\" stroke-width=\"2\" marker-end=\"url(#arr)\"/>\n  <!-- boxes -->\n  <g text-anchor=\"middle\">\n    <rect x=\"225\" y=\"300\" width=\"110\" height=\"36\" rx=\"8\" fill=\"#c8e6c9\" stroke=\"#2e7d32\" stroke-width=\"2\"/>\n    <text x=\"280\" y=\"323\">Grass</text>\n    <rect x=\"70\" y=\"200\" width=\"110\" height=\"36\" rx=\"8\" fill=\"#fff\" stroke=\"#333\" stroke-width=\"2\"/>\n    <text x=\"125\" y=\"223\">Grasshopper</text>\n    <rect x=\"380\" y=\"200\" width=\"110\" height=\"36\" rx=\"8\" fill=\"#fff\" stroke=\"#333\" stroke-width=\"2\"/>\n    <text x=\"435\" y=\"223\">Rabbit</text>\n    <rect x=\"70\" y=\"100\" width=\"110\" height=\"36\" rx=\"8\" fill=\"#fff\" stroke=\"#333\" stroke-width=\"2\"/>\n    <text x=\"125\" y=\"123\">Frog</text>\n    <rect x=\"225\" y=\"100\" width=\"110\" height=\"36\" rx=\"8\" fill=\"#fff\" stroke=\"#333\" stroke-width=\"2\"/>\n    <text x=\"280\" y=\"123\">Bird</text>\n    <rect x=\"70\" y=\"10\" width=\"110\" height=\"36\" rx=\"8\" fill=\"#fff\" stroke=\"#333\" stroke-width=\"2\"/>\n    <text x=\"125\" y=\"33\">Snake</text>\n    <rect x=\"225\" y=\"10\" width=\"110\" height=\"36\" rx=\"8\" fill=\"#fff\" stroke=\"#333\" stroke-width=\"2\"/>\n    <text x=\"280\" y=\"33\">Hawk</text>\n  </g>\n</svg>"
+    },
+    {
+      "id": "biology-065",
+      "year": "2025",
+      "topic": "Living Organisms",
+      "text": "Which labelled part controls all the activities of the cell?",
+      "options": [
+        "Nucleus",
+        "Chloroplast",
+        "Vacuole",
+        "Cell wall"
+      ],
+      "answer": 0,
+      "explanation": "The nucleus contains the genetic material (DNA) that controls all the activities of the cell.",
+      "diagram": "<svg width=\"560\" height=\"360\" viewBox=\"0 0 560 360\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"sans-serif\" font-size=\"15\">\n  <!-- cell wall -->\n  <rect x=\"80\" y=\"50\" width=\"400\" height=\"260\" rx=\"30\" fill=\"#f1f8e9\" stroke=\"#33691e\" stroke-width=\"3\"/>\n  <!-- cell membrane -->\n  <rect x=\"92\" y=\"62\" width=\"376\" height=\"236\" rx=\"24\" fill=\"none\" stroke=\"#558b2f\" stroke-width=\"1.5\"/>\n  <!-- central vacuole -->\n  <ellipse cx=\"300\" cy=\"190\" rx=\"95\" ry=\"70\" fill=\"#e3f2fd\" stroke=\"#64b5f6\" stroke-width=\"2\"/>\n  <!-- nucleus + nucleolus -->\n  <circle cx=\"170\" cy=\"120\" r=\"28\" fill=\"#ce93d8\" stroke=\"#7b1fa2\" stroke-width=\"2\"/>\n  <circle cx=\"170\" cy=\"120\" r=\"9\" fill=\"#7b1fa2\"/>\n  <!-- chloroplasts -->\n  <g fill=\"#66bb6a\" stroke=\"#2e7d32\" stroke-width=\"1.5\">\n    <ellipse cx=\"200\" cy=\"232\" rx=\"16\" ry=\"9\"/>\n    <ellipse cx=\"380\" cy=\"118\" rx=\"16\" ry=\"9\"/>\n    <ellipse cx=\"420\" cy=\"232\" rx=\"16\" ry=\"9\"/>\n    <ellipse cx=\"148\" cy=\"252\" rx=\"16\" ry=\"9\"/>\n  </g>\n  <!-- labels -->\n  <line x1=\"145\" y1=\"115\" x2=\"70\" y2=\"105\" stroke=\"#333\"/><text x=\"8\" y=\"109\">Nucleus</text>\n  <line x1=\"186\" y1=\"232\" x2=\"70\" y2=\"238\" stroke=\"#333\"/><text x=\"8\" y=\"242\">Chloroplast</text>\n  <line x1=\"420\" y1=\"52\" x2=\"440\" y2=\"40\" stroke=\"#333\"/><text x=\"446\" y=\"44\">Cell wall</text>\n  <line x1=\"410\" y1=\"70\" x2=\"440\" y2=\"88\" stroke=\"#333\"/><text x=\"446\" y=\"92\">Cell membrane</text>\n  <line x1=\"395\" y1=\"190\" x2=\"440\" y2=\"190\" stroke=\"#333\"/><text x=\"446\" y=\"194\">Vacuole</text>\n  <line x1=\"420\" y1=\"285\" x2=\"440\" y2=\"296\" stroke=\"#333\"/><text x=\"446\" y=\"300\">Cytoplasm</text>\n</svg>"
+    },
+    {
+      "id": "biology-066",
+      "subject": "Biology",
+      "year": "2025",
+      "topic": "Ecology of Populations",
+      "question": "The part labelled II in the diagram is the",
+      "options": [
+        "lag phase",
+        "log phase",
+        "stationary phase",
+        "death phase"
+      ],
+      "answer": 1,
+      "explanation": "II is the steep part of the S-shaped curve, where the population grows fastest \u2014 the log (exponential) phase. I is the lag phase and III is the stationary phase at the carrying capacity K.",
+      "diagram": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 560 360\" width=\"560\" height=\"360\"> <rect x=\"0\" y=\"0\" width=\"560\" height=\"360\" fill=\"#ffffff\"/> <!-- axes --> <line x1=\"80\" y1=\"300\" x2=\"520\" y2=\"300\" stroke=\"#333\" stroke-width=\"2\"/> <line x1=\"80\" y1=\"300\" x2=\"80\" y2=\"40\" stroke=\"#333\" stroke-width=\"2\"/> <text x=\"520\" y=\"325\" font-size=\"16\" fill=\"#333\" text-anchor=\"end\">time</text> <text x=\"52\" y=\"45\" font-size=\"16\" fill=\"#333\" text-anchor=\"middle\">population</text> <!-- carrying capacity dashed line --> <line x1=\"80\" y1=\"112\" x2=\"510\" y2=\"112\" stroke=\"#888\" stroke-width=\"1.5\" stroke-dasharray=\"6 5\"/> <text x=\"515\" y=\"118\" font-size=\"18\" fill=\"#333\">K</text> <!-- S-curve --> <path d=\"M80,292 C110,288 140,270 170,235 C200,200 215,150 250,132 C300,112 400,112 470,112\" fill=\"none\" stroke=\"#1565c0\" stroke-width=\"3\"/> <!-- label leaders --> <line x1=\"105\" y1=\"288\" x2=\"120\" y2=\"255\" stroke=\"#c62828\" stroke-width=\"1.5\"/> <text x=\"118\" y=\"250\" font-size=\"20\" font-weight=\"bold\" fill=\"#c62828\">I</text> <line x1=\"205\" y1=\"190\" x2=\"230\" y2=\"155\" stroke=\"#c62828\" stroke-width=\"1.5\"/> <text x=\"232\" y=\"152\" font-size=\"20\" font-weight=\"bold\" fill=\"#c62828\">II</text> <line x1=\"420\" y1=\"112\" x2=\"420\" y2=\"85\" stroke=\"#c62828\" stroke-width=\"1.5\"/> <text x=\"412\" y=\"80\" font-size=\"20\" font-weight=\"bold\" fill=\"#c62828\">III</text> </svg>"
+    },
+    {
+      "id": "biology-067",
+      "subject": "Biology",
+      "year": "2025",
+      "topic": "Nutrition",
+      "question": "In the diagram, food is churned and mixed with gastric juice in the part labelled",
+      "options": [
+        "I",
+        "II",
+        "III",
+        "IV"
+      ],
+      "answer": 1,
+      "explanation": "II is the stomach, where food is churned and mixed with gastric juice (hydrochloric acid and enzymes). I is the oesophagus, III the small intestine and IV the large intestine.",
+      "diagram": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 560 360\" width=\"560\" height=\"360\"> <rect x=\"0\" y=\"0\" width=\"560\" height=\"360\" fill=\"#ffffff\"/> <!-- oesophagus --> <rect x=\"210\" y=\"25\" width=\"26\" height=\"105\" fill=\"#f8bbd0\" stroke=\"#c2185b\" stroke-width=\"2\"/> <!-- stomach --> <path d=\"M210,130 C198,185 222,212 262,206 C296,201 302,170 276,155 C256,143 236,135 224,130 Z\" fill=\"#f8bbd0\" stroke=\"#c2185b\" stroke-width=\"2\"/> <!-- small intestine box with coils --> <rect x=\"215\" y=\"222\" width=\"130\" height=\"82\" fill=\"#fff3e0\" stroke=\"#e65100\" stroke-width=\"2\"/> <path d=\"M225,240 L335,240 L335,258 L225,258 L225,276 L335,276 L335,294\" fill=\"none\" stroke=\"#e65100\" stroke-width=\"2\"/> <!-- large intestine frame --> <path d=\"M372,312 L372,212 L198,212 L198,312\" fill=\"none\" stroke=\"#8d6e63\" stroke-width=\"13\"/> <!-- label leaders --> <line x1=\"210\" y1=\"75\" x2=\"120\" y2=\"75\" stroke=\"#1565c0\" stroke-width=\"1.5\"/> <text x=\"100\" y=\"82\" font-size=\"20\" font-weight=\"bold\" fill=\"#1565c0\">I</text> <line x1=\"212\" y1=\"178\" x2=\"120\" y2=\"178\" stroke=\"#1565c0\" stroke-width=\"1.5\"/> <text x=\"100\" y=\"185\" font-size=\"20\" font-weight=\"bold\" fill=\"#1565c0\">II</text> <line x1=\"345\" y1=\"262\" x2=\"430\" y2=\"262\" stroke=\"#1565c0\" stroke-width=\"1.5\"/> <text x=\"438\" y=\"269\" font-size=\"20\" font-weight=\"bold\" fill=\"#1565c0\">III</text> <line x1=\"372\" y1=\"312\" x2=\"430\" y2=\"312\" stroke=\"#1565c0\" stroke-width=\"1.5\"/> <text x=\"438\" y=\"319\" font-size=\"20\" font-weight=\"bold\" fill=\"#1565c0\">IV</text> </svg>"
+    },
+    {
+      "id": "biology-068",
+      "subject": "Biology",
+      "year": "2025",
+      "topic": "Coordination and Control",
+      "question": "In the diagram, the image of an object is formed on the part labelled",
+      "options": [
+        "I",
+        "II",
+        "III",
+        "IV"
+      ],
+      "answer": 3,
+      "explanation": "IV is the retina, the light-sensitive layer at the back of the eye where the image is formed. I is the cornea, II the iris and III the lens.",
+      "diagram": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 560 360\" width=\"560\" height=\"360\"> <rect x=\"0\" y=\"0\" width=\"560\" height=\"360\" fill=\"#ffffff\"/> <!-- eyeball --> <circle cx=\"280\" cy=\"180\" r=\"110\" fill=\"#ffffff\" stroke=\"#333\" stroke-width=\"2\"/> <!-- cornea bulge --> <path d=\"M185,125 C158,150 158,210 185,235\" fill=\"#e3f2fd\" stroke=\"#333\" stroke-width=\"2\"/> <!-- iris (two segments, pupil gap in middle) --> <line x1=\"205\" y1=\"128\" x2=\"205\" y2=\"162\" stroke=\"#7b1fa2\" stroke-width=\"7\"/> <line x1=\"205\" y1=\"198\" x2=\"205\" y2=\"232\" stroke=\"#7b1fa2\" stroke-width=\"7\"/> <!-- lens --> <ellipse cx=\"238\" cy=\"180\" rx=\"17\" ry=\"46\" fill=\"#fff9c4\" stroke=\"#f57f17\" stroke-width=\"2\"/> <!-- retina (back lining) --> <path d=\"M340,92 C382,140 382,220 340,268\" fill=\"none\" stroke=\"#c62828\" stroke-width=\"4\"/> <!-- optic nerve --> <line x1=\"390\" y1=\"180\" x2=\"490\" y2=\"180\" stroke=\"#333\" stroke-width=\"12\"/> <!-- label leaders --> <line x1=\"168\" y1=\"140\" x2=\"82\" y2=\"100\" stroke=\"#1565c0\" stroke-width=\"1.5\"/> <text x=\"62\" y=\"98\" font-size=\"20\" font-weight=\"bold\" fill=\"#1565c0\">I</text> <line x1=\"205\" y1=\"215\" x2=\"118\" y2=\"215\" stroke=\"#1565c0\" stroke-width=\"1.5\"/> <text x=\"98\" y=\"222\" font-size=\"20\" font-weight=\"bold\" fill=\"#1565c0\">II</text> <line x1=\"238\" y1=\"150\" x2=\"238\" y2=\"90\" stroke=\"#1565c0\" stroke-width=\"1.5\"/> <text x=\"230\" y=\"82\" font-size=\"20\" font-weight=\"bold\" fill=\"#1565c0\">III</text> <line x1=\"360\" y1=\"230\" x2=\"420\" y2=\"280\" stroke=\"#1565c0\" stroke-width=\"1.5\"/> <text x=\"424\" y=\"292\" font-size=\"20\" font-weight=\"bold\" fill=\"#1565c0\">IV</text> </svg>"
+    },
+    {
+      "id": "biology-069",
+      "subject": "Biology",
+      "year": "2025",
+      "topic": "Excretion",
+      "question": "The part labelled III in the diagram is the",
+      "options": [
+        "glomerulus",
+        "Bowman's capsule",
+        "loop of Henle",
+        "collecting duct"
+      ],
+      "answer": 2,
+      "explanation": "III is the loop of Henle, the U-shaped part of the nephron. I is the glomerulus, II the Bowman's capsule and IV the collecting duct.",
+      "diagram": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 560 360\" width=\"560\" height=\"360\"> <rect x=\"0\" y=\"0\" width=\"560\" height=\"360\" fill=\"#ffffff\"/> <!-- glomerulus --> <circle cx=\"150\" cy=\"100\" r=\"28\" fill=\"#ef9a9a\" stroke=\"#b71c1c\" stroke-width=\"2\"/> <path d=\"M132,92 C140,84 148,100 156,92 C164,84 168,100 162,108\" fill=\"none\" stroke=\"#b71c1c\" stroke-width=\"1.5\"/> <path d=\"M132,108 C140,100 148,114 156,106\" fill=\"none\" stroke=\"#b71c1c\" stroke-width=\"1.5\"/> <!-- Bowman's capsule cup --> <path d=\"M112,72 C100,92 104,128 128,142\" fill=\"none\" stroke=\"#b71c1c\" stroke-width=\"2\"/> <path d=\"M188,72 C198,88 198,112 186,128\" fill=\"none\" stroke=\"#b71c1c\" stroke-width=\"2\"/> <!-- tubule: proximal wavy -> loop of Henle -> distal wavy -> collecting duct --> <path d=\"M186,118 C205,125 215,140 208,155 C202,168 215,178 232,172 C248,166 250,180 244,195 L244,292 C244,308 260,308 260,292 L260,196 C260,182 272,172 284,176 C296,180 306,168 300,152 C295,138 308,128 322,134 C336,140 348,132 352,122 L352,300\" fill=\"none\" stroke=\"#1565c0\" stroke-width=\"6\"/> <!-- label leaders --> <line x1=\"138\" y1=\"82\" x2=\"110\" y2=\"50\" stroke=\"#c62828\" stroke-width=\"1.5\"/> <text x=\"102\" y=\"44\" font-size=\"20\" font-weight=\"bold\" fill=\"#c62828\">I</text> <line x1=\"116\" y1=\"128\" x2=\"70\" y2=\"150\" stroke=\"#c62828\" stroke-width=\"1.5\"/> <text x=\"50\" y=\"156\" font-size=\"20\" font-weight=\"bold\" fill=\"#c62828\">II</text> <line x1=\"252\" y1=\"300\" x2=\"252\" y2=\"330\" stroke=\"#c62828\" stroke-width=\"1.5\"/> <text x=\"244\" y=\"350\" font-size=\"20\" font-weight=\"bold\" fill=\"#c62828\">III</text> <line x1=\"352\" y1=\"280\" x2=\"420\" y2=\"280\" stroke=\"#c62828\" stroke-width=\"1.5\"/> <text x=\"428\" y=\"287\" font-size=\"20\" font-weight=\"bold\" fill=\"#c62828\">IV</text> </svg>"
+    },
+    {
+      "id": "biology-070",
+      "subject": "Biology",
+      "year": "2025",
+      "topic": "Growth",
+      "question": "The part labelled III in the diagram develops into the shoot of the seedling",
+      "options": [
+        "I",
+        "II",
+        "III",
+        "IV"
+      ],
+      "answer": 2,
+      "explanation": "III is the plumule, which grows into the shoot. IV (radicle) becomes the root and II (cotyledon) stores food for the germinating seed.",
+      "diagram": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 560 360\" width=\"560\" height=\"360\"> <rect x=\"0\" y=\"0\" width=\"560\" height=\"360\" fill=\"#ffffff\"/> <!-- seed outline (testa) --> <ellipse cx=\"280\" cy=\"180\" rx=\"135\" ry=\"95\" fill=\"#fff8e1\" stroke=\"#8d6e63\" stroke-width=\"3\"/> <!-- cotyledons --> <ellipse cx=\"240\" cy=\"180\" rx=\"72\" ry=\"62\" fill=\"#ffe082\" stroke=\"#f57f17\" stroke-width=\"2\"/> <ellipse cx=\"330\" cy=\"180\" rx=\"62\" ry=\"56\" fill=\"#ffe082\" stroke=\"#f57f17\" stroke-width=\"2\"/> <!-- plumule (shoot) --> <ellipse cx=\"272\" cy=\"102\" rx=\"9\" ry=\"18\" fill=\"#66bb6a\" stroke=\"#2e7d32\" stroke-width=\"1.5\"/> <ellipse cx=\"290\" cy=\"102\" rx=\"9\" ry=\"18\" fill=\"#66bb6a\" stroke=\"#2e7d32\" stroke-width=\"1.5\"/> <!-- radicle (root) --> <path d=\"M272,258 C276,272 284,272 288,258 C286,248 274,248 272,258 Z\" fill=\"#a5d6a7\" stroke=\"#2e7d32\" stroke-width=\"1.5\"/> <!-- label leaders --> <line x1=\"180\" y1=\"120\" x2=\"110\" y2=\"80\" stroke=\"#1565c0\" stroke-width=\"1.5\"/> <text x=\"92\" y=\"76\" font-size=\"20\" font-weight=\"bold\" fill=\"#1565c0\">I</text> <line x1=\"215\" y1=\"180\" x2=\"130\" y2=\"180\" stroke=\"#1565c0\" stroke-width=\"1.5\"/> <text x=\"110\" y=\"187\" font-size=\"20\" font-weight=\"bold\" fill=\"#1565c0\">II</text> <line x1=\"281\" y1=\"88\" x2=\"281\" y2=\"50\" stroke=\"#1565c0\" stroke-width=\"1.5\"/> <text x=\"273\" y=\"42\" font-size=\"20\" font-weight=\"bold\" fill=\"#1565c0\">III</text> <line x1=\"280\" y1=\"272\" x2=\"280\" y2=\"312\" stroke=\"#1565c0\" stroke-width=\"1.5\"/> <text x=\"272\" y=\"334\" font-size=\"20\" font-weight=\"bold\" fill=\"#1565c0\">IV</text> </svg>"
+    }
+  ]
 }
