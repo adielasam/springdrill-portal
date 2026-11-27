@@ -15,7 +15,7 @@
  * changes in a way that must reach devices that already cached it: old
  * caches are deleted on activate.
  */
-const CACHE_VERSION = "sd-pwa-v3";
+const CACHE_VERSION = "sd-pwa-v4";
 const PACK_CACHE = CACHE_VERSION + "-packs";
 const SHELL_CACHE = CACHE_VERSION + "-shell";
 
