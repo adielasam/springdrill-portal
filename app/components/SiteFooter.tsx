@@ -1,17 +1,13 @@
 import { LogoMark } from './LogoMark';
-import { PACK_SUBJECTS } from '../jamb-practice/packs';
 
 // Shared site footer for the landing pages, in the grouped-column pattern
-// of the Spotify/Udemy footers: a brand block, four link columns, and a
+// of the Spotify/Udemy footers: a brand block, three link columns, and a
 // bottom row with the Dorvas credit and copyright. Every link resolves to
 // a real page or home-page anchor — no dead links, no social icons (Spring
 // Drill has no verified social pages), no placeholders.
 //
-// The Practice column is data-driven: subject links come from PACK_SUBJECTS,
-// so the footer grows automatically when new subject packs land. Subject
-// links use ?subject=<slug> preselection (added by the JAMB practice
-// premium redesign); on a build without that support the parameter is
-// harmlessly ignored and the page loads with its default subject.
+// The Practice column was removed 27 Nov 2026 (owner's call): JAMB practice
+// is still linked under Free tools, so no destination is lost.
 export function SiteFooter() {
   return (
     <footer className="sd-footer">
@@ -20,18 +16,6 @@ export function SiteFooter() {
           <h3 className="sd-footer-brand"><LogoMark size={30} />SpringDrill</h3>
           <p>CBT tests, results and report cards for Nigerian schools.</p>
         </div>
-
-        <nav className="sd-footer-col" aria-label="Practice">
-          <h3>Practice</h3>
-          <ul>
-            <li><a href="/jamb-practice">All subjects</a></li>
-            {PACK_SUBJECTS.map((subject) => (
-              <li key={subject.slug}>
-                <a href={`/jamb-practice?subject=${subject.slug}`}>{subject.label}</a>
-              </li>
-            ))}
-          </ul>
-        </nav>
 
         <nav className="sd-footer-col" aria-label="Free tools">
           <h3>Free tools</h3>
