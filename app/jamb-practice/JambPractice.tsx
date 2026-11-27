@@ -778,6 +778,9 @@ export default function JambPractice({ initialSubject }: { initialSubject?: Pack
           <span className="sd-jp-chip">{q.topic}</span>
           <span className="sd-jp-chip">{q.year}</span>
         </p>
+        {q.diagram && (
+          <div className="sd-jp-diagram" dangerouslySetInnerHTML={{ __html: q.diagram }} />
+        )}
         <p className="sd-jp-stem">{q.text}</p>
         <ul className="sd-jp-review-options">
           {q.options.map((option, oi) => {
@@ -1228,6 +1231,9 @@ export default function JambPractice({ initialSubject }: { initialSubject?: Pack
             <span className="sd-jp-chip">{current.topic}</span>
             <span className="sd-jp-chip">{current.year}</span>
           </p>
+          {current.diagram && (
+            <div className="sd-jp-diagram" dangerouslySetInnerHTML={{ __html: current.diagram }} />
+          )}
           <p className="sd-jp-stem">{current.text}</p>
 
           <div className="sd-jp-options" role="group" aria-label="Answer options">

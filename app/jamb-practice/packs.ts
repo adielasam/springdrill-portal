@@ -13,6 +13,12 @@ export interface PackQuestion {
   options: string[];
   answer: number; // index into options (0-3)
   explanation: string;
+  // Optional labelled diagram for the question, as an inline SVG string.
+  // SVG only: exact labels, no hosting, rides inside the pack JSON so
+  // offline practice keeps working. Rendered with dangerouslySetInnerHTML
+  // in JambPractice — the string comes from our own shipped pack files,
+  // never from user input.
+  diagram?: string;
 }
 
 export interface Pack {
@@ -35,6 +41,7 @@ export interface RunQuestion {
   options: string[];
   answer: number;
   explanation: string;
+  diagram?: string;
   subjectSlug?: PackSubject;
   subjectLabel?: string;
 }
@@ -103,6 +110,7 @@ function toRunQuestion(
     options: order.map((i) => q.options[i]),
     answer: order.indexOf(q.answer),
     explanation: q.explanation,
+    ...(q.diagram ? { diagram: q.diagram } : {}),
     ...(subjectSlug ? { subjectSlug, subjectLabel } : {}),
   };
 }
@@ -129,7 +137,7 @@ export interface SittingSection {
 }
 
 // Build a real UTME sitting: ALL of the English pack (60) plus 40 sampled
-// from each of the three picked subjects' 60-question packs, all years.
+// from each of the three picked subjects' packs, all years.
 // Sections keep their order (English first, then the picks in pick order)
 // so the quiz screen can tab between subjects and score each /100.
 export function buildSitting(
